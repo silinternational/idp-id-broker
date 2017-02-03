@@ -1,0 +1,61 @@
+version: '2'
+services:
+    data:
+        image: silintl/data-volume:latest
+        volumes:
+            - ./application:/data
+        user: "${DOCKER_UIDGID}"
+
+    db:
+        image: silintl/mariadb:latest
+        ports:
+            - "3306"
+        environment:
+            MYSQL_ROOT_PASSWORD: r00tp@ss!
+            MYSQL_DATABASE: app
+            MYSQL_USER: user
+            MYSQL_PASSWORD: pass
+
+    testDb:
+       image: silintl/mariadb:latest
+       ports:
+           - "3306"
+       environment:
+           MYSQL_ROOT_PASSWORD: r00tp@ss!
+           MYSQL_DATABASE: test
+           MYSQL_USER: user
+           MYSQL_PASSWORD: pass
+
+    app:
+        build: ./
+        volumes_from:
+            - data
+        ports:
+            - "8080:80"
+        depends_on:
+            - db
+        env_file:
+            - ./common.env
+            - ./local.env
+
+    cli:
+        image: silintl/php7:latest
+        volumes_from:
+            - data
+        volumes:
+            - ${COMPOSER_CACHE_DIR}:/composer
+        working_dir: /data
+        env_file:
+            - ./common.env
+            - ./local.env
+        command: ["true"]
+
+networks:
+    default:
+        driver: bridge
+        ipam:
+            driver: default
+            config:
+            - subnet: 10.20.39.0/24
+              gateway: 10.20.39.1
+

@@ -1,0 +1,30 @@
+{
+  "minimum-stability": "stable",
+  "require": {
+    "php": ">=7.0",
+    "fillup/fake-bower-assets": "2.0.9",
+    "roave/security-advisories": "dev-master",
+    "silinternational/php-env": "^0.1.1",
+    "silinternational/yii2-jsonsyslog": "^1.0.0",
+    "silinternational/yii2-email-log-target": "dev-master",
+    "yiisoft/yii2": "^2.0.11",
+    "yiisoft/yii2-gii": "*",
+    "yiisoft/yii2-swiftmailer": "*"
+  },
+  "require-dev": {
+    "codeception/codeception": "^2.2",
+    "codeception/specify": "0.*",
+    "codeception/verify": "0.*",
+    "fillup/phpmyadmin-minimal": "dev-master",
+    "silinternational/yii2-codeception": "dev-master"
+  },
+  "config": {
+    "process-timeout": 1800
+  },
+  "extra": {
+    "asset-installer-paths": {
+      "npm-asset-library": "vendor/npm",
+      "bower-asset-library": "vendor/bower"
+    }
+  }
+}
