@@ -18,7 +18,6 @@ $alertsEmail = Env::get('ALERTS_EMAIL');
 $alertsEmailEnabled = Env::get('ALERTS_EMAIL_ENABLED');
 $fromEmail = Env::get('FROM_EMAIL');
 $appEnv = Env::get('APP_ENV');
-$uiCorsOrigin = Env::get('UI_CORS_ORIGIN');
 
 return [
     'id' => 'app-common',
@@ -74,7 +73,8 @@ return [
                     'message' => [
                         'from' => $fromEmail,
                         'to' => $alertsEmail,
-                        'subject' => 'ALERT - [env=' . $appEnv .']',
+//TODO: use idpName here to help distinguish different instances...see idpPwAppi for example.
+                        'subject' => 'ALERT - ID Broker - [env=' . $appEnv .']', 
                     ],
                     'prefix' => function($message) use ($appEnv) {
                         $prefix = 'env=' . $appEnv . PHP_EOL;
@@ -118,6 +118,6 @@ return [
         ],
     ],
     'params' => [
-        'uiCorsOrigin' => $uiCorsOrigin,
+        
     ],
 ];

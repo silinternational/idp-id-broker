@@ -11,6 +11,7 @@ services:
         ports:
             - "3306"
         environment:
+#TODO: are these still needed or can the common.env be pulled in here now?
             MYSQL_ROOT_PASSWORD: r00tp@ss!
             MYSQL_DATABASE: app
             MYSQL_USER: user
@@ -21,6 +22,7 @@ services:
        ports:
            - "3306"
        environment:
+#TODO: are these still needed or can the common.env be pulled in here now?
            MYSQL_ROOT_PASSWORD: r00tp@ss!
            MYSQL_DATABASE: test
            MYSQL_USER: user
