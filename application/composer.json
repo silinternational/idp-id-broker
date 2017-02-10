@@ -9,7 +9,8 @@
     "silinternational/yii2-email-log-target": "dev-master",
     "yiisoft/yii2": "^2.0.11",
     "yiisoft/yii2-gii": "*",
-    "yiisoft/yii2-swiftmailer": "*"
+    "yiisoft/yii2-swiftmailer": "*",
+    "ramsey/uuid": "^3.5.2"
   },
   "require-dev": {
     "codeception/codeception": "^2.2",
