@@ -7,59 +7,56 @@ $frontCookieSecure = Env::get('FRONT_COOKIE_SECURE', true);
 
 $sessionLifetime = 1800; // 30 minutes
 
-const UID_ROUTE_PATTERN = '<uid:([a-zA-Z0-9_\-]{32})>';
-
 return [
     'id' => 'app-frontend',
     'basePath' => dirname(__DIR__),
-    'bootstrap' => ['log', 'errorHandler'],
+    'bootstrap' => ['log'], //TODO: is this used?
     'controllerNamespace' => 'frontend\controllers',
     'components' => [
         'user' => [
-            'identityClass' => 'common\models\User',
+            'identityClass' => 'common\models\ApiConsumer',
             'enableAutoLogin' => false,
             'enableSession' => false,
             'loginUrl' => null,
         ],
         'session' => [
             'cookieParams' => [// http://us2.php.net/manual/en/function.session-set-cookie-params.php
-                'lifetime' => $sessionLifetime,
+                'lifetime' => $sessionLifetime, //TODO: if we have enableSession=false, is this relevant?
                 'path' => '/',
                 'httponly' => true,
                 'secure' => $frontCookieSecure,
             ],
         ],
-        'log' => [
-
-        ],
-        'errorHandler' => [
-            'errorAction' => 'site/error',
-        ],
         'request' => [
-            'enableCsrfValidation' => false,
+            'enableCsrfValidation' => false,  //TODO: should we be doing this?  Or is it even relevant for this project?
             'parsers' => [
-                'application/json' => 'yii\web\JsonParser',
+                'application/json' => 'yii\web\JsonParser', // required according to http://www.yiiframework.com/doc-2.0/guide-rest-quick-start.html#enabling-json-input
             ]
         ],
         'urlManager' => [
             'enablePrettyUrl' => true,
-            'enableStrictParsing' => true,
+            'enableStrictParsing' => true, //TODO: what does this mean?
             'showScriptName' => false,
             'rules' => [
-
                 /*
-                 * Status route
+                 * Status
                  */
                 'GET /site/system-status' => 'site/system-status',
 
                 /*
-                 * Catch all to throw 401 or 405
+                 * User
                  */
-                '/<url:.*>' => 'site/index',
+                'POST /user' => 'user/create',
+                'GET /user' => 'user/index',
+                'GET /user/<employeeId:(\w+)>' => 'user/view',
+                'PUT /user/<employeeId:(\w+)>' => 'user/update',
+                'PUT /user/<employeeId:(\w+)>/password' => 'user/updatePassword',
+
+                /*
+                 * Authentication
+                 */
+                'POST /authentication' => 'authentication/create',
             ]
         ]
-    ],
-    'params' => [
-
     ],
 ];
