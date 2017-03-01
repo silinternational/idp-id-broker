@@ -1,7 +1,6 @@
 <?php
 
 use Sil\PhpEnv\Env;
-use Sil\Log\EmailTarget;
 
 /*
  * Get config settings from ENV vars or set defaults
@@ -74,7 +73,7 @@ return [
                         'from' => $fromEmail,
                         'to' => $alertsEmail,
 //TODO: use idpName here to help distinguish different instances...see idpPwAppi for example.
-                        'subject' => 'ALERT - ID Broker - [env=' . $appEnv .']', 
+                        'subject' => 'ALERT - ID Broker - [env=' . $appEnv .']',
                     ],
                     'prefix' => function($message) use ($appEnv) {
                         $prefix = 'env=' . $appEnv . PHP_EOL;
@@ -118,6 +117,6 @@ return [
         ],
     ],
     'params' => [
-        
+
     ],
 ];
