@@ -1,5 +1,8 @@
 start: app
 
+behat:
+	docker-compose run --rm cli bash -c 'vendor/bin/behat'
+
 test:
 	make testunit
 
