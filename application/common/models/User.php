@@ -3,19 +3,33 @@
 namespace common\models;
 
 use yii\helpers\ArrayHelper;
-use common\helpers\Utils;
 
 class User extends UserBase
 {
+    const SCENARIO_CREATE = "create";
+
+    public function scenarios()
+    {
+        $scenarios = parent::scenarios();
+
+        $scenarios[self::SCENARIO_CREATE] = [
+            'employee_id',
+            'first_name',
+            'last_name',
+            'display_name',
+            'username',
+            'email',
+        ];
+
+        return $scenarios;
+    }
+
     public function rules()
     {
         return ArrayHelper::merge(
             [
                 [
-                    ['employee_id', 'first_name', 'last_name', 'username', 'email', 'active', 'locked', 'last_changed_utc', 'last_synced_utc'], 'trim'
-                ],
-                [
-                    'uuid', 'default', 'value' => Utils::genUuid(),
+                    ['employee_id', 'first_name', 'last_name', 'display_name', 'username', 'email', 'active', 'locked'], 'trim'
                 ],
                 [
                     'active', 'default', 'value' => 'yes',
@@ -34,13 +48,26 @@ class User extends UserBase
                     }
                 ],
                 [
-                    ['last_changed_utc', 'last_synced_utc'], 'default', 'value' => date(Utils::DT_FMT)
-                ],
-                [
                     'email', 'email',
                 ]
             ],
             parent::rules()
         );
+    }
+
+    public function fields()
+    {
+        return [
+            'employee_id',
+            'first_name',
+            'last_name',
+            'display_name',
+            'username',
+            'email',
+            'active',
+            'locked',
+            'last_changed_utc',
+            'last_synced_utc',
+        ];
     }
 }

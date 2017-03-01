@@ -8,7 +8,6 @@ use Yii;
  * This is the model class for table "user".
  *
  * @property integer $id
- * @property string $uuid
  * @property string $employee_id
  * @property string $first_name
  * @property string $last_name
@@ -18,7 +17,6 @@ use Yii;
  * @property string $password_hash
  * @property string $active
  * @property string $locked
- * @property string $blocked_until_utc
  * @property string $last_changed_utc
  * @property string $last_synced_utc
  *
@@ -40,10 +38,9 @@ class UserBase extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['uuid', 'employee_id', 'first_name', 'last_name', 'username', 'email', 'active', 'locked', 'last_changed_utc', 'last_synced_utc'], 'required'],
+            [['employee_id', 'first_name', 'last_name', 'display_name', 'username', 'email', 'active', 'locked', 'last_changed_utc', 'last_synced_utc'], 'required'],
             [['active', 'locked'], 'string'],
-            [['blocked_until_utc', 'last_changed_utc', 'last_synced_utc'], 'safe'],
-            [['uuid'], 'string', 'max' => 64],
+            [['last_changed_utc', 'last_synced_utc'], 'safe'],
             [['employee_id', 'first_name', 'last_name', 'display_name', 'username', 'email', 'password_hash'], 'string', 'max' => 255],
             [['employee_id'], 'unique'],
             [['username'], 'unique'],
@@ -58,7 +55,6 @@ class UserBase extends \yii\db\ActiveRecord
     {
         return [
             'id' => Yii::t('app', 'ID'),
-            'uuid' => Yii::t('app', 'Uuid'),
             'employee_id' => Yii::t('app', 'Employee ID'),
             'first_name' => Yii::t('app', 'First Name'),
             'last_name' => Yii::t('app', 'Last Name'),
@@ -68,7 +64,6 @@ class UserBase extends \yii\db\ActiveRecord
             'password_hash' => Yii::t('app', 'Password Hash'),
             'active' => Yii::t('app', 'Active'),
             'locked' => Yii::t('app', 'Locked'),
-            'blocked_until_utc' => Yii::t('app', 'Blocked Until Utc'),
             'last_changed_utc' => Yii::t('app', 'Last Changed Utc'),
             'last_synced_utc' => Yii::t('app', 'Last Synced Utc'),
         ];

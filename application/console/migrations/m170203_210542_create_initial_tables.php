@@ -17,23 +17,21 @@ class m170203_210542_create_initial_tables extends Migration
         $this->dropUserTable();
     }
 
-    private function createUserTable() 
+    private function createUserTable()
     {
         $this->createTable(
             '{{user}}',
             [
                 'id' => 'pk',
-                'uuid' => 'varchar(64) not null',
                 'employee_id' => 'varchar(255) not null',
                 'first_name' => 'varchar(255) not null',
                 'last_name' => 'varchar(255) not null',
-                'display_name' => 'varchar(255) null',
+                'display_name' => 'varchar(255) not null',
                 'username' => 'varchar(255) not null',
                 'email' => 'varchar(255) not null',
                 'password_hash' => 'varchar(255) null',
                 'active' => "enum('yes','no') not null",
                 'locked' => "enum('no','yes') not null",
-                'blocked_until_utc' => 'datetime null',
                 'last_changed_utc' => 'datetime not null',
                 'last_synced_utc' => 'datetime not null',
             ],
@@ -45,12 +43,12 @@ class m170203_210542_create_initial_tables extends Migration
         $this->createIndex('uq_user_email','{{user}}','email',true);
     }
 
-    private function dropUserTable() 
+    private function dropUserTable()
     {
         $this->dropTable('{{user}}');
     }
 
-    private function createPreviousPasswordTable() 
+    private function createPreviousPasswordTable()
     {
         $this->createTable(
             '{{previous_password}}',
@@ -64,14 +62,14 @@ class m170203_210542_create_initial_tables extends Migration
         );
 
         $this->createIndex('idx_password_hash','{{previous_password}}','password_hash',false);
-        
+
         $this->addForeignKey('fk_previous_password_user_id','{{previous_password}}','user_id','{{user}}','id','CASCADE','NO ACTION');
     }
 
-    private function dropPreviousPasswordTable() 
+    private function dropPreviousPasswordTable()
     {
         $this->dropForeignKey('fk_previous_password_user_id','{{previous_password}}');
 
-        $this->dropTable('{{previous_password}}');        
+        $this->dropTable('{{previous_password}}');
     }
 }
