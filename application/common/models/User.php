@@ -52,20 +52,6 @@ class User extends UserBase
     {
         return ArrayHelper::merge([
             [
-                [
-                    'employee_id',
-                    'first_name',
-                    'last_name',
-                    'display_name',
-                    'username',
-                    'email',
-                    'active',
-                    'locked',
-                    'password'
-                ],
-                'trim'
-            ],
-            [
                 'active', 'default', 'value' => 'yes',
             ],
             [
@@ -82,7 +68,7 @@ class User extends UserBase
                 'on' => [self::SCENARIO_UPDATE_PASSWORD, self::SCENARIO_AUTHENTICATE],
             ],
             [
-                'password', 'string', 'min' => 2, // 'min' is needed until https://github.com/yiisoft/yii2/issues/13701 is resolved.
+                'password', 'string',
             ],
             [
                 'password',
@@ -93,9 +79,9 @@ class User extends UserBase
                 ['last_synced_utc', 'last_changed_utc'],
                 'default', 'value' => gmdate(Utils::DT_FMT),
             ],
-            [   // 'min' is needed on any strings until https://github.com/yiisoft/yii2/issues/13701 is resolved.
+            [
                 ['employee_id', 'first_name', 'last_name', 'display_name', 'username', 'email'],
-                'string', 'min' => 2
+                'string',
             ],
         ], parent::rules());
     }
