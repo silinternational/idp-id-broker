@@ -20,7 +20,7 @@ use Yii;
  * @property string $last_changed_utc
  * @property string $last_synced_utc
  *
- * @property PreviousPassword[] $previousPasswords
+ * @property PasswordHistory[] $passwordHistories
  */
 class UserBase extends \yii\db\ActiveRecord
 {
@@ -72,8 +72,8 @@ class UserBase extends \yii\db\ActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getPreviousPasswords()
+    public function getPasswordHistories()
     {
-        return $this->hasMany(PreviousPassword::className(), ['user_id' => 'id']);
+        return $this->hasMany(PasswordHistory::className(), ['user_id' => 'id']);
     }
 }

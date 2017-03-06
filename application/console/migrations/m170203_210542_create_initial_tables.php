@@ -7,13 +7,13 @@ class m170203_210542_create_initial_tables extends Migration
     public function up()
     {
         $this->createUserTable();
-        $this->createPreviousPasswordTable();
+        $this->createPasswordHistoryTable();
 
     }
 
     public function down()
     {
-        $this->dropPreviousPasswordTable();
+        $this->dropPasswordHistoryTable();
         $this->dropUserTable();
     }
 
@@ -48,28 +48,28 @@ class m170203_210542_create_initial_tables extends Migration
         $this->dropTable('{{user}}');
     }
 
-    private function createPreviousPasswordTable()
+    private function createPasswordHistoryTable()
     {
         $this->createTable(
-            '{{previous_password}}',
+            '{{password_history}}',
             [
                 'id' => 'pk',
                 'user_id' => 'int(11) not null',
-                'password_hash' => 'varchar(255) null',
+                'password_hash' => 'varchar(255) not null',
                 'created_utc' => 'datetime not null',
             ],
             "ENGINE=InnoDB DEFAULT CHARSET=utf8"
         );
 
-        $this->createIndex('idx_password_hash','{{previous_password}}','password_hash',false);
+        $this->createIndex('idx_password_hash','{{password_history}}','password_hash',false);
 
-        $this->addForeignKey('fk_previous_password_user_id','{{previous_password}}','user_id','{{user}}','id','CASCADE','NO ACTION');
+        $this->addForeignKey('fk_password_history_user_id','{{password_history}}','user_id','{{user}}','id','CASCADE','NO ACTION');
     }
 
-    private function dropPreviousPasswordTable()
+    private function dropPasswordHistoryTable()
     {
-        $this->dropForeignKey('fk_previous_password_user_id','{{previous_password}}');
+        $this->dropForeignKey('fk_password_history_user_id','{{password_history}}');
 
-        $this->dropTable('{{previous_password}}');
+        $this->dropTable('{{password_history}}');
     }
 }

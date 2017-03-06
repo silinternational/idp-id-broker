@@ -1,69 +1,63 @@
 <?php
 namespace frontend\controllers;
 
-use common\helpers\Utils;
+use common\models\PasswordHistory;
 use common\models\User;
 use frontend\components\BaseRestController;
-use yii\web\UnprocessableEntityHttpException;
+use yii\web\HttpException;
+use yii\web\NotFoundHttpException;
 
 class UserController extends BaseRestController
 {
     /**
      * Create a new User.  If User already exists, updates will occur but only for the
      * fields that would've been accepted during a normal creation.
+     *
+     * @throws HttpException
      */
-    public function actionCreate()
+    public function actionCreate(): User
     {
         $existingUser = User::findOne([
             'employee_id' => \Yii::$app->request->getBodyParam('employee_id')
         ]);
 
-        $user = $existingUser ?? new User(['scenario' => User::SCENARIO_CREATE]);
+        $user = $existingUser ?? new User();
 
         $user->attributes = \Yii::$app->request->getBodyParams();
 
-        if ($this->hasQualifyingChanges($user)) {
-            $user->last_changed_utc = gmdate(Utils::DT_FMT);
-        }
-
-        $user->last_synced_utc = gmdate(Utils::DT_FMT);
-
-        if (! $user->save()) {
-            throw new UnprocessableEntityHttpException(current($user->getFirstErrors()));
-        }
+        parent::save($user);
 
         return $user;
     }
 
     /**
-     * Return list of users
-     */
-    public function actionIndex()
-    {
-        //TODO: needs to support query string parms for search by certain field, e.g.,
-        // GET /user?username="kitten_lover" returns all user records matching on username.
-    }
-
-    /**
-     * Return the User associated with a specific employee id.
-     */
-    public function actionView($employeeId)
-    {
-        // verify employee id (if necessary)
-        // perform lookup
-        // return User
-    }
-
-    /**
-     * Updates the User associated with a specific employee id.
+     * Change a specific user's password.
      *
+     * @throws HttpException
      */
-    public function actionUpdate($employeeId)
+    public function actionUpdatePassword(string $employeeId): User
     {
-    }
+        $user = User::findOne([
+            'employee_id' => $employeeId
+        ]);
 
-    private function hasQualifyingChanges($user): bool
-    {
-        return !empty($user->getDirtyAttributes());
+        if ($user === null) {
+            //TODO: is ok to be divulging this user wasn't found?  I think so but verify with the team.
+            throw new NotFoundHttpException();
+        }
+
+        $user->scenario = User::SCENARIO_UPDATE_PASSWORD;
+
+        $previous = $user->savePassword(\Yii::$app->request->getBodyParam('password'));
+
+        if (empty($previous)) {
+            parent::save($user);
+        } else {
+            $history = new PasswordHistory($user->id, $previous);
+
+            parent::save($user, $history);
+        }
+
+        return $user;
     }
 }

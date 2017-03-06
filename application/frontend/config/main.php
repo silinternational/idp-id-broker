@@ -47,10 +47,7 @@ return [
                  * User
                  */
                 'POST /user' => 'user/create',
-                'GET /user' => 'user/index',
-                'GET /user/<employeeId:(\w+)>' => 'user/view',
-                'PUT /user/<employeeId:(\w+)>' => 'user/update',
-                'PUT /user/<employeeId:(\w+)>/password' => 'user/updatePassword',
+                'PUT /user/<employeeId:\w+>/password' => 'user/update-password',
 
                 /*
                  * Authentication

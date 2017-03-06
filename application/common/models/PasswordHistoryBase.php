@@ -5,7 +5,7 @@ namespace common\models;
 use Yii;
 
 /**
- * This is the model class for table "previous_password".
+ * This is the model class for table "password_history".
  *
  * @property integer $id
  * @property integer $user_id
@@ -14,14 +14,14 @@ use Yii;
  *
  * @property User $user
  */
-class PreviousPasswordBase extends \yii\db\ActiveRecord
+class PasswordHistoryBase extends \yii\db\ActiveRecord
 {
     /**
      * @inheritdoc
      */
     public static function tableName()
     {
-        return 'previous_password';
+        return 'password_history';
     }
 
     /**
@@ -30,7 +30,7 @@ class PreviousPasswordBase extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['user_id', 'created_utc'], 'required'],
+            [['user_id', 'password_hash', 'created_utc'], 'required'],
             [['user_id'], 'integer'],
             [['created_utc'], 'safe'],
             [['password_hash'], 'string', 'max' => 255],
