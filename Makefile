@@ -12,12 +12,14 @@ testunit: composer rmTestDb upTestDb yiimigratetestDb yiimigratetestDblocal rmTe
 app: upDb composer yiimigrate yiimigratelocal
 	docker-compose up -d app
 
+# TODO: is the --user still necessary?
 composer:
 	docker-compose run --rm --user="0:0" cli composer install
 
 composerupdate:
 	docker-compose run --rm --user="0:0" cli composer update
 
+# TODO: why a rm and up?, why not just db and rely on clean?
 rmDb:
 	docker-compose kill db
 	docker-compose rm -f db
@@ -40,6 +42,7 @@ yiimigratetestDb:
 yiimigratetestDblocal:
 	docker-compose run --rm cli bash -c 'MYSQL_HOST=testDb MYSQL_DATABASE=test whenavail testDb 3306 100 ./yii migrate --migrationPath=console/migrations-test/ --interactive=0'
 
+# TODO: are these necessary? Rename to testDb maybe.
 rmTestDb:
 	docker-compose kill testDb
 	docker-compose rm -f testDb

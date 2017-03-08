@@ -10,23 +10,15 @@ services:
         image: silintl/mariadb:latest
         ports:
             - "3306"
-        environment:
-#TODO: are these still needed or can the common.env be pulled in here now?
-            MYSQL_ROOT_PASSWORD: r00tp@ss!
-            MYSQL_DATABASE: app
-            MYSQL_USER: user
-            MYSQL_PASSWORD: pass
+        env_file:
+            - ./common.env
 
     testDb:
        image: silintl/mariadb:latest
        ports:
            - "3306"
-       environment:
-#TODO: are these still needed or can the common.env be pulled in here now?
-           MYSQL_ROOT_PASSWORD: r00tp@ss!
-           MYSQL_DATABASE: test
-           MYSQL_USER: user
-           MYSQL_PASSWORD: pass
+       env_file:
+           - ./common.env # TODO: may need to override the db name, not sure yet...
 
     app:
         build: ./
