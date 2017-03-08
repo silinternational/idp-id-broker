@@ -105,6 +105,7 @@ class User extends UserBase
                     ActiveRecord::EVENT_BEFORE_UPDATE => 'last_changed_utc',
                 ],
                 'value' => gmdate(Utils::DT_FMT),
+                'skipUpdateOnClean' => true, // only update the column if the model is dirty
             ],
             'updateTracker' => [
                 'class' => AttributeBehavior::className(),
@@ -113,7 +114,7 @@ class User extends UserBase
                     ActiveRecord::EVENT_BEFORE_UPDATE => 'last_synced_utc',
                 ],
                 'value' => gmdate(Utils::DT_FMT),
-                'skipUpdateOnClean' => false,
+                'skipUpdateOnClean' => false, // always update the column regardless of dirtiness
             ],
         ];
     }
