@@ -22,7 +22,6 @@ class AuthenticationController extends BaseRestController
         ]);
 
         if ($user === null) {
-            //TODO: is ok to be divulging this user wasn't found?  I think so but verify with the team.
             throw new NotFoundHttpException();
         }
 

@@ -10,8 +10,7 @@ use yii\web\NotFoundHttpException;
 class UserController extends BaseRestController
 {
     /**
-     * Create a new User.  If User already exists, updates will occur but only for the
-     * fields that would've been accepted during a normal creation.
+     * Creates a new user or updates an existing user if matched on the employee id.
      *
      * @throws HttpException
      */
@@ -33,7 +32,9 @@ class UserController extends BaseRestController
     /**
      * Change a specific user's password.
      *
-     * @throws HttpException
+     * @param string $employeeId
+     * @return User
+     * @throws NotFoundHttpException
      */
     public function actionUpdatePassword(string $employeeId): User
     {
@@ -42,7 +43,6 @@ class UserController extends BaseRestController
         ]);
 
         if ($user === null) {
-            //TODO: is ok to be divulging this user wasn't found?  I think so but verify with the team.
             throw new NotFoundHttpException();
         }
 
