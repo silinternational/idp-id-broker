@@ -27,9 +27,7 @@ COPY application/ /data/
 
 # Fix folder permissions
 RUN chown -R www-data:www-data \
-    console/runtime/ \
-    frontend/runtime/ \
-    frontend/web/assets/
+    console/runtime/
 
 EXPOSE 80
 ENTRYPOINT ["/usr/local/bin/s3-expand"]
