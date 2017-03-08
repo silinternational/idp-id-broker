@@ -13,6 +13,9 @@ return [
     'bootstrap' => ['log'], //TODO: is this used?
     'controllerNamespace' => 'frontend\controllers',
     'components' => [
+        'errorHandler' => [
+            'class' => 'frontend\web\ErrorHandler',
+        ],
         'user' => [
             'identityClass' => 'common\models\ApiConsumer',
             'enableAutoLogin' => false,
@@ -54,6 +57,6 @@ return [
                  */
                 'POST /authentication' => 'authentication/create',
             ]
-        ]
+        ],
     ],
 ];
