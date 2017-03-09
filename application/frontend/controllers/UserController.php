@@ -1,6 +1,7 @@
 <?php
 namespace frontend\controllers;
 
+use Yii;
 use common\models\PasswordHistory;
 use common\models\User;
 use frontend\components\BaseRestController;
@@ -17,12 +18,12 @@ class UserController extends BaseRestController
     public function actionCreate(): User
     {
         $existingUser = User::findOne([
-            'employee_id' => \Yii::$app->request->getBodyParam('employee_id')
+            'employee_id' => Yii::$app->request->getBodyParam('employee_id')
         ]);
 
         $user = $existingUser ?? new User();
 
-        $user->attributes = \Yii::$app->request->getBodyParams();
+        $user->attributes = Yii::$app->request->getBodyParams();
 
         parent::save($user);
 
@@ -48,7 +49,7 @@ class UserController extends BaseRestController
 
         $user->scenario = User::SCENARIO_UPDATE_PASSWORD;
 
-        $previous = $user->savePassword(\Yii::$app->request->getBodyParam('password'));
+        $previous = $user->hashPassword(Yii::$app->request->getBodyParam('password'));
 
         if (empty($previous)) {
             parent::save($user);

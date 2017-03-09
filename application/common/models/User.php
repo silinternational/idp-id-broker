@@ -15,7 +15,7 @@ class User extends UserBase
 
     public $password;
 
-    public function savePassword(string $password)
+    public function hashPassword(string $password)
     {
         $this->password = $password;
 
