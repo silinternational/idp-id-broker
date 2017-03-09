@@ -13,12 +13,33 @@ Feature: User
       And I receive a username
       And I receive an email
     When I receive a request to create a user
-    Then all the user info should be stored for later use
+    Then a new id should be created
+      And the employee id should be stored
+      And the first name should be stored
+      And the last name should be stored
+      And the display name should be stored
+      And the username should be stored
+      And the email should be stored
+      And the password hash should still be empty
+      And active should be stored as a yes
+      And locked should be stored as a no
+      And the last changed date should be stored as the instant it was stored
+      And the last changed date should be stored in UTC
+      And the last synched date should be stored as the instant it was stored
+      And the last synched date should be stored in UTC
 
-  Scenario: Attempt to create a new user when the user already exists
-  Scenario: Retrieve user info and password metadata for a specific user
-  Scenario: Update user info for a specific user
-  Scenario: Deactivate a specific user
-  Scenario: Disallow a specific user from authenticating, i.e., lock
-  Scenario: Retrieve all users the requester is allowed to view
-  Scenario: Retrieve user(s) based on username
+  Scenario: Attempt to create a user without providing an employee id
+  # TODO: there should be a scenario for each of the required properties
+  Scenario: Attempt to create a user without providing a valid employee id
+  # TODO: there should be a scenario for each of the updatable properties
+  Scenario: Attempt to create a user with an employee id that already exists
+  # TODO: there should be a scenario for each of the properties that must be unique
+  Scenario: Attempt to create a user with an employee id that is too long
+  # TODO: there should be a scenario for each of the properties that have a maximum length
+  Scenario: Update an existing user without any changes
+  Scenario: Change the employee id of an existing user
+  # TODO: there should be a scenario for each of the updatable properties
+
+  Scenario: Attempt to retrieve a user
+  Scenario: Attempt to update a user
+  Scenario: Attempt to delete a user

@@ -7,14 +7,24 @@ Feature: Authentication
     Given I receive a username
     And I receive a password
 
-  Scenario: Authenticate a known user with a matching password
+  Scenario: Create an authentication for a known user with a matching password
     When I verify it matches the existing password
     Then I will respond positively
 
-  Scenario: Attempt to authenticate an unknown user
+  Scenario: Attempt to create an authentication for an unknown user
     When I realize the username does not exist in my system
     Then I will respond negatively
 
-  Scenario: Attempt to authenticate a known user with a mismatched password
+  Scenario: Attempt to create an authentication without a user
+  Scenario: Attempt to create an authentication with an invalid user
+
+  Scenario: Attempt to create an authentication for a known user with a mismatched password
     When I realize the given password has does not match the stored version
     Then I will respond negatively
+
+  Scenario: Attempt to create an authentication without a password
+  Scenario: Attempt to create an authentication for a known user with an invalid password
+
+  Scenario: Attempt to retrieve an authentication
+  Scenario: Attempt to update an authentication
+  Scenario: Attempt to delete an authentication
