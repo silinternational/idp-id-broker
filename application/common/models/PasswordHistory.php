@@ -7,7 +7,7 @@ use yii\helpers\ArrayHelper;
 
 class PasswordHistory extends PasswordHistoryBase
 {
-    public function __construct($userId, $passwordHash, array $config = [])
+    public function __construct(string $userId, string $passwordHash, array $config = [])
     {
         $this->user_id = $userId;
         $this->password_hash = $passwordHash;
