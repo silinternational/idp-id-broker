@@ -1,5 +1,5 @@
 <?php
-defined('YII_DEBUG') or define('YII_DEBUG', true);
+defined('YII_DEBUG') or define('YII_DEBUG', false);
 
 //TODO: are these correct and/or are they needed?
 require(__DIR__ . '/../../vendor/autoload.php');
