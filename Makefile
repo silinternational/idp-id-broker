@@ -1,57 +1,28 @@
 start: app
 
-behat:
-	docker-compose run --rm cli bash -c 'vendor/bin/behat'
-
-test:
-	make testunit
-
-testunit: composer rmTestDb upTestDb yiimigratetestDb yiimigratetestDblocal rmTestDb
-	docker-compose run --rm cli bash -c 'MYSQL_HOST=testDb MYSQL_DATABASE=test ./vendor/bin/codecept run unit'
-
-app: upDb composer yiimigrate yiimigratelocal
+app: db composer yiimigrate basemodels
 	docker-compose up -d app
 
-# TODO: is the --user still necessary?
 composer:
-	docker-compose run --rm --user="0:0" cli composer install
+	docker-compose run --rm cli composer install
 
 composerupdate:
-	docker-compose run --rm --user="0:0" cli composer update
+	docker-compose run --rm cli composer update
 
-# TODO: why a rm and up?, why not just db and rely on clean?
-rmDb:
-	docker-compose kill db
-	docker-compose rm -f db
-
-upDb:
+db:
 	docker-compose up -d db
 
-yiimigrate:
+yiimigrate: db
 	docker-compose run --rm cli whenavail db 3306 100 ./yii migrate --interactive=0
 
-yiimigratelocal:
-	docker-compose run --rm cli whenavail db 3306 100 ./yii migrate --migrationPath=console/migrations-local/ --interactive=0
-
-basemodels:
+basemodels: db yiimigrate
 	docker-compose run --rm cli whenavail db 3306 100 ./rebuildbasemodels.sh
 
-yiimigratetestDb:
-	docker-compose run --rm cli bash -c 'MYSQL_HOST=testDb MYSQL_DATABASE=test whenavail testDb 3306 100 ./yii migrate --interactive=0'
+test: app
+	docker-compose run --rm cli bash -c 'vendor/bin/behat'
 
-yiimigratetestDblocal:
-	docker-compose run --rm cli bash -c 'MYSQL_HOST=testDb MYSQL_DATABASE=test whenavail testDb 3306 100 ./yii migrate --migrationPath=console/migrations-test/ --interactive=0'
-
-# TODO: are these necessary? Rename to testDb maybe.
-rmTestDb:
-	docker-compose kill testDb
-	docker-compose rm -f testDb
-
-upTestDb:
-	docker-compose up -d testDb
-
-bounce:
-	docker-compose up -d app
+testupdate:
+	docker-compose run --rm cli bash -c 'vendor/bin/behat --append-snippets'
 
 clean:
 	docker-compose kill

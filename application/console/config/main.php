@@ -1,4 +1,5 @@
 <?php
+// TODO: what's all this for?
 return [
     'id' => 'app-console',
     'basePath' => dirname(__DIR__),

@@ -1,11 +1,12 @@
 <?php
-defined('YII_DEBUG') or define('YII_DEBUG', false);
-
-//TODO: are these correct and/or are they needed?
 require(__DIR__ . '/../../vendor/autoload.php');
 require(__DIR__ . '/../../vendor/yiisoft/yii2/Yii.php');
+
+define('YII_ENV', Sil\PhpEnv\Env::get('APP_ENV', 'prod'));
+
+#define('YII_DEBUG', true);
+
 require(__DIR__ . '/../../common/config/bootstrap.php');
-require(__DIR__ . '/../config/bootstrap.php');
 
 $config = yii\helpers\ArrayHelper::merge(
     require(__DIR__ . '/../../common/config/main.php'),
