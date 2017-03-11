@@ -1,29 +1,31 @@
 start: app
 
-app: db composer yiimigrate basemodels
+app: db deps tables basemodels
 	docker-compose up -d app
 
-composer:
+deps:
 	docker-compose run --rm cli composer install
 
-composerupdate:
+depsupdate:
 	docker-compose run --rm cli composer update
+
+depsrefresh: depsupdate deps
 
 db:
 	docker-compose up -d db
 
-yiimigrate: db
+tables: db
 	docker-compose run --rm cli whenavail db 3306 100 ./yii migrate --interactive=0
 
-basemodels: db yiimigrate
+basemodels: db tables
 	docker-compose run --rm cli whenavail db 3306 100 ./rebuildbasemodels.sh
 
-test: app
+tests: app
 	docker-compose run --rm cli bash -c 'vendor/bin/behat'
 
-testupdate:
+testsupdate:
 	docker-compose run --rm cli bash -c 'vendor/bin/behat --append-snippets'
 
 clean:
 	docker-compose kill
-	docker-compose rm -f
+	docker system prune -f
