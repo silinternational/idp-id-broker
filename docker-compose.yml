@@ -33,6 +33,8 @@ services:
         working_dir: /data
         env_file:
             - ./local.env
+        environment:
+            COMPOSER_HOME: /composer
         command: ["true"]
 
 networks:
