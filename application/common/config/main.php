@@ -16,7 +16,6 @@ return [
             'username' => $mysqlUser,
             'password' => $mysqlPassword,
             'charset' => 'utf8',
-            'emulatePrepare' => false, // TODO: why this setting?
         ],
     ],
 ];
