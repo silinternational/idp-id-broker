@@ -3,6 +3,51 @@ Feature: User
   As an authorized user
   I need to be able to manage user information
 
+  Scenario: Attempt to create a new user without providing "employee_id"
+    Given the requester "is" authorized
+    When I do not provide "employee_id"
+      And I request the user be created
+    Then the response status code should be "422"
+      And "message" should contain "Employee ID"
+
+  Scenario: Attempt to create a new user using an invalid "employee_id"
+    Given the requester "is" authorized
+    When I provide an invalid "employee_id" as "" of type "string"
+    And I request the user be created
+    Then the response status code should be "422"
+    And "message" should contain "Employee ID"
+
+  Scenario: Attempt to create a new user using an invalid "employee_id" type
+    Given the requester "is" authorized
+    When I provide an invalid "employee_id" as "true" of type "bool"
+      And I request the user be created
+    Then the response status code should be "422"
+      And "message" should contain "Employee ID"
+
+  Scenario: Attempt to create a new user without providing "first_name"
+    Given the requester "is" authorized
+    When I provide a valid "employee_id" of "123"
+      But I do not provide "first_name"
+      And I request the user be created
+    Then the response status code should be "422"
+      And "message" should contain "First Name"
+
+  Scenario: Attempt to create a new user using an invalid "first_name"
+    Given the requester "is" authorized
+    When I provide a valid "employee_id" of "123"
+      But I provide an invalid "first_name" as "" of type "string"
+      And I request the user be created
+    Then the response status code should be "422"
+      And "message" should contain "First Name"
+
+  Scenario: Attempt to create a new user using an invalid "first_name" type
+    Given the requester "is" authorized
+    When I provide a valid "employee_id" of "123"
+      But I provide an invalid "first_name" as "true" of type "bool"
+      And I request the user be created
+    Then the response status code should be "422"
+      And "message" should contain "First Name"
+
   Scenario: Create a new user
     Given a user "does not exist" with "employee_id" of "123"
       And the requester "is" authorized
@@ -11,7 +56,7 @@ Feature: User
       And I provide a valid "display_name" of "Shep Clark"
       And I provide a valid "username" of "shep_clark"
       And I provide a valid "email" of "shep_clark@example.org"
-      And I request the user be created with an "employee_id" of "123"
+      And I request the user be created with "employee_id" of "123"
     Then the response status code should be "200"
       And "employee_id" should be returned as "123"
       And "first_name" should be returned as "Shep"
@@ -37,10 +82,6 @@ Feature: User
       And "last_changed_utc" should be stored as now UTC
       And "last_synced_utc" should be stored as now UTC
 
-#  Scenario: Attempt to create a user without providing an employee id
-#  Scenario: Attempt to create a user without providing a valid employee id
-#  Scenario: Attempt to create a user without providing a first name
-#  Scenario: Attempt to create a user without providing a valid first name
 #  Scenario: Attempt to create a user without providing a last name
 #  Scenario: Attempt to create a user without providing a valid last name
 #  Scenario: Attempt to create a user without providing a display name

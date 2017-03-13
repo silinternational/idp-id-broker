@@ -1,5 +1,6 @@
 <?php
 
+use Behat\Behat\Tester\Exception\PendingException;
 use Behat\Testwork\ServiceContainer\Exception\ConfigurationLoadingException;
 use common\helpers\Utils;
 use common\models\User;
@@ -37,6 +38,74 @@ class UserContext extends YiiContext
     }
 
     /**
+     * @Given /^the requester "([^"]*)" authorized$/
+     */
+    public function theRequesterAuthorized($isOrIsNot)
+    {
+        if ($isOrIsNot === 'is') {
+            $key = $this->getEnv('API_ACCESS_KEY');
+
+            $this->reqHeaders['Authorization'] = "Bearer $key";
+        }
+    }
+
+    /**
+     * @When /^I do not provide "([^"]*)"$/
+     */
+    public function iDoNotProvide($propertyName)
+    {
+        unset($this->reqBody[$propertyName]);
+    }
+
+    /**
+     * @Given /^I request the user be created$/
+     */
+    public function iRequestTheUserBeCreated()
+    {
+        $client = $this->buildClient();
+
+        $this->response = $client->post('/user');
+
+        $this->now = Utils::now();
+
+        $this->resBody = $this->extractBody($this->response);
+    }
+
+    /**
+     * @Then /^the response status code should be "([^"]*)"$/
+     */
+    public function theResponseStatusCodeShouldBe($statusCode)
+    {
+        Assert::eq($this->response->getStatusCode(), $statusCode);
+    }
+
+    /**
+     * @Given /^"([^"]*)" should contain "([^"]*)"$/
+     */
+    public function shouldContain($propertyName, $message)
+    {
+        Assert::contains($this->resBody[$propertyName], $message);
+    }
+
+    /**
+     * @When /^I provide an invalid "([^"]*)" as "([^"]*)" of type "([^"]*)"$/
+     */
+    public function iProvideAnInvalidAsOfType($propertyName, $propertyValue, $type)
+    {
+        $value = null;
+
+        switch ($type) {
+            case 'bool'  : $value = (bool)  $propertyValue; break;
+            case 'int'   : $value = (int)   $propertyValue; break;
+            case 'float' : $value = (float) $propertyValue; break;
+            case 'string':
+            default      : $value = (string) $propertyValue;
+        }
+
+        $this->reqBody[$propertyName] = $value;
+    }
+
+    /**
      * @Given /^a user "([^"]*)" with "([^"]*)" of "([^"]*)"$/
      */
     public function aUserWithOf($existsOrNot, $propertyName, $propertyValue)
@@ -47,18 +116,6 @@ class UserContext extends YiiContext
 
         ($existsOrNot === 'exists') ? Assert::notNull($user)
                                     : Assert::null($user);
-    }
-
-    /**
-     * @Given /^the requester "([^"]*)" authorized$/
-     */
-    public function theRequesterAuthorized($isOrIsNot)
-    {
-        if ($isOrIsNot === 'is') {
-            $key = $this->getEnv('API_ACCESS_KEY');
-
-            $this->reqHeaders['Authorization'] = "Bearer $key";
-        }
     }
 
     private function getEnv($key): string
@@ -81,19 +138,13 @@ class UserContext extends YiiContext
     }
 
     /**
-     * @Given /^I request the user be created with an "([^"]*)" of "([^"]*)"$/
+     * @Given /^I request the user be created with "([^"]*)" of "([^"]*)"$/
      */
     public function iRequestTheUserBeCreatedWithAnOf($keyName, $keyValue)
     {
         $this->reqBody[$keyName] = $keyValue;
 
-        $client = $this->buildClient();
-
-        $this->response = $client->post('/user');
-
-        $this->now = Utils::now();
-
-        $this->resBody = $this->extractBody($this->response);
+        $this->iRequestTheUserBeCreated();
 
         $this->userFromDb = User::findOne([
             $keyName => $keyValue
@@ -106,6 +157,7 @@ class UserContext extends YiiContext
 
         return new Client([
             'base_uri' => "http://$hostname",
+            'http_errors' => false, // don't throw exceptions on 4xx/5xx so responses can be inspected.
             'headers' => $this->reqHeaders,
             'json' => $this->reqBody,
         ]);
@@ -116,14 +168,6 @@ class UserContext extends YiiContext
         $jsonBlob = $response->getBody()->getContents();
 
         return json_decode($jsonBlob, true);
-    }
-
-    /**
-     * @Then /^the response status code should be "([^"]*)"$/
-     */
-    public function theResponseStatusCodeShouldBe($statusCode)
-    {
-        Assert::eq($this->response->getStatusCode(), $statusCode);
     }
 
     /**
