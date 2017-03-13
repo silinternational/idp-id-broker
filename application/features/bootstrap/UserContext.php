@@ -1,13 +1,30 @@
 <?php
 
-use Behat\Behat\Tester\Exception\PendingException;
-use Behat\Behat\Context\Context;
+use Behat\Testwork\ServiceContainer\Exception\ConfigurationLoadingException;
+use common\helpers\Utils;
+use common\models\User;
+use GuzzleHttp\Client;
+use GuzzleHttp\Psr7\Response;
+use Sil\SilIdBroker\Behat\Context\YiiContext;
+use Webmozart\Assert\Assert;
 
 /**
  * Defines application features from the specific context.
  */
-class UserContext implements Context
+class UserContext extends YiiContext
 {
+    private $reqHeaders = [];
+    private $reqBody = [];
+
+    /** @var Response */
+    private $response;
+    private $resBody = [];
+
+    /** @var User */
+    private $userFromDb;
+
+    private $now;
+
     /**
      * Initializes context.
      *
@@ -20,186 +37,140 @@ class UserContext implements Context
     }
 
     /**
-     * @Given /^the user does not already exist$/
+     * @Given /^a user "([^"]*)" with "([^"]*)" of "([^"]*)"$/
      */
-    public function theUserDoesNotAlreadyExist()
+    public function aUserWithOf($existsOrNot, $propertyName, $propertyValue)
     {
-        throw new PendingException();
+        $user = User::findOne([
+            $propertyName => $propertyValue
+        ]);
+
+        ($existsOrNot === 'exists') ? Assert::notNull($user)
+                                    : Assert::null($user);
     }
 
     /**
-     * @When /^I receive a request to create a user$/
+     * @Given /^the requester "([^"]*)" authorized$/
      */
-    public function iReceiveARequestToCreateAUser()
+    public function theRequesterAuthorized($isOrIsNot)
     {
-        throw new PendingException();
+        if ($isOrIsNot === 'is') {
+            $key = $this->getEnv('API_ACCESS_KEY');
+
+            $this->reqHeaders['Authorization'] = "Bearer $key";
+        }
+    }
+
+    private function getEnv($key): string
+    {
+        $value = getenv($key);
+
+        if (empty($value)) {
+            throw new ConfigurationLoadingException("$key missing from environment.");
+        }
+
+        return $value;
     }
 
     /**
-     * @Given /^I receive a valid employee id$/
+     * @When /^I provide a valid "([^"]*)" of "([^"]*)"$/
      */
-    public function iReceiveAValidEmployeeId()
+    public function iProvideAValidOf($propertyName, $propertyValue)
     {
-        throw new PendingException();
+        $this->reqBody[$propertyName] = $propertyValue;
     }
 
     /**
-     * @Given /^I receive a valid first name$/
+     * @Given /^I request the user be created with an "([^"]*)" of "([^"]*)"$/
      */
-    public function iReceiveAValidFirstName()
+    public function iRequestTheUserBeCreatedWithAnOf($keyName, $keyValue)
     {
-        throw new PendingException();
+        $this->reqBody[$keyName] = $keyValue;
+
+        $client = $this->buildClient();
+
+        $this->response = $client->post('/user');
+
+        $this->now = gmdate(Utils::DT_FMT);
+
+        $this->resBody = $this->extractBody($this->response);
+
+        $this->userFromDb = User::findOne([
+            $keyName => $keyValue
+        ]);
+    }
+
+    private function buildClient(): Client
+    {
+        $hostname = $this->getEnv('TEST_SERVER_HOSTNAME');
+
+        return new Client([
+            'base_uri' => "http://$hostname",
+            'headers' => $this->reqHeaders,
+            'json' => $this->reqBody,
+        ]);
+    }
+
+    private function extractBody(Response $response): array
+    {
+        $jsonBlob = $response->getBody()->getContents();
+
+        return json_decode($jsonBlob, true);
     }
 
     /**
-     * @Given /^I receive a valid last name$/
+     * @Then /^status code should be "([^"]*)"$/
      */
-    public function iReceiveAValidLastName()
+    public function statusCodeShouldBe($statusCode)
     {
-        throw new PendingException();
+        Assert::eq($this->response->getStatusCode(), $statusCode);
     }
 
     /**
-     * @Given /^I receive a valid display name$/
+     * @Then /^"([^"]*)" should be returned as "([^"]*)"$/
      */
-    public function iReceiveAValidDisplayName()
+    public function shouldBeReturnedAs($propertyName, $propertyValue)
     {
-        throw new PendingException();
+        Assert::eq($this->resBody[$propertyName], $propertyValue);
     }
 
     /**
-     * @Given /^I receive a valid username$/
+     * @Given /^"([^"]*)" should not be returned$/
      */
-    public function iReceiveAValidUsername()
+    public function shouldNotBeReturned($propertyName)
     {
-        throw new PendingException();
+        Assert::keyNotExists($this->resBody, $propertyName);
     }
 
     /**
-     * @Given /^I receive a valid gmail$/
+     * @Given /^"([^"]*)" should be returned as now UTC$/
      */
-    public function iReceiveAValidGmail()
+    public function shouldBeReturnedAsNowUTC($propertyName)
     {
-        throw new PendingException();
+        Assert::eq($this->resBody[$propertyName], $this->now);
     }
 
     /**
-     * @Then /^a new id should be created$/
+     * @Given /^"([^"]*)" should be stored as "([^"]*)"$/
      */
-    public function aNewIdShouldBeCreated()
+    public function shouldBeStoredAs($propertyName, $propertyValue)
     {
-        throw new PendingException();
+        Assert::eq($this->userFromDb->$propertyName, $propertyValue);
     }
 
     /**
-     * @Given /^the employee id should be stored$/
+     * @Given /^"([^"]*)" should be stored as null$/
      */
-    public function theEmployeeIdShouldBeStored()
+    public function shouldBeStoredAsNull($propertyName)
     {
-        throw new PendingException();
+        Assert::null($this->userFromDb->$propertyName);
     }
 
     /**
-     * @Given /^the first name should be stored$/
+     * @Given /^"([^"]*)" should be stored as now UTC$/
      */
-    public function theFirstNameShouldBeStored()
+    public function shouldBeStoredAsNowUTC($propertyName)
     {
-        throw new PendingException();
-    }
-
-    /**
-     * @Given /^the last name should be stored$/
-     */
-    public function theLastNameShouldBeStored()
-    {
-        throw new PendingException();
-    }
-
-    /**
-     * @Given /^the display name should be stored$/
-     */
-    public function theDisplayNameShouldBeStored()
-    {
-        throw new PendingException();
-    }
-
-    /**
-     * @Given /^the username should be stored$/
-     */
-    public function theUsernameShouldBeStored()
-    {
-        throw new PendingException();
-    }
-
-    /**
-     * @Given /^the email should be stored$/
-     */
-    public function theEmailShouldBeStored()
-    {
-        throw new PendingException();
-    }
-
-    /**
-     * @Given /^the password hash should still be empty$/
-     */
-    public function thePasswordHashShouldStillBeEmpty()
-    {
-        throw new PendingException();
-    }
-
-    /**
-     * @Given /^active should be stored as a yes$/
-     */
-    public function activeShouldBeStoredAsAYes()
-    {
-        throw new PendingException();
-    }
-
-    /**
-     * @Given /^locked should be stored as a no$/
-     */
-    public function lockedShouldBeStoredAsANo()
-    {
-        throw new PendingException();
-    }
-
-    /**
-     * @Given /^the requester is authorized$/
-     */
-    public function theRequesterIsAuthorized()
-    {
-        throw new PendingException();
-    }
-
-    /**
-     * @Given /^the last synced date should be stored as the instant it was stored$/
-     */
-    public function theLastSyncedDateShouldBeStoredAsTheInstantItWasStored()
-    {
-        throw new PendingException();
-    }
-
-    /**
-     * @Given /^the last synced date should be stored in UTC$/
-     */
-    public function theLastSyncedDateShouldBeStoredInUTC()
-    {
-        throw new PendingException();
-    }
-
-    /**
-     * @Then the last changed date should be stored as the instant it was stored
-     */
-    public function theLastChangedDateShouldBeStoredAsTheInstantItWasStored()
-    {
-        throw new PendingException();
-    }
-
-    /**
-     * @Then the last changed date should be stored in UTC
-     */
-    public function theLastChangedDateShouldBeStoredInUtc()
-    {
-        throw new PendingException();
+        Assert::eq($this->userFromDb->$propertyName, $this->now);
     }
 }

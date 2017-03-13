@@ -37,6 +37,20 @@ services:
             COMPOSER_HOME: /composer
         command: ["true"]
 
+    test:
+        image: silintl/php7:latest
+        volumes_from:
+            - data
+        working_dir: /data
+        depends_on:
+            - app
+        env_file:
+            - ./local.env
+        environment:
+            TEST_SERVER_HOSTNAME: app
+            APP_ENV: test
+        command: vendor/bin/behat --suite=user_features
+
 networks:
     default:
         driver: bridge

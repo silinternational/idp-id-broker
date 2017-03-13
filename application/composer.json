@@ -10,9 +10,16 @@
   "require-dev": {
     "yiisoft/yii2-gii": "*",
     "fillup/phpmyadmin-minimal": "dev-master",
-    "behat/behat": "^3.3"
+    "behat/behat": "^3.3",
+    "guzzlehttp/guzzle": "^6.2",
+    "webmozart/assert": "^1.2"
   },
   "config": {
     "process-timeout": 1800
+  },
+  "autoload": {
+    "psr-4": {
+      "Sil\\SilIdBroker\\Behat\\Context\\": "features/bootstrap"
+    }
   }
 }

@@ -20,11 +20,8 @@ tables: db
 basemodels: db tables
 	docker-compose run --rm cli whenavail db 3306 100 ./rebuildbasemodels.sh
 
-tests: app
-	docker-compose run --rm cli bash -c 'vendor/bin/behat'
-
-testsupdate:
-	docker-compose run --rm cli bash -c 'vendor/bin/behat --append-snippets'
+test: app
+	docker-compose run --rm test
 
 clean:
 	docker-compose kill
