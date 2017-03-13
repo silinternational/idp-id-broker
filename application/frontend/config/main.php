@@ -23,7 +23,7 @@ return [
         ],
         'urlManager' => [
             'enablePrettyUrl' => true,
-            'enableStrictParsing' => true, //TODO: what does this mean?
+            'enableStrictParsing' => true,
             'showScriptName' => false,
             'rules' => [
                 /*
