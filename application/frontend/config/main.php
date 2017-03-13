@@ -5,7 +5,6 @@ use Sil\PhpEnv\Env;
 return [
     'id' => 'app-frontend',
     'basePath' => dirname(__DIR__),
-    'bootstrap' => ['log'], //TODO: is this used?
     'controllerNamespace' => 'frontend\controllers',
     'components' => [
         'errorHandler' => [
