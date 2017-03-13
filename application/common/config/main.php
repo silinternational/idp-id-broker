@@ -8,8 +8,7 @@ $mysqlUser     = Env::get('MYSQL_USER');
 $mysqlPassword = Env::get('MYSQL_PASSWORD');
 
 return [
-    'id' => 'app-common', // TODO: how's this used, is there a better name here? (looks like it's in all the main.php files...
-    'vendorPath' => dirname(dirname(__DIR__)) . '/vendor', // TODO: why 2 dirname calls here?
+    'id' => 'app-common',
     'components' => [
         'db' => [
             'class' => 'yii\db\Connection',
