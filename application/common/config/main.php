@@ -17,7 +17,6 @@ return [
             'password' => $mysqlPassword,
             'charset' => 'utf8',
             'emulatePrepare' => false, // TODO: why this setting?
-            'tablePrefix' => '', // TODO: what's the default here?
         ],
     ],
 ];
