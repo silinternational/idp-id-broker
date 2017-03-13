@@ -2,11 +2,6 @@
 
 use Sil\PhpEnv\Env;
 
-/* Get frontend-specific config settings from ENV vars or set defaults. */
-$frontCookieSecure = Env::get('FRONT_COOKIE_SECURE', true);  // TODO: is this necessary for this app?
-
-$sessionLifetime = 1800; // 30 minutes
-
 return [
     'id' => 'app-frontend',
     'basePath' => dirname(__DIR__),
@@ -21,14 +16,6 @@ return [
             'enableAutoLogin' => false,
             'enableSession' => false,
             'loginUrl' => null,
-        ],
-        'session' => [
-            'cookieParams' => [// http://us2.php.net/manual/en/function.session-set-cookie-params.php
-                'lifetime' => $sessionLifetime, //TODO: if we have enableSession=false, is this relevant?
-                'path' => '/',
-                'httponly' => true,
-                'secure' => $frontCookieSecure,
-            ],
         ],
         'request' => [
             'enableCsrfValidation' => false,  //TODO: should we be doing this?  Or is it even relevant for this project?
