@@ -17,7 +17,6 @@ return [
             'loginUrl' => null,
         ],
         'request' => [
-            'enableCsrfValidation' => false,  //TODO: should we be doing this?  Or is it even relevant for this project?
             'parsers' => [
                 'application/json' => 'yii\web\JsonParser', // required according to http://www.yiiframework.com/doc-2.0/guide-rest-quick-start.html#enabling-json-input
             ]
