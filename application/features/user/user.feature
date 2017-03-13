@@ -12,7 +12,7 @@ Feature: User
       And I provide a valid "username" of "shep_clark"
       And I provide a valid "email" of "shep_clark@example.org"
       And I request the user be created with an "employee_id" of "123"
-    Then status code should be "200"
+    Then the response status code should be "200"
       And "employee_id" should be returned as "123"
       And "first_name" should be returned as "Shep"
       And "last_name" should be returned as "Clark"

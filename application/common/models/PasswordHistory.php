@@ -19,7 +19,7 @@ class PasswordHistory extends PasswordHistoryBase
     {
         return ArrayHelper::merge([
             [
-                'created_utc', 'default', 'value' => gmdate(Utils::DT_FMT),
+                'created_utc', 'default', 'value' => Utils::now(),
             ],
         ], parent::rules());
     }

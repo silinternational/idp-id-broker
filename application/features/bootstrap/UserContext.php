@@ -91,7 +91,7 @@ class UserContext extends YiiContext
 
         $this->response = $client->post('/user');
 
-        $this->now = gmdate(Utils::DT_FMT);
+        $this->now = Utils::now();
 
         $this->resBody = $this->extractBody($this->response);
 
@@ -119,9 +119,9 @@ class UserContext extends YiiContext
     }
 
     /**
-     * @Then /^status code should be "([^"]*)"$/
+     * @Then /^the response status code should be "([^"]*)"$/
      */
-    public function statusCodeShouldBe($statusCode)
+    public function theResponseStatusCodeShouldBe($statusCode)
     {
         Assert::eq($this->response->getStatusCode(), $statusCode);
     }

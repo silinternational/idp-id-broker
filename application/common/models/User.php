@@ -77,7 +77,7 @@ class User extends UserBase
             ],
             [
                 ['last_synced_utc', 'last_changed_utc'],
-                'default', 'value' => gmdate(Utils::DT_FMT),
+                'default', 'value' => Utils::now(),
             ],
             [
                 ['employee_id', 'first_name', 'last_name', 'display_name', 'username', 'email'],
@@ -104,7 +104,7 @@ class User extends UserBase
                     ActiveRecord::EVENT_BEFORE_INSERT => 'last_changed_utc',
                     ActiveRecord::EVENT_BEFORE_UPDATE => 'last_changed_utc',
                 ],
-                'value' => gmdate(Utils::DT_FMT),
+                'value' => Utils::now(),
                 'skipUpdateOnClean' => true, // only update the column if the model is dirty
             ],
             'updateTracker' => [
@@ -113,7 +113,7 @@ class User extends UserBase
                     ActiveRecord::EVENT_BEFORE_INSERT => 'last_synced_utc',
                     ActiveRecord::EVENT_BEFORE_UPDATE => 'last_synced_utc',
                 ],
-                'value' => gmdate(Utils::DT_FMT),
+                'value' => Utils::now(),
                 'skipUpdateOnClean' => false, // always update the column regardless of dirtiness
             ],
         ];
