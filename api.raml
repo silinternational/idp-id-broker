@@ -31,6 +31,11 @@ types:
     body:
       application/json:
         type: Authentication
+        example: |
+          {
+            "username": "john_smith",
+            "password": "correcthorsebatterystaple"
+          }
     responses:
       200:
         description:
@@ -39,6 +44,17 @@ types:
         body:
           application/json:
             type: User
+            example: |
+              {
+                "employee_id": "12345",
+                "first_name": "John",
+                "last_name": "Smith",
+                "display_name": "John Smith",
+                "username": "john_smith",
+                "email": "john_smith@example.com",
+                "active": "yes",
+                "locked": "no"
+              }
       400:
         description:
           The given credentials were NOT acceptable/valid (i.e. - the
@@ -49,6 +65,14 @@ types:
     body:
       application/json:
         type: User
+        example: |
+          {
+            "employee_id": "12345",
+            "first_name": "John",
+            "last_name": "Smith",
+            "username": "john_smith",
+            "email": "john_smith@example.com"
+          }
     responses:
       200:
         description:
@@ -62,6 +86,10 @@ types:
           application/json:
             properties:
               password: string
+            example: |
+              {
+                "password": "correcthorsebatterystaple"
+              }
         responses:
           200:
             description:
