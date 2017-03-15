@@ -1,0 +1,77 @@
+#%RAML 1.0
+title: ID Broker API
+protocols: [ HTTPS ]
+mediaType: application/json
+securitySchemes:
+  # TODO: Define auth. bearer token schema
+securedBy:
+  # TODO: Specify auth. bearer token schema
+types:
+  Authentication:
+    type: object
+    properties:
+      username: string
+      password: string
+  User:
+    type: object
+    properties:
+      employee_id: string
+      first_name: string
+      last_name: string
+      display_name?: string
+      username: string
+      email: string
+      active?: YesOrNo
+      locked?: YesOrNo
+  YesOrNo:
+    type: string
+    enum: [ yes, no ]
+/authentication:
+  post:
+    body:
+      application/json:
+        type: Authentication
+    responses:
+      200:
+        description:
+          The given credentials were acceptable/valid (i.e. - the
+          authentication succeeded).
+        body:
+          application/json:
+            type: User
+      400:
+        description:
+          The given credentials were NOT acceptable/valid (i.e. - the
+          authentication failed).
+
+/user:
+  post:
+    body:
+      application/json:
+        type: User
+    responses:
+      200:
+        description:
+          The corresponding user record (matching on `employee_id`) was either
+          created (if it did not yet) or updated to match the given data (if it
+          did exist).
+  /{employee_id}:
+    /password:
+      put:
+        body:
+          application/json:
+            properties:
+              password: string
+        responses:
+          200:
+            description:
+              The password for the user with that `employee_id` was
+              successfully updated.
+          422:
+            description:
+              The given password does not meet some requirement (such as if an
+              empty string was given).
+          429:
+            description:
+              The given password is unacceptable because it is one of that
+              User's recent passwords.
