@@ -43,6 +43,7 @@ types:
           authentication succeeded).
         body:
           application/json:
+            description: The attributes of the authenticated User.
             type: User
             example: |
               {
@@ -82,6 +83,7 @@ types:
   /{employee_id}:
     /password:
       put:
+        description: Set the password for a User.
         body:
           application/json:
             properties:
@@ -102,4 +104,4 @@ types:
           429:
             description:
               The given password is unacceptable because it is one of that
-              User's recent passwords.
+              User's recent previous passwords.
