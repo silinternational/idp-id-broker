@@ -26,7 +26,7 @@ class m170203_210542_create_initial_tables extends Migration
                 'employee_id' => 'varchar(255) not null',
                 'first_name' => 'varchar(255) not null',
                 'last_name' => 'varchar(255) not null',
-                'display_name' => 'varchar(255) not null',
+                'display_name' => 'varchar(255) null',
                 'username' => 'varchar(255) not null',
                 'email' => 'varchar(255) not null',
                 'password_hash' => 'varchar(255) null',
