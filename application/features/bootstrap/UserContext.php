@@ -1,17 +1,16 @@
 <?php
 
 use Behat\Behat\Tester\Exception\PendingException;
+use Behat\Gherkin\Node\TableNode;
 use Behat\Testwork\ServiceContainer\Exception\ConfigurationLoadingException;
 use common\helpers\Utils;
 use common\models\User;
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Response;
+use Psr\Http\Message\ResponseInterface;
 use Sil\SilIdBroker\Behat\Context\YiiContext;
 use Webmozart\Assert\Assert;
 
-/**
- * Defines application features from the specific context.
- */
 class UserContext extends YiiContext
 {
     private $reqHeaders = [];
@@ -23,132 +22,39 @@ class UserContext extends YiiContext
 
     /** @var User */
     private $userFromDb;
+    /** @var User */
+    private $userFromDbBefore;
 
     private $now;
 
     /**
-     * Initializes context.
-     *
-     * Every scenario gets its own context instance.
-     * You can also pass arbitrary arguments to the
-     * context constructor through behat.yml.
+     * @Given the requester is not authorized
      */
-    public function __construct()
+    public function theRequesterIsNotAuthorized()
     {
+        unset($this->reqHeaders['Authorization']);
     }
 
     /**
-     * @Given /^the requester "([^"]*)" authorized$/
+     * @Given there are no users yet
      */
-    public function theRequesterAuthorized($isOrIsNot)
+    public function theUserStoreIsEmpty()
     {
-        if ($isOrIsNot === 'is') {
-            $key = $this->getEnv('API_ACCESS_KEY');
-
-            $this->reqHeaders['Authorization'] = "Bearer $key";
-        }
+        User::deleteAll();
     }
 
     /**
-     * @When /^I do not provide "([^"]*)"$/
+     * @When /^I request the user be (created|updated|deleted|retrieved|<.*>)$/
      */
-    public function iDoNotProvide($propertyName)
-    {
-        unset($this->reqBody[$propertyName]);
-    }
-
-    /**
-     * @Given /^I request the user be created$/
-     */
-    public function iRequestTheUserBeCreated()
+    public function iRequestTheUserBe($action)
     {
         $client = $this->buildClient();
 
-        $this->response = $client->post('/user');
+        $this->response = $this->sendRequest($client, $action, '/user');
 
         $this->now = Utils::now();
 
         $this->resBody = $this->extractBody($this->response);
-    }
-
-    /**
-     * @Then /^the response status code should be "([^"]*)"$/
-     */
-    public function theResponseStatusCodeShouldBe($statusCode)
-    {
-        Assert::eq($this->response->getStatusCode(), $statusCode);
-    }
-
-    /**
-     * @Given /^"([^"]*)" should contain "([^"]*)"$/
-     */
-    public function shouldContain($propertyName, $message)
-    {
-        Assert::contains($this->resBody[$propertyName], $message);
-    }
-
-    /**
-     * @When /^I provide an invalid "([^"]*)" as "([^"]*)" of type "([^"]*)"$/
-     */
-    public function iProvideAnInvalidAsOfType($propertyName, $propertyValue, $type)
-    {
-        $value = null;
-
-        switch ($type) {
-            case 'bool'  : $value = (bool)  $propertyValue; break;
-            case 'int'   : $value = (int)   $propertyValue; break;
-            case 'float' : $value = (float) $propertyValue; break;
-            case 'string':
-            default      : $value = (string) $propertyValue;
-        }
-
-        $this->reqBody[$propertyName] = $value;
-    }
-
-    /**
-     * @Given /^a user "([^"]*)" with "([^"]*)" of "([^"]*)"$/
-     */
-    public function aUserWithOf($existsOrNot, $propertyName, $propertyValue)
-    {
-        $user = User::findOne([
-            $propertyName => $propertyValue
-        ]);
-
-        ($existsOrNot === 'exists') ? Assert::notNull($user)
-                                    : Assert::null($user);
-    }
-
-    private function getEnv($key): string
-    {
-        $value = getenv($key);
-
-        if (empty($value)) {
-            throw new ConfigurationLoadingException("$key missing from environment.");
-        }
-
-        return $value;
-    }
-
-    /**
-     * @When /^I provide a valid "([^"]*)" of "([^"]*)"$/
-     */
-    public function iProvideAValidOf($propertyName, $propertyValue)
-    {
-        $this->reqBody[$propertyName] = $propertyValue;
-    }
-
-    /**
-     * @Given /^I request the user be created with "([^"]*)" of "([^"]*)"$/
-     */
-    public function iRequestTheUserBeCreatedWithAnOf($keyName, $keyValue)
-    {
-        $this->reqBody[$keyName] = $keyValue;
-
-        $this->iRequestTheUserBeCreated();
-
-        $this->userFromDb = User::findOne([
-            $keyName => $keyValue
-        ]);
     }
 
     private function buildClient(): Client
@@ -163,6 +69,16 @@ class UserContext extends YiiContext
         ]);
     }
 
+    private function sendRequest(Client $client, string $action, string $resource): ResponseInterface
+    {
+        switch ($action) {
+            case 'created': return $client->post  ($resource);
+            case 'updated': return $client->put   ($resource);
+            case 'deleted': return $client->delete($resource);
+                   default: return $client->get   ($resource);
+        }
+    }
+
     private function extractBody(Response $response): array
     {
         $jsonBlob = $response->getBody()->getContents();
@@ -171,50 +87,221 @@ class UserContext extends YiiContext
     }
 
     /**
-     * @Then /^"([^"]*)" should be returned as "([^"]*)"$/
+     * @Then the response status code should be :statusCode
      */
-    public function shouldBeReturnedAs($propertyName, $propertyValue)
+    public function theResponseStatusCodeShouldBe($statusCode)
     {
-        Assert::eq($this->resBody[$propertyName], $propertyValue);
+        Assert::eq($this->response->getStatusCode(), $statusCode);
     }
 
     /**
-     * @Given /^"([^"]*)" should not be returned$/
+     * @Then /^the property (\w+) should contain "(.*)"/
      */
-    public function shouldNotBeReturned($propertyName)
+    public function thePropertyShouldContain($property, $contents)
     {
-        Assert::keyNotExists($this->resBody, $propertyName);
+        Assert::contains($this->resBody[$property], $contents);
     }
 
     /**
-     * @Given /^"([^"]*)" should be returned as now UTC$/
+     * @Then a user was not created
      */
-    public function shouldBeReturnedAsNowUTC($propertyName)
+    public function aUserWasNotCreated()
     {
-        Assert::eq($this->resBody[$propertyName], $this->now);
+        Assert::isEmpty(User::find()->all());
     }
 
     /**
-     * @Given /^"([^"]*)" should be stored as "([^"]*)"$/
+     * @Given the requester is authorized
      */
-    public function shouldBeStoredAs($propertyName, $propertyValue)
+    public function theRequesterIsAuthorized()
     {
-        Assert::eq($this->userFromDb->$propertyName, $propertyValue);
+        $key = $this->getEnv('API_ACCESS_KEY');
+
+        $this->reqHeaders['Authorization'] = "Bearer $key";
+    }
+
+    private function getEnv($key): string
+    {
+        $value = getenv($key);
+
+        if (empty($value)) {
+            throw new ConfigurationLoadingException("$key missing from environment.");
+        }
+
+        return $value;
     }
 
     /**
-     * @Given /^"([^"]*)" should be stored as null$/
+     * @Given I provide all the required fields
      */
-    public function shouldBeStoredAsNull($propertyName)
+    public function iProvideAllTheRequiredFields()
     {
-        Assert::null($this->userFromDb->$propertyName);
+        $this->reqBody = [
+            'employee_id' => '123',
+            'first_name' => 'Shep',
+            'last_name' => 'Clark',
+            'username' => 'shep_clark',
+            'email' => 'shep_clark@example.org',
+        ];
     }
 
     /**
-     * @Given /^"([^"]*)" should be stored as now UTC$/
+     * @Given /^I do not provide (?:a|an) (.*)$/
      */
-    public function shouldBeStoredAsNowUTC($propertyName)
+    public function iDoNotProvideA($property)
     {
-        Assert::eq($this->userFromDb->$propertyName, $this->now);
+        unset($this->reqBody[$property]);
+    }
+
+    /**
+     * @Given /^I provide an invalid (.*) of "?([^"]*)"?$/
+     */
+    public function iProvideAnInvalidPropertyValue($property, $value)
+    {
+        $this->reqBody[$property] = $value;
+    }
+
+    /**
+     * @Transform /^(true|false)$/
+     */
+    public function transformBool($string)
+    {
+        return boolval($string);
+    }
+
+    /**
+     * @Transform /^null$/
+     */
+    public function transformNull()
+    {
+        return null;
+    }
+
+    /**
+     * @Given /^I provide (?:a|an) (.*) that is too long$/
+     */
+    public function iProvideAPropertyThatIsTooLong($property)
+    {
+        $this->reqBody[$property] = str_repeat("z", 256);
+    }
+
+    /**
+     * @Given /^a user does not exist with (?:a|an) (.*) of "?([^"]*)"?$/
+     */
+    public function aUserDoesNotExist($property, $value)
+    {
+         User::deleteAll([$property => $value]);
+    }
+
+    /**
+     * @Given I provide the following valid data:
+     */
+    public function iProvideTheFollowingValidData(TableNode $data)
+    {
+        foreach ($data as $row) {
+            $this->reqBody[$row['property']] = $row['value'];
+        }
+    }
+
+    /**
+     * @Given /^the following data (is|is not) returned:$/
+     */
+    public function theFollowingDataReturned($isOrIsNot, TableNode $data)
+    {
+        foreach ($data as $row) {
+            $isOrIsNot === 'is' ? Assert::eq($this->resBody[$row['property']], $row['value'])
+                                : Assert::keyNotExists($this->resBody, $row['property']);
+        }
+    }
+
+    /**
+     * @Then :property should be returned as now UTC
+     */
+    public function shouldBeReturnedAsNowUTC($property)
+    {
+        Assert::eq($this->resBody[$property], $this->now);
+    }
+
+
+    /**
+     * @Then /^a user exists with (?:a|an) (.*) of "?([^"]*)"?$/
+     */
+    public function aUserExistsForThisKey($lookupKey, $lookupValue)
+    {
+        $this->userFromDb = User::findOne([$lookupKey => $lookupValue]);
+
+        Assert::notNull($this->userFromDb);
+    }
+
+    /**
+     * @Then the following data should be stored:
+     */
+    public function theFollowingDataIsStored(TableNode $data)
+    {
+        foreach ($data as $row) {
+            $property = $row['property'];
+            $expectedValue = $row['value'];
+
+            Assert::eq($this->userFromDb->$property, $this->transformNULLs($expectedValue));
+        }
+    }
+
+    //TODO: remove once https://github.com/Behat/Behat/issues/777 is resolved for tables.
+    private function transformNULLs($value)
+    {
+        return ($value === "NULL") ? NULL : $value;
+    }
+
+    /**
+     * @Then :property should be stored as now UTC
+     */
+    public function shouldBeStoredAsNowUTC($property)
+    {
+        Assert::eq($this->userFromDb->$property, $this->now);
+    }
+
+    /**
+     * @When I request the user be created again
+     */
+    public function iRequestTheUserBeCreatedAgain()
+    {
+        $this->userFromDbBefore = $this->userFromDb;
+
+        sleep(1); // so timestamps won't be the same
+
+        $this->iRequestTheUserBe('created');
+    }
+
+    /**
+     * @Then the only property to change should be :property
+     */
+    public function theOnlyPropertyToChangeShouldBe($property)
+    {
+        foreach ($this->userFromDbBefore->attributes as $name => $value) {
+            $previous = $this->userFromDbBefore->$name;
+            $current = $this->userFromDb->$name;
+
+            if ($name === $property) {
+                Assert::notEq($current, $previous);
+            } else {
+                Assert::eq($current, $previous);
+            }
+        }
+    }
+
+    /**
+     * @Given /^I change the (.*) to (.*)$/
+     */
+    public function iChangeThe($property, $value)
+    {
+        $this->reqBody[$property] = $value;
+    }
+
+    /**
+     * @Given :property1 and :property2 are the same
+     */
+    public function propertiesAreTheSame($property1, $property2)
+    {
+        Assert::eq($this->userFromDb->$property1, $this->userFromDb->$property2);
     }
 }

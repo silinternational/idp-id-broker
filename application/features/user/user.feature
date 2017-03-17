@@ -3,118 +3,194 @@ Feature: User
   As an authorized user
   I need to be able to manage user information
 
-  Scenario: Attempt to create a new user without providing "employee_id"
-    Given the requester "is" authorized
-    When I do not provide "employee_id"
-      And I request the user be created
-    Then the response status code should be "422"
-      And "message" should contain "Employee ID"
+  Scenario: Attempt to create a user as an unauthorized user
+    Given the requester is not authorized
+      And there are no users yet
+    When I request the user be created
+    Then the response status code should be 401
+      And the property message should contain "invalid credentials"
+      And a user was not created
 
-  Scenario: Attempt to create a new user using an invalid "employee_id"
-    Given the requester "is" authorized
-    When I provide an invalid "employee_id" as "" of type "string"
-    And I request the user be created
-    Then the response status code should be "422"
-    And "message" should contain "Employee ID"
+  Scenario Outline: Attempt to act upon a user in an undefined way
+    Given the requester is authorized
+      And there are no users yet
+    When I request the user be <action>
+    Then the response status code should be 404
+      And the property message should contain "not found"
+      And a user was not created
 
-  Scenario: Attempt to create a new user using an invalid "employee_id" type
-    Given the requester "is" authorized
-    When I provide an invalid "employee_id" as "true" of type "bool"
-      And I request the user be created
-    Then the response status code should be "422"
-      And "message" should contain "Employee ID"
+    Examples:
+      | action    |
+      | retrieved |
+      | updated   |
+      | deleted   |
 
-  Scenario: Attempt to create a new user without providing "first_name"
-    Given the requester "is" authorized
-    When I provide a valid "employee_id" of "123"
-      But I do not provide "first_name"
-      And I request the user be created
-    Then the response status code should be "422"
-      And "message" should contain "First Name"
+  Scenario Outline: Attempt to create a new user without providing a required property
+    Given the requester is authorized
+      And there are no users yet
+      And I provide all the required fields
+      But I do not provide a <property>
+    When I request the user be created
+    Then the response status code should be 422
+      And the property message should contain "<message>"
+      And a user was not created
 
-  Scenario: Attempt to create a new user using an invalid "first_name"
-    Given the requester "is" authorized
-    When I provide a valid "employee_id" of "123"
-      But I provide an invalid "first_name" as "" of type "string"
-      And I request the user be created
-    Then the response status code should be "422"
-      And "message" should contain "First Name"
+    Examples:
+      | property    | message     |
+      | employee_id | Employee ID |
+      | first_name  | First Name  |
+      | last_name   | Last Name   |
+      | username    | Username    |
+      | email       | Email       |
 
-  Scenario: Attempt to create a new user using an invalid "first_name" type
-    Given the requester "is" authorized
-    When I provide a valid "employee_id" of "123"
-      But I provide an invalid "first_name" as "true" of type "bool"
-      And I request the user be created
-    Then the response status code should be "422"
-      And "message" should contain "First Name"
+  Scenario Outline: Attempt to create a new user while providing an invalid property for a required property
+    Given the requester is authorized
+      And there are no users yet
+      And I provide all the required fields
+      But I provide an invalid <property> of <value>
+    When I request the user be created
+    Then the response status code should be 422
+      And the property message should contain "<message>"
+      And a user was not created
+
+    Examples:
+      | property    | value              | message     |
+      | employee_id | ""                 | Employee ID |
+      | employee_id | true               | Employee ID |
+      | employee_id | false              | Employee ID |
+      | employee_id | null               | Employee ID |
+      | first_name  | ""                 | First Name  |
+      | first_name  | true               | First Name  |
+      | first_name  | false              | First Name  |
+      | first_name  | null               | First Name  |
+      | last_name   | ""                 | Last Name   |
+      | last_name   | true               | Last Name   |
+      | last_name   | false              | Last Name   |
+      | last_name   | null               | Last Name   |
+      | username    | ""                 | Username    |
+      | username    | true               | Username    |
+      | username    | false              | Username    |
+      | username    | null               | Username    |
+      | email       | ""                 | Email       |
+      | email       | true               | Email       |
+      | email       | false              | Email       |
+      | email       | null               | Email       |
+      | email       | shep_clark         | Email       |
+      | email       | shep_clark@example | Email       |
+      | active      | YES                | Active      |
+      | active      | Yes                | Active      |
+      | active      | yessir             | Active      |
+      | active      | NO                 | Active      |
+      | active      | No                 | Active      |
+      | active      | nosir              | Active      |
+      | active      | x                  | Active      |
+      | active      | 1                  | Active      |
+      | active      | true               | Active      |
+      | active      | false              | Active      |
+      | locked      | YES                | Locked      |
+      | locked      | Yes                | Locked      |
+      | locked      | yessir             | Locked      |
+      | locked      | NO                 | Locked      |
+      | locked      | No                 | Locked      |
+      | locked      | nosir              | Locked      |
+      | locked      | x                  | Locked      |
+      | locked      | 1                  | Locked      |
+      | locked      | true               | Locked      |
+      | locked      | false              | Locked      |
+
+  Scenario Outline: Attempt to create a new user while providing an invalid(too long) property
+    Given the requester is authorized
+      And there are no users yet
+      And I provide all the required fields
+      But I provide a <property> that is too long
+    When I request the user be created
+    Then the response status code should be 422
+      And the property message should contain "<message>"
+      And a user was not created
+
+    Examples:
+      | property     | message      |
+      | employee_id  | Employee ID  |
+      | first_name   | First Name   |
+      | last_name    | Last Name    |
+      | display_name | Display Name |
+      | username     | Username     |
+      | email        | Email        |
 
   Scenario: Create a new user
-    Given a user "does not exist" with "employee_id" of "123"
-      And the requester "is" authorized
-    When  I provide a valid "first_name" of "Shep"
-      And I provide a valid "last_name" of "Clark"
-      And I provide a valid "display_name" of "Shep Clark"
-      And I provide a valid "username" of "shep_clark"
-      And I provide a valid "email" of "shep_clark@example.org"
-      And I request the user be created with "employee_id" of "123"
-    Then the response status code should be "200"
-      And "employee_id" should be returned as "123"
-      And "first_name" should be returned as "Shep"
-      And "last_name" should be returned as "Clark"
-      And "display_name" should be returned as "Shep Clark"
-      And "username" should be returned as "shep_clark"
-      And "email" should be returned as "shep_clark@example.org"
-      And "id" should not be returned
-      And "password_hash" should not be returned
-      And "active" should be returned as "yes"
-      And "locked" should be returned as "no"
-      And "last_changed_utc" should be returned as now UTC
-      And "last_synced_utc" should be returned as now UTC
-      And "employee_id" should be stored as "123"
-      And "first_name" should be stored as "Shep"
-      And "last_name" should be stored as "Clark"
-      And "display_name" should be stored as "Shep Clark"
-      And "username" should be stored as "shep_clark"
-      And "email" should be stored as "shep_clark@example.org"
-      And "password_hash" should be stored as null
-      And "active" should be stored as "yes"
-      And "locked" should be stored as "no"
-      And "last_changed_utc" should be stored as now UTC
-      And "last_synced_utc" should be stored as now UTC
+    Given a user does not exist with an employee_id of "123"
+      And the requester is authorized
+      And I provide the following valid data:
+        | property     | value                 |
+        | employee_id  | 123                   |
+        | first_name   | Shep                  |
+        | last_name    | Clark                 |
+        | display_name | Shep Clark            |
+        | username     | shep_clark            |
+        | email        | shep_clark@example.org|
+    When I request the user be created
+    Then the response status code should be 200
+      And the following data is returned:
+        | property     | value                 |
+        | employee_id  | 123                   |
+        | first_name   | Shep                  |
+        | last_name    | Clark                 |
+        | display_name | Shep Clark            |
+        | username     | shep_clark            |
+        | email        | shep_clark@example.org|
+        | active       | yes                   |
+        | locked       | no                    |
+      And last_changed_utc should be returned as now UTC
+      And last_synced_utc should be returned as now UTC
+      And the following data is not returned:
+        | property      |
+        | id            |
+        | password_hash |
+      And a user exists with an employee_id of "123"
+      And the following data should be stored:
+        | property     | value                 |
+        | first_name   | Shep                  |
+        | last_name    | Clark                 |
+        | display_name | Shep Clark            |
+        | username     | shep_clark            |
+        | email        | shep_clark@example.org|
+        | password_hash| NULL                  |
+        | active       | yes                   |
+        | locked       | no                    |
+      And last_changed_utc should be stored as now UTC
+      And last_synced_utc should be stored as now UTC
 
-#  Scenario: Attempt to create a user without providing a last name
-#  Scenario: Attempt to create a user without providing a valid last name
-#  Scenario: Attempt to create a user without providing a display name
-#  Scenario: Attempt to create a user without providing a valid display name
-#  Scenario: Attempt to create a user without providing a username
-#  Scenario: Attempt to create a user without providing a valid username
-#  Scenario: Attempt to create a user without providing an email
-#  Scenario: Attempt to create a user without providing a valid active state
-#  Scenario: Attempt to create a user without providing a valid lock state
-#
-#  Scenario: Attempt to create a new user with an employee id that already exists
-#  Scenario: Attempt to create a new user with a username that already exists
-#  Scenario: Attempt to create a new user with an email that already exists
-#
-#  Scenario: Attempt to create a user with an employee id that is too long
-#  Scenario: Attempt to create a user with a first name that is too long
-#  Scenario: Attempt to create a user with a last name that is too long
-#  Scenario: Attempt to create a user with a display name that is too long
-#  Scenario: Attempt to create a user with a username that is too long
-#  Scenario: Attempt to create a user with an email that is too long
-#
-#  Scenario: Update an existing user without any changes
-#  Scenario: Change the employee id of an existing user
-#  Scenario: Change the first name of an existing user
-#  Scenario: Change the last name of an existing user
-#  Scenario: Change the display name of an existing user
-#  Scenario: Change the username of an existing user
-#  Scenario: Change the email of an existing user
-#  Scenario: Change the active state of an existing user
-#  Scenario: Change the lock state of an existing user
-#
-#  Scenario: Attempt to create a user as an unauthorized user
-#
-#  Scenario: Attempt to retrieve a user
-#  Scenario: Attempt to update a user
-#  Scenario: Attempt to delete a user
+  Scenario: "Touch" an existing user without making any changes
+    Given the requester is authorized
+      And I provide all the required fields
+      And I request the user be created
+      And a user exists with an employee_id of "123"
+    When I request the user be created again
+    Then a user exists with an employee_id of "123"
+      And the only property to change should be last_synced_utc
+      And last_synced_utc should be stored as now UTC
+
+  Scenario Outline: Change the properties of an existing user
+    Given the requester is authorized
+      And there are no users yet
+      And I provide all the required fields
+      And I request the user be created
+      And a user exists with an employee_id of "123"
+    When I change the <property> to <value>
+      And I request the user be created again
+    Then a user exists with a <property> of <value>
+      And last_changed_utc and last_synced_utc are the same
+      And last_synced_utc should be stored as now UTC
+
+    Examples:
+      | property    | value           |
+      | first_name  | FIRST           |
+      | last_name   | LAST            |
+      | display_name| DISPLAY         |
+      | username    | USER            |
+      | email       | chg@example.org |
+      | active      | no              |
+      | locked      | yes             |
+
+#TODO: Scenario: Change the employee id of an existing user?
+#TODO: Scenario: Ensure certain properties are unique in database, e.g., employee_id, username, email
