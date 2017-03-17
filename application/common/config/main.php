@@ -1,7 +1,7 @@
 <?php
 
 use Sil\PhpEnv\Env;
-
+//TODO: throw a message here for any missing ENV vars.
 $mysqlHost     = Env::get('MYSQL_HOST');
 $mysqlDatabase = Env::get('MYSQL_DATABASE');
 $mysqlUser     = Env::get('MYSQL_USER');

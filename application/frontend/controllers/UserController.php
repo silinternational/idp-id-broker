@@ -49,6 +49,8 @@ class UserController extends BaseRestController
 
         $user->scenario = User::SCENARIO_UPDATE_PASSWORD;
 
+//TODO: rework, move into User.
+//TODO: build in rule, can't one of last 10 passwords.
         $previous = $user->hashPassword(Yii::$app->request->getBodyParam('password'));
 
         if (empty($previous)) {
