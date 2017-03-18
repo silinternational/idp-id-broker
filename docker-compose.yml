@@ -28,14 +28,9 @@ services:
         image: silintl/php7:latest
         volumes_from:
             - data
-#TODO: is this composer stuff even needed?  ...it caused problems for Larry.
-        volumes:
-            - ${COMPOSER_HOME}:/composer
         working_dir: /data
         env_file:
             - ./local.env
-        environment:
-            COMPOSER_HOME: /composer
         command: ["true"]
 
     test:
