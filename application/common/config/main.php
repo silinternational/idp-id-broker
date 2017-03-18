@@ -1,11 +1,22 @@
 <?php
 
 use Sil\PhpEnv\Env;
-//TODO: throw a message here for any missing ENV vars.
-$mysqlHost     = Env::get('MYSQL_HOST');
-$mysqlDatabase = Env::get('MYSQL_DATABASE');
-$mysqlUser     = Env::get('MYSQL_USER');
-$mysqlPassword = Env::get('MYSQL_PASSWORD');
+
+$mysqlHost     = getRequiredEnv('MYSQL_HOST');
+$mysqlDatabase = getRequiredEnv('MYSQL_DATABASE');
+$mysqlUser     = getRequiredEnv('MYSQL_USER');
+$mysqlPassword = getRequiredEnv('MYSQL_PASSWORD');
+
+function getRequiredEnv($name)
+{
+    $value = Env::get($name);
+
+    if (empty($value)) {
+        die("$name missing from environment.");
+    }
+
+    return $value;
+}
 
 return [
     'id' => 'app-common',
