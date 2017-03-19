@@ -79,7 +79,7 @@ class User extends UserBase
     private function validatePassword(): \Closure
     {
         return function ($attributeName) {
-            if (! password_verify($this->password, $this->password_hash)) {
+            if (! password_verify($this->$attributeName, $this->password_hash)) {
                 $this->addError($attributeName, 'Incorrect password.');
             }
         };
