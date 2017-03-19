@@ -3,6 +3,7 @@
 namespace common\models;
 
 use common\helpers\Utils;
+use Exception;
 use yii\behaviors\AttributeBehavior;
 use yii\db\ActiveRecord;
 use yii\helpers\ArrayHelper;
@@ -14,17 +15,6 @@ class User extends UserBase
     const SCENARIO_AUTHENTICATE    = 'authenticate';
 
     public $password;
-
-    public function hashPassword(string $password)
-    {
-        $this->password = $password;
-
-        $previous = $this->password_hash;
-
-        $this->password_hash = password_hash($this->password, PASSWORD_DEFAULT);
-
-        return $previous;
-    }
 
     public function scenarios(): array
     {
@@ -136,5 +126,64 @@ class User extends UserBase
             'last_changed_utc',
             'last_synced_utc',
         ];
+    }
+
+    public function save($runValidation = true, $attributeNames = null)
+    {
+        if ($this->scenario === self::SCENARIO_UPDATE_PASSWORD) {
+            return $this->savePassword($runValidation, $attributeNames);
+        }
+
+        return parent::save($runValidation, $attributeNames);
+    }
+
+    private function savePassword($runValidation = true, $attributeNames = null): bool
+    {
+        $transaction = ActiveRecord::getDb()->beginTransaction();
+
+        try {
+            if ($this->hasPasswordAlready()) {
+                if (! $this->saveHistory()) {
+                    return false;
+                }
+            }
+
+            $this->password_hash = password_hash($this->password, PASSWORD_DEFAULT);
+
+            if (! parent::save($runValidation, $attributeNames)) {
+                $transaction->rollBack();
+
+                return false;
+            }
+
+            $transaction->commit();
+
+            return true;
+        } catch (Exception $e) {
+            $transaction->rollBack();
+
+            throw $e;
+        }
+    }
+
+    private function hasPasswordAlready(): bool
+    {
+        return ! empty($this->password_hash);
+    }
+
+    private function saveHistory(): bool
+    {
+        $history = new PasswordHistory();
+
+        $history->user_id = $this->id;
+        $history->password_hash = $this->password_hash;
+
+        if (! $history->save()) {
+            $this->addErrors($history->errors);
+
+            return false;
+        }
+
+        return true;
     }
 }

@@ -7,14 +7,7 @@ use yii\helpers\ArrayHelper;
 
 class PasswordHistory extends PasswordHistoryBase
 {
-    public function __construct(string $userId, string $passwordHash, array $config = [])
-    {
-        $this->user_id = $userId;
-        $this->password_hash = $passwordHash;
-
-        parent::__construct($config);
-    }
-
+    //TODO: build in rule, can't match one of last 10 passwords.
     public function rules(): array
     {
         return ArrayHelper::merge([

@@ -18,22 +18,10 @@ class BaseRestController extends Controller
         return $behaviors;
     }
 
-    protected function save(ActiveRecord ...$records)
+    protected function save(ActiveRecord $record)
     {
-        $transaction = ActiveRecord::getDb()->beginTransaction();
-
-        try {
-            foreach ($records as $record) {
-                if (! $record->save()) {
-                    throw new UnprocessableEntityHttpException(current($record->getFirstErrors()));
-                }
-            }
-
-            $transaction->commit();
-        } catch (\Exception $e) {
-            $transaction->rollBack();
-
-            throw $e;
+        if (! $record->save()) {
+            throw new UnprocessableEntityHttpException(current($record->getFirstErrors()));
         }
     }
 }
