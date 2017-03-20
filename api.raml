@@ -1,0 +1,123 @@
+#%RAML 1.0
+title: ID Broker API
+protocols: [ HTTPS ]
+mediaType: application/json
+securitySchemes:
+  AuthzBearerToken:
+    type: Pass Through
+    describedBy:
+      headers:
+        Authorization:
+          type: string
+          example: Bearer abc123
+securedBy: AuthzBearerToken
+
+types:
+  Authentication:
+    type: object
+    properties:
+      username: string
+      password: string
+  User:
+    type: object
+    properties:
+      employee_id: string
+      first_name: string
+      last_name: string
+      display_name?: string
+      username: string
+      email: string
+      active?: YesOrNo
+      locked?: YesOrNo
+  YesOrNo:
+    type: string
+    enum: [ yes, no ]
+
+/authentication:
+  post:
+    body:
+      application/json:
+        type: Authentication
+        example: |
+          {
+            "username": "john_smith",
+            "password": "correcthorsebatterystaple"
+          }
+    responses:
+      200:
+        description:
+          The given credentials were acceptable/valid (i.e. - the
+          authentication succeeded).
+        body:
+          application/json:
+            description: The attributes of the authenticated User.
+            type: User
+            example: |
+              {
+                "employee_id": "12345",
+                "first_name": "John",
+                "last_name": "Smith",
+                "display_name": "John Smith",
+                "username": "john_smith",
+                "email": "john_smith@example.com",
+                "active": "yes",
+                "locked": "no"
+              }
+      400:
+        description:
+          The given credentials were NOT acceptable/valid (i.e. - the
+          authentication failed).
+      500:
+        description: A server-side error occurred.
+
+/user:
+  post:
+    body:
+      application/json:
+        type: User
+        example: |
+          {
+            "employee_id": "12345",
+            "first_name": "John",
+            "last_name": "Smith",
+            "username": "john_smith",
+            "email": "john_smith@example.com"
+          }
+    responses:
+      200:
+        description:
+          The corresponding user record (matching on `employee_id`) was either
+          created (if it did not yet) or updated to match the given data (if it
+          did exist).
+      422:
+        description: The given user data does not satisfy some validation rule.
+      500:
+        description: A server-side error occurred.
+
+  /{employee_id}:
+    /password:
+      put:
+        description: Set the password for a User.
+        body:
+          application/json:
+            properties:
+              password: string
+            example: |
+              {
+                "password": "correcthorsebatterystaple"
+              }
+        responses:
+          200:
+            description:
+              The password for the user with that `employee_id` was
+              successfully updated.
+          422:
+            description:
+              The given password does not meet some requirement (such as if an
+              empty string was given).
+          429:
+            description:
+              The given password is unacceptable because it is one of that
+              User's recent previous passwords.
+          500:
+            description: A server-side error occurred.
