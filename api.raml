@@ -45,7 +45,7 @@ types:
           }
     responses:
       200:
-        description:
+        description: |
           The given credentials were acceptable/valid (i.e. - the
           authentication succeeded).
         body:
@@ -64,7 +64,7 @@ types:
                 "locked": "no"
               }
       400:
-        description:
+        description: |
           The given credentials were NOT acceptable/valid (i.e. - the
           authentication failed).
       500:
@@ -85,7 +85,7 @@ types:
           }
     responses:
       200:
-        description:
+        description: |
           The corresponding user record (matching on `employee_id`) was either
           created (if it did not yet) or updated to match the given data (if it
           did exist).
@@ -108,15 +108,15 @@ types:
               }
         responses:
           200:
-            description:
+            description: |
               The password for the user with that `employee_id` was
               successfully updated.
           422:
-            description:
+            description: |
               The given password does not meet some requirement (such as if an
               empty string was given).
           429:
-            description:
+            description: |
               The given password is unacceptable because it is one of that
               User's recent previous passwords.
           500:
