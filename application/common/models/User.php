@@ -176,6 +176,7 @@ class User extends UserBase
         $history = new PasswordHistory();
 
         $history->user_id = $this->id;
+        $history->password = $this->password;
         $history->password_hash = $this->password_hash;
 
         if (! $history->save()) {
