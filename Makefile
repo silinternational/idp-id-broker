@@ -9,8 +9,6 @@ deps:
 depsupdate:
 	docker-compose run --rm cli composer update
 
-depsrefresh: depsupdate deps
-
 db:
 	docker-compose up -d db
 
