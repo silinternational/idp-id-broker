@@ -131,23 +131,9 @@ class UserContext extends YiiContext
     }
 
     /**
-     * @Given I provide all the required fields
+     * @Given /^then I remove the (.*)$/
      */
-    public function iProvideAllTheRequiredFields()
-    {
-        $this->reqBody = [
-            'employee_id' => '123',
-            'first_name' => 'Shep',
-            'last_name' => 'Clark',
-            'username' => 'shep_clark',
-            'email' => 'shep_clark@example.org',
-        ];
-    }
-
-    /**
-     * @Given /^I do not provide (?:a|an) (.*)$/
-     */
-    public function iDoNotProvideA($property)
+    public function thenIRemoveThe($property)
     {
         unset($this->reqBody[$property]);
     }

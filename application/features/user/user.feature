@@ -28,8 +28,15 @@ Feature: User
   Scenario Outline: Attempt to create a new user without providing a required property
     Given the requester is authorized
       And there are no users yet
-      And I provide all the required fields
-      But I do not provide a <property>
+      And I provide the following valid data:
+        | property     | value                 |
+        | employee_id  | 123                   |
+        | first_name   | Shep                  |
+        | last_name    | Clark                 |
+        | display_name | Shep Clark            |
+        | username     | shep_clark            |
+        | email        | shep_clark@example.org|
+      But then I remove the <property>
     When I request the user be created
     Then the response status code should be 422
       And the property message should contain "<message>"
@@ -46,7 +53,14 @@ Feature: User
   Scenario Outline: Attempt to create a new user while providing an invalid property for a required property
     Given the requester is authorized
       And there are no users yet
-      And I provide all the required fields
+      And I provide the following valid data:
+        | property     | value                 |
+        | employee_id  | 123                   |
+        | first_name   | Shep                  |
+        | last_name    | Clark                 |
+        | display_name | Shep Clark            |
+        | username     | shep_clark            |
+        | email        | shep_clark@example.org|
       But I provide an invalid <property> of <value>
     When I request the user be created
     Then the response status code should be 422
@@ -101,7 +115,14 @@ Feature: User
   Scenario Outline: Attempt to create a new user while providing an invalid(too long) property
     Given the requester is authorized
       And there are no users yet
-      And I provide all the required fields
+      And I provide the following valid data:
+        | property     | value                 |
+        | employee_id  | 123                   |
+        | first_name   | Shep                  |
+        | last_name    | Clark                 |
+        | display_name | Shep Clark            |
+        | username     | shep_clark            |
+        | email        | shep_clark@example.org|
       But I provide a <property> that is too long
     When I request the user be created
     Then the response status code should be 422
@@ -162,7 +183,14 @@ Feature: User
 
   Scenario: "Touch" an existing user without making any changes
     Given the requester is authorized
-      And I provide all the required fields
+      And I provide the following valid data:
+        | property     | value                 |
+        | employee_id  | 123                   |
+        | first_name   | Shep                  |
+        | last_name    | Clark                 |
+        | display_name | Shep Clark            |
+        | username     | shep_clark            |
+        | email        | shep_clark@example.org|
       And I request the user be created
       And a user exists with an employee_id of "123"
     When I request the user be created again
@@ -173,7 +201,14 @@ Feature: User
   Scenario Outline: Change the properties of an existing user
     Given the requester is authorized
       And there are no users yet
-      And I provide all the required fields
+      And I provide the following valid data:
+        | property     | value                 |
+        | employee_id  | 123                   |
+        | first_name   | Shep                  |
+        | last_name    | Clark                 |
+        | display_name | Shep Clark            |
+        | username     | shep_clark            |
+        | email        | shep_clark@example.org|
       And I request the user be created
       And a user exists with an employee_id of "123"
     When I change the <property> to <value>
