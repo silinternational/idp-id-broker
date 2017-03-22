@@ -1,43 +1,80 @@
-#%RAML 1.0
+#%RAML 0.8
 title: ID Broker API
 protocols: [ HTTPS ]
 mediaType: application/json
 securitySchemes:
-  AuthzBearerToken:
-    type: Pass Through
-    describedBy:
-      headers:
-        Authorization:
-          type: string
-          example: Bearer abc123
+  - AuthzBearerToken:
+      type: x-{other}
+      describedBy:
+        headers:
+          Authorization:
+            type: string
+            example: Bearer abc123
 securedBy: [ AuthzBearerToken ]
 
-types:
-  Authentication:
-    type: object
-    properties:
-      username: string
-      password: string
-  User:
-    type: object
-    properties:
-      employee_id: string
-      first_name: string
-      last_name: string
-      display_name?: string
-      username: string
-      email: string
-      active?: YesOrNo
-      locked?: YesOrNo
-  YesOrNo:
-    type: string
-    enum: [ yes, no ]
+schemas:
+  - Authentication: |
+      {
+        "$schema": "http://json-schema.org/draft-03/schema",
+        "properties": {
+            "username": {
+              "required": true,
+              "type": "string"
+            },
+            "password": {
+              "required": true,
+              "type": "string"
+            }
+        },
+        "type": "object"
+      }
+  - User: |
+      {
+        "$schema": "http://json-schema.org/draft-03/schema",
+        "properties": {
+            "employee_id": {
+              "required": true,
+              "type": "string"
+            },
+            "first_name": {
+              "required": true,
+              "type": "string"
+            },
+            "last_name": {
+              "required": true,
+              "type": "string"
+            },
+            "display_name": {
+              "required": false,
+              "type": "string"
+            },
+            "username": {
+              "required": true,
+              "type": "string"
+            },
+            "email": {
+              "required": true,
+              "type": "string"
+            },
+            "active": {
+              "required": false,
+              "type": "string",
+              "enum": ["yes", "no"]
+            },
+            "locked": {
+              "required": false,
+              "type": "string",
+              "enum": ["yes", "no"]
+            }
+        },
+        "type": "object"
+      }
 
 /authentication:
   post:
     body:
       application/json:
-        type: Authentication
+        schema: Authentication
         example: |
           {
             "username": "john_smith",
@@ -51,7 +88,7 @@ types:
         body:
           application/json:
             description: The attributes of the authenticated User.
-            type: User
+            schema: User
             example: |
               {
                 "employee_id": "12345",
@@ -74,7 +111,7 @@ types:
   post:
     body:
       application/json:
-        type: User
+        schema: User
         example: |
           {
             "employee_id": "12345",
@@ -100,8 +137,17 @@ types:
         description: Set the password for a User.
         body:
           application/json:
-            properties:
-              password: string
+            schema:  |
+              {
+                "$schema": "http://json-schema.org/draft-03/schema",
+                "properties": {
+                    "password": {
+                      "required": true,
+                      "type": "string"
+                    }
+                },
+                "type": "object"
+              }
             example: |
               {
                 "password": "correcthorsebatterystaple"
