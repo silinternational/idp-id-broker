@@ -63,7 +63,7 @@ class m170203_210542_create_initial_tables extends Migration
 
         $this->createIndex('idx_password_hash','{{password_history}}','password_hash',false);
 
-        $this->addForeignKey('fk_password_history_user_id','{{password_history}}','user_id','{{user}}','id','CASCADE','NO ACTION');
+        $this->addForeignKey('fk_password_history_user_id','{{password_history}}','user_id','{{user}}','id','CASCADE','CASCADE');
     }
 
     private function dropPasswordHistoryTable()
