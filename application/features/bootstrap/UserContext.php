@@ -1,9 +1,8 @@
 <?php
 
-use Behat\Behat\Tester\Exception\PendingException;
 use Behat\Gherkin\Node\TableNode;
 use Behat\Testwork\ServiceContainer\Exception\ConfigurationLoadingException;
-use common\helpers\Utils;
+use common\helpers\MySqlDateTime;
 use common\models\User;
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Response;
@@ -52,7 +51,7 @@ class UserContext extends YiiContext
 
         $this->response = $this->sendRequest($client, $action, '/user');
 
-        $this->now = Utils::now();
+        $this->now = MySqlDateTime::now();
 
         $this->resBody = $this->extractBody($this->response);
     }

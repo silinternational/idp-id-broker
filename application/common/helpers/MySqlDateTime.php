@@ -1,7 +1,7 @@
 <?php
 namespace common\helpers;
 
-class Utils
+class MySqlDateTime
 {
     public static function now()
     {

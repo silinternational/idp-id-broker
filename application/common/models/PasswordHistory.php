@@ -2,7 +2,7 @@
 
 namespace common\models;
 
-use common\helpers\Utils;
+use common\helpers\MySqlDateTime;
 use yii\helpers\ArrayHelper;
 
 class PasswordHistory extends PasswordHistoryBase
@@ -13,7 +13,7 @@ class PasswordHistory extends PasswordHistoryBase
     {
         return ArrayHelper::merge([
             [
-                'created_utc', 'default', 'value' => Utils::now(),
+                'created_utc', 'default', 'value' => MySqlDateTime::now(),
             ],
             [
                 'password', 'required',

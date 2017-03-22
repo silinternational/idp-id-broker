@@ -2,7 +2,7 @@
 
 namespace common\models;
 
-use common\helpers\Utils;
+use common\helpers\MySqlDateTime;
 use Exception;
 use yii\behaviors\AttributeBehavior;
 use yii\db\ActiveRecord;
@@ -67,7 +67,7 @@ class User extends UserBase
             ],
             [
                 ['last_synced_utc', 'last_changed_utc'],
-                'default', 'value' => Utils::now(),
+                'default', 'value' => MySqlDateTime::now(),
             ],
             [
                 ['employee_id', 'first_name', 'last_name', 'display_name', 'username', 'email'],
@@ -94,7 +94,7 @@ class User extends UserBase
                     ActiveRecord::EVENT_BEFORE_INSERT => 'last_changed_utc',
                     ActiveRecord::EVENT_BEFORE_UPDATE => 'last_changed_utc',
                 ],
-                'value' => Utils::now(),
+                'value' => MySqlDateTime::now(),
                 'skipUpdateOnClean' => true, // only update the column if the model is dirty
             ],
             'updateTracker' => [
@@ -103,7 +103,7 @@ class User extends UserBase
                     ActiveRecord::EVENT_BEFORE_INSERT => 'last_synced_utc',
                     ActiveRecord::EVENT_BEFORE_UPDATE => 'last_synced_utc',
                 ],
-                'value' => Utils::now(),
+                'value' => MySqlDateTime::now(),
                 'skipUpdateOnClean' => false, // always update the column regardless of dirtiness
             ],
         ];
