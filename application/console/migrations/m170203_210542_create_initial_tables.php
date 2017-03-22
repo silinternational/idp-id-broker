@@ -4,14 +4,14 @@ use yii\db\Migration;
 
 class m170203_210542_create_initial_tables extends Migration
 {
-    public function up()
+    public function safeUp()
     {
         $this->createUserTable();
         $this->createPasswordHistoryTable();
 
     }
 
-    public function down()
+    public function safeDown()
     {
         $this->dropPasswordHistoryTable();
         $this->dropUserTable();
