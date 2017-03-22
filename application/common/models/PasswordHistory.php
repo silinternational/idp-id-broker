@@ -3,6 +3,7 @@
 namespace common\models;
 
 use common\helpers\MySqlDateTime;
+use Yii;
 use yii\behaviors\AttributeBehavior;
 use yii\db\ActiveRecord;
 use yii\helpers\ArrayHelper;
@@ -67,5 +68,14 @@ class PasswordHistory extends PasswordHistoryBase
                 'value' => MySqlDateTime::now()
             ],
         ];
+    }
+
+    public function attributeLabels()
+    {
+        $labels = parent::attributeLabels();
+
+        $labels['created_utc'] = Yii::t('app', 'Created (UTC)');
+
+        return $labels;
     }
 }
