@@ -21,6 +21,7 @@ class AuthenticationController extends BaseRestController
             'username' => \Yii::$app->request->getBodyParam('username')
         ]);
 
+        //TODO: need to review auth-sequence diagram for the appropriate handling of this situation.
         if ($user === null) {
             throw new NotFoundHttpException();
         }
