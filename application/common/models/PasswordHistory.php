@@ -3,6 +3,8 @@
 namespace common\models;
 
 use common\helpers\MySqlDateTime;
+use yii\behaviors\AttributeBehavior;
+use yii\db\ActiveRecord;
 use yii\helpers\ArrayHelper;
 
 class PasswordHistory extends PasswordHistoryBase
@@ -52,5 +54,18 @@ class PasswordHistory extends PasswordHistoryBase
         }
 
         return false;
+    }
+
+    public function behaviors(): array
+    {
+        return [
+            'createdTracker' => [
+                'class' => AttributeBehavior::className(),
+                'attributes' => [
+                    ActiveRecord::EVENT_BEFORE_INSERT => 'created_utc',
+                ],
+                'value' => MySqlDateTime::now()
+            ],
+        ];
     }
 }
