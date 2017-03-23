@@ -28,6 +28,29 @@ schemas:
         },
         "type": "object"
       }
+  - Error: |
+      {
+        "$schema": "http://json-schema.org/draft-03/schema",
+        "properties": {
+            "name": {
+              "required": true,
+              "type": "string"
+            },
+            "message": {
+              "required": true,
+              "type": "string"
+            },
+            "code": {
+              "required": true,
+              "type": "integer"
+            },
+            "status": {
+              "required": true,
+              "type": "integer"
+            }
+        },
+        "type": "object"
+      }
   - User: |
       {
         "$schema": "http://json-schema.org/draft-03/schema",
@@ -104,8 +127,28 @@ schemas:
         description: |
           The given credentials were NOT acceptable/valid (i.e. - the
           authentication failed).
+        body:
+          application/json:
+            schema: Error
+            example: |
+              {
+                "name": "Bad Request",
+                "message": "Some error message about an invalid login.",
+                "code": 0,
+                "status": 400
+              }
       500:
         description: A server-side error occurred.
+        body:
+          application/json:
+            schema: Error
+            example: |
+              {
+                "name": "Internal Server Error",
+                "message": "Some error message.",
+                "code": 0,
+                "status": 500
+              }
 
 /user:
   post:
@@ -128,8 +171,28 @@ schemas:
           did exist).
       422:
         description: The given user data does not satisfy some validation rule.
+        body:
+          application/json:
+            schema: Error
+            example: |
+              {
+                "name": "Unprocessable entity",
+                "message": "Employee ID cannot be blank.",
+                "code": 0,
+                "status": 422
+              }
       500:
         description: A server-side error occurred.
+        body:
+          application/json:
+            schema: Error
+            example: |
+              {
+                "name": "Internal Server Error",
+                "message": "Some error message.",
+                "code": 0,
+                "status": 500
+              }
 
   /{employee_id}:
     /password:
@@ -161,5 +224,25 @@ schemas:
             description: |
               The given password does not meet some requirement (such as if an
               empty string was given or a recent password was reused).
+            body:
+              application/json:
+                schema: Error
+                example: |
+                  {
+                    "name": "Unprocessable Entity",
+                    "message": "Some error message.",
+                    "code": 0,
+                    "status": 422
+                  }
           500:
             description: A server-side error occurred.
+            body:
+              application/json:
+                schema: Error
+                example: |
+                  {
+                    "name": "Internal Server Error",
+                    "message": "Some error message.",
+                    "code": 0,
+                    "status": 500
+                  }
