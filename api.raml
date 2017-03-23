@@ -160,10 +160,6 @@ schemas:
           422:
             description: |
               The given password does not meet some requirement (such as if an
-              empty string was given).
-          429:
-            description: |
-              The given password is unacceptable because it is one of that
-              User's recent previous passwords.
+              empty string was given or a recent password was reused).
           500:
             description: A server-side error occurred.
