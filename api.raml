@@ -1,0 +1,169 @@
+#%RAML 0.8
+title: ID Broker API
+protocols: [ HTTPS ]
+mediaType: application/json
+securitySchemes:
+  - AuthzBearerToken:
+      type: x-{other}
+      describedBy:
+        headers:
+          Authorization:
+            type: string
+            example: Bearer abc123
+securedBy: [ AuthzBearerToken ]
+
+schemas:
+  - Authentication: |
+      {
+        "$schema": "http://json-schema.org/draft-03/schema",
+        "properties": {
+            "username": {
+              "required": true,
+              "type": "string"
+            },
+            "password": {
+              "required": true,
+              "type": "string"
+            }
+        },
+        "type": "object"
+      }
+  - User: |
+      {
+        "$schema": "http://json-schema.org/draft-03/schema",
+        "properties": {
+            "employee_id": {
+              "required": true,
+              "type": "string"
+            },
+            "first_name": {
+              "required": true,
+              "type": "string"
+            },
+            "last_name": {
+              "required": true,
+              "type": "string"
+            },
+            "display_name": {
+              "required": false,
+              "type": "string"
+            },
+            "username": {
+              "required": true,
+              "type": "string"
+            },
+            "email": {
+              "required": true,
+              "type": "string"
+            },
+            "active": {
+              "required": false,
+              "type": "string",
+              "enum": ["yes", "no"]
+            },
+            "locked": {
+              "required": false,
+              "type": "string",
+              "enum": ["yes", "no"]
+            }
+        },
+        "type": "object"
+      }
+
+/authentication:
+  post:
+    body:
+      application/json:
+        schema: Authentication
+        example: |
+          {
+            "username": "john_smith",
+            "password": "correcthorsebatterystaple"
+          }
+    responses:
+      200:
+        description: |
+          The given credentials were acceptable/valid (i.e. - the
+          authentication succeeded).
+        body:
+          application/json:
+            description: The attributes of the authenticated User.
+            schema: User
+            example: |
+              {
+                "employee_id": "12345",
+                "first_name": "John",
+                "last_name": "Smith",
+                "display_name": "John Smith",
+                "username": "john_smith",
+                "email": "john_smith@example.com",
+                "active": "yes",
+                "locked": "no"
+              }
+      400:
+        description: |
+          The given credentials were NOT acceptable/valid (i.e. - the
+          authentication failed).
+      500:
+        description: A server-side error occurred.
+
+/user:
+  post:
+    body:
+      application/json:
+        schema: User
+        example: |
+          {
+            "employee_id": "12345",
+            "first_name": "John",
+            "last_name": "Smith",
+            "username": "john_smith",
+            "email": "john_smith@example.com"
+          }
+    responses:
+      200:
+        description: |
+          The corresponding user record (matching on `employee_id`) was either
+          created (if it did not yet) or updated to match the given data (if it
+          did exist).
+      422:
+        description: The given user data does not satisfy some validation rule.
+      500:
+        description: A server-side error occurred.
+
+  /{employee_id}:
+    /password:
+      put:
+        description: Set the password for a User.
+        body:
+          application/json:
+            schema:  |
+              {
+                "$schema": "http://json-schema.org/draft-03/schema",
+                "properties": {
+                    "password": {
+                      "required": true,
+                      "type": "string"
+                    }
+                },
+                "type": "object"
+              }
+            example: |
+              {
+                "password": "correcthorsebatterystaple"
+              }
+        responses:
+          200:
+            description: |
+              The password for the user with that `employee_id` was
+              successfully updated.
+          422:
+            description: |
+              The given password does not meet some requirement (such as if an
+              empty string was given).
+          429:
+            description: |
+              The given password is unacceptable because it is one of that
+              User's recent previous passwords.
+          500:
+            description: A server-side error occurred.
