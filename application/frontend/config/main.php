@@ -1,7 +1,5 @@
 <?php
 
-use Sil\PhpEnv\Env;
-
 return [
     'id' => 'app-frontend',
     'basePath' => dirname(__DIR__),
