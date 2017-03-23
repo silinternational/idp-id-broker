@@ -161,8 +161,6 @@ Feature: User
         | email        | shep_clark@example.org|
         | active       | yes                   |
         | locked       | no                    |
-      And last_changed_utc should be returned as now UTC
-      And last_synced_utc should be returned as now UTC
       And the following data is not returned:
         | property      |
         | id            |

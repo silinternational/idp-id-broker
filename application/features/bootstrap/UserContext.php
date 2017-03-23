@@ -200,15 +200,6 @@ class UserContext extends YiiContext
     }
 
     /**
-     * @Then :property should be returned as now UTC
-     */
-    public function shouldBeReturnedAsNowUTC($property)
-    {
-        Assert::eq($this->resBody[$property], $this->now);
-    }
-
-
-    /**
      * @Then /^a user exists with (?:a|an) (.*) of "?([^"]*)"?$/
      */
     public function aUserExistsForThisKey($lookupKey, $lookupValue)
@@ -266,11 +257,8 @@ class UserContext extends YiiContext
             $previous = $this->userFromDbBefore->$name;
             $current = $this->userFromDb->$name;
 
-            if ($name === $property) {
-                Assert::notEq($current, $previous);
-            } else {
-                Assert::eq($current, $previous);
-            }
+            $name === $property ? Assert::notEq($current, $previous)
+                                : Assert::eq($current, $previous);
         }
     }
 

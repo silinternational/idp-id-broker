@@ -4,7 +4,6 @@ namespace common\models;
 
 use common\helpers\MySqlDateTime;
 use Exception;
-use Yii;
 use yii\behaviors\AttributeBehavior;
 use yii\db\ActiveRecord;
 use yii\helpers\ArrayHelper;
@@ -124,8 +123,6 @@ class User extends UserBase
             'email',
             'active',
             'locked',
-            'last_changed_utc',
-            'last_synced_utc',
         ];
     }
 
@@ -187,15 +184,5 @@ class User extends UserBase
         }
 
         return true;
-    }
-
-    public function attributeLabels()
-    {
-        $labels = parent::attributeLabels();
-
-        $labels['last_changed_utc'] = Yii::t('app', 'Last Changed (UTC)');
-        $labels['last_synced_utc'] = Yii::t('app', 'Last Synced (UTC)');
-
-        return $labels;
     }
 }
