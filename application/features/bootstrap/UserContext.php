@@ -25,6 +25,7 @@ class UserContext extends YiiContext
     private $userFromDbBefore;
 
     private $now;
+    const ACCEPTABLE_DELTA_IN_SECONDS = 1;
 
     /**
      * @Given the requester is not authorized
@@ -230,10 +231,21 @@ class UserContext extends YiiContext
 
     /**
      * @Then :property should be stored as now UTC
+     *
+     * The time between the request being made and that data being stored might have
+     * some latency so "now" may not be the same in every circumstance, therefore a
+     * range of acceptable time will be used to determine accuracy.
      */
     public function shouldBeStoredAsNowUTC($property)
     {
-        Assert::eq($this->userFromDb->$property, $this->now);
+        $expectedNow = strtotime($this->now);
+
+        $minAcceptable = $expectedNow - self::ACCEPTABLE_DELTA_IN_SECONDS;
+        $maxAcceptable = $expectedNow + self::ACCEPTABLE_DELTA_IN_SECONDS;
+
+        $storedNow = strtotime($this->userFromDb->$property);
+
+        Assert::range($storedNow, $minAcceptable, $maxAcceptable);
     }
 
     /**
