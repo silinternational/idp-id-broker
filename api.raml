@@ -92,6 +92,43 @@ schemas:
         },
         "type": "object"
       }
+  - UserUpdate: |
+      {
+        "$schema": "http://json-schema.org/draft-03/schema",
+        "properties": {
+            "first_name": {
+              "required": false,
+              "type": "string"
+            },
+            "last_name": {
+              "required": false,
+              "type": "string"
+            },
+            "display_name": {
+              "required": false,
+              "type": "string"
+            },
+            "username": {
+              "required": false,
+              "type": "string"
+            },
+            "email": {
+              "required": false,
+              "type": "string"
+            },
+            "active": {
+              "required": false,
+              "type": "string",
+              "enum": ["yes", "no"]
+            },
+            "locked": {
+              "required": false,
+              "type": "string",
+              "enum": ["yes", "no"]
+            }
+        },
+        "type": "object"
+      }
 
 /authentication:
   post:
@@ -152,6 +189,7 @@ schemas:
 
 /user:
   post:
+    description: Create a new user record.
     body:
       application/json:
         schema: User
@@ -165,10 +203,7 @@ schemas:
           }
     responses:
       200:
-        description: |
-          The corresponding user record (matching on `employee_id`) was either
-          created (if it did not yet) or updated to match the given data (if it
-          did exist).
+        description: The new user record was created.
       422:
         description: The given user data does not satisfy some validation rule.
         body:
@@ -195,6 +230,45 @@ schemas:
               }
 
   /{employee_id}:
+    put:
+      description: Update a user record.
+      body:
+        application/json:
+          schema: UserUpdate
+          example: |
+            {
+              "active": "no"
+            }
+      responses:
+        200:
+          description: |
+            The corresponding user record (matching on the `employee_id` URL
+            parameter) was updated to match the given data.
+        422:
+          description: The given user data does not satisfy some validation rule.
+          body:
+            application/json:
+              schema: Error
+              example: |
+                {
+                  "name": "Unprocessable entity",
+                  "message": "Employee ID cannot be blank.",
+                  "code": 0,
+                  "status": 422
+                }
+        500:
+          description: A server-side error occurred.
+          body:
+            application/json:
+              schema: Error
+              example: |
+                {
+                  "name": "Internal Server Error",
+                  "message": "Some error message.",
+                  "code": 0,
+                  "status": 500
+                }
+
     /password:
       put:
         description: Set the password for a User.
