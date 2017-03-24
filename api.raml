@@ -92,6 +92,50 @@ schemas:
         },
         "type": "object"
       }
+  - UserList: |
+      {
+        "$schema": "http://json-schema.org/draft-03/schema",
+        "items": {
+          "properties": {
+              "employee_id": {
+                "required": true,
+                "type": "string"
+              },
+              "first_name": {
+                "required": false,
+                "type": "string"
+              },
+              "last_name": {
+                "required": false,
+                "type": "string"
+              },
+              "display_name": {
+                "required": false,
+                "type": "string"
+              },
+              "username": {
+                "required": false,
+                "type": "string"
+              },
+              "email": {
+                "required": false,
+                "type": "string"
+              },
+              "active": {
+                "required": false,
+                "type": "string",
+                "enum": ["yes", "no"]
+              },
+              "locked": {
+                "required": false,
+                "type": "string",
+                "enum": ["yes", "no"]
+              }
+          },
+          "type": "object"
+        },
+        "type": "array"
+      }
   - UserUpdate: |
       {
         "$schema": "http://json-schema.org/draft-03/schema",
@@ -188,6 +232,31 @@ schemas:
               }
 
 /user:
+  get:
+    description: |
+      Get a list of the existing user records' `employee_id`s (and optionally
+      additional fields).
+    queryParameters:
+      fields:
+        description: A comma-delimited list of fields to include for each user.
+        required: false
+        type: string
+        default: "fields=employee_id,active"
+        example: "fields=employee_id"
+      expand:
+        description: |
+          A comma-delimited list of extra fields to include for each user.
+        required: false
+        type: string
+        example: "fields=first_name,last_name,display_name,username,email,locked"
+    body:
+      application/json:
+        schema: UserList
+        example: |
+          [
+            {"employee_id": "11111", "active": "yes"},
+            {"employee_id": "22222", "active": "no"}
+          ]
   post:
     description: Create a new user record.
     body:
