@@ -5,9 +5,6 @@ return [
     'basePath' => dirname(__DIR__),
     'controllerNamespace' => 'frontend\controllers',
     'components' => [
-        'errorHandler' => [
-            'class' => 'frontend\web\ErrorHandler',
-        ],
         'user' => [
             'identityClass' => 'common\models\ApiConsumer',
             'enableAutoLogin' => false,
@@ -18,6 +15,9 @@ return [
             'parsers' => [
                 'application/json' => 'yii\web\JsonParser', // required according to http://www.yiiframework.com/doc-2.0/guide-rest-quick-start.html#enabling-json-input
             ]
+        ],
+        'response' => [
+            'format' => yii\web\Response::FORMAT_JSON,
         ],
         'urlManager' => [
             'enablePrettyUrl' => true,
