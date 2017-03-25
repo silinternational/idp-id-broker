@@ -236,5 +236,52 @@ Feature: User
       | active      | no              |
       | locked      | yes             |
 
-#TODO: Scenario: Change the employee id of an existing user?
-#TODO: Scenario: Ensure certain properties are unique in database, e.g., employee_id, username, email
+  Scenario: Attempt to create a new user with a username that already exists
+    Given the requester is authorized
+      And there are no users yet
+      And I provide the following valid data:
+        | property     | value                 |
+        | employee_id  | 123                   |
+        | first_name   | Shep                  |
+        | last_name    | Clark                 |
+        | display_name | Shep Clark            |
+        | username     | shep_clark            |
+        | email        | shep_clark@example.org|
+      And I request the user be created
+      And a user exists with an employee_id of "123"
+    When I provide the following valid data:
+        | property     | value            |
+        | employee_id  | 234              |
+        | first_name   | Shep             |
+        | last_name    | Clark            |
+        | display_name | Shep Clark       |
+        | username     | shep_clark       |
+        | email        | chg@example.org  |
+      And I request the user be created
+    Then the response status code should be 422
+      And the property message should contain "Username"
+
+  Scenario: Attempt to create a new user with an email address that already exists
+    Given the requester is authorized
+      And there are no users yet
+      And I provide the following valid data:
+        | property     | value                 |
+        | employee_id  | 123                   |
+        | first_name   | Shep                  |
+        | last_name    | Clark                 |
+        | display_name | Shep Clark            |
+        | username     | shep_clark            |
+        | email        | shep_clark@example.org|
+      And I request the user be created
+      And a user exists with an employee_id of "123"
+    When I provide the following valid data:
+        | property     | value                 |
+        | employee_id  | 234                   |
+        | first_name   | Shep                  |
+        | last_name    | Clark                 |
+        | display_name | Shep Clark            |
+        | username     | chg                   |
+        | email        | shep_clark@example.org|
+      And I request the user be created
+    Then the response status code should be 422
+      And the property message should contain "Email"
