@@ -3,27 +3,38 @@ Feature: User
   As an authorized user
   I need to be able to manage user information
 
-  Scenario: Attempt to create a user as an unauthorized user
+  Scenario Outline: Attempt to act upon a user as an unauthorized user
     Given the requester is not authorized
-      And there are no users yet
-    When I request the user be created
+    And there are no users yet
+    When I request the user be <action>
     Then the response status code should be 401
-      And the property message should contain "invalid credentials"
-      And a user was not created
+    And the property message should contain "invalid credentials"
+    And there are still no users
 
-  Scenario Outline: Attempt to act upon a user in an undefined way
+    Examples:
+      | action    |
+      | created   |
+      | retrieved |
+      | updated   |
+      | deleted   |
+      | retrieved |
+      | patched   |
+
+  Scenario Outline: Attempt to act upon a user in an undefined way as an authorized user
     Given the requester is authorized
       And there are no users yet
     When I request the user be <action>
-    Then the response status code should be 404
-      And the property message should contain "not found"
-      And a user was not created
+    Then the response status code should be 405
+      And the property message should contain "not allowed"
+      And there are still no users
 
     Examples:
       | action    |
       | retrieved |
       | updated   |
       | deleted   |
+      | retrieved |
+      | patched   |
 
   Scenario Outline: Attempt to create a new user without providing a required property
     Given the requester is authorized
@@ -39,11 +50,11 @@ Feature: User
       But then I remove the <property>
     When I request the user be created
     Then the response status code should be 422
-      And the property message should contain "<message>"
-      And a user was not created
+      And the property message should contain "<contents>"
+      And there are still no users
 
     Examples:
-      | property    | message     |
+      | property    | contents    |
       | employee_id | Employee ID |
       | first_name  | First Name  |
       | last_name   | Last Name   |
@@ -64,11 +75,11 @@ Feature: User
       But I provide an invalid <property> of <value>
     When I request the user be created
     Then the response status code should be 422
-      And the property message should contain "<message>"
-      And a user was not created
+      And the property message should contain "<contents>"
+      And there are still no users
 
     Examples:
-      | property    | value              | message     |
+      | property    | value              | contents    |
       | employee_id | ""                 | Employee ID |
       | employee_id | true               | Employee ID |
       | employee_id | false              | Employee ID |
@@ -126,11 +137,11 @@ Feature: User
       But I provide a <property> that is too long
     When I request the user be created
     Then the response status code should be 422
-      And the property message should contain "<message>"
-      And a user was not created
+      And the property message should contain "<contents>"
+      And there are still no users
 
     Examples:
-      | property     | message      |
+      | property     | contents     |
       | employee_id  | Employee ID  |
       | first_name   | First Name   |
       | last_name    | Last Name    |

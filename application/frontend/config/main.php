@@ -27,11 +27,19 @@ return [
         'urlManager' => [
             'enablePrettyUrl' => true, // turns /index.php?r=post%2Fview&id=100 into /index.php/post/100
             'showScriptName' => false, // turns /index.php/post/100 into /post/100
+            // http://www.yiiframework.com/doc-2.0/guide-rest-routing.html
             'rules' => [
-                'POST /authentication'                 => 'authentication/create',
-                'POST /user'                           => 'user/create',
-                'PUT  /user/<employeeId:\w+>/password' => 'user/update-password',
-                'GET  /site/system-status'             => 'site/system-status',
+                [
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => ['user', 'authentication'],
+                    'pluralize' => false,
+                ],
+
+                'PUT /user/<employeeId:\w+>/password' => 'user/update-password',
+
+                'GET /site/system-status' => 'site/system-status',
+
+                '<undefinedRequest>' => 'site/undefined-request',
             ]
         ],
     ],

@@ -44,7 +44,7 @@ class UserContext extends YiiContext
     }
 
     /**
-     * @When /^I request the user be (created|updated|deleted|retrieved|<.*>)$/
+     * @When /^I request the user be (created|updated|deleted|retrieved|headed|patched|<.*>)$/
      */
     public function iRequestTheUserBe($action)
     {
@@ -72,10 +72,14 @@ class UserContext extends YiiContext
     private function sendRequest(Client $client, string $action, string $resource): ResponseInterface
     {
         switch ($action) {
-            case 'created': return $client->post  ($resource);
-            case 'updated': return $client->put   ($resource);
-            case 'deleted': return $client->delete($resource);
-                   default: return $client->get   ($resource);
+            case 'created'  : return $client->post  ($resource);
+            case 'updated'  : return $client->put   ($resource);
+            case 'deleted'  : return $client->delete($resource);
+            case 'retrieved': return $client->get   ($resource);
+            case 'headed'   : return $client->head  ($resource);
+            case 'patched'  : return $client->patch ($resource);
+
+            default: throw new InvalidArgumentException("$action is not a recognized HTTP verb.");
         }
     }
 
@@ -83,7 +87,7 @@ class UserContext extends YiiContext
     {
         $jsonBlob = $response->getBody()->getContents();
 
-        return json_decode($jsonBlob, true);
+        return json_decode($jsonBlob, true) ?? [];
     }
 
     /**
@@ -95,7 +99,7 @@ class UserContext extends YiiContext
     }
 
     /**
-     * @Then /^the property (\w+) should contain "(.*)"/
+     * @Then /^the property (\w+) should contain "(.*)"$/
      */
     public function thePropertyShouldContain($property, $contents)
     {
@@ -103,9 +107,9 @@ class UserContext extends YiiContext
     }
 
     /**
-     * @Then a user was not created
+     * @Then there are still no users
      */
-    public function aUserWasNotCreated()
+    public function thereAreStillNoUsers()
     {
         Assert::isEmpty(User::find()->all());
     }

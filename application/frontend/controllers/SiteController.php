@@ -1,7 +1,10 @@
 <?php
 namespace frontend\controllers;
 
+use Exception;
 use frontend\components\BaseRestController;
+use Yii;
+use yii\web\NotFoundHttpException;
 use yii\web\ServerErrorHttpException;
 
 class SiteController extends BaseRestController
@@ -10,8 +13,8 @@ class SiteController extends BaseRestController
     {
         $behaviors = parent::behaviors();
 
-        // bypass authentication
         $behaviors['authenticator']['except'] = [
+            // bypass authentication, i.e., public API
             'system-status'
         ];
 
@@ -22,13 +25,18 @@ class SiteController extends BaseRestController
     {
         try {
             // db comms are a good indication of health
-            \Yii::$app->db->open();
+            Yii::$app->db->open();
 
-            \Yii::$app->response->statusCode = 204;
-        } catch (\Exception $e) {
+            Yii::$app->response->statusCode = 204;
+        } catch (Exception $e) {
             throw new ServerErrorHttpException(
                 'Database connection problem.', $e->getCode()
             );
         }
+    }
+
+    public function actionUndefinedRequest()
+    {
+        throw new NotFoundHttpException();
     }
 }
