@@ -3,13 +3,100 @@ Feature: User
   As an authorized user
   I need to be able to manage user information
 
+  Scenario: Create a new user
+    Given a user does not exist with an employee_id of "123"
+      And the requester is authorized
+      And I provide the following valid data:
+        | property     | value                 |
+        | employee_id  | 123                   |
+        | first_name   | Shep                  |
+        | last_name    | Clark                 |
+        | display_name | Shep Clark            |
+        | username     | shep_clark            |
+        | email        | shep_clark@example.org|
+    When I request the user be created
+    Then the response status code should be 200
+      And the following data is returned:
+        | property     | value                 |
+        | employee_id  | 123                   |
+        | first_name   | Shep                  |
+        | last_name    | Clark                 |
+        | display_name | Shep Clark            |
+        | username     | shep_clark            |
+        | email        | shep_clark@example.org|
+        | active       | yes                   |
+        | locked       | no                    |
+      And the following data is not returned:
+        | property      |
+        | id            |
+        | password_hash |
+      And a user exists with an employee_id of "123"
+      And the following data should be stored:
+        | property     | value                 |
+        | first_name   | Shep                  |
+        | last_name    | Clark                 |
+        | display_name | Shep Clark            |
+        | username     | shep_clark            |
+        | email        | shep_clark@example.org|
+        | password_hash| NULL                  |
+        | active       | yes                   |
+        | locked       | no                    |
+      And last_changed_utc should be stored as now UTC
+      And last_synced_utc should be stored as now UTC
+
+  Scenario: "Touch" an existing user without making any changes
+    Given the requester is authorized
+      And I provide the following valid data:
+        | property     | value                 |
+        | employee_id  | 123                   |
+        | first_name   | Shep                  |
+        | last_name    | Clark                 |
+        | display_name | Shep Clark            |
+        | username     | shep_clark            |
+        | email        | shep_clark@example.org|
+      And I request the user be created
+      And a user exists with an employee_id of "123"
+    When I request the user be created again
+    Then a user exists with an employee_id of "123"
+      And the only property to change should be last_synced_utc
+      And last_synced_utc should be stored as now UTC
+
+  Scenario Outline: Change the properties of an existing user
+    Given the requester is authorized
+      And there are no users yet
+      And I provide the following valid data:
+        | property     | value                 |
+        | employee_id  | 123                   |
+        | first_name   | Shep                  |
+        | last_name    | Clark                 |
+        | display_name | Shep Clark            |
+        | username     | shep_clark            |
+        | email        | shep_clark@example.org|
+      And I request the user be created
+      And a user exists with an employee_id of "123"
+    When I change the <property> to <value>
+      And I request the user be created again
+    Then a user exists with a <property> of <value>
+      And last_changed_utc and last_synced_utc are the same
+      And last_synced_utc should be stored as now UTC
+
+    Examples:
+      | property    | value           |
+      | first_name  | FIRST           |
+      | last_name   | LAST            |
+      | display_name| DISPLAY         |
+      | username    | USER            |
+      | email       | chg@example.org |
+      | active      | no              |
+      | locked      | yes             |
+
   Scenario Outline: Attempt to act upon a user as an unauthorized user
     Given the requester is not authorized
-    And there are no users yet
+      And there are no users yet
     When I request the user be <action>
     Then the response status code should be 401
-    And the property message should contain "invalid credentials"
-    And there are still no users
+      And the property message should contain "invalid credentials"
+      And there are still no users
 
     Examples:
       | action    |
@@ -149,92 +236,6 @@ Feature: User
       | username     | Username     |
       | email        | Email        |
 
-  Scenario: Create a new user
-    Given a user does not exist with an employee_id of "123"
-      And the requester is authorized
-      And I provide the following valid data:
-        | property     | value                 |
-        | employee_id  | 123                   |
-        | first_name   | Shep                  |
-        | last_name    | Clark                 |
-        | display_name | Shep Clark            |
-        | username     | shep_clark            |
-        | email        | shep_clark@example.org|
-    When I request the user be created
-    Then the response status code should be 200
-      And the following data is returned:
-        | property     | value                 |
-        | employee_id  | 123                   |
-        | first_name   | Shep                  |
-        | last_name    | Clark                 |
-        | display_name | Shep Clark            |
-        | username     | shep_clark            |
-        | email        | shep_clark@example.org|
-        | active       | yes                   |
-        | locked       | no                    |
-      And the following data is not returned:
-        | property      |
-        | id            |
-        | password_hash |
-      And a user exists with an employee_id of "123"
-      And the following data should be stored:
-        | property     | value                 |
-        | first_name   | Shep                  |
-        | last_name    | Clark                 |
-        | display_name | Shep Clark            |
-        | username     | shep_clark            |
-        | email        | shep_clark@example.org|
-        | password_hash| NULL                  |
-        | active       | yes                   |
-        | locked       | no                    |
-      And last_changed_utc should be stored as now UTC
-      And last_synced_utc should be stored as now UTC
-
-  Scenario: "Touch" an existing user without making any changes
-    Given the requester is authorized
-      And I provide the following valid data:
-        | property     | value                 |
-        | employee_id  | 123                   |
-        | first_name   | Shep                  |
-        | last_name    | Clark                 |
-        | display_name | Shep Clark            |
-        | username     | shep_clark            |
-        | email        | shep_clark@example.org|
-      And I request the user be created
-      And a user exists with an employee_id of "123"
-    When I request the user be created again
-    Then a user exists with an employee_id of "123"
-      And the only property to change should be last_synced_utc
-      And last_synced_utc should be stored as now UTC
-
-  Scenario Outline: Change the properties of an existing user
-    Given the requester is authorized
-      And there are no users yet
-      And I provide the following valid data:
-        | property     | value                 |
-        | employee_id  | 123                   |
-        | first_name   | Shep                  |
-        | last_name    | Clark                 |
-        | display_name | Shep Clark            |
-        | username     | shep_clark            |
-        | email        | shep_clark@example.org|
-      And I request the user be created
-      And a user exists with an employee_id of "123"
-    When I change the <property> to <value>
-      And I request the user be created again
-    Then a user exists with a <property> of <value>
-      And last_changed_utc and last_synced_utc are the same
-      And last_synced_utc should be stored as now UTC
-
-    Examples:
-      | property    | value           |
-      | first_name  | FIRST           |
-      | last_name   | LAST            |
-      | display_name| DISPLAY         |
-      | username    | USER            |
-      | email       | chg@example.org |
-      | active      | no              |
-      | locked      | yes             |
 
   Scenario: Attempt to create a new user with a username that already exists
     Given the requester is authorized
