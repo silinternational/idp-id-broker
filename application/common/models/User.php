@@ -93,6 +93,7 @@ class User extends UserBase
                 'value' => MySqlDateTime::now(),
                 'skipUpdateOnClean' => true, // only update the column if the model is dirty
             ],
+            //TODO: further design consideration needed here...this should only update via sync processes.
             'updateTracker' => [
                 'class' => AttributeBehavior::className(),
                 'attributes' => [
