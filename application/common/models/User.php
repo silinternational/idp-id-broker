@@ -69,10 +69,6 @@ class User extends UserBase
                 ['last_synced_utc', 'last_changed_utc'],
                 'default', 'value' => MySqlDateTime::now(),
             ],
-            [
-                ['employee_id', 'first_name', 'last_name', 'display_name', 'username', 'email'],
-                'string',
-            ],
         ], parent::rules());
     }
 
