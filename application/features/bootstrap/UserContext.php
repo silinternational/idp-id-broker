@@ -87,7 +87,7 @@ class UserContext extends YiiContext
     {
         $jsonBlob = $response->getBody()->getContents();
 
-        return json_decode($jsonBlob, true) ?? [];
+        return empty($jsonBlob) ? [] : json_decode($jsonBlob, true);
     }
 
     /**
