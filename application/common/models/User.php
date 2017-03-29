@@ -126,13 +126,13 @@ class User extends UserBase
     public function save($runValidation = true, $attributeNames = null)
     {
         if ($this->scenario === self::SCENARIO_UPDATE_PASSWORD) {
-            return $this->savePassword($runValidation, $attributeNames);
+            return $this->savePassword($runValidation);
         }
 
         return parent::save($runValidation, $attributeNames);
     }
 
-    private function savePassword($runValidation = true, $attributeNames = null): bool
+    private function savePassword($runValidation = true): bool
     {
         $transaction = ActiveRecord::getDb()->beginTransaction();
 
@@ -145,7 +145,7 @@ class User extends UserBase
 
             $this->password_hash = password_hash($this->password, PASSWORD_DEFAULT);
 
-            if (! parent::save($runValidation, $attributeNames)) {
+            if (! parent::save($runValidation, ['password_hash'])) {
                 $transaction->rollBack();
 
                 return false;
