@@ -1,16 +1,6 @@
 <?php
-defined('YII_DEBUG') or define('YII_DEBUG', true);
 
-//TODO: are these correct and/or are they needed?
-require(__DIR__ . '/../../vendor/autoload.php');
-require(__DIR__ . '/../../vendor/yiisoft/yii2/Yii.php');
-require(__DIR__ . '/../../common/config/bootstrap.php');
-require(__DIR__ . '/../config/bootstrap.php');
-
-$config = yii\helpers\ArrayHelper::merge(
-    require(__DIR__ . '/../../common/config/main.php'),
-    require(__DIR__ . '/../config/main.php')
-);
+$config = require('../config/load-configs.php');
 
 $application = new yii\web\Application($config);
 $application->run();

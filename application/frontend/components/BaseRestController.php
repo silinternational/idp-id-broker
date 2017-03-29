@@ -4,6 +4,7 @@ namespace frontend\components;
 use yii\db\ActiveRecord;
 use yii\filters\auth\HttpBearerAuth;
 use yii\rest\Controller;
+use yii\web\MethodNotAllowedHttpException;
 use yii\web\UnprocessableEntityHttpException;
 
 class BaseRestController extends Controller
@@ -18,22 +19,45 @@ class BaseRestController extends Controller
         return $behaviors;
     }
 
-    protected function save(ActiveRecord ...$records)
+    protected function save(ActiveRecord $record)
     {
-        $transaction = ActiveRecord::getDb()->beginTransaction();
-
-        try {
-            foreach ($records as $record) {
-                if (! $record->save()) {
-                    throw new UnprocessableEntityHttpException(current($record->getFirstErrors()));
-                }
-            }
-
-            $transaction->commit();
-        } catch (\Exception $e) {
-            $transaction->rollBack();
-
-            throw $e;
+        if (! $record->save()) {
+            throw new UnprocessableEntityHttpException(current($record->getFirstErrors()));
         }
+    }
+
+    public function actionCreate()
+    {
+        $this->throwNotAllowed();
+    }
+
+    public function actionIndex()
+    {
+        $this->throwNotAllowed();
+    }
+
+    public function actionUpdate()
+    {
+        $this->throwNotAllowed();
+    }
+
+    public function actionDelete()
+    {
+        $this->throwNotAllowed();
+    }
+
+    public function actionView()
+    {
+        $this->throwNotAllowed();
+    }
+
+    public function actionOptions()
+    {
+        $this->throwNotAllowed();
+    }
+
+    private function throwNotAllowed()
+    {
+        throw new MethodNotAllowedHttpException('Method not allowed.');
     }
 }

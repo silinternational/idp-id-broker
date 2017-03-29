@@ -4,14 +4,14 @@ use yii\db\Migration;
 
 class m170203_210542_create_initial_tables extends Migration
 {
-    public function up()
+    public function safeUp()
     {
         $this->createUserTable();
         $this->createPasswordHistoryTable();
 
     }
 
-    public function down()
+    public function safeDown()
     {
         $this->dropPasswordHistoryTable();
         $this->dropUserTable();
@@ -26,7 +26,7 @@ class m170203_210542_create_initial_tables extends Migration
                 'employee_id' => 'varchar(255) not null',
                 'first_name' => 'varchar(255) not null',
                 'last_name' => 'varchar(255) not null',
-                'display_name' => 'varchar(255) not null',
+                'display_name' => 'varchar(255) null',
                 'username' => 'varchar(255) not null',
                 'email' => 'varchar(255) not null',
                 'password_hash' => 'varchar(255) null',
@@ -63,7 +63,7 @@ class m170203_210542_create_initial_tables extends Migration
 
         $this->createIndex('idx_password_hash','{{password_history}}','password_hash',false);
 
-        $this->addForeignKey('fk_password_history_user_id','{{password_history}}','user_id','{{user}}','id','CASCADE','NO ACTION');
+        $this->addForeignKey('fk_password_history_user_id','{{password_history}}','user_id','{{user}}','id','CASCADE','CASCADE');
     }
 
     private function dropPasswordHistoryTable()

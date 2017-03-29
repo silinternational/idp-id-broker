@@ -11,23 +11,8 @@ services:
         image: silintl/mariadb:latest
         ports:
             - "3306"
-        environment:
-#TODO: are these still needed or can the common.env be pulled in here now?
-            MYSQL_ROOT_PASSWORD: r00tp@ss!
-            MYSQL_DATABASE: app
-            MYSQL_USER: user
-            MYSQL_PASSWORD: pass
-
-    testDb:
-       image: silintl/mariadb:latest
-       ports:
-           - "3306"
-       environment:
-#TODO: are these still needed or can the common.env be pulled in here now?
-           MYSQL_ROOT_PASSWORD: r00tp@ss!
-           MYSQL_DATABASE: test
-           MYSQL_USER: user
-           MYSQL_PASSWORD: pass
+        env_file:
+            - ./local.env
 
     app:
         build: ./
@@ -38,20 +23,30 @@ services:
         depends_on:
             - db
         env_file:
-            - ./common.env
             - ./local.env
 
     cli:
         image: silintl/php7:latest
         volumes_from:
             - data
-        volumes:
-            - ${COMPOSER_CACHE_DIR}:/composer
         working_dir: /data
         env_file:
-            - ./common.env
             - ./local.env
         command: ["true"]
+
+    test:
+        image: silintl/php7:latest
+        volumes_from:
+            - data
+        working_dir: /data
+        depends_on:
+            - app
+        env_file:
+            - ./local.env
+        environment:
+            TEST_SERVER_HOSTNAME: app
+            APP_ENV: test
+        command: vendor/bin/behat --suite=user_features
 
 networks:
     default:

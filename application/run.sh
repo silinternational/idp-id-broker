@@ -11,7 +11,6 @@ fi
 
 # Run database migrations
 /data/yii migrate --interactive=0
-/data/yii migrate --interactive=0 --migrationPath=console/migrations-local
 
 # Run apache in foreground
 apache2ctl -D FOREGROUND

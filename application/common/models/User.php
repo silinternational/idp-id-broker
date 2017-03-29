@@ -2,7 +2,8 @@
 
 namespace common\models;
 
-use common\helpers\Utils;
+use common\helpers\MySqlDateTime;
+use Exception;
 use yii\behaviors\AttributeBehavior;
 use yii\db\ActiveRecord;
 use yii\helpers\ArrayHelper;
@@ -14,17 +15,6 @@ class User extends UserBase
     const SCENARIO_AUTHENTICATE    = 'authenticate';
 
     public $password;
-
-    public function savePassword(string $password)
-    {
-        $this->password = $password;
-
-        $previous = $this->password_hash;
-
-        $this->password_hash = password_hash($this->password, PASSWORD_DEFAULT);
-
-        return $previous;
-    }
 
     public function scenarios(): array
     {
@@ -52,20 +42,6 @@ class User extends UserBase
     {
         return ArrayHelper::merge([
             [
-                [
-                    'employee_id',
-                    'first_name',
-                    'last_name',
-                    'display_name',
-                    'username',
-                    'email',
-                    'active',
-                    'locked',
-                    'password'
-                ],
-                'trim'
-            ],
-            [
                 'active', 'default', 'value' => 'yes',
             ],
             [
@@ -82,7 +58,7 @@ class User extends UserBase
                 'on' => [self::SCENARIO_UPDATE_PASSWORD, self::SCENARIO_AUTHENTICATE],
             ],
             [
-                'password', 'string', 'min' => 2, // 'min' is needed until https://github.com/yiisoft/yii2/issues/13701 is resolved.
+                'password', 'string',
             ],
             [
                 'password',
@@ -91,11 +67,7 @@ class User extends UserBase
             ],
             [
                 ['last_synced_utc', 'last_changed_utc'],
-                'default', 'value' => gmdate(Utils::DT_FMT),
-            ],
-            [   // 'min' is needed on any strings until https://github.com/yiisoft/yii2/issues/13701 is resolved.
-                ['employee_id', 'first_name', 'last_name', 'display_name', 'username', 'email'],
-                'string', 'min' => 2
+                'default', 'value' => MySqlDateTime::now(),
             ],
         ], parent::rules());
     }
@@ -103,7 +75,7 @@ class User extends UserBase
     private function validatePassword(): \Closure
     {
         return function ($attributeName) {
-            if (! password_verify($this->password, $this->password_hash)) {
+            if (! password_verify($this->$attributeName, $this->password_hash)) {
                 $this->addError($attributeName, 'Incorrect password.');
             }
         };
@@ -118,16 +90,18 @@ class User extends UserBase
                     ActiveRecord::EVENT_BEFORE_INSERT => 'last_changed_utc',
                     ActiveRecord::EVENT_BEFORE_UPDATE => 'last_changed_utc',
                 ],
-                'value' => gmdate(Utils::DT_FMT),
+                'value' => MySqlDateTime::now(),
+                'skipUpdateOnClean' => true, // only update the column if the model is dirty
             ],
+            //TODO: further design consideration needed here...this should only update via sync processes.
             'updateTracker' => [
                 'class' => AttributeBehavior::className(),
                 'attributes' => [
                     ActiveRecord::EVENT_BEFORE_INSERT => 'last_synced_utc',
                     ActiveRecord::EVENT_BEFORE_UPDATE => 'last_synced_utc',
                 ],
-                'value' => gmdate(Utils::DT_FMT),
-                'skipUpdateOnClean' => false,
+                'value' => MySqlDateTime::now(),
+                'skipUpdateOnClean' => false, // always update the column regardless of dirtiness
             ],
         ];
     }
@@ -146,8 +120,66 @@ class User extends UserBase
             'email',
             'active',
             'locked',
-            'last_changed_utc',
-            'last_synced_utc',
         ];
+    }
+
+    public function save($runValidation = true, $attributeNames = null)
+    {
+        if ($this->scenario === self::SCENARIO_UPDATE_PASSWORD) {
+            return $this->savePassword($runValidation);
+        }
+
+        return parent::save($runValidation, $attributeNames);
+    }
+
+    private function savePassword($runValidation = true): bool
+    {
+        $transaction = ActiveRecord::getDb()->beginTransaction();
+
+        try {
+            if ($this->hasPasswordAlready()) {
+                if (! $this->saveHistory()) {
+                    return false;
+                }
+            }
+
+            $this->password_hash = password_hash($this->password, PASSWORD_DEFAULT);
+
+            if (! parent::save($runValidation, ['password_hash'])) {
+                $transaction->rollBack();
+
+                return false;
+            }
+
+            $transaction->commit();
+
+            return true;
+        } catch (Exception $e) {
+            $transaction->rollBack();
+
+            throw $e;
+        }
+    }
+
+    private function hasPasswordAlready(): bool
+    {
+        return ! empty($this->password_hash);
+    }
+
+    private function saveHistory(): bool
+    {
+        $history = new PasswordHistory();
+
+        $history->user_id = $this->id;
+        $history->password = $this->password;
+        $history->password_hash = $this->password_hash;
+
+        if (! $history->save()) {
+            $this->addErrors($history->errors);
+
+            return false;
+        }
+
+        return true;
     }
 }

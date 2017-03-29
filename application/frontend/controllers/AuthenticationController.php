@@ -21,8 +21,8 @@ class AuthenticationController extends BaseRestController
             'username' => \Yii::$app->request->getBodyParam('username')
         ]);
 
+        //TODO: need to review auth-sequence diagram for the appropriate handling of this situation.
         if ($user === null) {
-            //TODO: is ok to be divulging this user wasn't found?  I think so but verify with the team.
             throw new NotFoundHttpException();
         }
 
