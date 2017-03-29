@@ -9,6 +9,7 @@ use GuzzleHttp\Psr7\Response;
 use Psr\Http\Message\ResponseInterface;
 use Sil\SilIdBroker\Behat\Context\YiiContext;
 use Webmozart\Assert\Assert;
+use yii\helpers\Json;
 
 class UserContext extends YiiContext
 {
@@ -87,7 +88,7 @@ class UserContext extends YiiContext
     {
         $jsonBlob = $response->getBody()->getContents();
 
-        return empty($jsonBlob) ? [] : json_decode($jsonBlob, true);
+        return Json::decode($jsonBlob) ?? [];
     }
 
     /**
