@@ -273,6 +273,22 @@ schemas:
     responses:
       200:
         description: The new user record was created.
+        body:
+          application/json:
+            description: The newly-created user record.
+            schema: User
+            example: |
+              {
+                "employee_id": "12345",
+                "first_name": "John",
+                "last_name": "Smith",
+                "display_name": "John Smith",
+                "username": "john_smith",
+                "email": "john_smith@example.com",
+                "active": "yes",
+                "locked": "no"
+              }
+
       422:
         description: The given user data does not satisfy some validation rule.
         body:
