@@ -216,7 +216,7 @@ schemas:
                 "name": "Bad Request",
                 "message": "Some error message about an invalid login.",
                 "code": 0,
-                "status": 400
+                "status": 422
               }
       500:
         description: A server-side error occurred.
@@ -247,14 +247,16 @@ schemas:
         required: false
         type: string
         example: "fields=first_name,last_name,display_name,username,email,locked"
-    body:
-      application/json:
-        schema: UserList
-        example: |
-          [
-            {"employee_id": "11111", "active": "yes"},
-            {"employee_id": "22222", "active": "no"}
-          ]
+    responses:
+      200:
+        body:
+          application/json:
+            schema: UserList
+            example: |
+              [
+                {"employee_id": "11111", "active": "yes"},
+                {"employee_id": "22222", "active": "no"}
+              ]
   post:
     description: Create a new user record.
     body:
