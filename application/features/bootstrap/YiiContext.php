@@ -3,6 +3,7 @@
 namespace Sil\SilIdBroker\Behat\Context;
 
 use Behat\Behat\Context\Context;
+use yii\web\Application;
 
 class YiiContext implements Context
 {
@@ -10,6 +11,8 @@ class YiiContext implements Context
      * @BeforeSuite
      */
     public static function loadYiiApp() {
-        require(__DIR__ . '/../../frontend/web/load-app.php');
+        $config = require(__DIR__ . '/../../frontend/config/load-configs.php');
+
+        new Application($config);
     }
 }
