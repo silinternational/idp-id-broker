@@ -44,7 +44,7 @@ class UserContext extends YiiContext
     }
 
     /**
-     * @When /^I request the user be (created|updated|deleted|retrieved|headed|patched|<.*>)$/
+     * @When /^I request the user be <?(created|updated|deleted|retrieved|headed|patched)>?$/
      */
     public function iRequestTheUserBe($action)
     {
