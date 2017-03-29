@@ -11,7 +11,7 @@ use Sil\SilIdBroker\Behat\Context\YiiContext;
 use Webmozart\Assert\Assert;
 use yii\helpers\Json;
 
-class UserContext extends YiiContext
+class FeatureContext extends YiiContext
 {
     private $reqHeaders = [];
     private $reqBody = [];
@@ -181,7 +181,7 @@ class UserContext extends YiiContext
      */
     public function aUserDoesNotExist($property, $value)
     {
-         User::deleteAll([$property => $value]);
+        User::deleteAll([$property => $value]);
     }
 
     /**
@@ -201,7 +201,7 @@ class UserContext extends YiiContext
     {
         foreach ($data as $row) {
             $isOrIsNot === 'is' ? Assert::eq($this->resBody[$row['property']], $row['value'])
-                                : Assert::keyNotExists($this->resBody, $row['property']);
+                : Assert::keyNotExists($this->resBody, $row['property']);
         }
     }
 
@@ -275,7 +275,7 @@ class UserContext extends YiiContext
             $current = $this->userFromDb->$name;
 
             $name === $property ? Assert::notEq($current, $previous)
-                                : Assert::eq($current, $previous);
+                : Assert::eq($current, $previous);
         }
     }
 

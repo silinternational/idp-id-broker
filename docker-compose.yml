@@ -46,7 +46,7 @@ services:
         environment:
             TEST_SERVER_HOSTNAME: app
             APP_ENV: test
-        command: vendor/bin/behat --suite=user_features
+        command: vendor/bin/behat
 
 networks:
     default:
