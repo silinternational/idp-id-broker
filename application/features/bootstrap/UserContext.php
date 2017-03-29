@@ -36,7 +36,7 @@ class UserContext extends YiiContext
     }
 
     /**
-     * @Given there are no users yet
+     * @Given the user store is empty
      */
     public function theUserStoreIsEmpty()
     {
@@ -107,7 +107,7 @@ class UserContext extends YiiContext
     }
 
     /**
-     * @Then there are still no users
+     * @Then the user store is still empty
      */
     public function thereAreStillNoUsers()
     {
@@ -176,7 +176,7 @@ class UserContext extends YiiContext
     }
 
     /**
-     * @Given /^a user does not exist with (?:a|an) (.*) of "?([^"]*)"?$/
+     * @Given /^a record does not exist with (?:a|an) (.*) of "?([^"]*)"?$/
      */
     public function aUserDoesNotExist($property, $value)
     {
@@ -205,7 +205,7 @@ class UserContext extends YiiContext
     }
 
     /**
-     * @Then /^a user exists with (?:a|an) (.*) of "?([^"]*)"?$/
+     * @Then /^a record exists with (?:a|an) (.*) of "?([^"]*)"?$/
      */
     public function aUserExistsForThisKey($lookupKey, $lookupValue)
     {
