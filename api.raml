@@ -297,6 +297,29 @@ schemas:
               }
 
   /{employee_id}:
+    get:
+      description: Get information about a specific user.
+      responses:
+        200:
+          description:
+            The corresponding user record (matching on the `employee_id` URL
+            parameter).
+          body:
+            application/json:
+              schema: User
+              example: |
+                {
+                  "employee_id": "12345",
+                  "first_name": "John",
+                  "last_name": "Smith",
+                  "display_name": "John Smith",
+                  "username": "john_smith",
+                  "email": "john_smith@example.com",
+                  "active": "yes",
+                  "locked": "no"
+                }
+        204:
+          description: No user record was found with that `employee_id`.
     put:
       description: Update a user record.
       body:
