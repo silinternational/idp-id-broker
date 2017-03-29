@@ -4,6 +4,7 @@ services:
         image: silintl/data-volume:latest
         volumes:
             - ./application:/data
+            - ./auth.json:/root/.composer/auth.json
         user: "${DOCKER_UIDGID}"
 
     db:
