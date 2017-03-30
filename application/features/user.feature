@@ -1,6 +1,6 @@
 Feature: User
   In order to identify users
-  As an authorized user
+  As an authorized requester
   I need to be able to manage user information
 
   Scenario: Create a new user

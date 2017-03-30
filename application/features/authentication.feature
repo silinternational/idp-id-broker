@@ -1,6 +1,6 @@
 Feature: Authentication
   In order to identify a specific user
-  As an authorized user
+  As an authorized requester
   I need to be able to authenticate a user based on certain credentials
 
   Background:
