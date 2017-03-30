@@ -10,7 +10,6 @@ use yii\helpers\ArrayHelper;
 
 class User extends UserBase
 {
-    const SCENARIO_SAVE            = 'save';
     const SCENARIO_UPDATE_PASSWORD = 'update_password';
     const SCENARIO_AUTHENTICATE    = 'authenticate';
 
@@ -91,19 +90,26 @@ class User extends UserBase
                     ActiveRecord::EVENT_BEFORE_UPDATE => 'last_changed_utc',
                 ],
                 'value' => MySqlDateTime::now(),
-                'skipUpdateOnClean' => true, // only update the column if the model is dirty
+                'skipUpdateOnClean' => true, // only update the value if something has changed
             ],
-            //TODO: further design consideration needed here...this should only update via sync processes.
-            'updateTracker' => [
+            'syncTracker' => [
                 'class' => AttributeBehavior::className(),
                 'attributes' => [
                     ActiveRecord::EVENT_BEFORE_INSERT => 'last_synced_utc',
                     ActiveRecord::EVENT_BEFORE_UPDATE => 'last_synced_utc',
                 ],
-                'value' => MySqlDateTime::now(),
-                'skipUpdateOnClean' => false, // always update the column regardless of dirtiness
+                'value' => $this->updateOnSync(),
+                'skipUpdateOnClean' => false, // always consider updating the value whether something has changed or not.
             ],
         ];
+    }
+
+    private function updateOnSync(): \Closure
+    {
+        return function () {
+            return $this->scenario === self::SCENARIO_DEFAULT ? MySqlDateTime::now()
+                                                              : $this->last_synced_utc;
+        };
     }
 
     /**
@@ -126,13 +132,13 @@ class User extends UserBase
     public function save($runValidation = true, $attributeNames = null)
     {
         if ($this->scenario === self::SCENARIO_UPDATE_PASSWORD) {
-            return $this->savePassword($runValidation);
+            return $this->savePassword();
         }
 
         return parent::save($runValidation, $attributeNames);
     }
 
-    private function savePassword($runValidation = true): bool
+    private function savePassword(): bool
     {
         $transaction = ActiveRecord::getDb()->beginTransaction();
 
@@ -145,7 +151,7 @@ class User extends UserBase
 
             $this->password_hash = password_hash($this->password, PASSWORD_DEFAULT);
 
-            if (! parent::save($runValidation, ['password_hash'])) {
+            if (! parent::save()) {
                 $transaction->rollBack();
 
                 return false;
