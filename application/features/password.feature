@@ -37,3 +37,5 @@ Feature: Password
 #  Scenario: Attempt to delete a password
 #  Scenario: Attempt to change the password of an existing user using the same password they already have.
 #  Scenario: consider invalid employee ids that test the type conversions of Yii and/or PHP, e.g., /user/[true|false|1|0]/password
+#  Scenario: ensure last_synced_utc does NOT change when changing a password.
+#  Scenario: ensure last_changed_utc does change when changing a password.

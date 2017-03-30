@@ -208,7 +208,7 @@ class FeatureContext extends YiiContext
     /**
      * @Then /^a record exists with (?:a|an) (.*) of "?([^"]*)"?$/
      */
-    public function aUserExistsForThisKey($lookupKey, $lookupValue)
+    public function aRecordExistsForThisKey($lookupKey, $lookupValue)
     {
         $this->userFromDb = User::findOne([$lookupKey => $lookupValue]);
 
@@ -305,5 +305,28 @@ class FeatureContext extends YiiContext
         $this->userFromDb->password = $password;
 
         Assert::true($this->userFromDb->save());
+    }
+
+    /**
+     * @Then /^a record still exists with (?:a|an) (.*) of "?([^"]*)"?$/
+     */
+    public function aRecordStillExistsForThisKey($lookupKey, $lookupValue)
+    {
+        $this->userFromDbBefore = $this->userFromDb;
+
+        $this->aRecordExistsForThisKey($lookupKey, $lookupValue);
+    }
+
+    /**
+     * @Then none of the data has changed
+     */
+    public function noneOfTheDataHasChanged()
+    {
+        foreach ($this->userFromDbBefore->attributes as $name => $value) {
+            $previous = $this->userFromDbBefore->$name;
+            $current = $this->userFromDb->$name;
+
+            Assert::eq($previous, $current);
+        }
     }
 }
