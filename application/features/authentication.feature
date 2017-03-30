@@ -45,7 +45,7 @@ Feature: Authentication
         | username  | daddy_o   |
         | password  | govols!!  |
     When I request "/authentication" be created
-    Then the response status code should be 404
+    Then the authentication is not successful
 
   Scenario: Attempt to authenticate without providing a username
     Given I provide the following valid data:
@@ -54,12 +54,12 @@ Feature: Authentication
         | password  | govols!!    |
       And then I remove the username
     When I request "/authentication" be created
-    Then the response status code should be 404
+    Then the authentication is not successful
 
   Scenario Outline: Attempt to authenticate while providing an invalid username
     Given I provide an invalid <property> of <value>
     When I request "/authentication" be created
-    Then the response status code should be 404
+    Then the authentication is not successful
 
     Examples:
       | property | value |
@@ -77,8 +77,7 @@ Feature: Authentication
       | username  | shep_clark |
       | password  | govols     |
     When I request "/authentication" be created
-    Then the response status code should be 400
-      And the property message should contain "password"
+    Then the authentication is not successful
 
   Scenario: Attempt to authenticate without providing a password
     Given I provide the following valid data:
@@ -87,14 +86,12 @@ Feature: Authentication
         | password  | govols!!    |
       And then I remove the password
     When I request "/authentication" be created
-    Then the response status code should be 400
-      And the property message should contain "Password"
+    Then the authentication is not successful
 
   Scenario Outline: Attempt to authenticate while providing an invalid password
     Given I provide an invalid <property> of <value>
     When I request "/authentication" be created
-    Then the response status code should be 400
-      And the property message should contain "assword"
+    Then the authentication is not successful
 
     Examples:
       | property | value |
