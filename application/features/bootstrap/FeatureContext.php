@@ -11,7 +11,7 @@ use Sil\SilIdBroker\Behat\Context\YiiContext;
 use Webmozart\Assert\Assert;
 use yii\helpers\Json;
 
-class UserContext extends YiiContext
+class FeatureContext extends YiiContext
 {
     private $reqHeaders = [];
     private $reqBody = [];
@@ -45,13 +45,13 @@ class UserContext extends YiiContext
     }
 
     /**
-     * @When /^I request the user be <?(created|updated|deleted|retrieved|headed|patched)>?$/
+     * @When /^I request "(.*)" be <?(created|updated|deleted|retrieved|headed|patched)>?$/
      */
-    public function iRequestTheUserBe($action)
+    public function iRequestTheResourceBe($resource, $action)
     {
         $client = $this->buildClient();
 
-        $this->response = $this->sendRequest($client, $action, '/user');
+        $this->response = $this->sendRequest($client, $action, $resource);
 
         $this->now = MySqlDateTime::now();
 
@@ -181,7 +181,7 @@ class UserContext extends YiiContext
      */
     public function aUserDoesNotExist($property, $value)
     {
-         User::deleteAll([$property => $value]);
+        User::deleteAll([$property => $value]);
     }
 
     /**
@@ -254,15 +254,15 @@ class UserContext extends YiiContext
     }
 
     /**
-     * @When I request the user be created again
+     * @When I request :resource be created again
      */
-    public function iRequestTheUserBeCreatedAgain()
+    public function iRequestTheResourceBeCreatedAgain($resource)
     {
         $this->userFromDbBefore = $this->userFromDb;
 
         sleep(1); // so timestamps won't be the same
 
-        $this->iRequestTheUserBe('created');
+        $this->iRequestTheResourceBe($resource, 'created');
     }
 
     /**
@@ -293,5 +293,17 @@ class UserContext extends YiiContext
     public function propertiesAreTheSame($property1, $property2)
     {
         Assert::eq($this->userFromDb->$property1, $this->userFromDb->$property2);
+    }
+
+    /**
+     * @Given the user has a password of :password
+     */
+    public function theUserHasAPasswordOf($password)
+    {
+        $this->userFromDb->scenario = User::SCENARIO_UPDATE_PASSWORD;
+
+        $this->userFromDb->password = $password;
+
+        Assert::true($this->userFromDb->save());
     }
 }
