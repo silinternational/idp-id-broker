@@ -45,13 +45,13 @@ class FeatureContext extends YiiContext
     }
 
     /**
-     * @When /^I request the user be <?(created|updated|deleted|retrieved|headed|patched)>?$/
+     * @When /^I request "(.*)" be <?(created|updated|deleted|retrieved|headed|patched)>?$/
      */
-    public function iRequestTheUserBe($action)
+    public function iRequestTheResourceBe($resource, $action)
     {
         $client = $this->buildClient();
 
-        $this->response = $this->sendRequest($client, $action, '/user');
+        $this->response = $this->sendRequest($client, $action, $resource);
 
         $this->now = MySqlDateTime::now();
 
@@ -201,7 +201,7 @@ class FeatureContext extends YiiContext
     {
         foreach ($data as $row) {
             $isOrIsNot === 'is' ? Assert::eq($this->resBody[$row['property']], $row['value'])
-                : Assert::keyNotExists($this->resBody, $row['property']);
+                                : Assert::keyNotExists($this->resBody, $row['property']);
         }
     }
 
@@ -254,15 +254,15 @@ class FeatureContext extends YiiContext
     }
 
     /**
-     * @When I request the user be created again
+     * @When I request :resource be created again
      */
-    public function iRequestTheUserBeCreatedAgain()
+    public function iRequestTheResourceBeCreatedAgain($resource)
     {
         $this->userFromDbBefore = $this->userFromDb;
 
         sleep(1); // so timestamps won't be the same
 
-        $this->iRequestTheUserBe('created');
+        $this->iRequestTheResourceBe($resource, 'created');
     }
 
     /**
@@ -275,7 +275,7 @@ class FeatureContext extends YiiContext
             $current = $this->userFromDb->$name;
 
             $name === $property ? Assert::notEq($current, $previous)
-                : Assert::eq($current, $previous);
+                                : Assert::eq($current, $previous);
         }
     }
 
@@ -293,5 +293,17 @@ class FeatureContext extends YiiContext
     public function propertiesAreTheSame($property1, $property2)
     {
         Assert::eq($this->userFromDb->$property1, $this->userFromDb->$property2);
+    }
+
+    /**
+     * @Given the user has a password of :password
+     */
+    public function theUserHasAPasswordOf($password)
+    {
+        $this->userFromDb->scenario = User::SCENARIO_UPDATE_PASSWORD;
+
+        $this->userFromDb->password = $password;
+
+        Assert::true($this->userFromDb->save());
     }
 }

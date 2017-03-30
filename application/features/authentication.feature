@@ -14,13 +14,17 @@ Feature: Authentication
         | display_name | Shep Clark            |
         | username     | shep_clark            |
         | email        | shep_clark@example.org|
-      And I request the user be created
+      And I request "/user" be created
       And a record exists with an employee_id of "123"
-      And the user with employee_id of "123" has a password of "govols!!!"
+      And the user has a password of "govols!!!"
 
 
   Scenario: Authenticate a known user with a matching password
-    When I attempt to authenticate "shep_clark" with password "govols!!!"
+    Given I provide the following valid data:
+        | property  | value       |
+        | username  | shep_clark  |
+        | password  | govols!!!   |
+    When I request "/authentication" be created
     Then the response status code should be 200
       And the following data is returned:
         | property     | value                 |
@@ -33,22 +37,99 @@ Feature: Authentication
         | active       | yes                   |
         | locked       | no                    |
 
-#
-#  Scenario: Attempt to create an authentication for an unknown user
-#    When I realize the username does not exist in my system
-#    Then I will respond negatively
-#
-#  Scenario: Attempt to create an authentication without a username
-#  Scenario: Attempt to create an authentication with an invalid username
-#
-#  Scenario: Attempt to create an authentication for a known user with a mismatched password
-#    When I realize the given password has does not match the stored version
-#    Then I will respond negatively
-#
-#  Scenario: Attempt to create an authentication without a password
-#  Scenario: Attempt to create an authentication for a known user with an invalid password
-#
-#  Scenario: Attempt to retrieve an authentication
-#  Scenario: Attempt to update an authentication
-#  Scenario: Attempt to delete an authentication
-#  Scenario: Attempt to create an authentication
+  Scenario: Attempt to authenticate an unknown user
+    Given I provide the following valid data:
+        | property  | value     |
+        | username  | daddy_o   |
+        | password  | govols!!  |
+    When I request "/authentication" be created
+    Then the response status code should be 404
+
+  Scenario: Attempt to authenticate without providing a username
+    Given I provide the following valid data:
+        | property  | value       |
+        | username  | shep_clark  |
+        | password  | govols!!    |
+      And then I remove the username
+    When I request "/authentication" be created
+    Then the response status code should be 404
+
+  Scenario Outline: Attempt to authenticate while providing an invalid username
+    Given I provide an invalid <property> of <value>
+    When I request "/authentication" be created
+    Then the response status code should be 404
+
+    Examples:
+      | property | value |
+      | username | ""    |
+      | username | true  |
+      | username | false |
+      | username | null  |
+      | username | 1     |
+      | username | 0     |
+      | username | 21    |
+
+  Scenario: Attempt to authenticate a known user with a mismatched password
+    Given I provide the following valid data:
+      | property  | value      |
+      | username  | shep_clark |
+      | password  | govols     |
+    When I request "/authentication" be created
+    Then the response status code should be 400
+      And the property message should contain "password"
+
+  Scenario: Attempt to authenticate without providing a password
+    Given I provide the following valid data:
+        | property  | value       |
+        | username  | shep_clark  |
+        | password  | govols!!    |
+      And then I remove the password
+    When I request "/authentication" be created
+    Then the response status code should be 400
+      And the property message should contain "Password"
+
+  Scenario Outline: Attempt to authenticate while providing an invalid password
+    Given I provide an invalid <property> of <value>
+    When I request "/authentication" be created
+    Then the response status code should be 400
+      And the property message should contain "assword"
+
+    Examples:
+      | property | value |
+      | password | ""    |
+      | password | true  |
+      | password | false |
+      | password | null  |
+      | password | 1     |
+      | password | 0     |
+      | password | 21    |
+
+  Scenario Outline: Attempt to act upon an authentication in an undefined way
+      And the user store is empty
+    When I request "/authentication" be <action>
+    Then the response status code should be 405
+      And the property message should contain "not allowed"
+      And the user store is still empty
+
+    Examples:
+      | action    |
+      | retrieved |
+      | updated   |
+      | deleted   |
+      | patched   |
+
+  Scenario Outline: Attempt to act upon an authentication as an unauthorized user
+    Given the requester is not authorized
+      And the user store is empty
+    When I request "/authentication" be <action>
+    Then the response status code should be 401
+      And the property message should contain "invalid credentials"
+      And the user store is still empty
+
+    Examples:
+      | action    |
+      | created   |
+      | retrieved |
+      | updated   |
+      | deleted   |
+      | patched   |
