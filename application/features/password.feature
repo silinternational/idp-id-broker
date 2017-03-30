@@ -35,3 +35,4 @@ Feature: Password
 #  Scenario: Attempt to create a password
 #  Scenario: Attempt to retrieve a password
 #  Scenario: Attempt to delete a password
+#  Scenario: Attempt to change the password of an existing user using the same password they already have.
