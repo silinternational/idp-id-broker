@@ -8,6 +8,11 @@ use yii\web\NotFoundHttpException;
 
 class UserController extends BaseRestController
 {
+    public function actionIndex()
+    {
+        return User::find()->all();
+    }
+
     public function actionCreate(): User
     {
         $existingUser = User::findOne([

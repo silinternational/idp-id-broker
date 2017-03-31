@@ -116,7 +116,6 @@ Feature: User
 
     Examples:
       | action    |
-      | retrieved |
       | updated   |
       | deleted   |
       | patched   |
@@ -303,3 +302,28 @@ Feature: User
       And I request "/user" be created
     Then the response status code should be 422
       And the property message should contain "Email"
+
+  Scenario: Retrieve all users
+    Given the requester is authorized
+      And the user store is empty
+      And I provide the following valid data:
+        | property     | value                 |
+        | employee_id  | 123                   |
+        | first_name   | Shep                  |
+        | last_name    | Clark                 |
+        | display_name | Shep Clark            |
+        | username     | shep_clark            |
+        | email        | shep_clark@example.org|
+      And I request "/user" be created
+      And I provide the following valid data:
+        | property     | value                  |
+        | employee_id  | 234                    |
+        | first_name   | Shepp                  |
+        | last_name    | Clark                  |
+        | display_name | Shepp Clark            |
+        | username     | shepp_clark            |
+        | email        | shepp_clark@example.org|
+      And I request "/user" be created
+    When I request "/user" be retrieved
+    Then the response status code should be 200
+      And I should receive 2 users

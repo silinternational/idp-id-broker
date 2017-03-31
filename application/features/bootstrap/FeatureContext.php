@@ -56,6 +56,7 @@ class FeatureContext extends YiiContext
         $this->now = MySqlDateTime::now();
 
         $this->resBody = $this->extractBody($this->response);
+
     }
 
     private function buildClient(): Client
@@ -348,5 +349,13 @@ class FeatureContext extends YiiContext
         $this->userFromDb->$property = $value;
 
         Assert::true($this->userFromDb->save());
+    }
+
+    /**
+     * @Given /^I should receive (\d+) users$/
+     */
+    public function iShouldReceiveUsers($numOfUsers)
+    {
+        Assert::count($this->resBody, $numOfUsers);
     }
 }

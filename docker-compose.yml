@@ -47,6 +47,9 @@ services:
             TEST_SERVER_HOSTNAME: app
             APP_ENV: test
         command: vendor/bin/behat
+        # running isolated tests
+        # docker-compose run --rm test vendor/bin/behat features/user.feature
+        # docker-compose run --rm test vendor/bin/behat features/user.feature:306
 
 networks:
     default:
