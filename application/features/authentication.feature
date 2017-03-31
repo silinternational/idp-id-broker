@@ -103,6 +103,27 @@ Feature: Authentication
         | password | 0     |
         | password | 21    |
 
+  Scenario Outline: Attempt to authenticate a user who's account is not in a good account status
+    Given I provide the following valid data:
+        | property  | value       |
+        | username  | shep_clark  |
+        | password  | govols!!!   |
+        | active    | yes         |
+        | locked    | no          |
+      And the <property> is stored as <value>
+    When I request "/authentication" be created
+    Then the authentication is not successful
+#TODO: and it isn't any faster than if the account had been in a good status, i.e., timing attack prevention
+#    1. fire off 10 successful authn calls
+#    2. stats_standard_deviation with those times to establish a standard deviation
+#    3. make authn calls where account is either inactive or locked
+#    4. ensure the time of those calls stays within the standard deviation
+
+    Examples:
+        | property | value |
+        | active   | no    |
+        | locked   | yes   |
+
   Scenario Outline: Attempt to act upon an authentication in an undefined way
       And the user store is empty
     When I request "/authentication" be <action>

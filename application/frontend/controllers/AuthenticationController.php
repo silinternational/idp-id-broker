@@ -5,7 +5,6 @@ use common\models\User;
 use frontend\components\BaseRestController;
 use Yii;
 use yii\web\BadRequestHttpException;
-use yii\web\HttpException;
 
 class AuthenticationController extends BaseRestController
 {
@@ -13,7 +12,7 @@ class AuthenticationController extends BaseRestController
      * Authenticates the given user based on his/her password
      *
      * @return User upon successful authentication, i.e., "creation".
-     * @throws HttpException
+     * @throws BadRequestHttpException
      */
     public function actionCreate(): User
     {

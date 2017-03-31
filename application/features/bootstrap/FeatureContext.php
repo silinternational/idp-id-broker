@@ -339,4 +339,14 @@ class FeatureContext extends YiiContext
         $this->theResponseStatusCodeShouldBe(400);
         $this->thePropertyShouldContain("message", "");
     }
+
+    /**
+     * @Given /^the (.*) is stored as (.*)$/
+     */
+    public function thePropertyIsStoredAs($property, $value)
+    {
+        $this->userFromDb->$property = $value;
+
+        Assert::true($this->userFromDb->save());
+    }
 }
