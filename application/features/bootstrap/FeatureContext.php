@@ -104,7 +104,8 @@ class FeatureContext extends YiiContext
      */
     public function thePropertyShouldContain($property, $contents)
     {
-        Assert::contains($this->resBody[$property], $contents);
+        empty($contents) ? Assert::eq($this->resBody[$property], "")
+                         : Assert::contains($this->resBody[$property], $contents);
     }
 
     /**
@@ -328,5 +329,14 @@ class FeatureContext extends YiiContext
 
             Assert::eq($previous, $current);
         }
+    }
+
+    /**
+     * @Then the authentication is not successful
+     */
+    public function theAuthenticationIsNotSuccessful()
+    {
+        $this->theResponseStatusCodeShouldBe(400);
+        $this->thePropertyShouldContain("message", "");
     }
 }
