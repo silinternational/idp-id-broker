@@ -204,7 +204,7 @@ schemas:
                 "active": "yes",
                 "locked": "no"
               }
-      422:
+      400:
         description: |
           The given credentials were NOT acceptable/valid (i.e. - the
           authentication failed).
@@ -214,9 +214,9 @@ schemas:
             example: |
               {
                 "name": "Bad Request",
-                "message": "Some error message about an invalid login.",
+                "message": "",
                 "code": 0,
-                "status": 422
+                "status": 400
               }
       500:
         description: A server-side error occurred.
