@@ -62,20 +62,20 @@ Feature: Authentication
     Then the authentication is not successful
 
     Examples:
-      | property | value |
-      | username | ""    |
-      | username | true  |
-      | username | false |
-      | username | null  |
-      | username | 1     |
-      | username | 0     |
-      | username | 21    |
+        | property | value |
+        | username | ""    |
+        | username | true  |
+        | username | false |
+        | username | null  |
+        | username | 1     |
+        | username | 0     |
+        | username | 21    |
 
   Scenario: Attempt to authenticate a known user with a mismatched password
     Given I provide the following valid data:
-      | property  | value      |
-      | username  | shep_clark |
-      | password  | govols     |
+        | property  | value      |
+        | username  | shep_clark |
+        | password  | govols     |
     When I request "/authentication" be created
     Then the authentication is not successful
 
@@ -94,14 +94,35 @@ Feature: Authentication
     Then the authentication is not successful
 
     Examples:
-      | property | value |
-      | password | ""    |
-      | password | true  |
-      | password | false |
-      | password | null  |
-      | password | 1     |
-      | password | 0     |
-      | password | 21    |
+        | property | value |
+        | password | ""    |
+        | password | true  |
+        | password | false |
+        | password | null  |
+        | password | 1     |
+        | password | 0     |
+        | password | 21    |
+
+  Scenario Outline: Attempt to authenticate a user who's account is not in a good account status
+    Given I provide the following valid data:
+        | property  | value       |
+        | username  | shep_clark  |
+        | password  | govols!!!   |
+        | active    | yes         |
+        | locked    | no          |
+      And the <property> is stored as <value>
+    When I request "/authentication" be created
+    Then the authentication is not successful
+#TODO: and it isn't any faster than if the account had been in a good status, i.e., timing attack prevention
+#    1. fire off 10 successful authn calls
+#    2. stats_standard_deviation with those times to establish a standard deviation
+#    3. make authn calls where account is either inactive or locked
+#    4. ensure the time of those calls stays within the standard deviation
+
+    Examples:
+        | property | value |
+        | active   | no    |
+        | locked   | yes   |
 
   Scenario Outline: Attempt to act upon an authentication in an undefined way
       And the user store is empty
@@ -111,11 +132,11 @@ Feature: Authentication
       And the user store is still empty
 
     Examples:
-      | action    |
-      | retrieved |
-      | updated   |
-      | deleted   |
-      | patched   |
+        | action    |
+        | retrieved |
+        | updated   |
+        | deleted   |
+        | patched   |
 
   Scenario Outline: Attempt to act upon an authentication as an unauthorized user
     Given the requester is not authorized
@@ -126,9 +147,9 @@ Feature: Authentication
       And the user store is still empty
 
     Examples:
-      | action    |
-      | created   |
-      | retrieved |
-      | updated   |
-      | deleted   |
-      | patched   |
+        | action    |
+        | created   |
+        | retrieved |
+        | updated   |
+        | deleted   |
+        | patched   |

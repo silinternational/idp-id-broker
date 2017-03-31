@@ -32,7 +32,7 @@ class User extends UserBase
 
         $scenarios[self::SCENARIO_UPDATE_PASSWORD] = ['password'];
 
-        $scenarios[self::SCENARIO_AUTHENTICATE] = ['username', 'password'];
+        $scenarios[self::SCENARIO_AUTHENTICATE] = ['username', 'password', '!active', '!locked'];
 
         return $scenarios;
     }
@@ -60,8 +60,19 @@ class User extends UserBase
                 'password', 'string',
             ],
             [
+                // special note:  we always want to hash a password first as a best practice
+                //  against timing attacks.  Therefore, this rule should be run before most
+                //  other rules.  https://en.wikipedia.org/wiki/Timing_attack
                 'password',
                 $this->validatePassword(),
+                'on' => self::SCENARIO_AUTHENTICATE,
+            ],
+            [
+                'active', 'compare', 'compareValue' => 'yes',
+                'on' => self::SCENARIO_AUTHENTICATE,
+            ],
+            [
+                'locked', 'compare', 'compareValue' => 'no',
                 'on' => self::SCENARIO_AUTHENTICATE,
             ],
             [
@@ -74,7 +85,7 @@ class User extends UserBase
     private function validatePassword(): \Closure
     {
         return function ($attributeName) {
-            if (! password_verify($this->$attributeName, $this->password_hash)) {
+            if (! password_verify($this->password, $this->password_hash)) {
                 $this->addError($attributeName, 'Incorrect password.');
             }
         };
