@@ -32,10 +32,17 @@ return [
                 [
                     // http://www.yiiframework.com/doc-2.0/yii-rest-urlrule.html
                     'class' => 'yii\rest\UrlRule',
-                    'controller' => ['user', 'authentication', 'site'],
+                    'controller' => 'user',
                     'extraPatterns' => [
                         'GET,HEAD <employeeId:\w+>' => 'view',
                         'PUT <employeeId:\w+>/password' => 'update-password',
+                    ],
+                ],
+                [
+                    // http://www.yiiframework.com/doc-2.0/yii-rest-urlrule.html
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => ['authentication', 'site'],
+                    'extraPatterns' => [
                         'system-status' => 'system-status',
                     ],
                     'pluralize' => false,

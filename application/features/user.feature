@@ -14,7 +14,7 @@ Feature: User
         | display_name | Shep Clark            |
         | username     | shep_clark            |
         | email        | shep_clark@example.org|
-    When I request "/user" be created
+    When I request "/users" be created
     Then the response status code should be 200
       And the following data is returned:
         | property     | value                 |
@@ -54,9 +54,9 @@ Feature: User
         | display_name | Shep Clark            |
         | username     | shep_clark            |
         | email        | shep_clark@example.org|
-      And I request "/user" be created
+      And I request "/users" be created
       And a record exists with an employee_id of "123"
-    When I request "/user" be created again
+    When I request "/users" be created again
     Then a record exists with an employee_id of "123"
       And the only property to change should be last_synced_utc
       And last_synced_utc should be stored as now UTC
@@ -72,10 +72,10 @@ Feature: User
         | display_name | Shep Clark            |
         | username     | shep_clark            |
         | email        | shep_clark@example.org|
-      And I request "/user" be created
+      And I request "/users" be created
       And a record exists with an employee_id of "123"
     When I change the <property> to <value>
-      And I request "/user" be created again
+      And I request "/users" be created again
     Then a record exists with a <property> of <value>
       And last_changed_utc and last_synced_utc are the same
       And last_synced_utc should be stored as now UTC
@@ -93,7 +93,7 @@ Feature: User
   Scenario Outline: Attempt to act upon a user as an unauthorized user
     Given the requester is not authorized
       And the user store is empty
-    When I request "/user" be <action>
+    When I request "/users" be <action>
     Then the response status code should be 401
       And the property message should contain "invalid credentials"
       And the user store is still empty
@@ -109,7 +109,7 @@ Feature: User
   Scenario Outline: Attempt to act upon a user in an undefined way as an authorized user
     Given the requester is authorized
       And the user store is empty
-    When I request "/user" be <action>
+    When I request "/users" be <action>
     Then the response status code should be 405
       And the property message should contain "not allowed"
       And the user store is still empty
@@ -132,7 +132,7 @@ Feature: User
         | username     | shep_clark            |
         | email        | shep_clark@example.org|
       But then I remove the <property>
-    When I request "/user" be created
+    When I request "/users" be created
     Then the response status code should be 422
       And the property message should contain "<contents>"
       And the user store is still empty
@@ -157,7 +157,7 @@ Feature: User
         | username     | shep_clark            |
         | email        | shep_clark@example.org|
       But I provide an invalid <property> of <value>
-    When I request "/user" be created
+    When I request "/users" be created
     Then the response status code should be 422
       And the property message should contain "<contents>"
       And the user store is still empty
@@ -238,7 +238,7 @@ Feature: User
         | username     | shep_clark            |
         | email        | shep_clark@example.org|
       But I provide a <property> that is too long
-    When I request "/user" be created
+    When I request "/users" be created
     Then the response status code should be 422
       And the property message should contain "<contents>"
       And the user store is still empty
@@ -264,7 +264,7 @@ Feature: User
         | display_name | Shep Clark            |
         | username     | shep_clark            |
         | email        | shep_clark@example.org|
-      And I request "/user" be created
+      And I request "/users" be created
       And a record exists with an employee_id of "123"
     When I provide the following valid data:
         | property     | value            |
@@ -274,7 +274,7 @@ Feature: User
         | display_name | Shep Clark       |
         | username     | shep_clark       |
         | email        | chg@example.org  |
-      And I request "/user" be created
+      And I request "/users" be created
     Then the response status code should be 422
       And the property message should contain "Username"
 
@@ -289,7 +289,7 @@ Feature: User
         | display_name | Shep Clark            |
         | username     | shep_clark            |
         | email        | shep_clark@example.org|
-      And I request "/user" be created
+      And I request "/users" be created
       And a record exists with an employee_id of "123"
     When I provide the following valid data:
         | property     | value                 |
@@ -299,7 +299,7 @@ Feature: User
         | display_name | Shep Clark            |
         | username     | chg                   |
         | email        | shep_clark@example.org|
-      And I request "/user" be created
+      And I request "/users" be created
     Then the response status code should be 422
       And the property message should contain "Email"
 
@@ -314,7 +314,7 @@ Feature: User
         | display_name | Shep Clark            |
         | username     | shep_clark            |
         | email        | shep_clark@example.org|
-      And I request "/user" be created
+      And I request "/users" be created
       And I provide the following valid data:
         | property     | value                  |
         | employee_id  | 234                    |
@@ -323,8 +323,8 @@ Feature: User
         | display_name | Shepp Clark            |
         | username     | shepp_clark            |
         | email        | shepp_clark@example.org|
-      And I request "/user" be created
-    When I request "/user" be retrieved
+      And I request "/users" be created
+    When I request "/users" be retrieved
     Then the response status code should be 200
       And I should receive 2 users
 
