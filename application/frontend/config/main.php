@@ -30,17 +30,16 @@ return [
             // http://www.yiiframework.com/doc-2.0/guide-rest-routing.html
             'rules' => [
                 [
+                    // http://www.yiiframework.com/doc-2.0/yii-rest-urlrule.html
                     'class' => 'yii\rest\UrlRule',
-                    'controller' => ['user', 'authentication'],
+                    'controller' => ['user', 'authentication', 'site'],
                     'extraPatterns' => [
                         'GET,HEAD <employeeId:\w+>' => 'view',
+                        'PUT <employeeId:\w+>/password' => 'update-password',
+                        'system-status' => 'system-status',
                     ],
                     'pluralize' => false,
                 ],
-
-                'PUT /user/<employeeId:\w+>/password' => 'user/update-password',
-
-                'GET /site/system-status' => 'site/system-status',
 
                 '<undefinedRequest>' => 'site/undefined-request',
             ]
