@@ -327,3 +327,10 @@ Feature: User
     When I request "/user" be retrieved
     Then the response status code should be 200
       And I should receive 2 users
+
+    #TODO: get a user with/without a match
+    #TODO: get a user with both an alphanumeric and numeric employee_id
+    #TODO: get a user with invalid employee_id
+    #TODO: act upon a user/{id} in an undefined authz and !authz
+    #TODO: review previous test for additional ideas
+

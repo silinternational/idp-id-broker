@@ -8,9 +8,14 @@ use yii\web\NotFoundHttpException;
 
 class UserController extends BaseRestController
 {
-    public function actionIndex()
+    public function actionIndex() // GET /user
     {
         return User::find()->all();
+    }
+
+    public function actionView($employeeId) // GET /user/abc123
+    {
+        return User::findOne(['employee_id' => $employeeId]);
     }
 
     public function actionCreate(): User

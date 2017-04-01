@@ -32,6 +32,9 @@ return [
                 [
                     'class' => 'yii\rest\UrlRule',
                     'controller' => ['user', 'authentication'],
+                    'extraPatterns' => [
+                        'GET,HEAD <employeeId:\w+>' => 'view',
+                    ],
                     'pluralize' => false,
                 ],
 

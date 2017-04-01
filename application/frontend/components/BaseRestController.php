@@ -46,7 +46,7 @@ class BaseRestController extends Controller
         $this->throwNotAllowed();
     }
 
-    public function actionView()
+    public function actionView($id)
     {
         $this->throwNotAllowed();
     }
