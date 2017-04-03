@@ -29,6 +29,23 @@ class UserController extends BaseRestController
         return $user;
     }
 
+    public function actionUpdate($id)
+    {
+        $user = User::findOne($id);
+
+        if ($user === null) {
+            throw new NotFoundHttpException();
+        }
+
+        $user->scenario = User::SCENARIO_UPDATE_USER;
+
+        $user->attributes = Yii::$app->request->getBodyParams();
+
+        parent::save($user);
+
+        return $user;
+    }
+
     public function actionUpdatePassword($id): User
     {
         $user = User::findOne($id);

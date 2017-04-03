@@ -330,9 +330,16 @@ Feature: User
     Then the response status code should be 200
       And I should receive 2 users
 
-    #TODO: get a user with/without a match
-    #TODO: get a user with invalid id
-    #TODO: act upon a user/{id} in an undefined authz and !authz
-    #TODO: review previous tests for additional ideas
-    #TODO: get a user utilizing fields param
+#TODO: get a user with/without a match
+#TODO: get a user with invalid id
+#TODO: act upon a user/{id} in an undefined authz and !authz
+#TODO: review previous tests for additional ideas
+#TODO: get a user utilizing fields param
+
+#TODO: ensure an employee_id cannot be changed in PUT
+#TODO: PUT without any changes should still update last_synced, right?
+#TODO: PUT with a change to an existing value on one of the unique fields should generate an error.
+#TODO: PUT with a change should update the last_changed data properly...as well as the field to be updated :-)
+
+
 

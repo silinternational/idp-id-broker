@@ -10,6 +10,8 @@ use yii\helpers\ArrayHelper;
 
 class User extends UserBase
 {
+    const SCENARIO_NEW_USER        = 'new_user';
+    const SCENARIO_UPDATE_USER     = 'update_user';
     const SCENARIO_UPDATE_PASSWORD = 'update_password';
     const SCENARIO_AUTHENTICATE    = 'authenticate';
 
@@ -19,8 +21,18 @@ class User extends UserBase
     {
         $scenarios = parent::scenarios();
 
-        $scenarios[self::SCENARIO_DEFAULT] = [
+        $scenarios[self::SCENARIO_NEW_USER] = [
             'employee_id',
+            'first_name',
+            'last_name',
+            'display_name',
+            'username',
+            'email',
+            'active',
+            'locked',
+        ];
+
+        $scenarios[self::SCENARIO_UPDATE_USER] = [
             'first_name',
             'last_name',
             'display_name',
@@ -33,6 +45,8 @@ class User extends UserBase
         $scenarios[self::SCENARIO_UPDATE_PASSWORD] = ['password'];
 
         $scenarios[self::SCENARIO_AUTHENTICATE] = ['username', 'password', '!active', '!locked'];
+
+        $scenarios[self::SCENARIO_DEFAULT] = $scenarios[self::SCENARIO_NEW_USER];
 
         return $scenarios;
     }
@@ -118,6 +132,7 @@ class User extends UserBase
     private function updateOnSync(): \Closure
     {
         return function () {
+            //TODO: make explicit for NEW and UPDATE_USER only.
             return $this->scenario === self::SCENARIO_DEFAULT ? MySqlDateTime::now()
                                                               : $this->last_synced_utc;
         };
