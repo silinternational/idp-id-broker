@@ -22,6 +22,8 @@ class UserController extends BaseRestController
     {
         $user = new User();
 
+        $user->scenario = User::SCENARIO_NEW_USER;
+
         $user->attributes = Yii::$app->request->getBodyParams();
 
         parent::save($user);

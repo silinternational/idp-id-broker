@@ -21,6 +21,8 @@ class User extends UserBase
     {
         $scenarios = parent::scenarios();
 
+        $scenarios[self::SCENARIO_DEFAULT] = null;
+
         $scenarios[self::SCENARIO_NEW_USER] = [
             'employee_id',
             'first_name',
@@ -45,8 +47,6 @@ class User extends UserBase
         $scenarios[self::SCENARIO_UPDATE_PASSWORD] = ['password'];
 
         $scenarios[self::SCENARIO_AUTHENTICATE] = ['username', 'password', '!active', '!locked'];
-
-        $scenarios[self::SCENARIO_DEFAULT] = $scenarios[self::SCENARIO_NEW_USER];
 
         return $scenarios;
     }
@@ -132,10 +132,14 @@ class User extends UserBase
     private function updateOnSync(): \Closure
     {
         return function () {
-            //TODO: make explicit for NEW and UPDATE_USER only.
-            return $this->scenario === self::SCENARIO_DEFAULT ? MySqlDateTime::now()
-                                                              : $this->last_synced_utc;
+            return $this->isSync($this->scenario) ? MySqlDateTime::now()
+                                                  : $this->last_synced_utc;
         };
+    }
+
+    private function isSync($scenario): bool
+    {
+        return in_array($scenario, [self::SCENARIO_NEW_USER, self::SCENARIO_UPDATE_USER]);
     }
 
     /**
