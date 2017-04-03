@@ -46,10 +46,10 @@ services:
         environment:
             TEST_SERVER_HOSTNAME: app
             APP_ENV: test
-        command: vendor/bin/behat
+        command: vendor/bin/behat --stop-on-failure
         # running isolated tests
-        # docker-compose run --rm test vendor/bin/behat features/user.feature
-        # docker-compose run --rm test vendor/bin/behat features/user.feature:306
+        # docker-compose run --rm test vendor/bin/behat --stop-on-failure features/user.feature
+        # docker-compose run --rm test vendor/bin/behat --stop-on-failure features/user.feature:306
 
 networks:
     default:
