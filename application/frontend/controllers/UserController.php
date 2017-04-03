@@ -20,11 +20,7 @@ class UserController extends BaseRestController
 
     public function actionCreate(): User
     {
-        $existingUser = User::findOne([
-            'employee_id' => Yii::$app->request->getBodyParam('employee_id')
-        ]);
-
-        $user = $existingUser ?? new User();
+        $user = new User();
 
         $user->attributes = Yii::$app->request->getBodyParams();
 
