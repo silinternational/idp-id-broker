@@ -243,6 +243,13 @@ schemas:
 /users:
   get:
     description: Get a list of the existing users.
+    queryParameters:
+      fields:
+        description: A comma-delimited list of fields to include for each user.
+        required: false
+        type: string
+        default: "fields=employee_id,first_name,last_name,display_name,username,email,active,locked"
+        example: "fields=employee_id,active"
     responses:
       200:
           body:
