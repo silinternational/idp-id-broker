@@ -19,16 +19,14 @@ class AuthenticationController extends BaseRestController
     {
         $user = User::findOne([
             'username' => (string)Yii::$app->request->getBodyParam('username')
-        ]);
+        ]) ?? new User();
 
-        if (isset($user)) {
-            $user->scenario = User::SCENARIO_AUTHENTICATE;
+        $user->scenario = User::SCENARIO_AUTHENTICATE;
 
-            $user->attributes = Yii::$app->request->getBodyParams();
+        $user->attributes = Yii::$app->request->getBodyParams();
 
-            if ($user->validate()) {
-                return $user;
-            }
+        if ($user->validate()) {
+            return $user;
         }
 
         throw new BadRequestHttpException();
