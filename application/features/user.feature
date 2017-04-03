@@ -303,3 +303,5 @@ Feature: User
       And I request "/user" be created
     Then the response status code should be 422
       And the property message should contain "Email"
+
+#TODO: make sure display_name is built up from first + last when not supplied.
