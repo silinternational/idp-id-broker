@@ -18,6 +18,7 @@ Feature: User
     Then the response status code should be 200
       And the following data is returned:
         | property     | value                 |
+#TODO: need to figure this check out.        | id           | ???                   |
         | employee_id  | 123                   |
         | first_name   | Shep                  |
         | last_name    | Clark                 |
@@ -28,7 +29,6 @@ Feature: User
         | locked       | no                    |
       And the following data is not returned:
         | property      |
-        | id            |
         | password_hash |
       And a record exists with an employee_id of "123"
       And the following data should be stored:

@@ -55,6 +55,10 @@ schemas:
       {
         "$schema": "http://json-schema.org/draft-03/schema",
         "properties": {
+            "id": {
+              "required": true,
+              "type": "integer"
+            },
             "employee_id": {
               "required": true,
               "type": "string"
@@ -97,6 +101,10 @@ schemas:
         "$schema": "http://json-schema.org/draft-03/schema",
         "items": {
           "properties": {
+               "id": {
+                 "required": true,
+                 "type": "integer"
+               },
               "employee_id": {
                 "required": true,
                 "type": "string"
@@ -195,6 +203,7 @@ schemas:
             schema: User
             example: |
               {
+                "id": "1",
                 "employee_id": "12345",
                 "first_name": "John",
                 "last_name": "Smith",
@@ -242,6 +251,7 @@ schemas:
               example: |
                 [
                     {
+                      "id": "1",
                       "employee_id": "12345",
                       "first_name": "John",
                       "last_name": "Smith",
@@ -252,6 +262,7 @@ schemas:
                       "locked": "no"
                     },
                     {
+                      "id": "2",
                       "employee_id": "54321",
                       "first_name": "Jane",
                       "last_name": "Smith",
@@ -303,19 +314,19 @@ schemas:
                 "status": 500
               }
 
-  /{employee_id}:
+  /{id}:
     get:
       description: Get information about a specific user.
       responses:
         200:
           description:
-            The corresponding user record (matching on the `employee_id` URL
-            parameter).
+            The corresponding user record (matching on the `id` URL parameter).
           body:
             application/json:
               schema: User
               example: |
                 {
+                  "id": "1",
                   "employee_id": "12345",
                   "first_name": "John",
                   "last_name": "Smith",
@@ -326,7 +337,7 @@ schemas:
                   "locked": "no"
                 }
         204:
-          description: No user record was found with that `employee_id`.
+          description: No user record was found with that `id`.
     put:
       description: Update a user record.
       body:
@@ -389,8 +400,20 @@ schemas:
         responses:
           200:
             description: |
-              The password for the user with that `employee_id` was
-              successfully updated.
+              The password for the user with that `id` was successfully updated.
+          404:
+            description: |
+              No record was found for the given `id`.
+            body:
+              application/json:
+                schema: Error
+                example: |
+                  {
+                    "name": "Not found",
+                    "message": "",
+                    "code": 0,
+                    "status": 404
+                  }
           422:
             description: |
               The given password does not meet some requirement (such as if an

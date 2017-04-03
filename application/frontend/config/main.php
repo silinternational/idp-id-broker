@@ -34,8 +34,7 @@ return [
                     'class' => 'yii\rest\UrlRule',
                     'controller' => 'user',
                     'extraPatterns' => [
-                        'GET,HEAD <employeeId:\w+>' => 'view',
-                        'PUT <employeeId:\w+>/password' => 'update-password',
+                        'PUT <id>/password' => 'update-password',
                     ],
                 ],
                 [

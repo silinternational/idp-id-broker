@@ -129,6 +129,7 @@ class User extends UserBase
     public function fields(): array
     {
         return [
+            'id',
             'employee_id',
             'first_name',
             'last_name',
