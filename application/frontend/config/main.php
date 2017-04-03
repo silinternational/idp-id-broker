@@ -1,5 +1,7 @@
 <?php
 
+use common\models\ApiConsumer;
+
 return [
     'id' => 'app-frontend',
     'basePath' => dirname(__DIR__),
@@ -8,7 +10,7 @@ return [
     'components' => [
         // http://www.yiiframework.com/doc-2.0/guide-security-authentication.html
         'user' => [
-            'identityClass' => 'common\models\ApiConsumer', // custom Bearer <token> implementation
+            'identityClass' => ApiConsumer::class, // custom Bearer <token> implementation
             'enableSession' => false, // ensure statelessness
         ],
         // http://www.yiiframework.com/doc-2.0/guide-runtime-requests.html
