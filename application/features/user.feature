@@ -342,4 +342,7 @@ Feature: User
 
 
 
-  #TODO: add site.feature to test all verbs to status, not found, authn/nonauthn...as well as NotFound.
+#TODO: add site.feature to test all verbs to status, not found, authn/nonauthn...as well as NotFound
+
+#TODO: make sure display_name is built up from first + last when not supplied.
+
