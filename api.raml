@@ -196,10 +196,10 @@ schemas:
       200:
         description: |
           The given credentials were acceptable/valid (i.e. - the
-          authentication succeeded).
+          authentication succeeded).  The body of the response will have the attributes of the
+          authenticated User.
         body:
           application/json:
-            description: The attributes of the authenticated User.
             schema: User
             example: |
               {
