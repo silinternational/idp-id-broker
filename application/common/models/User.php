@@ -132,7 +132,9 @@ class User extends UserBase
             'employee_id',
             'first_name',
             'last_name',
-            'display_name',
+            'display_name' => function ($model) {
+                return $model->display_name ?? $model->first_name . ' ' . $model->last_name    
+            },
             'username',
             'email',
             'active',
