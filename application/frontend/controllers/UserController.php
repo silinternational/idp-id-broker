@@ -4,18 +4,23 @@ namespace frontend\controllers;
 use common\models\User;
 use frontend\components\BaseRestController;
 use Yii;
-use yii\web\NotFoundHttpException;
 
 class UserController extends BaseRestController
 {
-    public function actionIndex() // GET /users
+    public function actionIndex() // GET /user
     {
         return User::find()->all();
     }
 
-    public function actionView($id) // GET /users/1
+    public function actionView($employeeId) // GET /user/abc123
     {
-        return User::findOne($id);
+        $user = User::findOne(['employee_id' => $employeeId]);
+
+        if (isset($user)) {
+            return $user;
+        }
+
+        Yii::$app->response->statusCode = 204;
     }
 
     public function actionCreate(): User
@@ -31,12 +36,14 @@ class UserController extends BaseRestController
         return $user;
     }
 
-    public function actionUpdate($id)
+    public function actionUpdate($employeeId)
     {
-        $user = User::findOne($id);
+        $user = User::findOne(['employee_id' => $employeeId]);
 
         if ($user === null) {
-            throw new NotFoundHttpException();
+            Yii::$app->response->statusCode = 204;
+
+            return null;
         }
 
         $user->scenario = User::SCENARIO_UPDATE_USER;
@@ -48,12 +55,14 @@ class UserController extends BaseRestController
         return $user;
     }
 
-    public function actionUpdatePassword($id): User
+    public function actionUpdatePassword($employeeId)
     {
-        $user = User::findOne($id);
+        $user = User::findOne(['employee_id' => $employeeId]);
 
         if ($user === null) {
-            throw new NotFoundHttpException();
+            Yii::$app->response->statusCode = 204;
+
+            return null;
         }
 
         $user->scenario = User::SCENARIO_UPDATE_PASSWORD;

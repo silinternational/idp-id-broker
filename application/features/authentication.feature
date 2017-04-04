@@ -14,7 +14,7 @@ Feature: Authentication
         | display_name | Shep Clark            |
         | username     | shep_clark            |
         | email        | shep_clark@example.org|
-      And I request "/users" be created
+      And I request "/user" be created
       And a record exists with an employee_id of "123"
       And the user has a password of "govols!!!"
 

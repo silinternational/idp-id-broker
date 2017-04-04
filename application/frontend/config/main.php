@@ -35,20 +35,16 @@ return [
                 [
                     // http://www.yiiframework.com/doc-2.0/yii-rest-urlrule.html
                     'class' => 'yii\rest\UrlRule',
-                    'controller' => 'user',
+                    'controller' => ['authentication', 'user'],
                     'extraPatterns' => [
-                        'PUT <id>/password' => 'update-password',
-                    ],
-                ],
-                [
-                    // http://www.yiiframework.com/doc-2.0/yii-rest-urlrule.html
-                    'class' => 'yii\rest\UrlRule',
-                    'controller' => ['authentication', 'site'],
-                    'extraPatterns' => [
-                        'system-status' => 'system-status',
+                        'GET <employeeId:\w+>' => 'view',
+                        'PUT <employeeId:\w+>' => 'update',
+                        'PUT <employeeId:\w+>/password' => 'update-password',
                     ],
                     'pluralize' => false,
                 ],
+
+                'status' => 'site/status',
 
                 '<undefinedRequest>' => 'site/undefined-request',
             ]
