@@ -324,13 +324,13 @@ schemas:
                 "status": 500
               }
 
-  /{id}:
+  /{employee_id}:
     get:
       description: Get information about a specific user.
       responses:
         200:
           description:
-            The corresponding user record (matching on the `id` URL parameter).
+            The corresponding user record (matching on the `employee_id` URL parameter).
           body:
             application/json:
               schema: User
@@ -346,7 +346,7 @@ schemas:
                   "locked": "no"
                 }
         204:
-          description: No user record was found with that `id`.
+          description: No user record was found with that `employee_id`.
     put:
       description: Update a user record.
       body:
@@ -376,7 +376,7 @@ schemas:
                   "locked": "no"
                 }
         204:
-          description: No user record was found with that `id`.
+          description: No user record was found with that `employee_id`.
         422:
           description: The given user data does not satisfy some validation rule.
           body:
@@ -425,7 +425,7 @@ schemas:
         responses:
           200:
             description: |
-              The password for the user with that `id` was successfully updated.
+              The password for the user with that `employee_id` was successfully updated.
             body:
               application/json:
                 schema: User
@@ -441,7 +441,7 @@ schemas:
                     "locked": "no"
                   }
           204:
-            description: No user record was found with that `id`.
+            description: No user record was found with that `employee_id`.
           422:
             description: |
               The given password does not meet some requirement (such as if an
