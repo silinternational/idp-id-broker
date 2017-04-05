@@ -22,6 +22,7 @@ WORKDIR /data
 
 # Install/cleanup composer dependencies
 COPY application/composer.json /data/
+COPY application/composer.lock /data/
 RUN composer install --prefer-dist --no-interaction --no-dev --optimize-autoloader
 
 # It is expected that /data is = application/ in project folder
