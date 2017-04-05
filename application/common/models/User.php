@@ -2,6 +2,7 @@
 
 namespace common\models;
 
+use Closure;
 use common\helpers\MySqlDateTime;
 use Exception;
 use yii\behaviors\AttributeBehavior;
@@ -96,7 +97,7 @@ class User extends UserBase
         ], parent::rules());
     }
 
-    private function validatePassword(): \Closure
+    private function validatePassword(): Closure
     {
         return function ($attributeName) {
             if (! password_verify($this->password, $this->password_hash)) {
@@ -129,7 +130,7 @@ class User extends UserBase
         ];
     }
 
-    private function updateOnSync(): \Closure
+    private function updateOnSync(): Closure
     {
         return function () {
             return $this->isSync($this->scenario) ? MySqlDateTime::now()

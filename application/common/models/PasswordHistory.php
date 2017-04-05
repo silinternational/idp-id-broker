@@ -2,6 +2,7 @@
 
 namespace common\models;
 
+use Closure;
 use common\helpers\MySqlDateTime;
 use Yii;
 use yii\behaviors\AttributeBehavior;
@@ -31,7 +32,7 @@ class PasswordHistory extends PasswordHistoryBase
         ], parent::rules());
     }
 
-    private function validateReuseLimit(): \Closure
+    private function validateReuseLimit(): Closure
     {
         return function ($attributeName) {
             if ($this->hasAlreadyBeenUsedWithinLimit()) {

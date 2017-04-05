@@ -2,6 +2,7 @@
 
 use common\models\ApiConsumer;
 use yii\web\JsonParser;
+use yii\web\Response;
 
 return [
     'id' => 'app-frontend',
@@ -24,7 +25,7 @@ return [
         // http://www.yiiframework.com/doc-2.0/guide-runtime-responses.html
         'response' => [
             // all responses, even unhandled errors, need to be in JSON for an API.
-            'format' => yii\web\Response::FORMAT_JSON,
+            'format' => Response::FORMAT_JSON,
         ],
         // http://www.yiiframework.com/doc-2.0/guide-runtime-routing.html
         'urlManager' => [
