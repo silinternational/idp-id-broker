@@ -3,6 +3,9 @@ MAINTAINER Phillip Shipley <phillip_shipley@sil.org>
 
 ENV REFRESHED_AT 2017-02-03
 
+RUN apt-get update -y && \
+    apt-get install -y make
+
 COPY dockerbuild/vhost.conf /etc/apache2/sites-enabled/
 
 RUN mkdir -p /data
@@ -19,7 +22,6 @@ WORKDIR /data
 
 # Install/cleanup composer dependencies
 COPY application/composer.json /data/
-COPY application/composer.lock /data/
 RUN composer install --prefer-dist --no-interaction --no-dev --optimize-autoloader
 
 # It is expected that /data is = application/ in project folder
