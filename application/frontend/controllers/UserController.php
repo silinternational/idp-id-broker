@@ -31,7 +31,7 @@ class UserController extends BaseRestController
 
         $user->attributes = Yii::$app->request->getBodyParams();
 
-        parent::save($user);
+        $this->save($user);
 
         return $user;
     }
@@ -50,7 +50,7 @@ class UserController extends BaseRestController
 
         $user->attributes = Yii::$app->request->getBodyParams();
 
-        parent::save($user);
+        $this->save($user);
 
         return $user;
     }
@@ -69,7 +69,7 @@ class UserController extends BaseRestController
 
         $user->attributes = Yii::$app->request->getBodyParams();
 
-        parent::save($user);
+        $this->save($user);
 
         return $user;
     }
