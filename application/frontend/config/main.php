@@ -33,17 +33,13 @@ return [
             'showScriptName' => false, // turns /index.php/post/100 into /post/100
             // http://www.yiiframework.com/doc-2.0/guide-rest-routing.html
             'rules' => [
-                [
-                    // http://www.yiiframework.com/doc-2.0/yii-rest-urlrule.html
-                    'class' => 'yii\rest\UrlRule',
-                    'controller' => ['authentication', 'user'],
-                    'extraPatterns' => [
-                        'GET <employeeId:\w+>' => 'view',
-                        'PUT <employeeId:\w+>' => 'update',
-                        'PUT <employeeId:\w+>/password' => 'update-password',
-                    ],
-                    'pluralize' => false,
-                ],
+                'GET  user'                           => 'user/index',
+                'GET  user/<employeeId:\w+>'          => 'user/view',
+                'POST user'                           => 'user/create',
+                'PUT  user/<employeeId:\w+>'          => 'user/update',
+                'PUT  user/<employeeId:\w+>/password' => 'user/update-password',
+
+                'POST authentication' => 'authentication/create',
 
                 'status' => 'site/status',
 
