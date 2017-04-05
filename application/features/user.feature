@@ -111,8 +111,8 @@ Feature: User
     Given the requester is authorized
       And the user store is empty
     When I request "/user" be <action>
-    Then the response status code should be 405
-      And the property message should contain "not allowed"
+    Then the response status code should be 404
+      And the property message should contain ""
       And the user store is still empty
 
     Examples:
