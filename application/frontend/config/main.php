@@ -1,5 +1,9 @@
 <?php
 
+use common\models\ApiConsumer;
+use yii\web\JsonParser;
+use yii\web\Response;
+
 return [
     'id' => 'app-frontend',
     'basePath' => dirname(__DIR__),
@@ -8,20 +12,20 @@ return [
     'components' => [
         // http://www.yiiframework.com/doc-2.0/guide-security-authentication.html
         'user' => [
-            'identityClass' => 'common\models\ApiConsumer', // custom Bearer <token> implementation
+            'identityClass' => ApiConsumer::class, // custom Bearer <token> implementation
             'enableSession' => false, // ensure statelessness
         ],
         // http://www.yiiframework.com/doc-2.0/guide-runtime-requests.html
         'request' => [
             // restrict input to JSON only http://www.yiiframework.com/doc-2.0/guide-rest-quick-start.html#enabling-json-input
             'parsers' => [
-                'application/json' => 'yii\web\JsonParser',
+                'application/json' => JsonParser::class,
             ]
         ],
         // http://www.yiiframework.com/doc-2.0/guide-runtime-responses.html
         'response' => [
             // all responses, even unhandled errors, need to be in JSON for an API.
-            'format' => yii\web\Response::FORMAT_JSON,
+            'format' => Response::FORMAT_JSON,
         ],
         // http://www.yiiframework.com/doc-2.0/guide-runtime-routing.html
         'urlManager' => [
@@ -30,14 +34,18 @@ return [
             // http://www.yiiframework.com/doc-2.0/guide-rest-routing.html
             'rules' => [
                 [
+                    // http://www.yiiframework.com/doc-2.0/yii-rest-urlrule.html
                     'class' => 'yii\rest\UrlRule',
-                    'controller' => ['user', 'authentication'],
+                    'controller' => ['authentication', 'user'],
+                    'extraPatterns' => [
+                        'GET <employeeId:\w+>' => 'view',
+                        'PUT <employeeId:\w+>' => 'update',
+                        'PUT <employeeId:\w+>/password' => 'update-password',
+                    ],
                     'pluralize' => false,
                 ],
 
-                'PUT /user/<employeeId:\w+>/password' => 'user/update-password',
-
-                'GET /site/system-status' => 'site/system-status',
+                'status' => 'site/status',
 
                 '<undefinedRequest>' => 'site/undefined-request',
             ]

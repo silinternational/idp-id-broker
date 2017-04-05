@@ -17,14 +17,14 @@ schemas:
       {
         "$schema": "http://json-schema.org/draft-03/schema",
         "properties": {
-            "username": {
-              "required": true,
-              "type": "string"
-            },
-            "password": {
-              "required": true,
-              "type": "string"
-            }
+          "username": {
+            "required": true,
+            "type": "string"
+          },
+          "password": {
+            "required": true,
+            "type": "string"
+          }
         },
         "type": "object"
       }
@@ -32,22 +32,22 @@ schemas:
       {
         "$schema": "http://json-schema.org/draft-03/schema",
         "properties": {
-            "name": {
-              "required": true,
-              "type": "string"
-            },
-            "message": {
-              "required": true,
-              "type": "string"
-            },
-            "code": {
-              "required": true,
-              "type": "integer"
-            },
-            "status": {
-              "required": true,
-              "type": "integer"
-            }
+          "name": {
+            "required": true,
+            "type": "string"
+          },
+          "message": {
+            "required": true,
+            "type": "string"
+          },
+          "code": {
+            "required": true,
+            "type": "integer"
+          },
+          "status": {
+            "required": true,
+            "type": "integer"
+          }
         },
         "type": "object"
       }
@@ -55,16 +55,58 @@ schemas:
       {
         "$schema": "http://json-schema.org/draft-03/schema",
         "properties": {
+          "employee_id": {
+            "required": true,
+            "type": "string"
+          },
+          "first_name": {
+            "required": true,
+            "type": "string"
+          },
+          "last_name": {
+            "required": true,
+            "type": "string"
+          },
+          "display_name": {
+            "required": false,
+            "type": "string"
+          },
+          "username": {
+            "required": true,
+            "type": "string"
+          },
+          "email": {
+            "required": true,
+            "type": "string"
+          },
+          "active": {
+            "required": false,
+            "type": "string",
+            "enum": ["yes", "no"]
+          },
+          "locked": {
+            "required": false,
+            "type": "string",
+            "enum": ["yes", "no"]
+          }
+        },
+        "type": "object"
+      }
+  - UserList: |
+      {
+        "$schema": "http://json-schema.org/draft-03/schema",
+        "items": {
+          "properties": {
             "employee_id": {
-              "required": true,
+              "required": false,
               "type": "string"
             },
             "first_name": {
-              "required": true,
+              "required": false,
               "type": "string"
             },
             "last_name": {
-              "required": true,
+              "required": false,
               "type": "string"
             },
             "display_name": {
@@ -72,11 +114,11 @@ schemas:
               "type": "string"
             },
             "username": {
-              "required": true,
+              "required": false,
               "type": "string"
             },
             "email": {
-              "required": true,
+              "required": false,
               "type": "string"
             },
             "active": {
@@ -89,48 +131,6 @@ schemas:
               "type": "string",
               "enum": ["yes", "no"]
             }
-        },
-        "type": "object"
-      }
-  - UserList: |
-      {
-        "$schema": "http://json-schema.org/draft-03/schema",
-        "items": {
-          "properties": {
-              "employee_id": {
-                "required": false,
-                "type": "string"
-              },
-              "first_name": {
-                "required": false,
-                "type": "string"
-              },
-              "last_name": {
-                "required": false,
-                "type": "string"
-              },
-              "display_name": {
-                "required": false,
-                "type": "string"
-              },
-              "username": {
-                "required": false,
-                "type": "string"
-              },
-              "email": {
-                "required": false,
-                "type": "string"
-              },
-              "active": {
-                "required": false,
-                "type": "string",
-                "enum": ["yes", "no"]
-              },
-              "locked": {
-                "required": false,
-                "type": "string",
-                "enum": ["yes", "no"]
-              }
           },
           "type": "object"
         },
@@ -140,36 +140,36 @@ schemas:
       {
         "$schema": "http://json-schema.org/draft-03/schema",
         "properties": {
-            "first_name": {
-              "required": false,
-              "type": "string"
-            },
-            "last_name": {
-              "required": false,
-              "type": "string"
-            },
-            "display_name": {
-              "required": false,
-              "type": "string"
-            },
-            "username": {
-              "required": false,
-              "type": "string"
-            },
-            "email": {
-              "required": false,
-              "type": "string"
-            },
-            "active": {
-              "required": false,
-              "type": "string",
-              "enum": ["yes", "no"]
-            },
-            "locked": {
-              "required": false,
-              "type": "string",
-              "enum": ["yes", "no"]
-            }
+          "first_name": {
+            "required": false,
+            "type": "string"
+          },
+          "last_name": {
+            "required": false,
+            "type": "string"
+          },
+          "display_name": {
+            "required": false,
+            "type": "string"
+          },
+          "username": {
+            "required": false,
+            "type": "string"
+          },
+          "email": {
+            "required": false,
+            "type": "string"
+          },
+          "active": {
+            "required": false,
+            "type": "string",
+            "enum": ["yes", "no"]
+          },
+          "locked": {
+            "required": false,
+            "type": "string",
+            "enum": ["yes", "no"]
+          }
         },
         "type": "object"
       }
@@ -188,10 +188,10 @@ schemas:
       200:
         description: |
           The given credentials were acceptable/valid (i.e. - the
-          authentication succeeded).
+          authentication succeeded).  The body of the response will have the attributes of the
+          authenticated User.
         body:
           application/json:
-            description: The attributes of the authenticated User.
             schema: User
             example: |
               {
@@ -239,24 +239,36 @@ schemas:
         description: A comma-delimited list of fields to include for each user.
         required: false
         type: string
-        default: "fields=employee_id,active"
-        example: "fields=employee_id"
-      expand:
-        description: |
-          A comma-delimited list of extra fields to include for each user.
-        required: false
-        type: string
-        example: "fields=first_name,last_name,display_name,username,email,locked"
+        default: "fields=employee_id,first_name,last_name,display_name,username,email,active,locked"
+        example: "fields=employee_id,active"
     responses:
       200:
-        body:
-          application/json:
-            schema: UserList
-            example: |
-              [
-                {"employee_id": "11111", "active": "yes"},
-                {"employee_id": "22222", "active": "no"}
-              ]
+          body:
+            application/json:
+              schema: UserList
+              example: |
+                [
+                  {
+                    "employee_id": "12345",
+                    "first_name": "John",
+                    "last_name": "Smith",
+                    "display_name": "John Smith",
+                    "username": "john_smith",
+                    "email": "john_smith@example.com",
+                    "active": "yes",
+                    "locked": "no"
+                  },
+                  {
+                    "employee_id": "54321",
+                    "first_name": "Jane",
+                    "last_name": "Smith",
+                    "display_name": "Jane Smith",
+                    "username": "jane_smith",
+                    "email": "jane_smith@example.com",
+                    "active": "yes",
+                    "locked": "no"
+                  }
+                ]
   post:
     description: Create a new user record.
     body:
@@ -275,7 +287,6 @@ schemas:
         description: The new user record was created.
         body:
           application/json:
-            description: The newly-created user record.
             schema: User
             example: |
               {
@@ -288,7 +299,6 @@ schemas:
                 "active": "yes",
                 "locked": "no"
               }
-
       422:
         description: The given user data does not satisfy some validation rule.
         body:
@@ -319,9 +329,8 @@ schemas:
       description: Get information about a specific user.
       responses:
         200:
-          description:
-            The corresponding user record (matching on the `employee_id` URL
-            parameter).
+          description: |
+            The corresponding user record (matching on the `employee_id` URL parameter).
           body:
             application/json:
               schema: User
@@ -352,6 +361,22 @@ schemas:
           description: |
             The corresponding user record (matching on the `employee_id` URL
             parameter) was updated to match the given data.
+          body:
+            application/json:
+              schema: User
+              example: |
+                {
+                  "employee_id": "12345",
+                  "first_name": "John",
+                  "last_name": "Smith",
+                  "display_name": "John Smith",
+                  "username": "john_smith",
+                  "email": "john_smith@example.com",
+                  "active": "no",
+                  "locked": "no"
+                }
+        204:
+          description: No user record was found with that `employee_id`.
         422:
           description: The given user data does not satisfy some validation rule.
           body:
@@ -386,10 +411,10 @@ schemas:
               {
                 "$schema": "http://json-schema.org/draft-03/schema",
                 "properties": {
-                    "password": {
-                      "required": true,
-                      "type": "string"
-                    }
+                  "password": {
+                    "required": true,
+                    "type": "string"
+                  }
                 },
                 "type": "object"
               }
@@ -400,8 +425,23 @@ schemas:
         responses:
           200:
             description: |
-              The password for the user with that `employee_id` was
-              successfully updated.
+              The password for the user with that `employee_id` was successfully updated.
+            body:
+              application/json:
+                schema: User
+                example: |
+                  {
+                    "employee_id": "12345",
+                    "first_name": "John",
+                    "last_name": "Smith",
+                    "display_name": "John Smith",
+                    "username": "john_smith",
+                    "email": "john_smith@example.com",
+                    "active": "yes",
+                    "locked": "no"
+                  }
+          204:
+            description: No user record was found with that `employee_id`.
           422:
             description: |
               The given password does not meet some requirement (such as if an

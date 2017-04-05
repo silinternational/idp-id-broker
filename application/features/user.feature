@@ -28,7 +28,6 @@ Feature: User
         | locked       | no                    |
       And the following data is not returned:
         | property      |
-        | id            |
         | password_hash |
       And a record exists with an employee_id of "123"
       And the following data should be stored:
@@ -44,51 +43,53 @@ Feature: User
       And last_changed_utc should be stored as now UTC
       And last_synced_utc should be stored as now UTC
 
-  Scenario: "Touch" an existing user without making any changes
-    Given the requester is authorized
-      And I provide the following valid data:
-        | property     | value                 |
-        | employee_id  | 123                   |
-        | first_name   | Shep                  |
-        | last_name    | Clark                 |
-        | display_name | Shep Clark            |
-        | username     | shep_clark            |
-        | email        | shep_clark@example.org|
-      And I request "/user" be created
-      And a record exists with an employee_id of "123"
-    When I request "/user" be created again
-    Then a record exists with an employee_id of "123"
-      And the only property to change should be last_synced_utc
-      And last_synced_utc should be stored as now UTC
+#TODO: related to PUT now.
+#  Scenario: "Touch" an existing user without making any changes
+#    Given the requester is authorized
+#      And I provide the following valid data:
+#        | property     | value                 |
+#        | employee_id  | 123                   |
+#        | first_name   | Shep                  |
+#        | last_name    | Clark                 |
+#        | display_name | Shep Clark            |
+#        | username     | shep_clark            |
+#        | email        | shep_clark@example.org|
+#      And I request "/user" be created
+#      And a record exists with an employee_id of "123"
+#    When I request "/user" be created again
+#    Then a record exists with an employee_id of "123"
+#      And the only property to change should be last_synced_utc
+#      And last_synced_utc should be stored as now UTC
 
-  Scenario Outline: Change the properties of an existing user
-    Given the requester is authorized
-      And the user store is empty
-      And I provide the following valid data:
-        | property     | value                 |
-        | employee_id  | 123                   |
-        | first_name   | Shep                  |
-        | last_name    | Clark                 |
-        | display_name | Shep Clark            |
-        | username     | shep_clark            |
-        | email        | shep_clark@example.org|
-      And I request "/user" be created
-      And a record exists with an employee_id of "123"
-    When I change the <property> to <value>
-      And I request "/user" be created again
-    Then a record exists with a <property> of <value>
-      And last_changed_utc and last_synced_utc are the same
-      And last_synced_utc should be stored as now UTC
-
-    Examples:
-      | property    | value           |
-      | first_name  | FIRST           |
-      | last_name   | LAST            |
-      | display_name| DISPLAY         |
-      | username    | USER            |
-      | email       | chg@example.org |
-      | active      | no              |
-      | locked      | yes             |
+#TODO: related to PUT now.
+#  Scenario Outline: Change the properties of an existing user
+#    Given the requester is authorized
+#      And the user store is empty
+#      And I provide the following valid data:
+#        | property     | value                 |
+#        | employee_id  | 123                   |
+#        | first_name   | Shep                  |
+#        | last_name    | Clark                 |
+#        | display_name | Shep Clark            |
+#        | username     | shep_clark            |
+#        | email        | shep_clark@example.org|
+#      And I request "/user" be created
+#      And a record exists with an employee_id of "123"
+#    When I change the <property> to <value>
+#      And I request "/user" be created again
+#    Then a record exists with a <property> of <value>
+#      And last_changed_utc and last_synced_utc are the same
+#      And last_synced_utc should be stored as now UTC
+#
+#    Examples:
+#      | property    | value           |
+#      | first_name  | FIRST           |
+#      | last_name   | LAST            |
+#      | display_name| DISPLAY         |
+#      | username    | USER            |
+#      | email       | chg@example.org |
+#      | active      | no              |
+#      | locked      | yes             |
 
   Scenario Outline: Attempt to act upon a user as an unauthorized user
     Given the requester is not authorized
@@ -116,7 +117,6 @@ Feature: User
 
     Examples:
       | action    |
-      | retrieved |
       | updated   |
       | deleted   |
       | patched   |
@@ -253,7 +253,6 @@ Feature: User
       | username     | Username     |
       | email        | Email        |
 
-
   Scenario: Attempt to create a new user with a username that already exists
     Given the requester is authorized
       And the user store is empty
@@ -303,5 +302,47 @@ Feature: User
       And I request "/user" be created
     Then the response status code should be 422
       And the property message should contain "Email"
+#TODO: need one of these for employee id now too.
+
+  Scenario: Retrieve all users
+    Given the requester is authorized
+      And the user store is empty
+      And I provide the following valid data:
+        | property     | value                 |
+        | employee_id  | 123                   |
+        | first_name   | Shep                  |
+        | last_name    | Clark                 |
+        | display_name | Shep Clark            |
+        | username     | shep_clark            |
+        | email        | shep_clark@example.org|
+      And I request "/user" be created
+      And I provide the following valid data:
+        | property     | value                  |
+        | employee_id  | 234                    |
+        | first_name   | Shepp                  |
+        | last_name    | Clark                  |
+        | display_name | Shepp Clark            |
+        | username     | shepp_clark            |
+        | email        | shepp_clark@example.org|
+      And I request "/user" be created
+    When I request "/user" be retrieved
+    Then the response status code should be 200
+      And I should receive 2 users
+
+#TODO: get a user with/without a match
+#TODO: get a user with invalid id
+#TODO: act upon a user/{id} in an undefined authz and !authz
+#TODO: review previous tests for additional ideas
+#TODO: get a user utilizing fields param
+
+#TODO: ensure an employee_id cannot be changed in PUT
+#TODO: PUT without any changes should still update last_synced, right?
+#TODO: PUT with a change to an existing value on one of the unique fields should generate an error.
+#TODO: PUT with a change should update the last_changed data properly...as well as the field to be updated :-)
+
+
+
+#TODO: add site.feature to test all verbs to status, not found, authn/nonauthn...as well as NotFound
 
 #TODO: make sure display_name is built up from first + last when not supplied.
+

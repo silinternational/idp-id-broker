@@ -15,24 +15,24 @@ class SiteController extends BaseRestController
 
         $behaviors['authenticator']['except'] = [
             // bypass authentication, i.e., public API
-            'system-status'
+            'status'
         ];
 
         return $behaviors;
     }
 
-    public function actionSystemStatus()
+    public function actionStatus()
     {
         try {
             // db comms are a good indication of health
             Yii::$app->db->open();
-
-            Yii::$app->response->statusCode = 204;
         } catch (Exception $e) {
             throw new ServerErrorHttpException(
                 'Database connection problem.', $e->getCode()
             );
         }
+
+        Yii::$app->response->statusCode = 204;
     }
 
     public function actionUndefinedRequest()

@@ -2,6 +2,7 @@
 
 namespace common\models;
 
+use Closure;
 use common\helpers\MySqlDateTime;
 use Exception;
 use yii\behaviors\AttributeBehavior;
@@ -10,6 +11,8 @@ use yii\helpers\ArrayHelper;
 
 class User extends UserBase
 {
+    const SCENARIO_NEW_USER        = 'new_user';
+    const SCENARIO_UPDATE_USER     = 'update_user';
     const SCENARIO_UPDATE_PASSWORD = 'update_password';
     const SCENARIO_AUTHENTICATE    = 'authenticate';
 
@@ -19,8 +22,20 @@ class User extends UserBase
     {
         $scenarios = parent::scenarios();
 
-        $scenarios[self::SCENARIO_DEFAULT] = [
+        $scenarios[self::SCENARIO_DEFAULT] = null;
+
+        $scenarios[self::SCENARIO_NEW_USER] = [
             'employee_id',
+            'first_name',
+            'last_name',
+            'display_name',
+            'username',
+            'email',
+            'active',
+            'locked',
+        ];
+
+        $scenarios[self::SCENARIO_UPDATE_USER] = [
             'first_name',
             'last_name',
             'display_name',
@@ -82,7 +97,7 @@ class User extends UserBase
         ], parent::rules());
     }
 
-    private function validatePassword(): \Closure
+    private function validatePassword(): Closure
     {
         return function ($attributeName) {
             if (! password_verify($this->password, $this->password_hash)) {
@@ -115,12 +130,17 @@ class User extends UserBase
         ];
     }
 
-    private function updateOnSync(): \Closure
+    private function updateOnSync(): Closure
     {
         return function () {
-            return $this->scenario === self::SCENARIO_DEFAULT ? MySqlDateTime::now()
-                                                              : $this->last_synced_utc;
+            return $this->isSync($this->scenario) ? MySqlDateTime::now()
+                                                  : $this->last_synced_utc;
         };
+    }
+
+    private function isSync($scenario): bool
+    {
+        return in_array($scenario, [self::SCENARIO_NEW_USER, self::SCENARIO_UPDATE_USER]);
     }
 
     /**
