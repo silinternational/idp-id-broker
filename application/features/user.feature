@@ -91,6 +91,8 @@ Feature: User
 #      | active      | no              |
 #      | locked      | yes             |
 
+#TODO: consider creating a new security.feature file for all these security-related tests.
+#TODO: need to think through tests for API_ACCESS_KEYS config, i.e., need tests for ApiConsumer
   Scenario Outline: Attempt to act upon a user as an unauthorized user
     Given the requester is not authorized
       And the user store is empty
