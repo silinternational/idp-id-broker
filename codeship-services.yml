@@ -21,7 +21,7 @@ app:
         MYSQL_DATABASE: test
         MYSQL_USER: idbroker
         MYSQL_PASSWORD: idbroker
-        API_ACCESS_KEY: abc123
+        API_ACCESS_KEYS: abc123
         TEST_SERVER_HOSTNAME: localhost
 
 
