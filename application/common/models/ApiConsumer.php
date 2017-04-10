@@ -12,6 +12,7 @@ class ApiConsumer extends Component implements IdentityInterface
             return new ApiConsumer();
         }
 
+//TODO: Yii::warning with details of current environment and request to identify either trends token misuse or misconfiguration.
         return null;
     }
 

@@ -194,6 +194,7 @@ class User extends UserBase
 
             return true;
         } catch (Exception $e) {
+//TODO: Yii::warning with details of request, non-sensitive user info, exception details...not sure how actionable this one is or under what circumstances we might see this.
             $transaction->rollBack();
 
             throw $e;

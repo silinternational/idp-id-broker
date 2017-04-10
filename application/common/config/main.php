@@ -12,6 +12,7 @@ function getRequiredEnv($name)
     $value = Env::get($name);
 
     if (empty($value)) {
+//TODO: Yii::error with details of current environment and request to help identify where the config is broken.
         die("$name missing from environment.");
     }
 
