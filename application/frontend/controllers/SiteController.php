@@ -37,6 +37,7 @@ class SiteController extends BaseRestController
 
     public function actionUndefinedRequest()
     {
+//TODO: Yii::warning with details of current environment and request to identify either trends of either potential attacks or API misunderstandings.
         throw new NotFoundHttpException();
     }
 }
