@@ -8,11 +8,18 @@ class ApiConsumer extends Component implements IdentityInterface
 {
     public static function findIdentityByAccessToken($token, $type = null)
     {
-        if ($token === getenv('API_ACCESS_KEY')) {
+        if (self::isRecognized($token)) {
             return new ApiConsumer();
         }
 
         return null;
+    }
+
+    private static function isRecognized($token): bool
+    {
+        $recognizedKeys = explode(',', getenv('API_ACCESS_KEYS'));
+
+        return in_array($token, $recognizedKeys);
     }
 
     public static function findIdentity($id)
