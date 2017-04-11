@@ -18,7 +18,17 @@ tables: db
 basemodels: db tables
 	docker-compose run --rm cli whenavail db 3306 100 ./rebuildbasemodels.sh
 
-test: app
+ldap:
+	docker-compose up -d ldap
+
+ldapload: ldap
+	docker-compose run --rm ldapload
+
+rmldap:
+	docker-compose kill ldap
+	docker-compose rm -f ldap
+
+test: app rmldap ldap ldapload
 	docker-compose run --rm test
 
 clean:
