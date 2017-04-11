@@ -1,5 +1,6 @@
 <?php
 
+use common\ldap\Ldap;
 use Sil\PhpEnv\Env;
 
 $mysqlHost     = getRequiredEnv('MYSQL_HOST');
@@ -27,6 +28,17 @@ return [
             'username' => $mysqlUser,
             'password' => $mysqlPassword,
             'charset' => 'utf8',
+        ],
+        'ldap' => [
+            'class' => Ldap::class,
+            'acct_suffix' => Env::get('LDAP_ACCT_SUFFIX'),
+            'domain_controllers' => explode('|', Env::get('LDAP_DOMAIN_CONTROLLERS')),
+            'base_dn' => Env::get('LDAP_BASE_DN'),
+            'admin_username' => Env::get('LDAP_ADMIN_USERNAME'),
+            'admin_password' => Env::get('LDAP_ADMIN_PASSWORD'),
+            'use_ssl' => Env::get('LDAP_USE_SSL', true),
+            'use_tls' => Env::get('LDAP_USE_TLS', true),
+            'timeout' => Env::get('LDAP_TIMEOUT', 5),
         ],
     ],
 ];
