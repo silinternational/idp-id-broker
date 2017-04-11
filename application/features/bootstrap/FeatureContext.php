@@ -359,4 +359,39 @@ class FeatureContext extends YiiContext
     {
         Assert::count($this->resBody, $numOfUsers);
     }
+
+    /**
+     * @Given there is a(n) :username user in the ldap with a password of :password
+     */
+    public function thereIsAnUserInTheLdapWithAPasswordOf($username, $password)
+    {
+        $isCorrect = Yii::$app->ldap->isPasswordCorrectForUser(
+            $username,
+            $password
+        );
+        Assert::true($isCorrect);
+    }
+    
+    /**
+     * @Given the user :username has no password in the database
+     */
+    public function theUserHasNoPasswordInTheDatabase($username)
+    {
+        $user = User::findByUsername($username);
+        Assert::notNull($user);
+        $user->password_hash = null;
+        Assert::true($user->save(false, ['password_hash']));
+        $user->refresh();
+        Assert::null($user->password_hash);
+    }
+    
+    /**
+     * @Given the user :username does have a password in the database
+     */
+    public function theUserDoesHaveAPasswordInTheDatabase($username)
+    {
+        $user = User::findByUsername($username);
+        Assert::notNull($user);
+        Assert::notNull($user->password_hash);
+    }
 }
