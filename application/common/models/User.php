@@ -8,6 +8,7 @@ use Exception;
 use yii\behaviors\AttributeBehavior;
 use yii\db\ActiveRecord;
 use yii\helpers\ArrayHelper;
+use Yii;
 
 class User extends UserBase
 {
@@ -17,6 +18,56 @@ class User extends UserBase
     const SCENARIO_AUTHENTICATE    = 'authenticate';
 
     public $password;
+    
+    protected function attemptPasswordMigration()
+    {
+        if (empty($this->username)) {
+            Yii::warning('No username given for checking against ldap.');
+            return;
+        }
+        
+        if (empty($this->password)) {
+            Yii::warning('No password given for checking against ldap.');
+            return;
+        }
+        
+        $user = User::findByUsername($this->username);
+        if ($user === null) {
+            Yii::warning(sprintf(
+                'No user found with that username (%s) when trying to check '
+                . 'password against ldap.',
+                var_export($this->username, true)
+            ));
+            return;
+        }
+        
+        if (Yii::$app->ldap->isPasswordCorrectForUser($this->username, $this->password)) {
+            
+            /* Try to save the password, but let the user proceed even if
+             * we can't (since we know the password is correct).  */
+            $user->scenario = User::SCENARIO_UPDATE_PASSWORD;
+            $savedPassword = $user->savePassword();
+            if ( ! $savedPassword) {
+                Yii::warning(sprintf(
+                    'Confirmed given password for %s against LDAP, but failed '
+                    . 'to save password hash to database: %s',
+                    var_export($this->username, true),
+                    json_encode($this->getFirstErrors())
+                ));
+            } else {
+                $this->refresh();
+            }
+        }
+    }
+    
+    /**
+     * @param string $username
+     * @return User|null
+     */
+    public static function findByUsername(string $username)
+    {
+        return User::findOne(['username' => $username]);
+    }
 
     public function scenarios(): array
     {
@@ -100,6 +151,11 @@ class User extends UserBase
     private function validatePassword(): Closure
     {
         return function ($attributeName) {
+            
+            if ( ! $this->hasPasswordAlready()) {
+                $this->attemptPasswordMigration();
+            }
+            
             if (! password_verify($this->password, $this->password_hash)) {
                 $this->addError($attributeName, 'Incorrect password.');
             }
