@@ -1,6 +1,7 @@
 <?php
 namespace common\models;
 
+use Yii;
 use yii\base\Component;
 use yii\web\IdentityInterface;
 
@@ -12,7 +13,8 @@ class ApiConsumer extends Component implements IdentityInterface
             return new ApiConsumer();
         }
 
-//TODO: Yii::warning with details of current environment and request to identify either trends token misuse or misconfiguration.
+        Yii::warning("unrecognized token: $token");
+
         return null;
     }
 

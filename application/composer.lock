@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "e0ea96b3ff2a854a1fa394ff08489500",
+    "content-hash": "ba88f87815d48cc8ffcfae0cafdcddd8",
     "packages": [
         {
             "name": "cebe/markdown",
@@ -317,6 +317,43 @@
                 "MIT"
             ],
             "time": "2015-10-29T21:09:24+00:00"
+        },
+        {
+            "name": "silinternational/yii2-jsonsyslog",
+            "version": "1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/silinternational/yii2-jsonsyslog.git",
+                "reference": "d3a9326deff4ececbdbc84d0963185f5849c94cc"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/silinternational/yii2-jsonsyslog/zipball/d3a9326deff4ececbdbc84d0963185f5849c94cc",
+                "reference": "d3a9326deff4ececbdbc84d0963185f5849c94cc",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.4.0",
+                "yiisoft/yii2": "2.*"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Sil\\JsonSyslog\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "Yii2 log target for sending data to Syslog as a JSON encoded string",
+            "keywords": [
+                "json",
+                "log",
+                "syslog",
+                "yii2"
+            ],
+            "time": "2015-08-19T15:07:38+00:00"
         },
         {
             "name": "yiisoft/yii2",
@@ -727,7 +764,7 @@
                 "phpmyadmin",
                 "web"
             ],
-            "time": "2016-11-16T16:03:54+00:00"
+            "time": "2016-11-16 16:03:54"
         },
         {
             "name": "guzzlehttp/guzzle",
