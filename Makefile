@@ -28,6 +28,9 @@ rmldap:
 	docker-compose kill ldap
 	docker-compose rm -f ldap
 
+quicktest:
+	docker-compose run --rm test bash -c "vendor/bin/behat --stop-on-failure --strict"
+
 test: app rmldap ldap ldapload
 	docker-compose run --rm test
 
