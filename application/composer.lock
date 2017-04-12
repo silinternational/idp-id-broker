@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "618cc179b1478b4826a1e8279d7a85b5",
+    "content-hash": "c65242f3452ba8b6e7540f68341e3c3c",
     "packages": [
         {
             "name": "adldap2/adldap2",
@@ -553,16 +553,16 @@
         },
         {
             "name": "silinternational/php-env",
-            "version": "0.1.1",
+            "version": "1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/silinternational/php-env.git",
-                "reference": "4dd4aad8cdec438cecd3e779d2d434736cfdfd96"
+                "reference": "887740f343469311845bfd0447d9065ff8dd3bdf"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/silinternational/php-env/zipball/4dd4aad8cdec438cecd3e779d2d434736cfdfd96",
-                "reference": "4dd4aad8cdec438cecd3e779d2d434736cfdfd96",
+                "url": "https://api.github.com/repos/silinternational/php-env/zipball/887740f343469311845bfd0447d9065ff8dd3bdf",
+                "reference": "887740f343469311845bfd0447d9065ff8dd3bdf",
                 "shasum": ""
             },
             "require": {
@@ -570,7 +570,7 @@
             },
             "require-dev": {
                 "johnkary/phpunit-speedtrap": "1.*",
-                "phpunit/phpunit": "4.*"
+                "phpunit/phpunit": "^6.1"
             },
             "type": "library",
             "autoload": {
@@ -582,7 +582,7 @@
             "license": [
                 "MIT"
             ],
-            "time": "2015-10-29T21:09:24+00:00"
+            "time": "2017-04-12T15:43:22+00:00"
         },
         {
             "name": "silinternational/yii2-jsonsyslog",
