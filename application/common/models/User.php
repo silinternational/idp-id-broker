@@ -257,7 +257,7 @@ class User extends UserBase
         }
     }
 
-    private function hasPasswordAlready(): bool
+    public function hasPasswordAlready(): bool
     {
         return ! empty($this->password_hash);
     }
