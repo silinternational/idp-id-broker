@@ -30,7 +30,7 @@ class Ldap extends Component
             $this->use_ssl = false;
         }
         
-        if (empty(join('', $this->domain_controllers))) {
+        if (empty($this->domain_controllers) || empty(join('', $this->domain_controllers))) {
             throw new \InvalidArgumentException('No domain_controllers provided.');
         }
         
