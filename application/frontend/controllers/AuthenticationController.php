@@ -1,6 +1,7 @@
 <?php
 namespace frontend\controllers;
 
+use common\models\Authentication;
 use common\models\User;
 use frontend\components\BaseRestController;
 use Yii;
@@ -16,18 +17,18 @@ class AuthenticationController extends BaseRestController
      */
     public function actionCreate(): User
     {
-        $user = User::findOne([
-            'username' => (string)Yii::$app->request->getBodyParam('username')
-        ]) ?? new User();
-
-        $user->scenario = User::SCENARIO_AUTHENTICATE;
-
-        $user->attributes = Yii::$app->request->getBodyParams();
-
-        if ($user->validate()) {
-            return $user;
+        $authentication = new Authentication(
+            (string)Yii::$app->request->getBodyParam('username'),
+            (string)Yii::$app->request->getBodyParam('password'),
+            Yii::$app->ldap
+        );
+        
+        $authenticatedUser = $authentication->getAuthenticatedUser();
+        
+        if ($authenticatedUser !== null) {
+            return $authenticatedUser;
         }
-
+        
         throw new BadRequestHttpException();
     }
 }
