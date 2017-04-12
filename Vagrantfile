@@ -93,9 +93,6 @@ EOF
     # Ensure env vars are loaded from bash_profile
     source /home/vagrant/.bash_profile
 
-    # Start services
-    make start
-
   SHELL
 
 end
