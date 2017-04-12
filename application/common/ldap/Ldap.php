@@ -64,19 +64,9 @@ class Ldap extends Component
                 $this->provider = $provider;
             } catch (BindException $e) {
                 throw new LdapConnectionException(sprintf(
-                    "There was a problem connecting to the LDAP server: (%s) %s\n%s",
+                    'There was a problem connecting to the LDAP server: (%s) %s',
                     $e->getCode(),
-                    $e->getMessage(),
-                    json_encode([
-                        'acct_suffix' => $this->acct_suffix,
-                        'domain_controllers' => $this->domain_controllers,
-                        'base_dn' => $this->base_dn,
-                        'admin_username' => $this->admin_username,
-                        'admin_password' => $this->admin_password,
-                        'use_ssl' => $this->use_ssl,
-                        'use_tls' => $this->use_tls,
-                        'timeout' => $this->timeout,
-                    ], JSON_PRETTY_PRINT)
+                    $e->getMessage()
                 ), 1481752312, $e);
             }
         }
