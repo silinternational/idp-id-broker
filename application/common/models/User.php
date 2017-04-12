@@ -46,6 +46,7 @@ class User extends UserBase
             /* Try to save the password, but let the user proceed even if
              * we can't (since we know the password is correct).  */
             $user->scenario = User::SCENARIO_UPDATE_PASSWORD;
+            $user->password = $this->password;
             $savedPassword = $user->savePassword();
             if ( ! $savedPassword) {
                 Yii::warning(sprintf(
