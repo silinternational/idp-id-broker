@@ -1,15 +1,25 @@
 <?php
 
 use Sil\JsonSyslog\JsonSyslogTarget;
+use Sil\Log\EmailTarget;
 use Sil\PhpEnv\Env;
 use yii\db\Connection;
 use yii\helpers\Json;
+use yii\swiftmailer\Mailer;
 use yii\web\Request;
+
+$idpName = getRequiredEnv('IDP_NAME');
 
 $mysqlHost     = getRequiredEnv('MYSQL_HOST');
 $mysqlDatabase = getRequiredEnv('MYSQL_DATABASE');
 $mysqlUser     = getRequiredEnv('MYSQL_USER');
 $mysqlPassword = getRequiredEnv('MYSQL_PASSWORD');
+
+$mailerUseFiles    = Env::get('MAILER_USEFILES', false);
+$mailerHost        = Env::get('MAILER_HOST');
+$mailerUsername    = Env::get('MAILER_USERNAME');
+$mailerPassword    = Env::get('MAILER_PASSWORD');
+$notificationEmail = Env::get('NOTIFICATION_EMAIL');
 
 function getRequiredEnv($name)
 {
@@ -59,6 +69,29 @@ return [
                         return Json::encode($prefixData);
                     },
                 ],
+                [
+                    'class' => EmailTarget::class,
+                    'categories' => ['application'], // stick to messages from this app, not all of Yii's built-in messaging.
+                    'logVars' => [], // no need for default stuff: http://www.yiiframework.com/doc-2.0/yii-log-target.html#$logVars-detail
+                    'levels' => ['error'],
+                    'message' => [
+                        'from' => $notificationEmail,
+                        'to' => $notificationEmail,
+                        'subject' => "ERROR - $idpName-id-broker [".YII_ENV."] Error",
+                    ],
+                ],
+            ],
+        ],
+        'mailer' => [
+            'class' => Mailer::class,
+            'useFileTransport' => $mailerUseFiles,
+            'transport' => [
+                'class' => 'Swift_SmtpTransport',
+                'host' => $mailerHost,
+                'username' => $mailerUsername,
+                'password' => $mailerPassword,
+                'port' => '465',
+                'encryption' => 'ssl',
             ],
         ],
     ],
