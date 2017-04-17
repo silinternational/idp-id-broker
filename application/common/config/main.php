@@ -19,7 +19,7 @@ $mailerUseFiles    = Env::get('MAILER_USEFILES', false);
 $mailerHost        = Env::get('MAILER_HOST');
 $mailerUsername    = Env::get('MAILER_USERNAME');
 $mailerPassword    = Env::get('MAILER_PASSWORD');
-$notificationEmail = Env::get('NOTIFICATION_EMAIL');
+$notificationEmail = Env::get('NOTIFICATION_EMAIL', 'oncall@example.org');
 
 function getRequiredEnv($name)
 {
