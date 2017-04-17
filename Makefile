@@ -29,7 +29,7 @@ rmldap:
 	docker-compose rm -f ldap
 
 quicktest:
-	docker-compose run --rm test bash -c "vendor/bin/behat --stop-on-failure --strict"
+	docker-compose run --rm test bash -c "vendor/bin/behat --stop-on-failure --strict --append-snippets"
 
 test: app rmldap ldap ldapload
 	docker-compose run --rm test
