@@ -1,6 +1,7 @@
 <?php
 namespace common\models;
 
+use Yii;
 use yii\base\Component;
 use yii\web\IdentityInterface;
 
@@ -11,6 +12,8 @@ class ApiConsumer extends Component implements IdentityInterface
         if (self::isRecognized($token)) {
             return new ApiConsumer();
         }
+
+        Yii::warning("unrecognized token: $token");
 
         return null;
     }

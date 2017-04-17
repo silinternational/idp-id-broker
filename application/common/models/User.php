@@ -5,6 +5,7 @@ namespace common\models;
 use Closure;
 use common\helpers\MySqlDateTime;
 use Exception;
+use Yii;
 use yii\behaviors\AttributeBehavior;
 use yii\db\ActiveRecord;
 use yii\helpers\ArrayHelper;
@@ -195,6 +196,8 @@ class User extends UserBase
             return true;
         } catch (Exception $e) {
             $transaction->rollBack();
+
+            Yii::warning("Something went wrong trying to save a new password for $this->employee_id: $e");
 
             throw $e;
         }

@@ -37,6 +37,11 @@ class SiteController extends BaseRestController
 
     public function actionUndefinedRequest()
     {
+        $method = Yii::$app->request->method;
+        $url    = Yii::$app->request->url;
+
+        Yii::warning("$method $url requested but not defined.");
+
         throw new NotFoundHttpException();
     }
 }
