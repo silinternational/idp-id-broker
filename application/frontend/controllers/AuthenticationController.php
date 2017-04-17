@@ -17,10 +17,12 @@ class AuthenticationController extends BaseRestController
      */
     public function actionCreate(): User
     {
+        $migratePasswords = Yii::$app->params['migratePasswordsFromLdap'];
+        
         $authentication = new Authentication(
             (string)Yii::$app->request->getBodyParam('username'),
             (string)Yii::$app->request->getBodyParam('password'),
-            Yii::$app->ldap
+            $migratePasswords ? Yii::$app->ldap : null
         );
         
         $authenticatedUser = $authentication->getAuthenticatedUser();

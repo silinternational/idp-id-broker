@@ -41,4 +41,7 @@ return [
             'timeout' => Env::get('LDAP_TIMEOUT', 5),
         ],
     ],
+    'params' => [
+        'migratePasswordsFromLdap' => Env::get('MIGRATE_PW_FROM_LDAP', false),
+    ],
 ];
