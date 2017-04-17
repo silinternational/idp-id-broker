@@ -122,9 +122,10 @@ class FeatureContext extends YiiContext
      */
     public function theRequesterIsAuthorized()
     {
-        $key = $this->getEnv('API_ACCESS_KEY');
+        $keysString = $this->getEnv('API_ACCESS_KEYS');
+        $keys = explode(',', $keysString);
 
-        $this->reqHeaders['Authorization'] = "Bearer $key";
+        $this->reqHeaders['Authorization'] = 'Bearer ' . $keys[0];
     }
 
     private function getEnv($key): string
