@@ -16,13 +16,14 @@ class Authentication
      *
      * @param string $username The username to try.
      * @param string $password The password to try.
-     * @param Ldap $ldap The LDAP to use for lazy-loading passwords not yet
-     *     stored in our local database.
+     * @param Ldap|null $ldap (Optional:) The LDAP to use for lazy-loading
+     *     passwords not yet stored in our local database. Defaults to null,
+     *     meaning passwords will not be migrated.
      */
     public function __construct(
         string $username,
         string $password,
-        Ldap $ldap
+        $ldap = null
     ) {
         /* @var $user User */
         $user = User::findByUsername($username) ?? new User();
@@ -33,7 +34,9 @@ class Authentication
             'username' => $username,
             'password' => $password,
         ];
-        $user->setLdap($ldap);
+        if ($ldap instanceof Ldap) {
+            $user->setLdap($ldap);
+        }
 
         if ($user->validate()) {
             $this->authenticatedUser = $user;
