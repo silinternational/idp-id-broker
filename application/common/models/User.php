@@ -28,6 +28,12 @@ class User extends UserBase
         try {
             if ($this->ldap === null) {
                 
+                // If no LDAP was provided, simply skip password migration.
+                return;
+            }
+            
+            if (empty($this->username)) {
+                
                 /**
                  * @todo If adding errors here causes a problem (because I think
                  * it will cause the `validate()` call to return false... right?)
@@ -36,14 +42,6 @@ class User extends UserBase
                  * the LdapContext Behat test file accordingly, since it gets
                  * the errors and reports them (to help the developer debug).
                  */
-                $this->addError(
-                    'password',
-                    'No LDAP provided for checking/migrating credentials.'
-                );
-                return;
-            }
-            
-            if (empty($this->username)) {
                 $this->addError(
                     'username',
                     'No username given for checking against ldap.'
