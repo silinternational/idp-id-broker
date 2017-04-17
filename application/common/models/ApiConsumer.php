@@ -22,7 +22,7 @@ class ApiConsumer extends Component implements IdentityInterface
     {
         $recognizedKeys = explode(',', Yii::$app->params['authorizedTokens']);
 
-        return in_array($token, $recognizedKeys);
+        return in_array($token, $recognizedKeys, true);
     }
 
     public static function findIdentity($id)
