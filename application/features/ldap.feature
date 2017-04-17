@@ -24,3 +24,10 @@ Feature: LDAP
       But the LDAP is offline
     When I try to authenticate as "shep_clark" using "govols!!!"
     Then the authentication should NOT be successful
+
+  Scenario: LDAP password migration disabled
+    Given there is a "shep_clark" user in the database with no password
+      And there is a "shep_clark" user in the ldap with a password of "govols!!!"
+      And LDAP password migration is disabled
+    When I try to authenticate as "shep_clark" using "govols!!!"
+    Then the authentication should NOT be successful

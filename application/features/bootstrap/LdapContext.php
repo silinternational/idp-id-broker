@@ -143,4 +143,12 @@ class LdapContext extends YiiContext
             'domain_controllers' => $this->ldap->domain_controllers,
         ]);
     }
+
+    /**
+     * @Given LDAP password migration is disabled
+     */
+    public function ldapPasswordMigrationIsDisabled()
+    {
+        $this->ldap = null;
+    }
 }
