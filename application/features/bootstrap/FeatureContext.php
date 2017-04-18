@@ -1,12 +1,12 @@
 <?php
 
 use Behat\Gherkin\Node\TableNode;
-use Behat\Testwork\ServiceContainer\Exception\ConfigurationLoadingException;
 use common\helpers\MySqlDateTime;
 use common\models\User;
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Response;
 use Psr\Http\Message\ResponseInterface;
+use Sil\PhpEnv\Env;
 use Sil\SilIdBroker\Behat\Context\YiiContext;
 use Webmozart\Assert\Assert;
 use yii\helpers\Json;
@@ -61,7 +61,7 @@ class FeatureContext extends YiiContext
 
     private function buildClient(): Client
     {
-        $hostname = $this->getEnv('TEST_SERVER_HOSTNAME');
+        $hostname = Env::get('TEST_SERVER_HOSTNAME');
 
         return new Client([
             'base_uri' => "http://$hostname",
@@ -122,21 +122,9 @@ class FeatureContext extends YiiContext
      */
     public function theRequesterIsAuthorized()
     {
-        $keysString = $this->getEnv('API_ACCESS_KEYS');
-        $keys = explode(',', $keysString);
+        $keys = Env::getArray('API_ACCESS_KEYS');
 
         $this->reqHeaders['Authorization'] = 'Bearer ' . $keys[0];
-    }
-
-    private function getEnv($key): string
-    {
-        $value = getenv($key);
-
-        if (empty($value)) {
-            throw new ConfigurationLoadingException("$key missing from environment.");
-        }
-
-        return $value;
     }
 
     /**
@@ -371,7 +359,7 @@ class FeatureContext extends YiiContext
         );
         Assert::true($isCorrect);
     }
-    
+
     /**
      * @Given the user :username has no password in the database
      */
@@ -384,7 +372,7 @@ class FeatureContext extends YiiContext
         $user->refresh();
         Assert::null($user->password_hash);
     }
-    
+
     /**
      * @Given the user :username does have a password in the database
      */

@@ -9,7 +9,7 @@ class ApiConsumer extends Component implements IdentityInterface
 {
     public static function findIdentityByAccessToken($token, $type = null)
     {
-        if (self::isRecognized($token)) {
+        if (self::isAuthorized($token)) {
             return new ApiConsumer();
         }
 
@@ -18,11 +18,9 @@ class ApiConsumer extends Component implements IdentityInterface
         return null;
     }
 
-    private static function isRecognized($token): bool
+    private static function isAuthorized($token): bool
     {
-        $recognizedKeys = explode(',', Yii::$app->params['authorizedTokens']);
-
-        return in_array($token, $recognizedKeys, true);
+        return in_array($token, Yii::$app->params['authorizedTokens'], true);
     }
 
     public static function findIdentity($id)
