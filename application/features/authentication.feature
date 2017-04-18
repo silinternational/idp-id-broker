@@ -153,3 +153,23 @@ Feature: Authentication
         | updated   |
         | deleted   |
         | patched   |
+
+  Scenario: Incorrect password for an account with no password in the db, just in ldap
+    Given there is a "shep_clark" user in the ldap with a password of "govols!!!"
+      And the user "shep_clark" has no password in the database
+      And I provide the following valid data:
+        | property  | value       |
+        | username  | shep_clark  |
+        | password  | ThisIsWrong |
+    When I request "/authentication" be created
+    Then the authentication is not successful
+
+  Scenario: Correct password for an account with no password in the db, just in ldap
+    Given there is a "shep_clark" user in the ldap with a password of "govols!!!"
+      And the user "shep_clark" has no password in the database
+      And I provide the following valid data:
+        | property  | value       |
+        | username  | shep_clark  |
+        | password  | govols!!!   |
+    When I request "/authentication" be created
+    Then the response status code should be 200

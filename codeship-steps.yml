@@ -1,3 +1,7 @@
+- name: ldapload
+  service: ldapload
+  command: /data/load_ldap.sh
+
 - name: test
   service: app
   command: /data/run-tests.sh

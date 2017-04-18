@@ -7,12 +7,17 @@ use yii\web\Application;
 
 class YiiContext implements Context
 {
+    private static $application;
+    
     /**
      * @BeforeSuite
      */
-    public static function loadYiiApp() {
-        $config = require(__DIR__ . '/../../frontend/config/load-configs.php');
+    public static function loadYiiApp()
+    {
+        if (empty(self::$application)) {
+            $config = require(__DIR__ . '/../../frontend/config/load-configs.php');
 
-        new Application($config);
+            self::$application = new Application($config);
+        }
     }
 }

@@ -25,7 +25,7 @@ Vagrant.configure(2) do |config|
   #
   config.vm.provider "virtualbox" do |vb|
      # Customize the amount of memory on the VM:
-     vb.memory = "1024"
+     vb.memory = "1536"
 
      # A fix for speed issues with DNS resolution:
      # http://serverfault.com/questions/453185/vagrant-virtualbox-dns-10-0-2-3-not-working?rq=1
@@ -92,9 +92,6 @@ EOF
 
     # Ensure env vars are loaded from bash_profile
     source /home/vagrant/.bash_profile
-
-    # Start services
-    make start
 
   SHELL
 

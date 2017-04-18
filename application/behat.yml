@@ -1,0 +1,12 @@
+default:
+    suites:
+        common_features:
+            paths:
+                - %paths.base%/features/authentication.feature
+                - %paths.base%/features/password.feature
+                - %paths.base%/features/user.feature
+            contexts: [ FeatureContext ]
+        ldap_features:
+            paths:
+                - %paths.base%/features/ldap.feature
+            contexts: [ Sil\SilIdBroker\Behat\Context\LdapContext ]

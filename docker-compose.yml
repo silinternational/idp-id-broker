@@ -24,6 +24,8 @@ services:
             - db
         env_file:
             - ./local.env
+        environment:
+            MIGRATE_PW_FROM_LDAP: "true"
 
     cli:
         image: silintl/php7:latest
@@ -33,6 +35,34 @@ services:
         env_file:
             - ./local.env
         command: ["true"]
+
+    ldap:
+        build:
+            context: ./development/ldap
+            dockerfile: Dockerfile
+        ports:
+            - "389"
+        env_file:
+            - ./local.env
+        working_dir: /data
+        environment:
+            DEBUG_LEVEL: 320
+
+    ldapload:
+        build:
+            context: ./development/ldap
+            dockerfile: Dockerfile
+        working_dir: /data
+        env_file:
+            - ./local.env
+        environment:
+            DEBUG_LEVEL: 320
+        links:
+            - ldap
+        volumes:
+            - ./development/ldap/fakepeople.ldif:/root/fakepeople.ldif
+            - ./development/ldap/fakerep.ldif:/root/fakerep.ldif
+        command: bash -c "sleep 10 && /data/load_ldap.sh"
 
     test:
         image: silintl/php7:latest
@@ -46,7 +76,7 @@ services:
         environment:
             TEST_SERVER_HOSTNAME: app
             APP_ENV: test
-        command: vendor/bin/behat --stop-on-failure
+        command: ./run-tests.sh
         # running isolated tests
         # docker-compose run --rm test vendor/bin/behat --stop-on-failure features/user.feature
         # docker-compose run --rm test vendor/bin/behat --stop-on-failure features/user.feature:306
