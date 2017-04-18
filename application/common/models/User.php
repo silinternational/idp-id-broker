@@ -33,15 +33,6 @@ class User extends UserBase
             }
             
             if (empty($this->username)) {
-                
-                /**
-                 * @todo If adding errors here causes a problem (because I think
-                 * it will cause the `validate()` call to return false... right?)
-                 * then find some other way to record/report what happened. We
-                 * may be able to use Yii::warn(...), but we'll have to update
-                 * the LdapContext Behat test file accordingly, since it gets
-                 * the errors and reports them (to help the developer debug).
-                 */
                 $this->addError(
                     'username',
                     'No username given for checking against ldap.'
@@ -75,6 +66,15 @@ class User extends UserBase
                 $user->password = $this->password;
                 $savedPassword = $user->savePassword();
                 if ( ! $savedPassword) {
+                    
+                    /**
+                     * @todo If adding errors here causes a problem (because I think
+                     * it will cause the `validate()` call to return false... right?)
+                     * then find some other way to record/report what happened. We
+                     * may be able to use Yii::warn(...), but we'll have to update
+                     * the LdapContext Behat test file accordingly, since it gets
+                     * the errors and reports them (to help the developer debug).
+                     */
                     $this->addError('password', sprintf(
                         'Confirmed given password for %s against LDAP, but '
                         . 'failed to save password hash to database: %s',
