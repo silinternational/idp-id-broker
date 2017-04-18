@@ -24,6 +24,8 @@ services:
             - db
         env_file:
             - ./local.env
+        environment:
+            MIGRATE_PW_FROM_LDAP: "true"
 
     cli:
         image: silintl/php7:latest

@@ -31,6 +31,7 @@ app:
         LDAP_DOMAIN_CONTROLLERS: ldap
         LDAP_USE_SSL: false
         LDAP_USE_TLS: false
+        MIGRATE_PW_FROM_LDAP: true
 
 ldap:
     build:
