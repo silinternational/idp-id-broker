@@ -1,6 +1,7 @@
 <?php
 
 use common\models\ApiConsumer;
+use Sil\PhpEnv\Env;
 use yii\web\JsonParser;
 use yii\web\Response;
 
@@ -46,5 +47,8 @@ return [
                 '<undefinedRequest>' => 'site/undefined-request',
             ]
         ],
+    ],
+    'params' => [
+        'authorizedTokens' => Env::get('API_ACCESS_KEYS'),
     ],
 ];

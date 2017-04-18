@@ -7,8 +7,10 @@
     "fillup/fake-bower-assets": "2.0.9",
     "roave/security-advisories": "dev-master",
     "silinternational/php-env": "^1.0",
+    "yiisoft/yii2": "^2.0.11",
     "silinternational/yii2-jsonsyslog": "^1.0",
-    "yiisoft/yii2": "^2.0.11"
+    "silinternational/yii2-email-log-target": "^1.0",
+    "yiisoft/yii2-swiftmailer": "^2.0"
   },
   "require-dev": {
     "yiisoft/yii2-gii": "*",

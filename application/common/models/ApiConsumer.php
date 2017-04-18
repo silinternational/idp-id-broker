@@ -1,6 +1,7 @@
 <?php
 namespace common\models;
 
+use Yii;
 use yii\base\Component;
 use yii\web\IdentityInterface;
 
@@ -12,14 +13,16 @@ class ApiConsumer extends Component implements IdentityInterface
             return new ApiConsumer();
         }
 
+        Yii::warning("unrecognized token: $token");
+
         return null;
     }
 
     private static function isRecognized($token): bool
     {
-        $recognizedKeys = explode(',', getenv('API_ACCESS_KEYS'));
+        $recognizedKeys = explode(',', Yii::$app->params['authorizedTokens']);
 
-        return in_array($token, $recognizedKeys);
+        return in_array($token, $recognizedKeys, true);
     }
 
     public static function findIdentity($id)
