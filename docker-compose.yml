@@ -25,6 +25,12 @@ services:
         env_file:
             - ./local.env
         environment:
+            LDAP_BASE_DN: dc=acme,dc=org
+            LDAP_ADMIN_USERNAME: cn=Manager,dc=acme,dc=org
+            LDAP_ADMIN_PASSWORD: admin
+            LDAP_DOMAIN_CONTROLLERS: ldap
+            LDAP_USE_SSL: "false"
+            LDAP_USE_TLS: "false"
             MIGRATE_PW_FROM_LDAP: "true"
 
     cli:

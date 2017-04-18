@@ -49,6 +49,6 @@ return [
         ],
     ],
     'params' => [
-        'authorizedTokens' => Env::get('API_ACCESS_KEYS'),
+        'authorizedTokens' => Env::getArray('API_ACCESS_KEYS'),
     ],
 ];

@@ -4,17 +4,29 @@ use common\ldap\Ldap;
 use Sil\JsonSyslog\JsonSyslogTarget;
 use Sil\Log\EmailTarget;
 use Sil\PhpEnv\Env;
+use Sil\PhpEnv\EnvVarNotFoundException;
 use yii\db\Connection;
 use yii\helpers\Json;
 use yii\swiftmailer\Mailer;
 use yii\web\Request;
 
-$idpName = getRequiredEnv('IDP_NAME');
+$idpName       = null;
+$mysqlHost     = null;
+$mysqlDatabase = null;
+$mysqlUser     = null;
+$mysqlPassword = null;
 
-$mysqlHost     = getRequiredEnv('MYSQL_HOST');
-$mysqlDatabase = getRequiredEnv('MYSQL_DATABASE');
-$mysqlUser     = getRequiredEnv('MYSQL_USER');
-$mysqlPassword = getRequiredEnv('MYSQL_PASSWORD');
+try {
+    $idpName       = Env::requireEnv('IDP_NAME');
+    $mysqlHost     = Env::requireEnv('MYSQL_HOST');
+    $mysqlDatabase = Env::requireEnv('MYSQL_DATABASE');
+    $mysqlUser     = Env::requireEnv('MYSQL_USER');
+    $mysqlPassword = Env::requireEnv('MYSQL_PASSWORD');
+} catch (EnvVarNotFoundException $e) {
+    // dieing here since no logging or Yii errorhandling is configured yet.  This is the only
+    // way to let someone know what's wrong in the environment at this point.
+    die($e->getMessage());
+}
 
 $mailerUseFiles    = Env::get('MAILER_USEFILES', false);
 $mailerHost        = Env::get('MAILER_HOST');
@@ -22,24 +34,13 @@ $mailerUsername    = Env::get('MAILER_USERNAME');
 $mailerPassword    = Env::get('MAILER_PASSWORD');
 $notificationEmail = Env::get('NOTIFICATION_EMAIL', 'oncall@example.org');
 
-function getRequiredEnv($name)
-{
-    $value = Env::get($name);
-
-    if (empty($value)) {
-        Yii::error("$name missing from environment.");
-    }
-
-    return $value;
-}
-
 return [
     'id' => 'app-common',
     'bootstrap' => ['log'],
     'components' => [
         'db' => [
             'class' => Connection::class,
-            'dsn' => sprintf('mysql:host=%s;dbname=%s', $mysqlHost, $mysqlDatabase),
+            'dsn' => "mysql:host=$mysqlHost;dbname=$mysqlDatabase",
             'username' => $mysqlUser,
             'password' => $mysqlPassword,
             'charset' => 'utf8',
