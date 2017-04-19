@@ -18,7 +18,6 @@ Feature: Authentication
       And a record exists with an employee_id of "123"
       And the user has a password of "govols!!!"
 
-
   Scenario: Authenticate a known user with a matching password
     Given I provide the following valid data:
         | property  | value       |
