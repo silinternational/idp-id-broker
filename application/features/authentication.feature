@@ -123,6 +123,8 @@ Feature: Authentication
         | active   | no    |
         | locked   | yes   |
 
+#TODO: need test(s) for expired passwords
+
   Scenario Outline: Attempt to act upon an authentication in an undefined way
       And the user store is empty
     When I request "/authentication" be <action>

@@ -172,6 +172,11 @@ class User extends UserBase
                 'on' => self::SCENARIO_AUTHENTICATE,
             ],
             [
+                'password',
+                $this->validateExpiration(),
+                'on' => self::SCENARIO_AUTHENTICATE,
+            ],
+            [
                 'active', 'compare', 'compareValue' => 'yes',
                 'on' => self::SCENARIO_AUTHENTICATE,
             ],
@@ -198,6 +203,34 @@ class User extends UserBase
                 $this->addError($attributeName, 'Incorrect password.');
             }
         };
+    }
+
+    private function validateExpiration(): Closure
+    {
+        return function ($attributeName) {
+            $now = time();
+            $expiration = $this->addGracePeriod($this->getPasswordExpiration());
+
+            if ($now > $expiration) {
+                $this->addError($attributeName, 'Expired password.');
+            }
+        };
+    }
+
+    private function getPasswordExpiration(): string
+    {
+        /** @var $mostRecentPassword PasswordHistory */
+        $mostRecentPassword = $this->getPasswordHistories()
+                                   ->orderBy(['id' => SORT_DESC])
+                                   ->one();
+
+        return $mostRecentPassword->expires();
+
+    }
+
+    private function addGracePeriod(string $expiration): int
+    {
+        return strtotime('+30 days', strtotime($expiration));
     }
 
     public function behaviors(): array
@@ -257,11 +290,7 @@ class User extends UserBase
 
         if ($this->hasPasswordAlready()) {
             $fields['password_expires_at_utc'] = function () {
-                $mostRecentPassword = $this->getPasswordHistories()
-                                           ->orderBy(['id' => SORT_DESC])
-                                           ->one();
-
-                return $mostRecentPassword->expires();
+                return $this->getPasswordExpiration();
             };
         }
 

@@ -58,7 +58,7 @@ class PasswordHistory extends PasswordHistoryBase
         return false;
     }
 
-    public function expires()
+    public function expires(): string
     {
         return MySqlDateTime::format(strtotime('+1 year', strtotime($this->created_utc)));
     }
