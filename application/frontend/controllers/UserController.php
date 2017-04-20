@@ -12,7 +12,7 @@ class UserController extends BaseRestController
         return User::find()->all();
     }
 
-    public function actionView($employeeId) // GET /user/abc123
+    public function actionView(string $employeeId) // GET /user/abc123
     {
         $user = User::findOne(['employee_id' => $employeeId]);
 
@@ -36,7 +36,7 @@ class UserController extends BaseRestController
         return $user;
     }
 
-    public function actionUpdate($employeeId)
+    public function actionUpdate(string $employeeId)
     {
         $user = User::findOne(['employee_id' => $employeeId]);
 
@@ -55,7 +55,7 @@ class UserController extends BaseRestController
         return $user;
     }
 
-    public function actionUpdatePassword($employeeId)
+    public function actionUpdatePassword(string $employeeId)
     {
         $user = User::findOne(['employee_id' => $employeeId]);
 
