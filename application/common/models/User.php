@@ -230,7 +230,9 @@ class User extends UserBase
 
     private function addGracePeriod(string $expiration): int
     {
-        return strtotime('+30 days', strtotime($expiration));
+        $gracePeriod = Yii::$app->params['passwordExpirationGracePeriod'];
+
+        return strtotime($gracePeriod, strtotime($expiration));
     }
 
     public function behaviors(): array

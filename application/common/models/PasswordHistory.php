@@ -43,10 +43,12 @@ class PasswordHistory extends PasswordHistoryBase
 
     private function hasAlreadyBeenUsedWithinLimit(): bool
     {
+        $reuseLimit = Yii::$app->params['passwordReuseLimit'];
+
         /** @var PasswordHistory[] $previousPasswords */
         $previousPasswords = $this->user->getPasswordHistories()
                                         ->orderBy(['id' => SORT_DESC])
-                                        ->limit(10)
+                                        ->limit($reuseLimit)
                                         ->all();
 
         foreach ($previousPasswords as $previousPassword) {
@@ -60,7 +62,9 @@ class PasswordHistory extends PasswordHistoryBase
 
     public function expires(): string
     {
-        return MySqlDateTime::format(strtotime('+1 year', strtotime($this->created_utc)));
+        $lifespan = Yii::$app->params['passwordLifespan'];
+
+        return MySqlDateTime::format(strtotime($lifespan, strtotime($this->created_utc)));
     }
 
     public function behaviors(): array
