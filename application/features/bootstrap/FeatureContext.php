@@ -2,6 +2,7 @@
 
 use Behat\Gherkin\Node\TableNode;
 use common\helpers\MySqlDateTime;
+use common\models\PasswordHistory;
 use common\models\User;
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Response;
@@ -337,6 +338,7 @@ class FeatureContext extends YiiContext
     {
         $this->userFromDb->$property = $value;
 
+        $this->userFromDb->scenario = User::SCENARIO_UPDATE_USER;
         Assert::true($this->userFromDb->save());
     }
 
@@ -367,6 +369,7 @@ class FeatureContext extends YiiContext
     {
         $user = User::findByUsername($username);
         Assert::notNull($user);
+        PasswordHistory::deleteAll();
         $user->password_hash = null;
         Assert::true($user->save(false, ['password_hash']));
         $user->refresh();

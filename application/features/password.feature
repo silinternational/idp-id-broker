@@ -38,3 +38,5 @@ Feature: Password
 #  Scenario: Attempt to change the password of an existing user using the same password they already have.
 #  Scenario: consider invalid employee ids that test the type conversions of Yii and/or PHP, e.g., /user/[true|false|1|0]/password
 #  Scenario: ensure password_hash and last_changed date are the only things that change even when passed all attributes available on the table.
+# TODO: need to test the expiration date calculation
+# TODO: need to test the reuse limit

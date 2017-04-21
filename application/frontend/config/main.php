@@ -49,6 +49,9 @@ return [
         ],
     ],
     'params' => [
-        'authorizedTokens' => Env::getArray('API_ACCESS_KEYS'),
+        'authorizedTokens'              => Env::getArray('API_ACCESS_KEYS'),
+        'passwordReuseLimit'            => Env::get('PASSWORD_REUSE_LIMIT', 10),
+        'passwordLifespan'              => Env::get('PASSWORD_LIFESPAN', '+1 year'),
+        'passwordExpirationGracePeriod' => Env::get('PASSWORD_EXPIRATION_GRACE_PERIOD', '+30 days'),
     ],
 ];

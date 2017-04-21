@@ -27,8 +27,9 @@ Feature: User
         | active       | yes                   |
         | locked       | no                    |
       And the following data is not returned:
-        | property      |
-        | password_hash |
+        | property                |
+        | password_hash           |
+        | password_expires_at_utc |
       And a record exists with an employee_id of "123"
       And the following data should be stored:
         | property     | value                 |

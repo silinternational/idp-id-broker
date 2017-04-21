@@ -10,7 +10,7 @@ class Authentication
 {
     private $authenticatedUser = null;
     private $errors = [];
-    
+
     /**
      * Attempt an authentication.
      *
@@ -44,7 +44,7 @@ class Authentication
             $this->errors = $user->getErrors();
         }
     }
-    
+
     /**
      * Get the authenticated User (if authentication was successful) or null.
      *
@@ -54,7 +54,7 @@ class Authentication
     {
         return $this->authenticatedUser;
     }
-    
+
     public function getErrors()
     {
         return $this->errors;

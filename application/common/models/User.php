@@ -19,19 +19,19 @@ class User extends UserBase
     const SCENARIO_AUTHENTICATE    = 'authenticate';
 
     public $password;
-    
+
     /** @var Ldap */
     private $ldap;
-    
+
     protected function attemptPasswordMigration()
     {
         try {
             if ($this->ldap === null) {
-                
+
                 // If no LDAP was provided, simply skip password migration.
                 return;
             }
-            
+
             if (empty($this->username)) {
                 $this->addError(
                     'username',
@@ -39,7 +39,7 @@ class User extends UserBase
                 );
                 return;
             }
-            
+
             if (empty($this->password)) {
                 $this->addError(
                     'password',
@@ -47,7 +47,7 @@ class User extends UserBase
                 );
                 return;
             }
-            
+
             $user = User::findByUsername($this->username);
             if ($user === null) {
                 $this->addError('username', sprintf(
@@ -57,16 +57,16 @@ class User extends UserBase
                 ));
                 return;
             }
-            
+
             if ($this->ldap->isPasswordCorrectForUser($this->username, $this->password)) {
-                
+
                 /* Try to save the password, but let the user proceed even if
                  * we can't (since we know the password is correct).  */
                 $user->scenario = User::SCENARIO_UPDATE_PASSWORD;
                 $user->password = $this->password;
                 $savedPassword = $user->savePassword();
                 if ( ! $savedPassword) {
-                    
+
                     /**
                      * @todo If adding errors here causes a problem (because I think
                      * it will cause the `validate()` call to return false... right?)
@@ -92,7 +92,7 @@ class User extends UserBase
             ));
         }
     }
-    
+
     /**
      * @param string $username
      * @return User|null
@@ -135,7 +135,7 @@ class User extends UserBase
 
         return $scenarios;
     }
-    
+
     public function setLdap(Ldap $ldap)
     {
         $this->ldap = $ldap;
@@ -172,6 +172,11 @@ class User extends UserBase
                 'on' => self::SCENARIO_AUTHENTICATE,
             ],
             [
+                'password',
+                $this->validateExpiration(),
+                'on' => self::SCENARIO_AUTHENTICATE,
+            ],
+            [
                 'active', 'compare', 'compareValue' => 'yes',
                 'on' => self::SCENARIO_AUTHENTICATE,
             ],
@@ -189,15 +194,45 @@ class User extends UserBase
     private function validatePassword(): Closure
     {
         return function ($attributeName) {
-            
+
             if ( ! $this->hasPasswordAlready()) {
                 $this->attemptPasswordMigration();
             }
-            
+
             if (! password_verify($this->password, $this->password_hash)) {
                 $this->addError($attributeName, 'Incorrect password.');
             }
         };
+    }
+
+    private function validateExpiration(): Closure
+    {
+        return function ($attributeName) {
+            $now = time();
+            $expiration = $this->addGracePeriod($this->getPasswordExpiration());
+
+            if ($now > $expiration) {
+                $this->addError($attributeName, 'Expired password.');
+            }
+        };
+    }
+
+    private function getPasswordExpiration(): string
+    {
+        /** @var $mostRecentPassword PasswordHistory */
+        $mostRecentPassword = $this->getPasswordHistories()
+                                   ->orderBy(['id' => SORT_DESC])
+                                   ->one();
+
+        return $mostRecentPassword->expires();
+
+    }
+
+    private function addGracePeriod(string $expiration): int
+    {
+        $gracePeriod = Yii::$app->params['passwordExpirationGracePeriod'];
+
+        return strtotime($gracePeriod, strtotime($expiration));
     }
 
     public function behaviors(): array
@@ -242,18 +277,26 @@ class User extends UserBase
      */
     public function fields(): array
     {
-        return [
+        $fields = [
             'employee_id',
             'first_name',
             'last_name',
             'display_name' => function ($model) {
-                return $model->display_name ?? $model->first_name . ' ' . $model->last_name;
+                return $model->display_name ?? "$model->first_name $model->last_name";
             },
             'username',
             'email',
             'active',
             'locked',
         ];
+
+        if ($this->hasPasswordAlready()) {
+            $fields['password_expires_at_utc'] = function () {
+                return $this->getPasswordExpiration();
+            };
+        }
+
+        return $fields;
     }
 
     public function save($runValidation = true, $attributeNames = null)
@@ -270,13 +313,11 @@ class User extends UserBase
         $transaction = ActiveRecord::getDb()->beginTransaction();
 
         try {
-            if ($this->hasPasswordAlready()) {
-                if (! $this->saveHistory()) {
-                    return false;
-                }
-            }
-
             $this->password_hash = password_hash($this->password, PASSWORD_DEFAULT);
+
+            if (! $this->saveHistory()) {
+                return false;
+            }
 
             if (! parent::save()) {
                 $transaction->rollBack();
