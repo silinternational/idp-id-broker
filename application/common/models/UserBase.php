@@ -8,6 +8,7 @@ use Yii;
  * This is the model class for table "user".
  *
  * @property integer $id
+ * @property string $uuid
  * @property string $employee_id
  * @property string $first_name
  * @property string $last_name
@@ -38,9 +39,10 @@ class UserBase extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['employee_id', 'first_name', 'last_name', 'username', 'email', 'active', 'locked', 'last_changed_utc', 'last_synced_utc'], 'required'],
+            [['uuid', 'employee_id', 'first_name', 'last_name', 'username', 'email', 'active', 'locked', 'last_changed_utc', 'last_synced_utc'], 'required'],
             [['active', 'locked'], 'string'],
             [['last_changed_utc', 'last_synced_utc'], 'safe'],
+            [['uuid'], 'string', 'max' => 64],
             [['employee_id', 'first_name', 'last_name', 'display_name', 'username', 'email', 'password_hash'], 'string', 'max' => 255],
             [['employee_id'], 'unique'],
             [['username'], 'unique'],
@@ -55,6 +57,7 @@ class UserBase extends \yii\db\ActiveRecord
     {
         return [
             'id' => Yii::t('app', 'ID'),
+            'uuid' => Yii::t('app', 'Uuid'),
             'employee_id' => Yii::t('app', 'Employee ID'),
             'first_name' => Yii::t('app', 'First Name'),
             'last_name' => Yii::t('app', 'Last Name'),

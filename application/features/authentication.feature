@@ -27,6 +27,7 @@ Feature: Authentication
     Then the response status code should be 200
       And the following data is returned:
         | property     | value                 |
+#TODO:need to ensure uuid came back but not sure about value...
         | employee_id  | 123                   |
         | first_name   | Shep                  |
         | last_name    | Clark                 |

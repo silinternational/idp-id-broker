@@ -6,6 +6,7 @@ use Closure;
 use common\helpers\MySqlDateTime;
 use common\ldap\Ldap;
 use Exception;
+use Ramsey\Uuid\Uuid;
 use Yii;
 use yii\behaviors\AttributeBehavior;
 use yii\db\ActiveRecord;
@@ -93,10 +94,6 @@ class User extends UserBase
         }
     }
 
-    /**
-     * @param string $username
-     * @return User|null
-     */
     public static function findByUsername(string $username)
     {
         return User::findOne(['username' => $username]);
@@ -106,9 +103,10 @@ class User extends UserBase
     {
         $scenarios = parent::scenarios();
 
-        $scenarios[self::SCENARIO_DEFAULT] = null;
+        $scenarios[self::SCENARIO_DEFAULT] = null; // force consumers to choose a scenario
 
         $scenarios[self::SCENARIO_NEW_USER] = [
+            '!uuid',
             'employee_id',
             'first_name',
             'last_name',
@@ -144,6 +142,9 @@ class User extends UserBase
     public function rules(): array
     {
         return ArrayHelper::merge([
+            [
+                'uuid', 'default', 'value' => Uuid::uuid4()->toString()
+            ],
             [
                 'active', 'default', 'value' => 'yes',
             ],
@@ -254,7 +255,7 @@ class User extends UserBase
                     ActiveRecord::EVENT_BEFORE_UPDATE => 'last_synced_utc',
                 ],
                 'value' => $this->updateOnSync(),
-                'skipUpdateOnClean' => false, // always consider updating the value whether something has changed or not.
+                'skipUpdateOnClean' => false, // update the value whether something has changed or not.
             ],
         ];
     }
@@ -278,6 +279,7 @@ class User extends UserBase
     public function fields(): array
     {
         $fields = [
+            'uuid',
             'employee_id',
             'first_name',
             'last_name',

@@ -23,6 +23,7 @@ class m170203_210542_create_initial_tables extends Migration
             '{{user}}',
             [
                 'id' => 'pk',
+                'uuid' => 'varchar(64) not null',
                 'employee_id' => 'varchar(255) not null',
                 'first_name' => 'varchar(255) not null',
                 'last_name' => 'varchar(255) not null',
