@@ -345,6 +345,7 @@ Feature: User
 #TODO: PUT with a change should update the last_changed data properly...as well as the field to be updated :-)
 
 #TODO: need to think about how to verify uuid comes back in calls.
+#TODO: ensure uuid cannot be changed in any way.
 
 #TODO: add site.feature to test all verbs to status, not found, authn/nonauthn...as well as NotFound
 
