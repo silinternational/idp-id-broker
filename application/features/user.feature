@@ -18,6 +18,7 @@ Feature: User
     Then the response status code should be 200
       And the following data is returned:
         | property     | value                 |
+#TODO:need to ensure uuid came back but not sure about value...
         | employee_id  | 123                   |
         | first_name   | Shep                  |
         | last_name    | Clark                 |
@@ -343,7 +344,7 @@ Feature: User
 #TODO: PUT with a change to an existing value on one of the unique fields should generate an error.
 #TODO: PUT with a change should update the last_changed data properly...as well as the field to be updated :-)
 
-
+#TODO: need to think about how to verify uuid comes back in calls.
 
 #TODO: add site.feature to test all verbs to status, not found, authn/nonauthn...as well as NotFound
 
