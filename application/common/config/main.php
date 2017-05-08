@@ -23,9 +23,16 @@ try {
     $mysqlUser     = Env::requireEnv('MYSQL_USER');
     $mysqlPassword = Env::requireEnv('MYSQL_PASSWORD');
 } catch (EnvVarNotFoundException $e) {
-    // dieing here since no logging or Yii errorhandling is configured yet.  This is the only
-    // way to let someone know what's wrong in the environment at this point.
-    die($e->getMessage());
+    header('Content-type: application/json');
+    http_response_code(500);
+
+    $responseContent = json_encode([
+        'name' => 'Internal Server Error',
+        'message' => $e->getMessage(),
+        'status' => 500,
+    ]);
+
+    exit($responseContent);
 }
 
 $mailerUseFiles    = Env::get('MAILER_USEFILES', false);
