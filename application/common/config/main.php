@@ -27,7 +27,9 @@ try {
     http_response_code(500);
 
     $responseContent = json_encode([
+        'name' => 'Internal Server Error',
         'message' => $e->getMessage(),
+        'status' => 500,
     ]);
 
     exit($responseContent);
