@@ -55,6 +55,10 @@ schemas:
       {
         "$schema": "http://json-schema.org/draft-03/schema",
         "properties": {
+          "uuid": {
+            "required": true,
+            "type": "string"
+          },
           "employee_id": {
             "required": true,
             "type": "string"
@@ -97,6 +101,10 @@ schemas:
         "$schema": "http://json-schema.org/draft-03/schema",
         "items": {
           "properties": {
+            "uuid": {
+              "required": false,
+              "type": "string"
+            },
             "employee_id": {
               "required": false,
               "type": "string"
@@ -195,6 +203,7 @@ schemas:
             schema: User
             example: |
               {
+                "uuid": "11111111-aaaa-1111-aaaa-111111111111",
                 "employee_id": "12345",
                 "first_name": "John",
                 "last_name": "Smith",
@@ -249,6 +258,7 @@ schemas:
               example: |
                 [
                   {
+                    "uuid": "11111111-aaaa-1111-aaaa-111111111111",
                     "employee_id": "12345",
                     "first_name": "John",
                     "last_name": "Smith",
@@ -259,6 +269,7 @@ schemas:
                     "locked": "no"
                   },
                   {
+                    "uuid": "22222222-bbbb-2222-bbbb-222222222222",
                     "employee_id": "54321",
                     "first_name": "Jane",
                     "last_name": "Smith",
@@ -290,6 +301,7 @@ schemas:
             schema: User
             example: |
               {
+                "uuid": "11111111-aaaa-1111-aaaa-111111111111",
                 "employee_id": "12345",
                 "first_name": "John",
                 "last_name": "Smith",
@@ -336,6 +348,7 @@ schemas:
               schema: User
               example: |
                 {
+                  "uuid": "11111111-aaaa-1111-aaaa-111111111111",
                   "employee_id": "12345",
                   "first_name": "John",
                   "last_name": "Smith",
@@ -366,6 +379,7 @@ schemas:
               schema: User
               example: |
                 {
+                  "uuid": "11111111-aaaa-1111-aaaa-111111111111",
                   "employee_id": "12345",
                   "first_name": "John",
                   "last_name": "Smith",
@@ -431,6 +445,7 @@ schemas:
                 schema: User
                 example: |
                   {
+                    "uuid": "11111111-aaaa-1111-aaaa-111111111111",
                     "employee_id": "12345",
                     "first_name": "John",
                     "last_name": "Smith",
