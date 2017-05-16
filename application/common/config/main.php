@@ -95,7 +95,7 @@ return [
                     'logVars' => [], // no need for default stuff: http://www.yiiframework.com/doc-2.0/yii-log-target.html#$logVars-detail
                     'levels' => ['error'],
                     'message' => [
-                        'from' => $notificationEmail,
+                        'from' => $mailerUsername,
                         'to' => $notificationEmail,
                         'subject' => "ERROR - $idpName-id-broker [".YII_ENV."] Error",
                     ],
