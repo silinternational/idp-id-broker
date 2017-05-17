@@ -296,6 +296,15 @@ class User extends UserBase
             $fields['password_expires_at_utc'] = function () {
                 return $this->getPasswordExpiration();
             };
+
+            $fields['password_last_changed'] = function () {
+                /** @var $mostRecentPassword PasswordHistory */
+                $mostRecentPassword = $this->getPasswordHistories()
+                                           ->orderBy(['id' => SORT_DESC])
+                                           ->one();
+
+                return $mostRecentPassword->created_utc;
+            };
         }
 
         return $fields;
