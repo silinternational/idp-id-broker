@@ -16,24 +16,11 @@ $mysqlDatabase = null;
 $mysqlUser     = null;
 $mysqlPassword = null;
 
-try {
-    $idpName       = Env::requireEnv('IDP_NAME');
-    $mysqlHost     = Env::requireEnv('MYSQL_HOST');
-    $mysqlDatabase = Env::requireEnv('MYSQL_DATABASE');
-    $mysqlUser     = Env::requireEnv('MYSQL_USER');
-    $mysqlPassword = Env::requireEnv('MYSQL_PASSWORD');
-} catch (EnvVarNotFoundException $e) {
-    header('Content-type: application/json');
-    http_response_code(500);
-
-    $responseContent = json_encode([
-        'name' => 'Internal Server Error',
-        'message' => $e->getMessage(),
-        'status' => 500,
-    ]);
-
-    exit($responseContent);
-}
+$idpName       = Env::requireEnv('IDP_NAME');
+$mysqlHost     = Env::requireEnv('MYSQL_HOST');
+$mysqlDatabase = Env::requireEnv('MYSQL_DATABASE');
+$mysqlUser     = Env::requireEnv('MYSQL_USER');
+$mysqlPassword = Env::requireEnv('MYSQL_PASSWORD');
 
 $mailerUseFiles    = Env::get('MAILER_USEFILES', false);
 $mailerHost        = Env::get('MAILER_HOST');
