@@ -13,7 +13,14 @@ else
 fi
 
 # Run database migrations
-/data/yii migrate --interactive=0
+output=$(/data/yii migrate --interactive=0 2>&1)
+
+# If the migrations failed, exit.
+rc=$?;
+if [[ $rc != 0 ]]; then
+  logger -p 1 -t application.crit "Migrations FAILED. Exit code ${rc}. Message: ${output}"
+  exit $rc;
+fi
 
 # Run apache in foreground
 apache2ctl -D FOREGROUND
