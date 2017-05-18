@@ -1,6 +1,6 @@
 start: app
 
-app: db deps tables basemodels
+app: db deps
 	docker-compose up -d app
 
 deps:
