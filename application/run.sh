@@ -7,6 +7,9 @@ else
     sed -i /etc/rsyslog.conf -e "s/LOGENTRIESKEY/${LOGENTRIES_KEY}/"
     # Start syslog
     rsyslogd
+    
+    # Give syslog time to fully start up.
+    sleep 3
 fi
 
 # Run database migrations
