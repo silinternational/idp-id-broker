@@ -4,7 +4,6 @@ use common\ldap\Ldap;
 use Sil\JsonSyslog\JsonSyslogTarget;
 use Sil\Log\EmailTarget;
 use Sil\PhpEnv\Env;
-use Sil\PhpEnv\EnvVarNotFoundException;
 use yii\db\Connection;
 use yii\helpers\Json;
 use yii\swiftmailer\Mailer;

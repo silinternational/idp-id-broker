@@ -1,8 +1,10 @@
 <?php
 
 try {
+    /* NOTE: The composer autoloader will be one of the first things loaded by
+     *       this required file.  */
     $config = require('../config/load-configs.php');
-} catch (EnvVarNotFoundException $e) {
+} catch (Sil\PhpEnv\EnvVarNotFoundException $e) {
     header('Content-Type: application/json');
     http_response_code(500);
 
