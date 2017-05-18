@@ -24,7 +24,7 @@ try {
         require(__DIR__ . '/common/config/main.php'),
         require(__DIR__ . '/console/config/main.php')
     );
-} catch (EnvVarNotFoundException $e) {
+} catch (Sil\PhpEnv\EnvVarNotFoundException $e) {
     fwrite(STDERR, $e->getMessage());
     exit(1);
 }
