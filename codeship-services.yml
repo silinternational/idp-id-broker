@@ -19,6 +19,7 @@ app:
     command: /data/run-tests.sh
     environment:
         APP_ENV: test
+        IDP_NAME: Test
         MYSQL_HOST: db
         MYSQL_DATABASE: test
         MYSQL_USER: idbroker
