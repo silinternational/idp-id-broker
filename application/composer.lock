@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "8b6651bb9cc0147ccb60961d83746643",
+    "content-hash": "9813a4cf6d913ded08eba918e9251e15",
     "packages": [
         {
             "name": "adldap2/adldap2",
@@ -720,16 +720,16 @@
         },
         {
             "name": "silinternational/php-env",
-            "version": "1.0.1",
+            "version": "2.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/silinternational/php-env.git",
-                "reference": "030821eebac6ff1379a1b0eb6cc4ca18bf3804e0"
+                "reference": "935c5e66309612c8a6323c07de5f02c00edecdef"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/silinternational/php-env/zipball/030821eebac6ff1379a1b0eb6cc4ca18bf3804e0",
-                "reference": "030821eebac6ff1379a1b0eb6cc4ca18bf3804e0",
+                "url": "https://api.github.com/repos/silinternational/php-env/zipball/935c5e66309612c8a6323c07de5f02c00edecdef",
+                "reference": "935c5e66309612c8a6323c07de5f02c00edecdef",
                 "shasum": ""
             },
             "require": {
@@ -749,7 +749,8 @@
             "license": [
                 "MIT"
             ],
-            "time": "2017-05-10T16:00:51+00:00"
+            "description": "Simple PHP library for getting (or requiring) environment variables, designed to handle true, false, and null more intelligently. If desired, an environment variable's value can be split into an array automatically.",
+            "time": "2017-05-22T18:16:15+00:00"
         },
         {
             "name": "silinternational/psr3-adapters",
