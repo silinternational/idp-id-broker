@@ -4,6 +4,7 @@ namespace Sil\SilIdBroker\Behat\Context;
 use common\ldap\Ldap;
 use common\models\Authentication;
 use common\models\User;
+use Sil\Psr3Adapters\Psr3ConsoleLogger;
 use Sil\SilIdBroker\Behat\Context\fakes\FakeOfflineLdap;
 use Sil\SilIdBroker\Behat\Context\YiiContext;
 use Webmozart\Assert\Assert;
@@ -28,6 +29,7 @@ class LdapContext extends YiiContext
     public function __construct()
     {
         $this->ldap = Yii::$app->ldap;
+        $this->ldap->logger = new Psr3ConsoleLogger();
     }
     
     /**

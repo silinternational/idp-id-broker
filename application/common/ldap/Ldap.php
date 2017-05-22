@@ -7,6 +7,8 @@ use Adldap\Exceptions\Auth\BindException;
 use Adldap\Exceptions\Auth\PasswordRequiredException;
 use Adldap\Exceptions\Auth\UsernameRequiredException;
 use Adldap\Schemas\OpenLDAP;
+use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 use yii\base\Component;
 
 class Ldap extends Component
@@ -19,18 +21,27 @@ class Ldap extends Component
     public $base_dn;
     public $admin_username;
     public $admin_password;
+    
+    /** @var LoggerInterface */
+    public $logger;
+    
     public $use_ssl = true;
     public $use_tls = true;
     public $timeout = 5;
     
     public function init()
     {
+        if (empty($this->logger)) {
+            $this->logger = new NullLogger();
+        }
+        
         if ($this->use_ssl && $this->use_tls) {
             // Prefer TLS over SSL.
             $this->use_ssl = false;
         }
         
         if (empty($this->domain_controllers) || empty(join('', $this->domain_controllers))) {
+            $this->logger->critical('No domain_controllers provided.');
             throw new \InvalidArgumentException('No domain_controllers provided.');
         }
         
@@ -61,19 +72,23 @@ class Ldap extends Component
             
             try {
                 $ldapClient->connect('default');
+                $this->logger->info('Connected to LDAP server.');
                 $this->provider = $provider;
             } catch (BindException $e) {
-                throw new LdapConnectionException(sprintf(
+                $errorMessage = sprintf(
                     'There was a problem connecting to the LDAP server: (%s) %s',
                     $e->getCode(),
                     $e->getMessage()
-                ), 1481752312, $e);
+                );
+                $this->logger->critical($errorMessage);
+                throw new LdapConnectionException($errorMessage, 1481752312, $e);
             }
         }
     }
     
     protected function addError($errorMessage)
     {
+        $this->logger->error($errorMessage);
         $this->errors[] = $errorMessage;
     }
     
@@ -100,9 +115,11 @@ class Ldap extends Component
             'dn', // Distinguished name
         ])->where(['cn' => $userCn])->get();
         foreach ($results as $ldapUser) {
+            $this->logger->info('Found user: ' . var_export($userCn, true));
             /* @var $ldapUser \Adldap\Models\User */
             return $ldapUser;
         }
+        $this->logger->info('No such user found: ' . var_export($userCn, true));
         return null;
     }
     
