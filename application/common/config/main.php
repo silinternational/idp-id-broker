@@ -4,6 +4,7 @@ use common\ldap\Ldap;
 use Sil\JsonSyslog\JsonSyslogTarget;
 use Sil\Log\EmailTarget;
 use Sil\PhpEnv\Env;
+use Sil\Psr3Adapters\Psr3Yii2Logger;
 use yii\db\Connection;
 use yii\helpers\Json;
 use yii\swiftmailer\Mailer;
@@ -48,6 +49,7 @@ return [
             'use_ssl' => Env::get('LDAP_USE_SSL', true),
             'use_tls' => Env::get('LDAP_USE_TLS', true),
             'timeout' => Env::get('LDAP_TIMEOUT', 5),
+            'logger' => new Psr3Yii2Logger(),
         ],
         // http://www.yiiframework.com/doc-2.0/guide-runtime-logging.html
         'log' => [
