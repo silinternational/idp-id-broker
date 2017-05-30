@@ -15,13 +15,13 @@ use Yii;
  * @property string $display_name
  * @property string $username
  * @property string $email
- * @property string $password_hash
+ * @property integer $password_id
  * @property string $active
  * @property string $locked
  * @property string $last_changed_utc
  * @property string $last_synced_utc
  *
- * @property PasswordHistory[] $passwordHistories
+ * @property Password $password
  */
 class UserBase extends \yii\db\ActiveRecord
 {
@@ -40,13 +40,15 @@ class UserBase extends \yii\db\ActiveRecord
     {
         return [
             [['uuid', 'employee_id', 'first_name', 'last_name', 'username', 'email', 'active', 'locked', 'last_changed_utc', 'last_synced_utc'], 'required'],
+            [['password_id'], 'integer'],
             [['active', 'locked'], 'string'],
             [['last_changed_utc', 'last_synced_utc'], 'safe'],
             [['uuid'], 'string', 'max' => 64],
-            [['employee_id', 'first_name', 'last_name', 'display_name', 'username', 'email', 'password_hash'], 'string', 'max' => 255],
+            [['employee_id', 'first_name', 'last_name', 'display_name', 'username', 'email'], 'string', 'max' => 255],
             [['employee_id'], 'unique'],
             [['username'], 'unique'],
             [['email'], 'unique'],
+            [['password_id'], 'exist', 'skipOnError' => true, 'targetClass' => Password::className(), 'targetAttribute' => ['password_id' => 'id']],
         ];
     }
 
@@ -64,7 +66,7 @@ class UserBase extends \yii\db\ActiveRecord
             'display_name' => Yii::t('app', 'Display Name'),
             'username' => Yii::t('app', 'Username'),
             'email' => Yii::t('app', 'Email'),
-            'password_hash' => Yii::t('app', 'Password Hash'),
+            'password_id' => Yii::t('app', 'Password ID'),
             'active' => Yii::t('app', 'Active'),
             'locked' => Yii::t('app', 'Locked'),
             'last_changed_utc' => Yii::t('app', 'Last Changed Utc'),
@@ -75,8 +77,8 @@ class UserBase extends \yii\db\ActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getPasswordHistories()
+    public function getPassword()
     {
-        return $this->hasMany(PasswordHistory::className(), ['user_id' => 'id']);
+        return $this->hasOne(Password::className(), ['id' => 'password_id']);
     }
 }

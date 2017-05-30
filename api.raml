@@ -93,13 +93,9 @@ schemas:
             "type": "string",
             "enum": ["yes", "no"]
           },
-          "password_expires_at_utc": {
+          "password": {
             "required": false,
-            "type": "string"
-          },
-          "password_last_changed": {
-            "required": false,
-            "type": "string"
+            "type": "object"
           }
         },
         "type": "object"
@@ -147,14 +143,11 @@ schemas:
               "type": "string",
               "enum": ["yes", "no"]
             },
-            "password_expires_at_utc": {
+            "password": {
               "required": false,
-              "type": "string"
-            },
-            "password_last_changed": {
-              "required": false,
-              "type": "string"
+              "type": "object"
             }
+
           },
           "type": "object"
         },
@@ -193,6 +186,30 @@ schemas:
             "required": false,
             "type": "string",
             "enum": ["yes", "no"]
+          },
+          "password": {
+            "required": false,
+            "type": "object"
+          }
+
+        },
+        "type": "object"
+      }
+  - Password: |
+      {
+        "$schema": "http://json-schema.org/draft-03/schema",
+        "properties": {
+          "created_utc": {
+            "required": true,
+            "type": "string"
+          },
+          "expiration_utc": {
+            "required": true,
+            "type": "string"
+          },
+          "grace_period_ends_utc": {
+            "required": true,
+            "type": "string"
           }
         },
         "type": "object"
@@ -228,8 +245,11 @@ schemas:
                 "email": "john_smith@example.com",
                 "active": "yes",
                 "locked": "no",
-                "password_expires_at_utc": "2018-05-17 18:07:29",
-                "password_last_changed": "2017-05-17 18:07:29"
+                "password": {
+                  "created_utc":"2017-05-24 14:04:51",
+                  "expiration_utc":"2018-05-24 14:04:51",
+                  "grace_period_ends_utc":"2018-06-23 14:04:51"
+                }
               }
       400:
         description: |
@@ -285,8 +305,11 @@ schemas:
                     "email": "john_smith@example.com",
                     "active": "yes",
                     "locked": "no",
-                    "password_expires_at_utc": "2018-05-17 18:07:29",
-                    "password_last_changed": "2017-05-17 18:07:29"
+                    "password": {
+                      "created_utc":"2017-05-24 14:04:51",
+                      "expiration_utc":"2018-05-24 14:04:51",
+                      "grace_period_ends_utc":"2018-06-23 14:04:51"
+                    }
                   },
                   {
                     "uuid": "22222222-bbbb-2222-bbbb-222222222222",
@@ -377,8 +400,11 @@ schemas:
                   "email": "john_smith@example.com",
                   "active": "yes",
                   "locked": "no",
-                  "password_expires_at_utc": "2018-05-17 18:07:29",
-                  "password_last_changed": "2017-05-17 18:07:29"
+                  "password": {
+                    "created_utc":"2017-05-24 14:04:51",
+                    "expiration_utc":"2018-05-24 14:04:51",
+                    "grace_period_ends_utc":"2018-06-23 14:04:51"
+                  }
                 }
         204:
           description: No user record was found with that `employee_id`.
@@ -410,8 +436,11 @@ schemas:
                   "email": "john_smith@example.com",
                   "active": "no",
                   "locked": "no",
-                  "password_expires_at_utc": "2018-05-17 18:07:29",
-                  "password_last_changed": "2017-05-17 18:07:29"
+                  "password": {
+                    "created_utc":"2017-05-24 14:04:51",
+                    "expiration_utc":"2018-05-24 14:04:51",
+                    "grace_period_ends_utc":"2018-06-23 14:04:51"
+                  }
                 }
         204:
           description: No user record was found with that `employee_id`.
@@ -478,8 +507,11 @@ schemas:
                     "email": "john_smith@example.com",
                     "active": "yes",
                     "locked": "no",
-                    "password_expires_at_utc": "2018-05-17 18:07:29",
-                    "password_last_changed": "2017-05-17 18:07:29"
+                    "password": {
+                      "created_utc":"2017-05-24 14:04:51",
+                      "expiration_utc":"2018-05-24 14:04:51",
+                      "grace_period_ends_utc":"2018-06-23 14:04:51"
+                    }
                   }
           204:
             description: No user record was found with that `employee_id`.

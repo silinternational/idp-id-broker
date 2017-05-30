@@ -5,7 +5,6 @@ use common\ldap\Ldap;
 use common\models\Authentication;
 use common\models\User;
 use Sil\SilIdBroker\Behat\Context\fakes\FakeOfflineLdap;
-use Sil\SilIdBroker\Behat\Context\YiiContext;
 use Webmozart\Assert\Assert;
 use Yii;
 
@@ -16,20 +15,20 @@ class LdapContext extends YiiContext
      * @var User|null
      */
     private $authenticatedUser = null;
-    
+
     private $authenticationErrors = null;
-    
+
     /**
      *
      * @var Ldap
      */
     private $ldap;
-    
+
     public function __construct()
     {
         $this->ldap = Yii::$app->ldap;
     }
-    
+
     /**
      * Create a new user in the database with the given username (and other
      * details based off that username). If a user already exists with that
@@ -44,7 +43,7 @@ class LdapContext extends YiiContext
         if ($existingUser !== null) {
             Assert::notSame($existingUser->delete(), false);
         }
-        
+
         $user = new User([
             'email' => $username . '@example.com',
             'employee_id' => (string)time(),
@@ -60,20 +59,20 @@ class LdapContext extends YiiContext
         Assert::notNull($user);
         return $user;
     }
-    
+
     /**
      * @Given there is a :username user in the database with no password
      */
     public function thereIsAUserInTheDatabaseWithNoPassword($username)
     {
         $user = $this->createNewUserInDatabase($username);
-        $user->password_hash = null;
+        $user->password_id = null;
         Assert::true(
-            $user->save(false, ['password_hash']),
+            $user->save(false, ['password_id']),
             var_export($user->getErrors(), true)
         );
         Assert::true($user->refresh());
-        Assert::false($user->hasPasswordAlready());
+        Assert::null($user->getPassword()->one());
     }
 
     /**

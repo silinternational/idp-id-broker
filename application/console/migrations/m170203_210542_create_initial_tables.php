@@ -7,13 +7,16 @@ class m170203_210542_create_initial_tables extends Migration
     public function safeUp()
     {
         $this->createUserTable();
-        $this->createPasswordHistoryTable();
+        $this->createPasswordTable();
 
+        $this->createForeignKeys();
     }
 
     public function safeDown()
     {
-        $this->dropPasswordHistoryTable();
+        $this->dropForeignKeys();
+
+        $this->dropPasswordTable();
         $this->dropUserTable();
     }
 
@@ -30,7 +33,7 @@ class m170203_210542_create_initial_tables extends Migration
                 'display_name' => 'varchar(255) null',
                 'username' => 'varchar(255) not null',
                 'email' => 'varchar(255) not null',
-                'password_hash' => 'varchar(255) null',
+                'password_id' => 'int(11) null',
                 'active' => "enum('yes','no') not null",
                 'locked' => "enum('no','yes') not null",
                 'last_changed_utc' => 'datetime not null',
@@ -39,9 +42,9 @@ class m170203_210542_create_initial_tables extends Migration
             "ENGINE=InnoDB DEFAULT CHARSET=utf8"
         );
 
-        $this->createIndex('uq_user_employee_id','{{user}}','employee_id',true);
-        $this->createIndex('uq_user_username','{{user}}','username',true);
-        $this->createIndex('uq_user_email','{{user}}','email',true);
+        $this->createIndex('uq_user_employee_id', '{{user}}', 'employee_id', true);
+        $this->createIndex('uq_user_username', '{{user}}', 'username', true);
+        $this->createIndex('uq_user_email', '{{user}}', 'email', true);
     }
 
     private function dropUserTable()
@@ -49,28 +52,34 @@ class m170203_210542_create_initial_tables extends Migration
         $this->dropTable('{{user}}');
     }
 
-    private function createPasswordHistoryTable()
+    private function createPasswordTable()
     {
         $this->createTable(
-            '{{password_history}}',
+            '{{password}}',
             [
                 'id' => 'pk',
                 'user_id' => 'int(11) not null',
-                'password_hash' => 'varchar(255) not null',
+                'hash' => 'varchar(255) not null',
                 'created_utc' => 'datetime not null',
+                'expiration_utc' => 'datetime not null',
+                'grace_period_ends_utc' => 'datetime not null',
             ],
             "ENGINE=InnoDB DEFAULT CHARSET=utf8"
         );
-
-        $this->createIndex('idx_password_hash','{{password_history}}','password_hash',false);
-
-        $this->addForeignKey('fk_password_history_user_id','{{password_history}}','user_id','{{user}}','id','CASCADE','CASCADE');
     }
 
-    private function dropPasswordHistoryTable()
+    private function dropPasswordTable()
     {
-        $this->dropForeignKey('fk_password_history_user_id','{{password_history}}');
+        $this->dropTable('{{password}}');
+    }
 
-        $this->dropTable('{{password_history}}');
+    private function createForeignKeys()
+    {
+        $this->addForeignKey('fk_user_to_current_password','{{user}}','password_id','{{password}}','id','CASCADE','CASCADE');
+    }
+
+    private function dropForeignKeys()
+    {
+        $this->dropForeignKey('fk_user_to_current_password','{{user}}');
     }
 }
