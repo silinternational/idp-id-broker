@@ -51,14 +51,73 @@ schemas:
         },
         "type": "object"
       }
-  - User: |
+  - ReturnedUser: |
       {
         "$schema": "http://json-schema.org/draft-03/schema",
         "properties": {
           "uuid": {
-            "required": true,
+            "required": false,
             "type": "string"
           },
+          "employee_id": {
+            "required": false,
+            "type": "string"
+          },
+          "first_name": {
+            "required": false,
+            "type": "string"
+          },
+          "last_name": {
+            "required": false,
+            "type": "string"
+          },
+          "display_name": {
+            "required": false,
+            "type": "string"
+          },
+          "username": {
+            "required": false,
+            "type": "string"
+          },
+          "email": {
+            "required": false,
+            "type": "string"
+          },
+          "active": {
+            "required": false,
+            "type": "string",
+            "enum": ["yes", "no"]
+          },
+          "locked": {
+            "required": false,
+            "type": "string",
+            "enum": ["yes", "no"]
+          },
+          "password": {
+            "required": false,
+            "type": "object",
+            "properties": {
+              "created_utc": {
+                "required": true,
+                "type": "string"
+              },
+              "expiration_utc": {
+                "required": true,
+                "type": "string"
+              },
+              "grace_period_ends_utc": {
+                "required": true,
+                "type": "string"
+              }
+            }
+          }
+        },
+        "type": "object"
+      }
+  - UserCreation: |
+      {
+        "$schema": "http://json-schema.org/draft-03/schema",
+        "properties": {
           "employee_id": {
             "required": true,
             "type": "string"
@@ -92,24 +151,6 @@ schemas:
             "required": false,
             "type": "string",
             "enum": ["yes", "no"]
-          },
-          "password": {
-            "required": false,
-            "type": "object",
-            "properties": {
-              "created_utc": {
-                "required": true,
-                "type": "string"
-              },
-              "expiration_utc": {
-                "required": true,
-                "type": "string"
-              },
-              "grace_period_ends_utc": {
-                "required": true,
-                "type": "string"
-              }
-            }
           }
         },
         "type": "object"
@@ -217,25 +258,6 @@ schemas:
         },
         "type": "object"
       }
-  - Password: |
-      {
-        "$schema": "http://json-schema.org/draft-03/schema",
-        "properties": {
-          "created_utc": {
-            "required": true,
-            "type": "string"
-          },
-          "expiration_utc": {
-            "required": true,
-            "type": "string"
-          },
-          "grace_period_ends_utc": {
-            "required": true,
-            "type": "string"
-          }
-        },
-        "type": "object"
-      }
 
 /authentication:
   post:
@@ -251,11 +273,11 @@ schemas:
       200:
         description: |
           The given credentials were acceptable/valid (i.e. - the
-          authentication succeeded).  The body of the response will have the attributes of the
-          authenticated User.
+          authentication succeeded). The body of the response will have the
+          attributes of the authenticated User.
         body:
           application/json:
-            schema: User
+            schema: ReturnedUser
             example: |
               {
                 "uuid": "11111111-aaaa-1111-aaaa-111111111111",
@@ -308,7 +330,7 @@ schemas:
         description: A comma-delimited list of fields to include for each user.
         required: false
         type: string
-        default: "fields=employee_id,first_name,last_name,display_name,username,email,active,locked"
+        default: "fields=uuid,employee_id,first_name,last_name,display_name,username,email,active,locked,password"
         example: "fields=employee_id,active"
     responses:
       200:
@@ -349,7 +371,7 @@ schemas:
     description: Create a new user record.
     body:
       application/json:
-        schema: User
+        schema: UserCreation
         example: |
           {
             "employee_id": "12345",
@@ -363,7 +385,7 @@ schemas:
         description: The new user record was created.
         body:
           application/json:
-            schema: User
+            schema: ReturnedUser
             example: |
               {
                 "uuid": "11111111-aaaa-1111-aaaa-111111111111",
@@ -407,10 +429,11 @@ schemas:
       responses:
         200:
           description: |
-            The corresponding user record (matching on the `employee_id` URL parameter).
+            The corresponding user record (matching on the `employee_id` URL
+            parameter).
           body:
             application/json:
-              schema: User
+              schema: ReturnedUser
               example: |
                 {
                   "uuid": "11111111-aaaa-1111-aaaa-111111111111",
@@ -446,7 +469,7 @@ schemas:
             parameter) was updated to match the given data.
           body:
             application/json:
-              schema: User
+              schema: ReturnedUser
               example: |
                 {
                   "uuid": "11111111-aaaa-1111-aaaa-111111111111",
@@ -517,7 +540,7 @@ schemas:
               The password for the user with that `employee_id` was successfully updated.
             body:
               application/json:
-                schema: User
+                schema: ReturnedUser
                 example: |
                   {
                     "uuid": "11111111-aaaa-1111-aaaa-111111111111",
