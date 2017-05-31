@@ -66,13 +66,13 @@ class LdapContext extends YiiContext
     public function thereIsAUserInTheDatabaseWithNoPassword($username)
     {
         $user = $this->createNewUserInDatabase($username);
-        $user->password_id = null;
+        $user->current_password_id = null;
         Assert::true(
-            $user->save(false, ['password_id']),
+            $user->save(false, ['current_password_id']),
             var_export($user->getErrors(), true)
         );
         Assert::true($user->refresh());
-        Assert::null($user->getPassword()->one());
+        Assert::null($user->currentPassword);
     }
 
     /**

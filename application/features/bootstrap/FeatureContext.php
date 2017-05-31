@@ -370,10 +370,10 @@ class FeatureContext extends YiiContext
     {
         $user = User::findByUsername($username);
         Assert::notNull($user);
-        $user->password_id = null;
-        Assert::true($user->save(false, ['password_id']));
+        $user->current_password_id = null;
+        Assert::true($user->save(false, ['current_password_id']));
         $user->refresh();
-        Assert::null($user->password_id);
+        Assert::null($user->current_password_id);
         Password::deleteAll(['user_id' => $user->id]);
     }
 
@@ -384,6 +384,6 @@ class FeatureContext extends YiiContext
     {
         $user = User::findByUsername($username);
         Assert::notNull($user);
-        Assert::notNull($user->getPassword()->one());
+        Assert::notNull($user->currentPassword);
     }
 }

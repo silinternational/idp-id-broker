@@ -15,13 +15,13 @@ use Yii;
  * @property string $display_name
  * @property string $username
  * @property string $email
- * @property integer $password_id
+ * @property integer $current_password_id
  * @property string $active
  * @property string $locked
  * @property string $last_changed_utc
  * @property string $last_synced_utc
  *
- * @property Password $password
+ * @property Password $currentPassword
  */
 class UserBase extends \yii\db\ActiveRecord
 {
@@ -40,7 +40,7 @@ class UserBase extends \yii\db\ActiveRecord
     {
         return [
             [['uuid', 'employee_id', 'first_name', 'last_name', 'username', 'email', 'active', 'locked', 'last_changed_utc', 'last_synced_utc'], 'required'],
-            [['password_id'], 'integer'],
+            [['current_password_id'], 'integer'],
             [['active', 'locked'], 'string'],
             [['last_changed_utc', 'last_synced_utc'], 'safe'],
             [['uuid'], 'string', 'max' => 64],
@@ -48,7 +48,7 @@ class UserBase extends \yii\db\ActiveRecord
             [['employee_id'], 'unique'],
             [['username'], 'unique'],
             [['email'], 'unique'],
-            [['password_id'], 'exist', 'skipOnError' => true, 'targetClass' => Password::className(), 'targetAttribute' => ['password_id' => 'id']],
+            [['current_password_id'], 'exist', 'skipOnError' => true, 'targetClass' => Password::className(), 'targetAttribute' => ['current_password_id' => 'id']],
         ];
     }
 
@@ -66,7 +66,7 @@ class UserBase extends \yii\db\ActiveRecord
             'display_name' => Yii::t('app', 'Display Name'),
             'username' => Yii::t('app', 'Username'),
             'email' => Yii::t('app', 'Email'),
-            'password_id' => Yii::t('app', 'Password ID'),
+            'current_password_id' => Yii::t('app', 'Current Password ID'),
             'active' => Yii::t('app', 'Active'),
             'locked' => Yii::t('app', 'Locked'),
             'last_changed_utc' => Yii::t('app', 'Last Changed Utc'),
@@ -77,8 +77,8 @@ class UserBase extends \yii\db\ActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getPassword()
+    public function getCurrentPassword()
     {
-        return $this->hasOne(Password::className(), ['id' => 'password_id']);
+        return $this->hasOne(Password::className(), ['id' => 'current_password_id']);
     }
 }

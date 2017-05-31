@@ -120,12 +120,11 @@ class User extends UserBase
     {
         return function ($attributeName) {
 
-            if ($this->password_id === null) {
+            if ($this->current_password_id === null) {
                 $this->attemptPasswordMigration();
             }
 
-            /** @var Password $currentPassword */
-            $currentPassword = $this->getPassword()->one() ?? new Password();
+            $currentPassword = $this->currentPassword ?? new Password();
             if (! password_verify($this->password, $currentPassword->hash)) {
                 $this->addError($attributeName, 'Incorrect password.');
             }
@@ -210,10 +209,8 @@ class User extends UserBase
     private function validateExpiration(): Closure
     {
         return function ($attributeName) {
-            if ($this->password_id !== null) {
-                /** @var $currentPassword Password */
-                $currentPassword = $this->getPassword()->one();
-                $gracePeriodEnds = strtotime($currentPassword->grace_period_ends_utc);
+            if ($this->currentPassword !== null) {
+                $gracePeriodEnds = strtotime($this->currentPassword->grace_period_ends_utc);
 
                 $now = time();
 
@@ -282,9 +279,9 @@ class User extends UserBase
             'locked',
         ];
 
-        if ($this->password_id !== null) {
+        if ($this->current_password_id !== null) {
             $fields['password'] = function () {
-                return $this->getPassword()->one();
+                return $this->currentPassword;
             };
         }
 
@@ -341,7 +338,7 @@ class User extends UserBase
             return false;
         }
 
-        $this->password_id = $password->id;
+        $this->current_password_id = $password->id;
 
         return true;
     }

@@ -33,7 +33,7 @@ class m170203_210542_create_initial_tables extends Migration
                 'display_name' => 'varchar(255) null',
                 'username' => 'varchar(255) not null',
                 'email' => 'varchar(255) not null',
-                'password_id' => 'int(11) null',
+                'current_password_id' => 'int(11) null',
                 'active' => "enum('yes','no') not null",
                 'locked' => "enum('no','yes') not null",
                 'last_changed_utc' => 'datetime not null',
@@ -75,7 +75,7 @@ class m170203_210542_create_initial_tables extends Migration
 
     private function createForeignKeys()
     {
-        $this->addForeignKey('fk_user_to_current_password','{{user}}','password_id','{{password}}','id','CASCADE','CASCADE');
+        $this->addForeignKey('fk_user_to_current_password','{{user}}','current_password_id','{{password}}','id','CASCADE');
     }
 
     private function dropForeignKeys()
