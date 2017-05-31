@@ -1,84 +1,47 @@
 <?php
 namespace frontend\controllers;
 
+use Exception;
 use frontend\components\BaseRestController;
-use yii\filters\AccessControl;
-use yii\helpers\ArrayHelper;
-use yii\web\MethodNotAllowedHttpException;
+use Yii;
+use yii\web\NotFoundHttpException;
 use yii\web\ServerErrorHttpException;
-use yii\web\UnauthorizedHttpException;
 
-/**
- * Site controller
- */
 class SiteController extends BaseRestController
 {
-
-    public $layout = false;
-
-    /**
-     * Access Control Filter
-     * REMEMBER: NEEDS TO BE UPDATED FOR EVERY ACTION
-     * @return array
-     */
     public function behaviors()
     {
-        return ArrayHelper::merge(parent::behaviors(), [
-            'access' => [
-                'class' => AccessControl::className(),
-                'rules' => [
-                    [
-                        'allow' => true,
-                        'roles' => ['@'],
-                    ],
-                    [
-                        'allow' => true,
-                        'actions' => ['system-status'],
-                        'roles' => ['?'],
-                    ],
-                ]
-            ],
-            'authenticator' => [
-                'except' => ['system-status'] // bypass authentication for /site/system-status
-            ]
-        ]);
-    }
+        $behaviors = parent::behaviors();
 
-    /**
-     * @inheritdoc
-     */
-    public function actions()
-    {
-        return [
-            'error' => [
-                'class' => 'frontend\components\ErrorAction',
-            ],
+        $behaviors['authenticator']['except'] = [
+            // bypass authentication, i.e., public API
+            'status'
         ];
+
+        return $behaviors;
     }
 
-    public function actionIndex()
+    public function actionStatus()
     {
-        if (\Yii::$app->user->isGuest) {
-            throw new UnauthorizedHttpException();
-        }
-        throw new MethodNotAllowedHttpException();
-    }
-
-    public function actionSystemStatus()
-    {
-        /**
-         * Check for DB connection
-         */
         try {
-            \Yii::$app->db->open();
-            return [];
-        } catch (\Exception $e) {
+            // db comms are a good indication of health
+            Yii::$app->db->open();
+        } catch (Exception $e) {
             throw new ServerErrorHttpException(
-                'Unable to connect to db, error code ' . $e->getCode(),
-                $e->getCode()
+                'Database connection problem.', $e->getCode()
             );
         }
 
+        Yii::$app->response->statusCode = 204;
     }
 
+    public function actionUndefinedRequest()
+    {
+        $method = Yii::$app->request->method;
+        $url    = Yii::$app->request->url;
+
+        Yii::warning("$method $url requested but not defined.");
+
+        throw new NotFoundHttpException();
+    }
 }

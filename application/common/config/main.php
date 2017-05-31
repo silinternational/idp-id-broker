@@ -1,111 +1,97 @@
 <?php
 
-use Sil\PhpEnv\Env;
+use common\ldap\Ldap;
+use Sil\JsonSyslog\JsonSyslogTarget;
 use Sil\Log\EmailTarget;
+use Sil\PhpEnv\Env;
+use Sil\Psr3Adapters\Psr3Yii2Logger;
+use yii\db\Connection;
+use yii\helpers\Json;
+use yii\swiftmailer\Mailer;
+use yii\web\Request;
 
-/*
- * Get config settings from ENV vars or set defaults
- */
-$mysqlHost = Env::get('MYSQL_HOST');
-$mysqlDatabase = Env::get('MYSQL_DATABASE');
-$mysqlUser = Env::get('MYSQL_USER');
-$mysqlPassword = Env::get('MYSQL_PASSWORD');
-$mailerUseFiles = Env::get('MAILER_USEFILES', false);
-$mailerHost = Env::get('MAILER_HOST');
-$mailerUsername = Env::get('MAILER_USERNAME');
-$mailerPassword = Env::get('MAILER_PASSWORD');
-$alertsEmail = Env::get('ALERTS_EMAIL');
-$alertsEmailEnabled = Env::get('ALERTS_EMAIL_ENABLED');
-$fromEmail = Env::get('FROM_EMAIL');
-$appEnv = Env::get('APP_ENV');
-$uiCorsOrigin = Env::get('UI_CORS_ORIGIN');
+$idpName       = null;
+$mysqlHost     = null;
+$mysqlDatabase = null;
+$mysqlUser     = null;
+$mysqlPassword = null;
+
+$idpName       = Env::requireEnv('IDP_NAME');
+$mysqlHost     = Env::requireEnv('MYSQL_HOST');
+$mysqlDatabase = Env::requireEnv('MYSQL_DATABASE');
+$mysqlUser     = Env::requireEnv('MYSQL_USER');
+$mysqlPassword = Env::requireEnv('MYSQL_PASSWORD');
+
+$mailerUseFiles    = Env::get('MAILER_USEFILES', false);
+$mailerHost        = Env::get('MAILER_HOST');
+$mailerUsername    = Env::get('MAILER_USERNAME');
+$mailerPassword    = Env::get('MAILER_PASSWORD');
+$notificationEmail = Env::get('NOTIFICATION_EMAIL', 'oncall@example.org');
 
 return [
     'id' => 'app-common',
-    'vendorPath' => dirname(dirname(__DIR__)) . '/vendor',
+    'bootstrap' => ['log'],
     'components' => [
         'db' => [
-            'class' => 'yii\db\Connection',
-            'dsn' => sprintf('mysql:host=%s;dbname=%s', $mysqlHost, $mysqlDatabase),
+            'class' => Connection::class,
+            'dsn' => "mysql:host=$mysqlHost;dbname=$mysqlDatabase",
             'username' => $mysqlUser,
             'password' => $mysqlPassword,
             'charset' => 'utf8',
-            'emulatePrepare' => false,
-            'tablePrefix' => '',
         ],
+        'ldap' => [
+            'class' => Ldap::class,
+            'acct_suffix' => Env::get('LDAP_ACCT_SUFFIX'),
+            'domain_controllers' => explode('|', Env::get('LDAP_DOMAIN_CONTROLLERS')),
+            'base_dn' => Env::get('LDAP_BASE_DN'),
+            'admin_username' => Env::get('LDAP_ADMIN_USERNAME'),
+            'admin_password' => Env::get('LDAP_ADMIN_PASSWORD'),
+            'use_ssl' => Env::get('LDAP_USE_SSL', true),
+            'use_tls' => Env::get('LDAP_USE_TLS', true),
+            'timeout' => Env::get('LDAP_TIMEOUT', 5),
+            'logger' => new Psr3Yii2Logger(),
+        ],
+        // http://www.yiiframework.com/doc-2.0/guide-runtime-logging.html
         'log' => [
-            'traceLevel' => 0,
             'targets' => [
                 [
-                    'class' => 'Sil\JsonSyslog\JsonSyslogTarget',
-                    'levels' => ['error', 'warning'],
-                    'except' => [
-                        'yii\web\HttpException:401',
-                        'yii\web\HttpException:404',
-                    ],
-                    'logVars' => [], // Disable logging of _SERVER, _POST, etc.
-                    'prefix' => function($message) use ($appEnv) {
+                    'class' => JsonSyslogTarget::class,
+                    'categories' => ['application'], // stick to messages from this app, not all of Yii's built-in messaging.
+                    'logVars' => [], // no need for default stuff: http://www.yiiframework.com/doc-2.0/yii-log-target.html#$logVars-detail
+                    'prefix' => function () {
+                        //TODO: assumes yii\web\Request here, could be a problem if app
+                        //    develops a console portion since there's also a
+                        //    yii\console\Request
+                        /* @var Request */
+                        $request = Yii::$app->request;
+
+                        // Assumes format: Bearer consumer-module-name-32randomcharacters
+                        $requesterId = substr($request->headers['Authorization'], 7, 16) ?: 'unknown';
+
                         $prefixData = [
-                            'env' => $appEnv,
+                            'env' => YII_ENV,
+                            'id' => $requesterId,
+                            'ip' => $request->getUserIP(),
                         ];
 
-                        // There is no user when a console command is run
-                        try {
-                            $appUser = \Yii::$app->user;
-                        } catch (\Exception $e) {
-                            $appUser = null;
-                        }
-                        if ($appUser && ! \Yii::$app->user->isGuest) {
-                            $prefixData['user'] = \Yii::$app->user->identity->email;
-                        }
-                        return \yii\helpers\Json::encode($prefixData);
+                        return Json::encode($prefixData);
                     },
                 ],
                 [
-                    'class' => 'Sil\Log\EmailTarget',
+                    'class' => EmailTarget::class,
+                    'categories' => ['application'], // stick to messages from this app, not all of Yii's built-in messaging.
+                    'logVars' => [], // no need for default stuff: http://www.yiiframework.com/doc-2.0/yii-log-target.html#$logVars-detail
                     'levels' => ['error'],
-                    'except' => [
-                        'yii\web\HttpException:400',
-                        'yii\web\HttpException:401',
-                        'yii\web\HttpException:404',
-                        'yii\web\HttpException:409',
-                    ],
-                    'logVars' => [], // Disable logging of _SERVER, _POST, etc.
                     'message' => [
-                        'from' => $fromEmail,
-                        'to' => $alertsEmail,
-                        'subject' => 'ALERT - [env=' . $appEnv .']',
+                        'from' => $mailerUsername,
+                        'to' => $notificationEmail,
+                        'subject' => "ERROR - $idpName-id-broker [".YII_ENV."] Error",
                     ],
-                    'prefix' => function($message) use ($appEnv) {
-                        $prefix = 'env=' . $appEnv . PHP_EOL;
-
-                        // There is no user when a console command is run
-                        try {
-                            $appUser = \Yii::$app->user;
-                        } catch (\Exception $e) {
-                            $appUser = Null;
-                        }
-                        if ($appUser && ! \Yii::$app->user->isGuest){
-                            $prefix .= 'user='.\Yii::$app->user->identity->email . PHP_EOL;
-                        }
-
-                        // Try to get requested url and method
-                        try {
-                            $request = \Yii::$app->request;
-                            $prefix .= 'Requested URL: ' . $request->getUrl() . PHP_EOL;
-                            $prefix .= 'Request method: ' . $request->getMethod() . PHP_EOL;
-                        } catch (\Exception $e) {
-                            $prefix .= 'Requested URL: not available';
-                        }
-
-                        return PHP_EOL . $prefix;
-                    },
-                    'enabled' => $alertsEmailEnabled,
                 ],
             ],
         ],
         'mailer' => [
-            'class' => 'yii\swiftmailer\Mailer',
+            'class' => Mailer::class,
             'useFileTransport' => $mailerUseFiles,
             'transport' => [
                 'class' => 'Swift_SmtpTransport',
@@ -118,6 +104,6 @@ return [
         ],
     ],
     'params' => [
-        'uiCorsOrigin' => $uiCorsOrigin,
+        'migratePasswordsFromLdap' => Env::get('MIGRATE_PW_FROM_LDAP', false),
     ],
 ];

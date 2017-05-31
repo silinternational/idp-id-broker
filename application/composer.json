@@ -1,30 +1,32 @@
 {
+  "name": "silinternational/idp-id-broker",
   "minimum-stability": "stable",
   "require": {
     "php": ">=7.0",
+    "adldap2/adldap2": "^6.1",
     "fillup/fake-bower-assets": "2.0.9",
     "roave/security-advisories": "dev-master",
-    "silinternational/php-env": "^0.1.1",
-    "silinternational/yii2-jsonsyslog": "^1.0.0",
-    "silinternational/yii2-email-log-target": "dev-master",
+    "silinternational/php-env": "^2.0.1",
     "yiisoft/yii2": "^2.0.11",
     "yiisoft/yii2-gii": "*",
-    "yiisoft/yii2-swiftmailer": "*"
+    "silinternational/psr3-adapters": "^1.1",
+    "silinternational/yii2-jsonsyslog": "^1.0",
+    "silinternational/yii2-email-log-target": "^1.0",
+    "yiisoft/yii2-swiftmailer": "^2.0",
+    "ramsey/uuid": "^3.6"
   },
   "require-dev": {
-    "codeception/codeception": "^2.2",
-    "codeception/specify": "0.*",
-    "codeception/verify": "0.*",
     "fillup/phpmyadmin-minimal": "dev-master",
-    "silinternational/yii2-codeception": "dev-master"
+    "behat/behat": "^3.3",
+    "guzzlehttp/guzzle": "^6.2",
+    "webmozart/assert": "^1.2"
   },
   "config": {
     "process-timeout": 1800
   },
-  "extra": {
-    "asset-installer-paths": {
-      "npm-asset-library": "vendor/npm",
-      "bower-asset-library": "vendor/bower"
+  "autoload": {
+    "psr-4": {
+      "Sil\\SilIdBroker\\Behat\\Context\\": "features/bootstrap"
     }
   }
 }

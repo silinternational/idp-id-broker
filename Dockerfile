@@ -3,6 +3,9 @@ MAINTAINER Phillip Shipley <phillip_shipley@sil.org>
 
 ENV REFRESHED_AT 2017-02-03
 
+RUN apt-get update -y && \
+    apt-get install -y make
+
 COPY dockerbuild/vhost.conf /etc/apache2/sites-enabled/
 
 RUN mkdir -p /data
@@ -27,9 +30,7 @@ COPY application/ /data/
 
 # Fix folder permissions
 RUN chown -R www-data:www-data \
-    console/runtime/ \
-    frontend/runtime/ \
-    frontend/web/assets/
+    console/runtime/
 
 EXPOSE 80
 ENTRYPOINT ["/usr/local/bin/s3-expand"]

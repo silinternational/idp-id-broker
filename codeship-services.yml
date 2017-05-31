@@ -1,0 +1,53 @@
+db:
+    image: silintl/mariadb:latest
+    environment:
+        MYSQL_ROOT_PASSWORD: r00tp@ss!
+        MYSQL_DATABASE: test
+        MYSQL_USER: idbroker
+        MYSQL_PASSWORD: idbroker
+
+app:
+    build:
+        image: silintl/idp-id-broker
+        dockerfile_path: ./Dockerfile
+        cached: true
+    links:
+        - db
+        - ldap
+        - ldapload
+    working_dir: /data
+    command: /data/run-tests.sh
+    environment:
+        APP_ENV: test
+        IDP_NAME: Test
+        MYSQL_HOST: db
+        MYSQL_DATABASE: test
+        MYSQL_USER: idbroker
+        MYSQL_PASSWORD: idbroker
+        API_ACCESS_KEYS: abc123
+        TEST_SERVER_HOSTNAME: localhost
+        LDAP_BASE_DN: dc=acme,dc=org
+        LDAP_ADMIN_USERNAME: cn=Manager,dc=acme,dc=org
+        LDAP_ADMIN_PASSWORD: admin
+        LDAP_DOMAIN_CONTROLLERS: ldap
+        LDAP_USE_SSL: false
+        LDAP_USE_TLS: false
+        MIGRATE_PW_FROM_LDAP: true
+
+ldap:
+    build:
+        context: ./development/ldap
+        dockerfile: Dockerfile
+    working_dir: /data
+
+ldapload:
+    build:
+        context: ./development/ldap
+        dockerfile: Dockerfile
+    working_dir: /data
+    links:
+        - ldap
+    volumes:
+        - ./development/ldap/fakepeople.ldif:/root/fakepeople.ldif
+        - ./development/ldap/fakerep.ldif:/root/fakerep.ldif
+    command: bash -c "sleep 10 && /data/load_ldap.sh"

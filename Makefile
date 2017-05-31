@@ -1,52 +1,39 @@
 start: app
 
-test:
-	make testunit
-
-testunit: composer rmTestDb upTestDb yiimigratetestDb yiimigratetestDblocal rmTestDb
-	docker-compose run --rm cli bash -c 'MYSQL_HOST=testDb MYSQL_DATABASE=test ./vendor/bin/codecept run unit'
-
-app: upDb composer yiimigrate yiimigratelocal
+app: db deps
 	docker-compose up -d app
 
-composer:
-	docker-compose run --rm --user="0:0" cli composer install
+deps:
+	docker-compose run --rm cli composer install
 
-composerupdate:
-	docker-compose run --rm --user="0:0" cli composer update
+depsupdate:
+	docker-compose run --rm cli composer update
 
-rmDb:
-	docker-compose kill db
-	docker-compose rm -f db
-
-upDb:
+db:
 	docker-compose up -d db
 
-yiimigrate:
+tables: db
 	docker-compose run --rm cli whenavail db 3306 100 ./yii migrate --interactive=0
 
-yiimigratelocal:
-	docker-compose run --rm cli whenavail db 3306 100 ./yii migrate --migrationPath=console/migrations-local/ --interactive=0
-
-basemodels:
+basemodels: db tables
 	docker-compose run --rm cli whenavail db 3306 100 ./rebuildbasemodels.sh
 
-yiimigratetestDb:
-	docker-compose run --rm cli bash -c 'MYSQL_HOST=testDb MYSQL_DATABASE=test whenavail testDb 3306 100 ./yii migrate --interactive=0'
+ldap:
+	docker-compose up -d ldap
 
-yiimigratetestDblocal:
-	docker-compose run --rm cli bash -c 'MYSQL_HOST=testDb MYSQL_DATABASE=test whenavail testDb 3306 100 ./yii migrate --migrationPath=console/migrations-test/ --interactive=0'
+ldapload: ldap
+	docker-compose run --rm ldapload
 
-rmTestDb:
-	docker-compose kill testDb
-	docker-compose rm -f testDb
+rmldap:
+	docker-compose kill ldap
+	docker-compose rm -f ldap
 
-upTestDb:
-	docker-compose up -d testDb
+quicktest:
+	docker-compose run --rm test bash -c "vendor/bin/behat --stop-on-failure --strict --append-snippets"
 
-bounce:
-	docker-compose up -d app
+test: app rmldap ldap ldapload
+	docker-compose run --rm test
 
 clean:
 	docker-compose kill
-	docker-compose rm -f
+	docker system prune -f

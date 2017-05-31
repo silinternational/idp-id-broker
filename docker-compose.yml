@@ -4,27 +4,15 @@ services:
         image: silintl/data-volume:latest
         volumes:
             - ./application:/data
+            - ./auth.json:/root/.composer/auth.json
         user: "${DOCKER_UIDGID}"
 
     db:
         image: silintl/mariadb:latest
         ports:
             - "3306"
-        environment:
-            MYSQL_ROOT_PASSWORD: r00tp@ss!
-            MYSQL_DATABASE: app
-            MYSQL_USER: user
-            MYSQL_PASSWORD: pass
-
-    testDb:
-       image: silintl/mariadb:latest
-       ports:
-           - "3306"
-       environment:
-           MYSQL_ROOT_PASSWORD: r00tp@ss!
-           MYSQL_DATABASE: test
-           MYSQL_USER: user
-           MYSQL_PASSWORD: pass
+        env_file:
+            - ./local.env
 
     app:
         build: ./
@@ -35,20 +23,69 @@ services:
         depends_on:
             - db
         env_file:
-            - ./common.env
             - ./local.env
+        environment:
+            LDAP_BASE_DN: dc=acme,dc=org
+            LDAP_ADMIN_USERNAME: cn=Manager,dc=acme,dc=org
+            LDAP_ADMIN_PASSWORD: admin
+            LDAP_DOMAIN_CONTROLLERS: ldap
+            LDAP_USE_SSL: "false"
+            LDAP_USE_TLS: "false"
+            MIGRATE_PW_FROM_LDAP: "true"
 
     cli:
         image: silintl/php7:latest
         volumes_from:
             - data
-        volumes:
-            - ${COMPOSER_CACHE_DIR}:/composer
         working_dir: /data
         env_file:
-            - ./common.env
             - ./local.env
         command: ["true"]
+
+    ldap:
+        build:
+            context: ./development/ldap
+            dockerfile: Dockerfile
+        ports:
+            - "389"
+        env_file:
+            - ./local.env
+        working_dir: /data
+        environment:
+            DEBUG_LEVEL: 320
+
+    ldapload:
+        build:
+            context: ./development/ldap
+            dockerfile: Dockerfile
+        working_dir: /data
+        env_file:
+            - ./local.env
+        environment:
+            DEBUG_LEVEL: 320
+        links:
+            - ldap
+        volumes:
+            - ./development/ldap/fakepeople.ldif:/root/fakepeople.ldif
+            - ./development/ldap/fakerep.ldif:/root/fakerep.ldif
+        command: bash -c "sleep 10 && /data/load_ldap.sh"
+
+    test:
+        image: silintl/php7:latest
+        volumes_from:
+            - data
+        working_dir: /data
+        depends_on:
+            - app
+        env_file:
+            - ./local.env
+        environment:
+            TEST_SERVER_HOSTNAME: app
+            APP_ENV: test
+        command: ./run-tests.sh
+        # running isolated tests
+        # docker-compose run --rm test vendor/bin/behat --stop-on-failure features/user.feature
+        # docker-compose run --rm test vendor/bin/behat --stop-on-failure features/user.feature:306
 
 networks:
     default:

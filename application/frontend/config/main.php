@@ -1,65 +1,57 @@
 <?php
 
+use common\models\ApiConsumer;
 use Sil\PhpEnv\Env;
-
-/* Get frontend-specific config settings from ENV vars or set defaults. */
-$frontCookieSecure = Env::get('FRONT_COOKIE_SECURE', true);
-
-$sessionLifetime = 1800; // 30 minutes
-
-const UID_ROUTE_PATTERN = '<uid:([a-zA-Z0-9_\-]{32})>';
+use yii\web\JsonParser;
+use yii\web\Response;
 
 return [
     'id' => 'app-frontend',
     'basePath' => dirname(__DIR__),
-    'bootstrap' => ['log', 'errorHandler'],
+    // http://www.yiiframework.com/doc-2.0/guide-structure-applications.html#controllerNamespace
     'controllerNamespace' => 'frontend\controllers',
     'components' => [
+        // http://www.yiiframework.com/doc-2.0/guide-security-authentication.html
         'user' => [
-            'identityClass' => 'common\models\User',
-            'enableAutoLogin' => false,
-            'enableSession' => false,
-            'loginUrl' => null,
+            'identityClass' => ApiConsumer::class, // custom Bearer <token> implementation
+            'enableSession' => false, // ensure statelessness
         ],
-        'session' => [
-            'cookieParams' => [// http://us2.php.net/manual/en/function.session-set-cookie-params.php
-                'lifetime' => $sessionLifetime,
-                'path' => '/',
-                'httponly' => true,
-                'secure' => $frontCookieSecure,
-            ],
-        ],
-        'log' => [
-
-        ],
-        'errorHandler' => [
-            'errorAction' => 'site/error',
-        ],
+        // http://www.yiiframework.com/doc-2.0/guide-runtime-requests.html
         'request' => [
-            'enableCsrfValidation' => false,
+            // restrict input to JSON only http://www.yiiframework.com/doc-2.0/guide-rest-quick-start.html#enabling-json-input
             'parsers' => [
-                'application/json' => 'yii\web\JsonParser',
+                'application/json' => JsonParser::class,
             ]
         ],
+        // http://www.yiiframework.com/doc-2.0/guide-runtime-responses.html
+        'response' => [
+            // all responses, even unhandled errors, need to be in JSON for an API.
+            'format' => Response::FORMAT_JSON,
+        ],
+        // http://www.yiiframework.com/doc-2.0/guide-runtime-routing.html
         'urlManager' => [
-            'enablePrettyUrl' => true,
-            'enableStrictParsing' => true,
-            'showScriptName' => false,
+            'enablePrettyUrl' => true, // turns /index.php?r=post%2Fview&id=100 into /index.php/post/100
+            'showScriptName' => false, // turns /index.php/post/100 into /post/100
+            // http://www.yiiframework.com/doc-2.0/guide-rest-routing.html
             'rules' => [
+                'GET  user'                           => 'user/index',
+                'GET  user/<employeeId:\w+>'          => 'user/view',
+                'POST user'                           => 'user/create',
+                'PUT  user/<employeeId:\w+>'          => 'user/update',
+                'PUT  user/<employeeId:\w+>/password' => 'user/update-password',
 
-                /*
-                 * Status route
-                 */
-                'GET /site/system-status' => 'site/system-status',
+                'POST authentication' => 'authentication/create',
 
-                /*
-                 * Catch all to throw 401 or 405
-                 */
-                '/<url:.*>' => 'site/index',
+                'status' => 'site/status',
+
+                '<undefinedRequest>' => 'site/undefined-request',
             ]
-        ]
+        ],
     ],
     'params' => [
-
+        'authorizedTokens'              => Env::getArray('API_ACCESS_KEYS'),
+        'passwordReuseLimit'            => Env::get('PASSWORD_REUSE_LIMIT', 10),
+        'passwordLifespan'              => Env::get('PASSWORD_LIFESPAN', '+1 year'),
+        'passwordExpirationGracePeriod' => Env::get('PASSWORD_EXPIRATION_GRACE_PERIOD', '+30 days'),
     ],
 ];

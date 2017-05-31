@@ -1,0 +1,355 @@
+<?php
+
+namespace common\models;
+
+use Closure;
+use common\helpers\MySqlDateTime;
+use common\ldap\Ldap;
+use Exception;
+use Ramsey\Uuid\Uuid;
+use Yii;
+use yii\behaviors\AttributeBehavior;
+use yii\db\ActiveRecord;
+use yii\helpers\ArrayHelper;
+
+class User extends UserBase
+{
+    const SCENARIO_NEW_USER        = 'new_user';
+    const SCENARIO_UPDATE_USER     = 'update_user';
+    const SCENARIO_UPDATE_PASSWORD = 'update_password';
+    const SCENARIO_AUTHENTICATE    = 'authenticate';
+
+    public $password;
+
+    /** @var Ldap */
+    private $ldap;
+
+    public function setLdap(Ldap $ldap)
+    {
+        $this->ldap = $ldap;
+    }
+
+    public function scenarios(): array
+    {
+        $scenarios = parent::scenarios();
+
+        $scenarios[self::SCENARIO_DEFAULT] = null; // force consumers to choose a scenario
+
+        $scenarios[self::SCENARIO_NEW_USER] = [
+            '!uuid',
+            'employee_id',
+            'first_name',
+            'last_name',
+            'display_name',
+            'username',
+            'email',
+            'active',
+            'locked',
+        ];
+
+        $scenarios[self::SCENARIO_UPDATE_USER] = [
+            'first_name',
+            'last_name',
+            'display_name',
+            'username',
+            'email',
+            'active',
+            'locked',
+        ];
+
+        $scenarios[self::SCENARIO_UPDATE_PASSWORD] = ['password'];
+
+        $scenarios[self::SCENARIO_AUTHENTICATE] = ['username', 'password', '!active', '!locked'];
+
+        return $scenarios;
+    }
+
+    public function rules(): array
+    {
+        return ArrayHelper::merge([
+            [
+                'uuid', 'default', 'value' => Uuid::uuid4()->toString()
+            ],
+            [
+                'active', 'default', 'value' => 'yes',
+            ],
+            [
+                'locked', 'default', 'value' => 'no',
+            ],
+            [
+                ['active', 'locked'], 'in', 'range' => ['yes', 'no'],
+            ],
+            [
+                'email', 'email',
+            ],
+            [
+                'password', 'required',
+                'on' => [self::SCENARIO_UPDATE_PASSWORD, self::SCENARIO_AUTHENTICATE],
+            ],
+            [
+                'password', 'string',
+            ],
+            [
+                // special note:  As a best practice against timing attacks this rule should be run
+                // before most other rules.  https://en.wikipedia.org/wiki/Timing_attack
+                'password',
+                $this->validatePassword(),
+                'on' => self::SCENARIO_AUTHENTICATE,
+            ],
+            [
+                'password',
+                $this->validateExpiration(),
+                'on' => self::SCENARIO_AUTHENTICATE,
+            ],
+            [
+                'active', 'compare', 'compareValue' => 'yes',
+                'on' => self::SCENARIO_AUTHENTICATE,
+            ],
+            [
+                'locked', 'compare', 'compareValue' => 'no',
+                'on' => self::SCENARIO_AUTHENTICATE,
+            ],
+            [
+                ['last_synced_utc', 'last_changed_utc'],
+                'default', 'value' => MySqlDateTime::now(),
+            ],
+        ], parent::rules());
+    }
+
+    private function validatePassword(): Closure
+    {
+        return function ($attributeName) {
+
+            if ($this->current_password_id === null) {
+                $this->attemptPasswordMigration();
+            }
+
+            $currentPassword = $this->currentPassword ?? new Password();
+            if (! password_verify($this->password, $currentPassword->hash)) {
+                $this->addError($attributeName, 'Incorrect password.');
+            }
+        };
+    }
+
+    protected function attemptPasswordMigration()
+    {
+        try {
+            if ($this->ldap === null) {
+
+                // If no LDAP was provided, simply skip password migration.
+                return;
+            }
+
+            if (empty($this->username)) {
+                $this->addError(
+                    'username',
+                    'No username given for checking against ldap.'
+                );
+                return;
+            }
+
+            if (empty($this->password)) {
+                $this->addError(
+                    'password',
+                    'No password given for checking against ldap.'
+                );
+                return;
+            }
+
+            $user = User::findByUsername($this->username);
+            if ($user === null) {
+                $this->addError('username', sprintf(
+                    'No user found with that username (%s) when trying to check '
+                    . 'password against ldap.',
+                    var_export($this->username, true)
+                ));
+                return;
+            }
+
+            if ($this->ldap->isPasswordCorrectForUser($this->username, $this->password)) {
+
+                /* Try to save the password, but let the user proceed even if
+                 * we can't (since we know the password is correct).  */
+                $user->scenario = User::SCENARIO_UPDATE_PASSWORD;
+                $user->password = $this->password;
+                $savedPassword = $user->updatePassword();
+                if ( ! $savedPassword) {
+
+                    /**
+                     * @todo If adding errors here causes a problem (because I think
+                     * it will cause the `validate()` call to return false... right?)
+                     * then find some other way to record/report what happened. We
+                     * may be able to use Yii::warn(...), but we'll have to update
+                     * the LdapContext Behat test file accordingly, since it gets
+                     * the errors and reports them (to help the developer debug).
+                     */
+                    $this->addError('password', sprintf(
+                        'Confirmed given password for %s against LDAP, but '
+                        . 'failed to save password hash to database: %s',
+                        var_export($this->username, true),
+                        json_encode($user->getFirstErrors())
+                    ));
+                } else {
+                    $this->refresh();
+                }
+            }
+        } catch (Exception $e) {
+            $this->addError('password', sprintf(
+                'Unexpected error while attempting to migrate password: %s',
+                $e->getMessage()
+            ));
+        }
+    }
+
+    public static function findByUsername(string $username)
+    {
+        return User::findOne(['username' => $username]);
+    }
+
+    private function validateExpiration(): Closure
+    {
+        return function ($attributeName) {
+            if ($this->currentPassword !== null) {
+                $gracePeriodEnds = strtotime($this->currentPassword->grace_period_ends_utc);
+
+                $now = time();
+
+                if ($now > $gracePeriodEnds) {
+                    $this->addError($attributeName, 'Expired password.');
+                }
+            } else {
+                $this->addError($attributeName, 'Nonexistent password.');
+            }
+        };
+    }
+
+    public function behaviors(): array
+    {
+        return [
+            'changeTracker' => [
+                'class' => AttributeBehavior::className(),
+                'attributes' => [
+                    ActiveRecord::EVENT_BEFORE_INSERT => 'last_changed_utc',
+                    ActiveRecord::EVENT_BEFORE_UPDATE => 'last_changed_utc',
+                ],
+                'value' => MySqlDateTime::now(),
+                'skipUpdateOnClean' => true, // only update the value if something has changed
+            ],
+            'syncTracker' => [
+                'class' => AttributeBehavior::className(),
+                'attributes' => [
+                    ActiveRecord::EVENT_BEFORE_INSERT => 'last_synced_utc',
+                    ActiveRecord::EVENT_BEFORE_UPDATE => 'last_synced_utc',
+                ],
+                'value' => $this->updateOnSync(),
+                'skipUpdateOnClean' => false, // update the value whether something has changed or not.
+            ],
+        ];
+    }
+
+    private function updateOnSync(): Closure
+    {
+        return function () {
+            return $this->isSync($this->scenario) ? MySqlDateTime::now()
+                                                  : $this->last_synced_utc;
+        };
+    }
+
+    private function isSync($scenario): bool
+    {
+        return in_array($scenario, [self::SCENARIO_NEW_USER, self::SCENARIO_UPDATE_USER]);
+    }
+
+    /**
+     * @return array of fields that should be included in responses.
+     */
+    public function fields(): array
+    {
+        $fields = [
+            'uuid',
+            'employee_id',
+            'first_name',
+            'last_name',
+            'display_name' => function ($model) {
+                return $model->display_name ?? "$model->first_name $model->last_name";
+            },
+            'username',
+            'email',
+            'active',
+            'locked',
+        ];
+
+        if ($this->current_password_id !== null) {
+            $fields['password'] = function () {
+                return $this->currentPassword;
+            };
+        }
+
+        return $fields;
+    }
+
+    public function save($runValidation = true, $attributeNames = null)
+    {
+        if ($this->scenario === self::SCENARIO_UPDATE_PASSWORD) {
+            return $this->updatePassword();
+        }
+
+        return parent::save($runValidation, $attributeNames);
+    }
+
+    private function updatePassword(): bool
+    {
+        $transaction = ActiveRecord::getDb()->beginTransaction();
+
+        try {
+
+            if (! $this->savePassword()) {
+                return false;
+            }
+
+            if (! parent::save()) {
+                $transaction->rollBack();
+
+                return false;
+            }
+
+            $transaction->commit();
+
+            return true;
+        } catch (Exception $e) {
+            $transaction->rollBack();
+
+            Yii::warning("Something went wrong trying to save a new password for $this->employee_id: $e");
+
+            throw $e;
+        }
+    }
+
+    private function savePassword()
+    {
+        $password = new Password();
+
+        $password->user_id = $this->id;
+        $password->password = $this->password;
+
+        if (! $password->save()) {
+            $this->addErrors($password->errors);
+
+            return false;
+        }
+
+        $this->current_password_id = $password->id;
+
+        return true;
+    }
+
+    public function attributeLabels()
+    {
+        $labels = parent::attributeLabels();
+
+        $labels['last_changed_utc'] = Yii::t('app', 'Last Changed (UTC)');
+        $labels['last_synced_utc'] = Yii::t('app', 'Last Synced (UTC)');
+
+        return $labels;
+    }
+}

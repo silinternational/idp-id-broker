@@ -1,0 +1,565 @@
+#%RAML 0.8
+title: ID Broker API
+protocols: [ HTTPS ]
+mediaType: application/json
+securitySchemes:
+  - AuthzBearerToken:
+      type: x-{other}
+      describedBy:
+        headers:
+          Authorization:
+            type: string
+            example: Bearer abc123
+securedBy: [ AuthzBearerToken ]
+
+schemas:
+  - Authentication: |
+      {
+        "$schema": "http://json-schema.org/draft-03/schema",
+        "properties": {
+          "username": {
+            "required": true,
+            "type": "string"
+          },
+          "password": {
+            "required": true,
+            "type": "string"
+          }
+        },
+        "type": "object"
+      }
+  - Error: |
+      {
+        "$schema": "http://json-schema.org/draft-03/schema",
+        "properties": {
+          "name": {
+            "required": true,
+            "type": "string"
+          },
+          "message": {
+            "required": true,
+            "type": "string"
+          },
+          "code": {
+            "required": true,
+            "type": "integer"
+          },
+          "status": {
+            "required": true,
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      }
+  - User: |
+      {
+        "$schema": "http://json-schema.org/draft-03/schema",
+        "properties": {
+          "uuid": {
+            "required": true,
+            "type": "string"
+          },
+          "employee_id": {
+            "required": true,
+            "type": "string"
+          },
+          "first_name": {
+            "required": true,
+            "type": "string"
+          },
+          "last_name": {
+            "required": true,
+            "type": "string"
+          },
+          "display_name": {
+            "required": false,
+            "type": "string"
+          },
+          "username": {
+            "required": true,
+            "type": "string"
+          },
+          "email": {
+            "required": true,
+            "type": "string"
+          },
+          "active": {
+            "required": false,
+            "type": "string",
+            "enum": ["yes", "no"]
+          },
+          "locked": {
+            "required": false,
+            "type": "string",
+            "enum": ["yes", "no"]
+          },
+          "password": {
+            "required": false,
+            "type": "object",
+            "properties": {
+              "created_utc": {
+                "required": true,
+                "type": "string"
+              },
+              "expiration_utc": {
+                "required": true,
+                "type": "string"
+              },
+              "grace_period_ends_utc": {
+                "required": true,
+                "type": "string"
+              }
+            }
+          }
+        },
+        "type": "object"
+      }
+  - UserList: |
+      {
+        "$schema": "http://json-schema.org/draft-03/schema",
+        "items": {
+          "properties": {
+            "uuid": {
+              "required": false,
+              "type": "string"
+            },
+            "employee_id": {
+              "required": false,
+              "type": "string"
+            },
+            "first_name": {
+              "required": false,
+              "type": "string"
+            },
+            "last_name": {
+              "required": false,
+              "type": "string"
+            },
+            "display_name": {
+              "required": false,
+              "type": "string"
+            },
+            "username": {
+              "required": false,
+              "type": "string"
+            },
+            "email": {
+              "required": false,
+              "type": "string"
+            },
+            "active": {
+              "required": false,
+              "type": "string",
+              "enum": ["yes", "no"]
+            },
+            "locked": {
+              "required": false,
+              "type": "string",
+              "enum": ["yes", "no"]
+            },
+            "password": {
+              "required": false,
+              "type": "object",
+              "properties": {
+                "created_utc": {
+                  "required": true,
+                  "type": "string"
+                },
+                "expiration_utc": {
+                  "required": true,
+                  "type": "string"
+                },
+                "grace_period_ends_utc": {
+                  "required": true,
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "type": "object"
+        },
+        "type": "array"
+      }
+  - UserUpdate: |
+      {
+        "$schema": "http://json-schema.org/draft-03/schema",
+        "properties": {
+          "first_name": {
+            "required": false,
+            "type": "string"
+          },
+          "last_name": {
+            "required": false,
+            "type": "string"
+          },
+          "display_name": {
+            "required": false,
+            "type": "string"
+          },
+          "username": {
+            "required": false,
+            "type": "string"
+          },
+          "email": {
+            "required": false,
+            "type": "string"
+          },
+          "active": {
+            "required": false,
+            "type": "string",
+            "enum": ["yes", "no"]
+          },
+          "locked": {
+            "required": false,
+            "type": "string",
+            "enum": ["yes", "no"]
+          }
+        },
+        "type": "object"
+      }
+  - Password: |
+      {
+        "$schema": "http://json-schema.org/draft-03/schema",
+        "properties": {
+          "created_utc": {
+            "required": true,
+            "type": "string"
+          },
+          "expiration_utc": {
+            "required": true,
+            "type": "string"
+          },
+          "grace_period_ends_utc": {
+            "required": true,
+            "type": "string"
+          }
+        },
+        "type": "object"
+      }
+
+/authentication:
+  post:
+    body:
+      application/json:
+        schema: Authentication
+        example: |
+          {
+            "username": "john_smith",
+            "password": "correcthorsebatterystaple"
+          }
+    responses:
+      200:
+        description: |
+          The given credentials were acceptable/valid (i.e. - the
+          authentication succeeded).  The body of the response will have the attributes of the
+          authenticated User.
+        body:
+          application/json:
+            schema: User
+            example: |
+              {
+                "uuid": "11111111-aaaa-1111-aaaa-111111111111",
+                "employee_id": "12345",
+                "first_name": "John",
+                "last_name": "Smith",
+                "display_name": "John Smith",
+                "username": "john_smith",
+                "email": "john_smith@example.com",
+                "active": "yes",
+                "locked": "no",
+                "password": {
+                  "created_utc":"2017-05-24 14:04:51",
+                  "expiration_utc":"2018-05-24 14:04:51",
+                  "grace_period_ends_utc":"2018-06-23 14:04:51"
+                }
+              }
+      400:
+        description: |
+          The given credentials were NOT acceptable/valid (i.e. - the
+          authentication failed).
+        body:
+          application/json:
+            schema: Error
+            example: |
+              {
+                "name": "Bad Request",
+                "message": "",
+                "code": 0,
+                "status": 400
+              }
+      500:
+        description: A server-side error occurred.
+        body:
+          application/json:
+            schema: Error
+            example: |
+              {
+                "name": "Internal Server Error",
+                "message": "Some error message.",
+                "code": 0,
+                "status": 500
+              }
+
+/user:
+  get:
+    description: Get a list of the existing users.
+    queryParameters:
+      fields:
+        description: A comma-delimited list of fields to include for each user.
+        required: false
+        type: string
+        default: "fields=employee_id,first_name,last_name,display_name,username,email,active,locked"
+        example: "fields=employee_id,active"
+    responses:
+      200:
+          body:
+            application/json:
+              schema: UserList
+              example: |
+                [
+                  {
+                    "uuid": "11111111-aaaa-1111-aaaa-111111111111",
+                    "employee_id": "12345",
+                    "first_name": "John",
+                    "last_name": "Smith",
+                    "display_name": "John Smith",
+                    "username": "john_smith",
+                    "email": "john_smith@example.com",
+                    "active": "yes",
+                    "locked": "no",
+                    "password": {
+                      "created_utc":"2017-05-24 14:04:51",
+                      "expiration_utc":"2018-05-24 14:04:51",
+                      "grace_period_ends_utc":"2018-06-23 14:04:51"
+                    }
+                  },
+                  {
+                    "uuid": "22222222-bbbb-2222-bbbb-222222222222",
+                    "employee_id": "54321",
+                    "first_name": "Jane",
+                    "last_name": "Smith",
+                    "display_name": "Jane Smith",
+                    "username": "jane_smith",
+                    "email": "jane_smith@example.com",
+                    "active": "yes",
+                    "locked": "no"
+                  }
+                ]
+  post:
+    description: Create a new user record.
+    body:
+      application/json:
+        schema: User
+        example: |
+          {
+            "employee_id": "12345",
+            "first_name": "John",
+            "last_name": "Smith",
+            "username": "john_smith",
+            "email": "john_smith@example.com"
+          }
+    responses:
+      200:
+        description: The new user record was created.
+        body:
+          application/json:
+            schema: User
+            example: |
+              {
+                "uuid": "11111111-aaaa-1111-aaaa-111111111111",
+                "employee_id": "12345",
+                "first_name": "John",
+                "last_name": "Smith",
+                "display_name": "John Smith",
+                "username": "john_smith",
+                "email": "john_smith@example.com",
+                "active": "yes",
+                "locked": "no"
+              }
+      422:
+        description: The given user data does not satisfy some validation rule.
+        body:
+          application/json:
+            schema: Error
+            example: |
+              {
+                "name": "Unprocessable entity",
+                "message": "Employee ID cannot be blank.",
+                "code": 0,
+                "status": 422
+              }
+      500:
+        description: A server-side error occurred.
+        body:
+          application/json:
+            schema: Error
+            example: |
+              {
+                "name": "Internal Server Error",
+                "message": "Some error message.",
+                "code": 0,
+                "status": 500
+              }
+
+  /{employee_id}:
+    get:
+      description: Get information about a specific user.
+      responses:
+        200:
+          description: |
+            The corresponding user record (matching on the `employee_id` URL parameter).
+          body:
+            application/json:
+              schema: User
+              example: |
+                {
+                  "uuid": "11111111-aaaa-1111-aaaa-111111111111",
+                  "employee_id": "12345",
+                  "first_name": "John",
+                  "last_name": "Smith",
+                  "display_name": "John Smith",
+                  "username": "john_smith",
+                  "email": "john_smith@example.com",
+                  "active": "yes",
+                  "locked": "no",
+                  "password": {
+                    "created_utc":"2017-05-24 14:04:51",
+                    "expiration_utc":"2018-05-24 14:04:51",
+                    "grace_period_ends_utc":"2018-06-23 14:04:51"
+                  }
+                }
+        204:
+          description: No user record was found with that `employee_id`.
+    put:
+      description: Update a user record.
+      body:
+        application/json:
+          schema: UserUpdate
+          example: |
+            {
+              "active": "no"
+            }
+      responses:
+        200:
+          description: |
+            The corresponding user record (matching on the `employee_id` URL
+            parameter) was updated to match the given data.
+          body:
+            application/json:
+              schema: User
+              example: |
+                {
+                  "uuid": "11111111-aaaa-1111-aaaa-111111111111",
+                  "employee_id": "12345",
+                  "first_name": "John",
+                  "last_name": "Smith",
+                  "display_name": "John Smith",
+                  "username": "john_smith",
+                  "email": "john_smith@example.com",
+                  "active": "no",
+                  "locked": "no",
+                  "password": {
+                    "created_utc":"2017-05-24 14:04:51",
+                    "expiration_utc":"2018-05-24 14:04:51",
+                    "grace_period_ends_utc":"2018-06-23 14:04:51"
+                  }
+                }
+        204:
+          description: No user record was found with that `employee_id`.
+        422:
+          description: The given user data does not satisfy some validation rule.
+          body:
+            application/json:
+              schema: Error
+              example: |
+                {
+                  "name": "Unprocessable entity",
+                  "message": "Employee ID cannot be blank.",
+                  "code": 0,
+                  "status": 422
+                }
+        500:
+          description: A server-side error occurred.
+          body:
+            application/json:
+              schema: Error
+              example: |
+                {
+                  "name": "Internal Server Error",
+                  "message": "Some error message.",
+                  "code": 0,
+                  "status": 500
+                }
+
+    /password:
+      put:
+        description: Set the password for a User.
+        body:
+          application/json:
+            schema:  |
+              {
+                "$schema": "http://json-schema.org/draft-03/schema",
+                "properties": {
+                  "password": {
+                    "required": true,
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              }
+            example: |
+              {
+                "password": "correcthorsebatterystaple"
+              }
+        responses:
+          200:
+            description: |
+              The password for the user with that `employee_id` was successfully updated.
+            body:
+              application/json:
+                schema: User
+                example: |
+                  {
+                    "uuid": "11111111-aaaa-1111-aaaa-111111111111",
+                    "employee_id": "12345",
+                    "first_name": "John",
+                    "last_name": "Smith",
+                    "display_name": "John Smith",
+                    "username": "john_smith",
+                    "email": "john_smith@example.com",
+                    "active": "yes",
+                    "locked": "no",
+                    "password": {
+                      "created_utc":"2017-05-24 14:04:51",
+                      "expiration_utc":"2018-05-24 14:04:51",
+                      "grace_period_ends_utc":"2018-06-23 14:04:51"
+                    }
+                  }
+          204:
+            description: No user record was found with that `employee_id`.
+          422:
+            description: |
+              The given password does not meet some requirement (such as if an
+              empty string was given or a recent password was reused).
+            body:
+              application/json:
+                schema: Error
+                example: |
+                  {
+                    "name": "Unprocessable Entity",
+                    "message": "Some error message.",
+                    "code": 0,
+                    "status": 422
+                  }
+          500:
+            description: A server-side error occurred.
+            body:
+              application/json:
+                schema: Error
+                example: |
+                  {
+                    "name": "Internal Server Error",
+                    "message": "Some error message.",
+                    "code": 0,
+                    "status": 500
+                  }
