@@ -2,7 +2,7 @@
 
 use Behat\Gherkin\Node\TableNode;
 use common\helpers\MySqlDateTime;
-use common\models\PasswordHistory;
+use common\models\Password;
 use common\models\User;
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Response;
@@ -98,7 +98,8 @@ class FeatureContext extends YiiContext
      */
     public function theResponseStatusCodeShouldBe($statusCode)
     {
-        Assert::eq($this->response->getStatusCode(), $statusCode);
+        Assert::eq($this->response->getStatusCode(), $statusCode,
+                   sprintf("Unexpected response: %s", var_export($this->resBody, true)));
     }
 
     /**
@@ -369,11 +370,11 @@ class FeatureContext extends YiiContext
     {
         $user = User::findByUsername($username);
         Assert::notNull($user);
-        PasswordHistory::deleteAll();
-        $user->password_hash = null;
-        Assert::true($user->save(false, ['password_hash']));
+        $user->current_password_id = null;
+        Assert::true($user->save(false, ['current_password_id']));
         $user->refresh();
-        Assert::null($user->password_hash);
+        Assert::null($user->current_password_id);
+        Password::deleteAll(['user_id' => $user->id]);
     }
 
     /**
@@ -383,6 +384,6 @@ class FeatureContext extends YiiContext
     {
         $user = User::findByUsername($username);
         Assert::notNull($user);
-        Assert::notNull($user->password_hash);
+        Assert::notNull($user->currentPassword);
     }
 }

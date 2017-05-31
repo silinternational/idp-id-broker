@@ -175,3 +175,5 @@ Feature: Authentication
         | password  | govols!!!   |
     When I request "/authentication" be created
     Then the response status code should be 200
+
+#    TODO: attempt to authenticate a user who doesn't have a password yet, expect 400 (ensure timing attack protection is enforced)

@@ -29,19 +29,19 @@ Feature: User
         | locked       | no                    |
       And the following data is not returned:
         | property                |
-        | password_hash           |
+        | current_password_id     |
         | password_expires_at_utc |
       And a record exists with an employee_id of "123"
       And the following data should be stored:
-        | property     | value                 |
-        | first_name   | Shep                  |
-        | last_name    | Clark                 |
-        | display_name | Shep Clark            |
-        | username     | shep_clark            |
-        | email        | shep_clark@example.org|
-        | password_hash| NULL                  |
-        | active       | yes                   |
-        | locked       | no                    |
+        | property            | value                 |
+        | first_name          | Shep                  |
+        | last_name           | Clark                 |
+        | display_name        | Shep Clark            |
+        | username            | shep_clark            |
+        | email               | shep_clark@example.org|
+        | current_password_id | NULL                  |
+        | active              | yes                   |
+        | locked              | no                    |
       And last_changed_utc should be stored as now UTC
       And last_synced_utc should be stored as now UTC
 

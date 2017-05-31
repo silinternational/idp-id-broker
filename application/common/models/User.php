@@ -24,6 +24,113 @@ class User extends UserBase
     /** @var Ldap */
     private $ldap;
 
+    public function setLdap(Ldap $ldap)
+    {
+        $this->ldap = $ldap;
+    }
+
+    public function scenarios(): array
+    {
+        $scenarios = parent::scenarios();
+
+        $scenarios[self::SCENARIO_DEFAULT] = null; // force consumers to choose a scenario
+
+        $scenarios[self::SCENARIO_NEW_USER] = [
+            '!uuid',
+            'employee_id',
+            'first_name',
+            'last_name',
+            'display_name',
+            'username',
+            'email',
+            'active',
+            'locked',
+        ];
+
+        $scenarios[self::SCENARIO_UPDATE_USER] = [
+            'first_name',
+            'last_name',
+            'display_name',
+            'username',
+            'email',
+            'active',
+            'locked',
+        ];
+
+        $scenarios[self::SCENARIO_UPDATE_PASSWORD] = ['password'];
+
+        $scenarios[self::SCENARIO_AUTHENTICATE] = ['username', 'password', '!active', '!locked'];
+
+        return $scenarios;
+    }
+
+    public function rules(): array
+    {
+        return ArrayHelper::merge([
+            [
+                'uuid', 'default', 'value' => Uuid::uuid4()->toString()
+            ],
+            [
+                'active', 'default', 'value' => 'yes',
+            ],
+            [
+                'locked', 'default', 'value' => 'no',
+            ],
+            [
+                ['active', 'locked'], 'in', 'range' => ['yes', 'no'],
+            ],
+            [
+                'email', 'email',
+            ],
+            [
+                'password', 'required',
+                'on' => [self::SCENARIO_UPDATE_PASSWORD, self::SCENARIO_AUTHENTICATE],
+            ],
+            [
+                'password', 'string',
+            ],
+            [
+                // special note:  As a best practice against timing attacks this rule should be run
+                // before most other rules.  https://en.wikipedia.org/wiki/Timing_attack
+                'password',
+                $this->validatePassword(),
+                'on' => self::SCENARIO_AUTHENTICATE,
+            ],
+            [
+                'password',
+                $this->validateExpiration(),
+                'on' => self::SCENARIO_AUTHENTICATE,
+            ],
+            [
+                'active', 'compare', 'compareValue' => 'yes',
+                'on' => self::SCENARIO_AUTHENTICATE,
+            ],
+            [
+                'locked', 'compare', 'compareValue' => 'no',
+                'on' => self::SCENARIO_AUTHENTICATE,
+            ],
+            [
+                ['last_synced_utc', 'last_changed_utc'],
+                'default', 'value' => MySqlDateTime::now(),
+            ],
+        ], parent::rules());
+    }
+
+    private function validatePassword(): Closure
+    {
+        return function ($attributeName) {
+
+            if ($this->current_password_id === null) {
+                $this->attemptPasswordMigration();
+            }
+
+            $currentPassword = $this->currentPassword ?? new Password();
+            if (! password_verify($this->password, $currentPassword->hash)) {
+                $this->addError($attributeName, 'Incorrect password.');
+            }
+        };
+    }
+
     protected function attemptPasswordMigration()
     {
         try {
@@ -65,7 +172,7 @@ class User extends UserBase
                  * we can't (since we know the password is correct).  */
                 $user->scenario = User::SCENARIO_UPDATE_PASSWORD;
                 $user->password = $this->password;
-                $savedPassword = $user->savePassword();
+                $savedPassword = $user->updatePassword();
                 if ( ! $savedPassword) {
 
                     /**
@@ -99,141 +206,21 @@ class User extends UserBase
         return User::findOne(['username' => $username]);
     }
 
-    public function scenarios(): array
-    {
-        $scenarios = parent::scenarios();
-
-        $scenarios[self::SCENARIO_DEFAULT] = null; // force consumers to choose a scenario
-
-        $scenarios[self::SCENARIO_NEW_USER] = [
-            '!uuid',
-            'employee_id',
-            'first_name',
-            'last_name',
-            'display_name',
-            'username',
-            'email',
-            'active',
-            'locked',
-        ];
-
-        $scenarios[self::SCENARIO_UPDATE_USER] = [
-            'first_name',
-            'last_name',
-            'display_name',
-            'username',
-            'email',
-            'active',
-            'locked',
-        ];
-
-        $scenarios[self::SCENARIO_UPDATE_PASSWORD] = ['password'];
-
-        $scenarios[self::SCENARIO_AUTHENTICATE] = ['username', 'password', '!active', '!locked'];
-
-        return $scenarios;
-    }
-
-    public function setLdap(Ldap $ldap)
-    {
-        $this->ldap = $ldap;
-    }
-
-    public function rules(): array
-    {
-        return ArrayHelper::merge([
-            [
-                'uuid', 'default', 'value' => Uuid::uuid4()->toString()
-            ],
-            [
-                'active', 'default', 'value' => 'yes',
-            ],
-            [
-                'locked', 'default', 'value' => 'no',
-            ],
-            [
-                ['active', 'locked'], 'in', 'range' => ['yes', 'no'],
-            ],
-            [
-                'email', 'email',
-            ],
-            [
-                'password', 'required',
-                'on' => [self::SCENARIO_UPDATE_PASSWORD, self::SCENARIO_AUTHENTICATE],
-            ],
-            [
-                'password', 'string',
-            ],
-            [
-                // special note:  we always want to hash a password first as a best practice
-                //  against timing attacks.  Therefore, this rule should be run before most
-                //  other rules.  https://en.wikipedia.org/wiki/Timing_attack
-                'password',
-                $this->validatePassword(),
-                'on' => self::SCENARIO_AUTHENTICATE,
-            ],
-            [
-                'password',
-                $this->validateExpiration(),
-                'on' => self::SCENARIO_AUTHENTICATE,
-            ],
-            [
-                'active', 'compare', 'compareValue' => 'yes',
-                'on' => self::SCENARIO_AUTHENTICATE,
-            ],
-            [
-                'locked', 'compare', 'compareValue' => 'no',
-                'on' => self::SCENARIO_AUTHENTICATE,
-            ],
-            [
-                ['last_synced_utc', 'last_changed_utc'],
-                'default', 'value' => MySqlDateTime::now(),
-            ],
-        ], parent::rules());
-    }
-
-    private function validatePassword(): Closure
-    {
-        return function ($attributeName) {
-
-            if ( ! $this->hasPasswordAlready()) {
-                $this->attemptPasswordMigration();
-            }
-
-            if (! password_verify($this->password, $this->password_hash)) {
-                $this->addError($attributeName, 'Incorrect password.');
-            }
-        };
-    }
-
     private function validateExpiration(): Closure
     {
         return function ($attributeName) {
-            $now = time();
-            $expiration = $this->addGracePeriod($this->getPasswordExpiration());
+            if ($this->currentPassword !== null) {
+                $gracePeriodEnds = strtotime($this->currentPassword->grace_period_ends_utc);
 
-            if ($now > $expiration) {
-                $this->addError($attributeName, 'Expired password.');
+                $now = time();
+
+                if ($now > $gracePeriodEnds) {
+                    $this->addError($attributeName, 'Expired password.');
+                }
+            } else {
+                $this->addError($attributeName, 'Nonexistent password.');
             }
         };
-    }
-
-    private function getPasswordExpiration(): string
-    {
-        /** @var $mostRecentPassword PasswordHistory */
-        $mostRecentPassword = $this->getPasswordHistories()
-                                   ->orderBy(['id' => SORT_DESC])
-                                   ->one();
-
-        return $mostRecentPassword->expires();
-
-    }
-
-    private function addGracePeriod(string $expiration): int
-    {
-        $gracePeriod = Yii::$app->params['passwordExpirationGracePeriod'];
-
-        return strtotime($gracePeriod, strtotime($expiration));
     }
 
     public function behaviors(): array
@@ -292,18 +279,9 @@ class User extends UserBase
             'locked',
         ];
 
-        if ($this->hasPasswordAlready()) {
-            $fields['password_expires_at_utc'] = function () {
-                return $this->getPasswordExpiration();
-            };
-
-            $fields['password_last_changed'] = function () {
-                /** @var $mostRecentPassword PasswordHistory */
-                $mostRecentPassword = $this->getPasswordHistories()
-                                           ->orderBy(['id' => SORT_DESC])
-                                           ->one();
-
-                return $mostRecentPassword->created_utc;
+        if ($this->current_password_id !== null) {
+            $fields['password'] = function () {
+                return $this->currentPassword;
             };
         }
 
@@ -313,20 +291,19 @@ class User extends UserBase
     public function save($runValidation = true, $attributeNames = null)
     {
         if ($this->scenario === self::SCENARIO_UPDATE_PASSWORD) {
-            return $this->savePassword();
+            return $this->updatePassword();
         }
 
         return parent::save($runValidation, $attributeNames);
     }
 
-    private function savePassword(): bool
+    private function updatePassword(): bool
     {
         $transaction = ActiveRecord::getDb()->beginTransaction();
 
         try {
-            $this->password_hash = password_hash($this->password, PASSWORD_DEFAULT);
 
-            if (! $this->saveHistory()) {
+            if (! $this->savePassword()) {
                 return false;
             }
 
@@ -348,25 +325,31 @@ class User extends UserBase
         }
     }
 
-    public function hasPasswordAlready(): bool
+    private function savePassword()
     {
-        return ! empty($this->password_hash);
-    }
+        $password = new Password();
 
-    private function saveHistory(): bool
-    {
-        $history = new PasswordHistory();
+        $password->user_id = $this->id;
+        $password->password = $this->password;
 
-        $history->user_id = $this->id;
-        $history->password = $this->password;
-        $history->password_hash = $this->password_hash;
-
-        if (! $history->save()) {
-            $this->addErrors($history->errors);
+        if (! $password->save()) {
+            $this->addErrors($password->errors);
 
             return false;
         }
 
+        $this->current_password_id = $password->id;
+
         return true;
+    }
+
+    public function attributeLabels()
+    {
+        $labels = parent::attributeLabels();
+
+        $labels['last_changed_utc'] = Yii::t('app', 'Last Changed (UTC)');
+        $labels['last_synced_utc'] = Yii::t('app', 'Last Synced (UTC)');
+
+        return $labels;
     }
 }

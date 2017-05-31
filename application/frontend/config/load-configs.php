@@ -3,7 +3,7 @@
 use Sil\PhpEnv\Env;
 use yii\helpers\ArrayHelper;
 
-require(__DIR__ . '/../../vendor/autoload.php'); //TODO: why is this required for the web app but not the tests?
+require(__DIR__ . '/../../vendor/autoload.php');
 
 define('YII_ENV', Env::get('APP_ENV', 'prod'));
 define('YII_DEBUG', YII_ENV !== 'prod');
