@@ -95,7 +95,21 @@ schemas:
           },
           "password": {
             "required": false,
-            "type": "object"
+            "type": "object",
+            "properties": {
+              "created_utc": {
+                "required": true,
+                "type": "string"
+              },
+              "expiration_utc": {
+                "required": true,
+                "type": "string"
+              },
+              "grace_period_ends_utc": {
+                "required": true,
+                "type": "string"
+              }
+            }
           }
         },
         "type": "object"
@@ -145,9 +159,22 @@ schemas:
             },
             "password": {
               "required": false,
-              "type": "object"
+              "type": "object",
+              "properties": {
+                "created_utc": {
+                  "required": true,
+                  "type": "string"
+                },
+                "expiration_utc": {
+                  "required": true,
+                  "type": "string"
+                },
+                "grace_period_ends_utc": {
+                  "required": true,
+                  "type": "string"
+                }
+              }
             }
-
           },
           "type": "object"
         },
@@ -189,7 +216,21 @@ schemas:
           },
           "password": {
             "required": false,
-            "type": "object"
+            "type": "object",
+            "properties": {
+              "created_utc": {
+                "required": true,
+                "type": "string"
+              },
+              "expiration_utc": {
+                "required": true,
+                "type": "string"
+              },
+              "grace_period_ends_utc": {
+                "required": true,
+                "type": "string"
+              }
+            }
           }
 
         },
