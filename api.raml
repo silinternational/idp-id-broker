@@ -213,26 +213,7 @@ schemas:
             "required": false,
             "type": "string",
             "enum": ["yes", "no"]
-          },
-          "password": {
-            "required": false,
-            "type": "object",
-            "properties": {
-              "created_utc": {
-                "required": true,
-                "type": "string"
-              },
-              "expiration_utc": {
-                "required": true,
-                "type": "string"
-              },
-              "grace_period_ends_utc": {
-                "required": true,
-                "type": "string"
-              }
-            }
           }
-
         },
         "type": "object"
       }
