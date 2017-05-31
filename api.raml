@@ -273,8 +273,8 @@ schemas:
       200:
         description: |
           The given credentials were acceptable/valid (i.e. - the
-          authentication succeeded).  The body of the response will have the attributes of the
-          authenticated User.
+          authentication succeeded). The body of the response will have the
+          attributes of the authenticated User.
         body:
           application/json:
             schema: ReturnedUser
@@ -429,7 +429,8 @@ schemas:
       responses:
         200:
           description: |
-            The corresponding user record (matching on the `employee_id` URL parameter).
+            The corresponding user record (matching on the `employee_id` URL
+            parameter).
           body:
             application/json:
               schema: ReturnedUser
