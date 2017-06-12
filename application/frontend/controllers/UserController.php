@@ -30,6 +30,8 @@ class UserController extends BaseRestController
         }
 
         Yii::$app->response->statusCode = 204;
+
+        return null;
     }
 
     public function actionCreate(): User
