@@ -71,10 +71,10 @@ class User extends UserBase
                 'uuid', 'default', 'value' => Uuid::uuid4()->toString()
             ],
             [
-                'active', 'default', 'value' => 'yes',
+                'active', 'default', 'value' => 'yes', 'on' => self::SCENARIO_NEW_USER
             ],
             [
-                'locked', 'default', 'value' => 'no',
+                'locked', 'default', 'value' => 'no', 'on' => self::SCENARIO_NEW_USER
             ],
             [
                 ['active', 'locked'], 'in', 'range' => ['yes', 'no'],
@@ -210,7 +210,7 @@ class User extends UserBase
     {
         return function ($attributeName) {
             if ($this->currentPassword !== null) {
-                $gracePeriodEnds = strtotime($this->currentPassword->grace_period_ends_utc);
+                $gracePeriodEnds = strtotime("{$this->currentPassword->grace_period_ends_on} 23:59:59");
 
                 $now = time();
 
@@ -341,6 +341,55 @@ class User extends UserBase
         $this->current_password_id = $password->id;
 
         return true;
+    }
+
+    public static function getExpiringUsers($criteria): array
+    {
+        if (empty($criteria)) {
+            return [];
+        }
+
+        $users = User::find()->joinWith('currentPassword')
+                             ->where(['active' => 'yes']);
+
+        foreach ($criteria as $name => $value) {
+            switch ($name) {
+                case 'expires_on':
+                case 'grace_period_ends_on':
+                    $users->andWhere(["password.$name" => $value]);
+                    break;
+                default:
+                    // if no criteria names match, this will ensure an empty result is returned
+                    $users->where('0=1');
+            }
+        }
+
+        return $users->all();
+    }
+
+    public static function getNewUsers($createdOn): array
+    {
+
+        //  find the earliest password for each user, if it matches the provided date, then return
+        //  that user's info:
+        //        SELECT *
+        //        FROM user
+        //        WHERE id in (
+        //          SELECT user_id
+        //	        FROM password
+        //	        GROUP BY user_id
+        //	        HAVING DATE(MIN(created_utc)) = "2017-06-07"
+        //        )
+        $oldestPasswords = Password::find()->select('user_id')
+                                           ->groupBy('user_id')
+                                           ->having(['=', "DATE(MIN(created_utc))", $createdOn]);
+
+        $users = User::find()->where([
+                                'active' => 'yes',
+                                'id' => $oldestPasswords
+                               ]);
+
+        return $users->all();
     }
 
     public function attributeLabels()

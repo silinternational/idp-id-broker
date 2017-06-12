@@ -101,11 +101,11 @@ schemas:
                 "required": true,
                 "type": "string"
               },
-              "expiration_utc": {
+              "expires_on": {
                 "required": true,
                 "type": "string"
               },
-              "grace_period_ends_utc": {
+              "grace_period_ends_on": {
                 "required": true,
                 "type": "string"
               }
@@ -206,11 +206,11 @@ schemas:
                   "required": true,
                   "type": "string"
                 },
-                "expiration_utc": {
+                "expires_on": {
                   "required": true,
                   "type": "string"
                 },
-                "grace_period_ends_utc": {
+                "grace_period_ends_on": {
                   "required": true,
                   "type": "string"
                 }
@@ -291,8 +291,8 @@ schemas:
                 "locked": "no",
                 "password": {
                   "created_utc":"2017-05-24 14:04:51",
-                  "expiration_utc":"2018-05-24 14:04:51",
-                  "grace_period_ends_utc":"2018-06-23 14:04:51"
+                  "expires_on":"2018-05-24",
+                  "grace_period_ends_on":"2018-06-23"
                 }
               }
       400:
@@ -351,8 +351,8 @@ schemas:
                     "locked": "no",
                     "password": {
                       "created_utc":"2017-05-24 14:04:51",
-                      "expiration_utc":"2018-05-24 14:04:51",
-                      "grace_period_ends_utc":"2018-06-23 14:04:51"
+                      "expires_on":"2018-05-24",
+                      "grace_period_ends_on":"2018-06-23"
                     }
                   },
                   {
@@ -447,8 +447,8 @@ schemas:
                   "locked": "no",
                   "password": {
                     "created_utc":"2017-05-24 14:04:51",
-                    "expiration_utc":"2018-05-24 14:04:51",
-                    "grace_period_ends_utc":"2018-06-23 14:04:51"
+                    "expires_on":"2018-05-24",
+                    "grace_period_ends_on":"2018-06-23"
                   }
                 }
         204:
@@ -483,8 +483,8 @@ schemas:
                   "locked": "no",
                   "password": {
                     "created_utc":"2017-05-24 14:04:51",
-                    "expiration_utc":"2018-05-24 14:04:51",
-                    "grace_period_ends_utc":"2018-06-23 14:04:51"
+                    "expires_on":"2018-05-24",
+                    "grace_period_ends_on":"2018-06-23"
                   }
                 }
         204:
@@ -554,8 +554,8 @@ schemas:
                     "locked": "no",
                     "password": {
                       "created_utc":"2017-05-24 14:04:51",
-                      "expiration_utc":"2018-05-24 14:04:51",
-                      "grace_period_ends_utc":"2018-06-23 14:04:51"
+                      "expires_on":"2018-05-24",
+                      "grace_period_ends_on":"2018-06-23"
                     }
                   }
           204:

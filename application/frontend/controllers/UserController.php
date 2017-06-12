@@ -1,6 +1,7 @@
 <?php
 namespace frontend\controllers;
 
+use common\helpers\MySqlDateTime;
 use common\models\User;
 use frontend\components\BaseRestController;
 use Yii;
@@ -80,5 +81,17 @@ class UserController extends BaseRestController
         $this->save($user);
 
         return $user;
+    }
+
+    public function actionExpiring(): array
+    {
+        return User::getExpiringUsers(Yii::$app->request->queryParams);
+    }
+
+    public function actionNew(): array
+    {
+        $createdOn = Yii::$app->request->queryParams['created_on'] ?? MySqlDateTime::today();
+
+        return User::getNewUsers($createdOn);
     }
 }

@@ -11,8 +11,8 @@ use Yii;
  * @property integer $user_id
  * @property string $hash
  * @property string $created_utc
- * @property string $expiration_utc
- * @property string $grace_period_ends_utc
+ * @property string $expires_on
+ * @property string $grace_period_ends_on
  *
  * @property User[] $users
  */
@@ -32,9 +32,9 @@ class PasswordBase extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['user_id', 'hash', 'created_utc', 'expiration_utc', 'grace_period_ends_utc'], 'required'],
+            [['user_id', 'hash', 'created_utc', 'expires_on', 'grace_period_ends_on'], 'required'],
             [['user_id'], 'integer'],
-            [['created_utc', 'expiration_utc', 'grace_period_ends_utc'], 'safe'],
+            [['created_utc', 'expires_on', 'grace_period_ends_on'], 'safe'],
             [['hash'], 'string', 'max' => 255],
         ];
     }
@@ -49,8 +49,8 @@ class PasswordBase extends \yii\db\ActiveRecord
             'user_id' => Yii::t('app', 'User ID'),
             'hash' => Yii::t('app', 'Hash'),
             'created_utc' => Yii::t('app', 'Created Utc'),
-            'expiration_utc' => Yii::t('app', 'Expiration Utc'),
-            'grace_period_ends_utc' => Yii::t('app', 'Grace Period Ends Utc'),
+            'expires_on' => Yii::t('app', 'Expires On'),
+            'grace_period_ends_on' => Yii::t('app', 'Grace Period Ends On'),
         ];
     }
 

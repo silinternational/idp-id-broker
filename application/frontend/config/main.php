@@ -35,6 +35,8 @@ return [
             // http://www.yiiframework.com/doc-2.0/guide-rest-routing.html
             'rules' => [
                 'GET  user'                           => 'user/index',
+                'GET  user/expiring'                  => 'user/expiring',
+                'GET  user/new'                       => 'user/new',
                 'GET  user/<employeeId:\w+>'          => 'user/view',
                 'POST user'                           => 'user/create',
                 'PUT  user/<employeeId:\w+>'          => 'user/update',
@@ -42,7 +44,7 @@ return [
 
                 'POST authentication' => 'authentication/create',
 
-                'status' => 'site/status',
+                'site/status' => 'site/status',
 
                 '<undefinedRequest>' => 'site/undefined-request',
             ]
