@@ -210,7 +210,7 @@ class User extends UserBase
     {
         return function ($attributeName) {
             if ($this->currentPassword !== null) {
-                $gracePeriodEnds = strtotime("{$this->currentPassword->grace_period_ends_on} 23:59:59");
+                $gracePeriodEnds = strtotime("{$this->currentPassword->grace_period_ends_on} 23:59:59 UTC");
 
                 $now = time();
 
