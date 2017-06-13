@@ -133,9 +133,15 @@ class Password extends PasswordBase
     public function fields(): array
     {
         $fields = [
-            'created_utc',
-            'expires_on',
-            'grace_period_ends_on',
+            'created_utc' => function ($model) {
+                return "{$model->created_utc} UTC";
+            },
+            'expires_on' => function ($model) {
+                return "{$model->expires_on} 23:59:59 UTC";
+            },
+            'grace_period_ends_on' => function ($model) {
+                return "{$model->grace_period_ends_on} 23:59:59 UTC";
+            },
         ];
 
         return $fields;
