@@ -343,6 +343,11 @@ class User extends UserBase
         return true;
     }
 
+    /**
+     * @param $criteria array Criteria to be used for filtering users based upon their password
+     *                        expiration, e.g., ['grace_period_ends_on' => '2018-07-16', 'expires_on' => '2018-06-17'].
+     * @return array Users matching given criteria
+     */
     public static function getExpiringUsers($criteria): array
     {
         if (empty($criteria)) {
