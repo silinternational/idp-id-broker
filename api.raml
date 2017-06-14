@@ -290,9 +290,9 @@ schemas:
                 "active": "yes",
                 "locked": "no",
                 "password": {
-                  "created_utc":"2017-05-24 14:04:51",
-                  "expires_on":"2018-05-24",
-                  "grace_period_ends_on":"2018-06-23"
+                  "created_utc":"2017-05-24 14:04:51 UTC",
+                  "expires_on":"2018-05-24 23:59:59 UTC",
+                  "grace_period_ends_on":"2018-06-23 23:59:59 UTC"
                 }
               }
       400:
@@ -446,9 +446,9 @@ schemas:
                   "active": "yes",
                   "locked": "no",
                   "password": {
-                    "created_utc":"2017-05-24 14:04:51",
-                    "expires_on":"2018-05-24",
-                    "grace_period_ends_on":"2018-06-23"
+                    "created_utc":"2017-05-24 14:04:51 UTC",
+                    "expires_on":"2018-05-24 23:59:59 UTC",
+                    "grace_period_ends_on":"2018-06-23 23:59:59 UTC"
                   }
                 }
         204:
@@ -482,9 +482,9 @@ schemas:
                   "active": "no",
                   "locked": "no",
                   "password": {
-                    "created_utc":"2017-05-24 14:04:51",
-                    "expires_on":"2018-05-24",
-                    "grace_period_ends_on":"2018-06-23"
+                    "created_utc":"2017-05-24 14:04:51 UTC",
+                    "expires_on":"2018-05-24 23:59:59 UTC",
+                    "grace_period_ends_on":"2018-06-23 23:59:59 UTC"
                   }
                 }
         204:
@@ -553,9 +553,9 @@ schemas:
                     "active": "yes",
                     "locked": "no",
                     "password": {
-                      "created_utc":"2017-05-24 14:04:51",
-                      "expires_on":"2018-05-24",
-                      "grace_period_ends_on":"2018-06-23"
+                      "created_utc":"2017-05-24 14:04:51 UTC",
+                      "expires_on":"2018-05-24 23:59:59 UTC",
+                      "grace_period_ends_on":"2018-06-23 23:59:59 UTC"
                     }
                   }
           204:
@@ -586,3 +586,72 @@ schemas:
                     "code": 0,
                     "status": 500
                   }
+  /expiring:
+    get:
+      description: Get a list of the active users whose password is expiring on a given date.
+      queryParameters:
+        grace_period_ends_on:
+          required: false
+          type: string
+          example: "grace_period_ends_on=2017-06-14"
+        expires_on:
+          required: false
+          type: string
+          example: "expires_on=2017-06-14"
+      responses:
+        200:
+            body:
+              application/json:
+                schema: UserList
+                example: |
+                  [
+                    {
+                      "uuid": "11111111-aaaa-1111-aaaa-111111111111",
+                      "employee_id": "12345",
+                      "first_name": "John",
+                      "last_name": "Smith",
+                      "display_name": "John Smith",
+                      "username": "john_smith",
+                      "email": "john_smith@example.com",
+                      "active": "yes",
+                      "locked": "no",
+                      "password": {
+                        "created_utc":"2017-05-24 14:04:51 UTC",
+                        "expires_on":"2017-05-44 23:59:59 UTC",
+                        "grace_period_ends_on":"2017-06-14 23:59:59 UTC"
+                      }
+                    }
+                  ]
+  /first-password:
+    get:
+      description: Get a list of the active users whose first password was created on a given date.
+      queryParameters:
+        created_on:
+          required: false
+          type: string
+          default: "created_on=<today's date>"
+          example: "created_on=2017-06-14"
+      responses:
+        200:
+            body:
+              application/json:
+                schema: UserList
+                example: |
+                  [
+                    {
+                      "uuid": "11111111-aaaa-1111-aaaa-111111111111",
+                      "employee_id": "12345",
+                      "first_name": "John",
+                      "last_name": "Smith",
+                      "display_name": "John Smith",
+                      "username": "john_smith",
+                      "email": "john_smith@example.com",
+                      "active": "yes",
+                      "locked": "no",
+                      "password": {
+                        "created_utc":"2017-06-14 14:04:51 UTC",
+                        "expires_on":"2018-05-44 23:59:59 UTC",
+                        "grace_period_ends_on":"2018-06-14 23:59:59 UTC"
+                      }
+                    }
+                  ]
