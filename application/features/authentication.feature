@@ -177,3 +177,4 @@ Feature: Authentication
     Then the response status code should be 200
 
 #    TODO: attempt to authenticate a user who doesn't have a password yet, expect 400 (ensure timing attack protection is enforced)
+# TODO: need test for check that a user's password is good all the way until midnight of the expiration/grace period dates

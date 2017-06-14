@@ -20,10 +20,10 @@ class Password extends PasswordBase
                 'created_utc', 'default', 'value' => MySqlDateTime::now(),
             ],
             [
-                'expiration_utc', 'default', 'value' => MySqlDateTime::now(),
+                'expires_on', 'default', 'value' => MySqlDateTime::today(),
             ],
             [
-                'grace_period_ends_utc', 'default', 'value' => MySqlDateTime::now(),
+                'grace_period_ends_on', 'default', 'value' => MySqlDateTime::today(),
             ],
             [
                 'password', 'required',
@@ -95,14 +95,14 @@ class Password extends PasswordBase
             'expirationTracker' => [
                 'class' => AttributeBehavior::className(),
                 'attributes' => [
-                    ActiveRecord::EVENT_BEFORE_INSERT => 'expiration_utc',
+                    ActiveRecord::EVENT_BEFORE_INSERT => 'expires_on',
                 ],
                 'value' => $this->expires()
             ],
             'gracePeriodTracker' => [
                 'class' => AttributeBehavior::className(),
                 'attributes' => [
-                    ActiveRecord::EVENT_BEFORE_INSERT => 'grace_period_ends_utc',
+                    ActiveRecord::EVENT_BEFORE_INSERT => 'grace_period_ends_on',
                 ],
                 'value' => $this->gracePeriodEnds()
             ],
@@ -114,7 +114,7 @@ class Password extends PasswordBase
         return function() {
             $lifespan = Yii::$app->params['passwordLifespan'];
 
-            return MySqlDateTime::format(strtotime($lifespan, strtotime($this->created_utc)));
+            return MySqlDateTime::formatDate(strtotime($lifespan, strtotime($this->created_utc)));
         };
     }
 
@@ -123,7 +123,7 @@ class Password extends PasswordBase
         return function() {
             $gracePeriod = Yii::$app->params['passwordExpirationGracePeriod'];
 
-            return MySqlDateTime::format(strtotime($gracePeriod, strtotime($this->expiration_utc)));
+            return MySqlDateTime::formatDate(strtotime($gracePeriod, strtotime($this->expires_on)));
         };
     }
 
@@ -133,9 +133,15 @@ class Password extends PasswordBase
     public function fields(): array
     {
         $fields = [
-            'created_utc',
-            'expiration_utc',
-            'grace_period_ends_utc',
+            'created_utc' => function ($model) {
+                return "{$model->created_utc} UTC";
+            },
+            'expires_on' => function ($model) {
+                return "{$model->expires_on} 23:59:59 UTC";
+            },
+            'grace_period_ends_on' => function ($model) {
+                return "{$model->grace_period_ends_on} 23:59:59 UTC";
+            },
         ];
 
         return $fields;
@@ -146,8 +152,6 @@ class Password extends PasswordBase
         $labels = parent::attributeLabels();
 
         $labels['created_utc'] = Yii::t('app', 'Created (UTC)');
-        $labels['expiration_utc'] = Yii::t('app', 'Expiration (UTC)');
-        $labels['grace_period_ends_utc'] = Yii::t('app', 'Grace Period Ends (UTC)');
 
         return $labels;
     }

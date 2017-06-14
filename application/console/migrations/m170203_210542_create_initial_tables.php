@@ -61,8 +61,8 @@ class m170203_210542_create_initial_tables extends Migration
                 'user_id' => 'int(11) not null',
                 'hash' => 'varchar(255) not null',
                 'created_utc' => 'datetime not null',
-                'expiration_utc' => 'datetime not null',
-                'grace_period_ends_utc' => 'datetime not null',
+                'expires_on' => 'date not null',
+                'grace_period_ends_on' => 'date not null',
             ],
             "ENGINE=InnoDB DEFAULT CHARSET=utf8"
         );

@@ -1,6 +1,7 @@
 <?php
 namespace frontend\controllers;
 
+use common\helpers\MySqlDateTime;
 use common\models\User;
 use frontend\components\BaseRestController;
 use Yii;
@@ -29,6 +30,8 @@ class UserController extends BaseRestController
         }
 
         Yii::$app->response->statusCode = 204;
+
+        return null;
     }
 
     public function actionCreate(): User
@@ -80,5 +83,17 @@ class UserController extends BaseRestController
         $this->save($user);
 
         return $user;
+    }
+
+    public function actionExpiring(): array
+    {
+        return User::getExpiringUsers(Yii::$app->request->queryParams);
+    }
+
+    public function actionFirstPassword(): array
+    {
+        $createdOn = Yii::$app->request->queryParams['created_on'] ?? MySqlDateTime::today();
+
+        return User::getUsersWithFirstPasswords($createdOn);
     }
 }
