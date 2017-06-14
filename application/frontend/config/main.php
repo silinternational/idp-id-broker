@@ -36,7 +36,7 @@ return [
             'rules' => [
                 'GET  user'                           => 'user/index',
                 'GET  user/expiring'                  => 'user/expiring',
-                'GET  user/new'                       => 'user/new',
+                'GET  user/first-password'            => 'user/first-password',
                 'GET  user/<employeeId:\w+>'          => 'user/view',
                 'POST user'                           => 'user/create',
                 'PUT  user/<employeeId:\w+>'          => 'user/update',

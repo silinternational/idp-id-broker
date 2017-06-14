@@ -372,7 +372,7 @@ class User extends UserBase
         return $users->all();
     }
 
-    public static function getNewUsers($createdOn): array
+    public static function getUsersWithFirstPasswords($createdOn): array
     {
 
         //  find the earliest password for each user, if it matches the provided date, then return
