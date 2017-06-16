@@ -5,20 +5,12 @@ use common\helpers\MySqlDateTime;
 use common\models\User;
 use frontend\components\BaseRestController;
 use Yii;
-use yii\data\ActiveDataProvider;
 
 class UserController extends BaseRestController
 {
     public function actionIndex() // GET /user
     {
-        /* NOTE: Return a DataProvider here (rather than an array of Models) so
-         *       that the Serializer can limit the fields returned if a 'fields'
-         *       query string parameter is present requesting only certain
-         *       fields.  */
-        return new ActiveDataProvider([
-            'query' => User::find(),
-            'pagination' => false,
-        ]);
+        return User::search(Yii::$app->request->queryParams);
     }
 
     public function actionView(string $employeeId) // GET /user/abc123

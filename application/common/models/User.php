@@ -9,6 +9,7 @@ use Exception;
 use Ramsey\Uuid\Uuid;
 use Yii;
 use yii\behaviors\AttributeBehavior;
+use yii\data\ActiveDataProvider;
 use yii\db\ActiveRecord;
 use yii\helpers\ArrayHelper;
 
@@ -374,7 +375,6 @@ class User extends UserBase
 
     public static function getUsersWithFirstPasswords($createdOn): array
     {
-
         //  find the earliest password for each user, if it matches the provided date, then return
         //  that user's info:
         //        SELECT *
@@ -395,6 +395,34 @@ class User extends UserBase
                                ]);
 
         return $users->all();
+    }
+
+    public static function search($params): ActiveDataProvider
+    {
+        $query = User::find();
+
+        foreach ($params as $name => $value) {
+            switch ($name) {
+                case 'username':
+                case 'email':
+                    $query->andWhere([$name => $value]);
+                    break;
+                case 'fields':
+                    break;
+                default:
+                    // if no criteria names match, this will ensure an empty result is returned
+                    $query->where('0=1');
+            }
+        }
+
+        /* NOTE: Return a DataProvider here (rather than an array of Models) so
+         *       that the Serializer can limit the fields returned if a 'fields'
+         *       query string parameter is present requesting only certain
+         *       fields.  */
+        return new ActiveDataProvider([
+            'query' => $query,
+            'pagination' => false,
+        ]);
     }
 
     public function attributeLabels()

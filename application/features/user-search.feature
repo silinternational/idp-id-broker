@@ -13,3 +13,5 @@
 # TODO: need test for new users with and without active=yes status
 # TODO: need test for new users with no active=yes users in db
 
+# TODO: need tests for username and email searching
+
