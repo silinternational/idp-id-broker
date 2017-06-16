@@ -26,17 +26,17 @@ class Authentication
         $ldap = null
     ) {
         /* @var $user User */
-        $user = User::findByUsername($username) ?? new User();
+        $user = User::findByUsername($username) ??
+                User::findByEmail($username)    ?? // maybe we got an email
+                new User();
 
         $user->scenario = User::SCENARIO_AUTHENTICATE;
 
-        $user->attributes = [
-            'username' => $username,
-            'password' => $password,
-        ];
         if ($ldap instanceof Ldap) {
             $user->setLdap($ldap);
         }
+
+        $user->password = $password;
 
         if ($user->validate()) {
             $this->authenticatedUser = $user;

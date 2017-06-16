@@ -178,3 +178,4 @@ Feature: Authentication
 
 #    TODO: attempt to authenticate a user who doesn't have a password yet, expect 400 (ensure timing attack protection is enforced)
 # TODO: need test for check that a user's password is good all the way until midnight of the expiration/grace period dates
+# TODO: need test to allow username or email address to be used for authentication
