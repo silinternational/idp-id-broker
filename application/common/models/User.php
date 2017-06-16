@@ -207,6 +207,11 @@ class User extends UserBase
         return User::findOne(['username' => $username]);
     }
 
+    public static function findByEmail(string $email)
+    {
+        return User::findOne(['email' => $email]);
+    }
+
     private function validateExpiration(): Closure
     {
         return function ($attributeName) {
