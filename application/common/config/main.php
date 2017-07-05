@@ -10,12 +10,6 @@ use yii\helpers\Json;
 use yii\swiftmailer\Mailer;
 use yii\web\Request;
 
-$idpName       = null;
-$mysqlHost     = null;
-$mysqlDatabase = null;
-$mysqlUser     = null;
-$mysqlPassword = null;
-
 $idpName       = Env::requireEnv('IDP_NAME');
 $mysqlHost     = Env::requireEnv('MYSQL_HOST');
 $mysqlDatabase = Env::requireEnv('MYSQL_DATABASE');
