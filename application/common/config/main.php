@@ -31,9 +31,6 @@ $notificationEmail = Env::get('NOTIFICATION_EMAIL', 'oncall@example.org');
  *  - EMAIL_SERVICE_validIpRanges
  */
 $emailServiceConfig = Env::getArrayFromPrefix('EMAIL_SERVICE_');
-if ( ! isset($emailServiceConfig['useEmailService'])) {
-    $emailServiceConfig['useEmailService'] = false;
-}
 
 // Re-retrieve the validIpRanges as an array.
 $emailServiceConfig['validIpRanges'] = Env::getArray('EMAIL_SERVICE_validIpRanges');
