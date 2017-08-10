@@ -212,6 +212,13 @@ class User extends UserBase
         return User::findOne(['email' => $email]);
     }
 
+    public function hasReceivedMessage(string $messageType)
+    {
+        return $this->getEmailLogs()->where([
+            'message_type' => $messageType,
+        ])->exists();
+    }
+    
     private function validateExpiration(): Closure
     {
         return function ($attributeName) {
