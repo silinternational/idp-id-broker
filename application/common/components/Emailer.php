@@ -128,6 +128,8 @@ class Emailer extends Component
                 $user->getAttributesForEmail()
             )
         );
+        
+        EmailLog::logMessage($messageType, $user->id);
     }
     
     /**
