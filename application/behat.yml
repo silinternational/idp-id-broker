@@ -6,6 +6,10 @@ default:
                 - %paths.base%/features/password.feature
                 - %paths.base%/features/user.feature
             contexts: [ FeatureContext ]
+        email_features:
+            paths:
+                - %paths.base%/features/email.feature
+            contexts: [ Sil\SilIdBroker\Behat\Context\EmailContext ]
         ldap_features:
             paths:
                 - %paths.base%/features/ldap.feature
