@@ -6,8 +6,11 @@ use yii\helpers\ArrayHelper;
 
 class EmailLog extends EmailLogBase
 {
-    /* Valid message_type values. Changes must be made here and in the
-     * email_log.message_type enum list in the database.  */
+    /* Valid message_type values.
+     *
+     * NOTE: Changes must be made here, in the `getMessageTypes()` method below,
+     *       and in the email_log.message_type enum list in the database.
+     */
     const MESSAGE_TYPE_INVITE = 'invite';
     const MESSAGE_TYPE_WELCOME = 'welcome';
 
@@ -21,6 +24,14 @@ class EmailLog extends EmailLogBase
         ]);
     }
     
+    public static function getMessageTypes()
+    {
+        return [
+            self::MESSAGE_TYPE_INVITE,
+            self::MESSAGE_TYPE_WELCOME,
+        ];
+    }
+    
     /**
      * {@inheritdoc}
      */
@@ -30,6 +41,12 @@ class EmailLog extends EmailLogBase
             [
                 'message_type',
                 'required',
+            ],
+            [
+                'message_type',
+                'in',
+                'range' => self::getMessageTypes(),
+                'strict' => true,
             ],
             [
                 'sent_utc',
