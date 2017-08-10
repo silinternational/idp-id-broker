@@ -3,6 +3,7 @@
 namespace common\models;
 
 use Closure;
+use common\components\Emailer;
 use common\helpers\MySqlDateTime;
 use common\ldap\Ldap;
 use Exception;
@@ -25,6 +26,16 @@ class User extends UserBase
     /** @var Ldap */
     private $ldap;
 
+    /**
+     * {@inheritdoc}
+     */
+    public function afterSave($insert, $changedAttributes)
+    {
+        parent::afterSave($insert, $changedAttributes);
+        
+        $this->sendAppropriateMessages($insert, $changedAttributes);
+    }
+    
     public function setLdap(Ldap $ldap)
     {
         $this->ldap = $ldap;
@@ -333,6 +344,20 @@ class User extends UserBase
         }
 
         return parent::save($runValidation, $attributeNames);
+    }
+    
+    protected function sendAppropriateMessages($isNewUser, $changedAttributes)
+    {
+        /* @var $emailer Emailer */
+        $emailer = \Yii::$app->emailer;
+        
+        if ($emailer->shouldSendInviteMessageTo($this, $isNewUser)) {
+            $emailer->sendMessageTo(EmailLog::MESSAGE_TYPE_INVITE, $this);
+        }
+        
+        if ($emailer->shouldSendWelcomeMessageTo($this)) {
+            $emailer->sendMessageTo(EmailLog::MESSAGE_TYPE_WELCOME, $this);
+        }
     }
 
     private function updatePassword(): bool
