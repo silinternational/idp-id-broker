@@ -112,6 +112,25 @@ class Emailer extends Component
     }
     
     /**
+     * Send the specified type of message to the given User.
+     *
+     * @param string $messageType The message type. Must be one of the
+     *     EmailLog::MESSAGE_TYPE_* values.
+     * @param User $user The intended recipient.
+     */
+    public function sendMessageTo(string $messageType, User $user)
+    {
+        $this->email(
+            $user->email,
+            $this->getSubjectForMessage($messageType),
+            \Yii::$app->view->render(
+                $this->getViewForMessage($messageType),
+                $user->getAttributesForEmail()
+            )
+        );
+    }
+    
+    /**
      * Whether we should send an invite message to the given User.
      *
      * @param User $user The User in question.
