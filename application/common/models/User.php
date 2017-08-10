@@ -212,6 +212,31 @@ class User extends UserBase
         return User::findOne(['email' => $email]);
     }
 
+    /**
+     * Get the list of attributes about this User that are safe to include in
+     * an email to them.
+     *
+     * NOTE: The resulting array uses camelCased attribute names for keys, so
+     *       the User's "employee_id" with have a key of "employeeId".
+     *
+     * @return array
+     */
+    public function getAttributesForEmail()
+    {
+        return [
+            'employeeId' => $this->employee_id,
+            'firstName' => $this->first_name,
+            'lastName' => $this->last_name,
+            'displayName' => $this->display_name,
+            'username' => $this->username,
+            'email' => $this->email,
+            'active' => $this->active,
+            'locked' => $this->locked,
+            'lastChangedUtc' => $this->last_changed_utc,
+            'lastSyncedUtc' => $this->last_synced_utc,
+        ];
+    }
+    
     public function hasReceivedMessage(string $messageType)
     {
         return $this->getEmailLogs()->where([
