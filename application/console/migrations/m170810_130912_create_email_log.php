@@ -9,7 +9,7 @@ class m170810_130912_create_email_log extends Migration
         $this->createTable(
             '{{email_log}}',
             [
-                'id' => 'unsignedpk',
+                'id' => 'pk',
                 'user_id' => 'integer NOT NULL',
                 'to_address' => 'varchar(255) NOT NULL',
                 'message_type' => "enum('invite','welcome') NULL",
