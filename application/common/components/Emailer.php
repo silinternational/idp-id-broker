@@ -24,6 +24,17 @@ class Emailer extends Component
     public $sendWelcomeEmails = false;
     
     /**
+     * The list of subjects, keyed on message type. This is initialized during
+     * the `init()` call during construction.
+     *
+     * @var array
+     */
+    protected $subjects;
+    
+    public $subjectForInvite = 'Your New Account';
+    public $subjectForWelcome = 'Welcome';
+    
+    /**
      * Use the email service to send an email.
      *
      * @param string $toAddress The recipient's email address.
@@ -59,6 +70,11 @@ class Emailer extends Component
         return $this->emailServiceClient;
     }
     
+    protected function getSubjectForMessage(string $messageType)
+    {
+        return $this->subjects[$messageType] ?? null;
+    }
+    
     protected function getViewForMessage(string $messageType)
     {
         return '@app/common/mail/' . Inflector::slug($messageType);
@@ -86,6 +102,11 @@ class Emailer extends Component
                 );
             }
         }
+        
+        $this->subjects = [
+            EmailLog::MESSAGE_TYPE_INVITE => $this->subjectForInvite,
+            EmailLog::MESSAGE_TYPE_WELCOME => $this->subjectForWelcome,
+        ];
         
         parent::init();
     }

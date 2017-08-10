@@ -49,8 +49,12 @@ return [
         'emailer' => [
             'class' => Emailer::class,
             'config' => $emailServiceConfig,
+            
             'sendInviteEmails' => Env::get('SEND_INVITE_EMAILS', false),
             'sendWelcomeEmails' => Env::get('SEND_WELCOME_EMAILS', false),
+            
+            'subjectForInvite' => Env::get('SUBJECT_FOR_INVITE', false),
+            'subjectForWelcome' => Env::get('SUBJECT_FOR_WELCOME', false),
         ],
         'ldap' => [
             'class' => Ldap::class,
