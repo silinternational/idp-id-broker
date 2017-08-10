@@ -11,11 +11,11 @@ use yii\web\ServerErrorHttpException;
 class Emailer extends Component
 {
     /**
-     * The configuration, primarily for the email-service client.
+     * The configuration for the email-service client.
      *
      * @var array
      */
-    public $config = [];
+    public $emailServiceConfig = [];
     
     /** @var EmailServiceClient */
     private $emailServiceClient = null;
@@ -58,11 +58,11 @@ class Emailer extends Component
         if ($this->emailServiceClient === null) {
             
             $this->emailServiceClient = new EmailServiceClient(
-                $this->config['baseUrl'],
-                $this->config['accessToken'],
+                $this->emailServiceConfig['baseUrl'],
+                $this->emailServiceConfig['accessToken'],
                 [
-                    EmailServiceClient::ASSERT_VALID_IP_CONFIG => $this->config['assertValidIp'],
-                    EmailServiceClient::TRUSTED_IPS_CONFIG => $this->config['validIpRanges'],
+                    EmailServiceClient::ASSERT_VALID_IP_CONFIG => $this->emailServiceConfig['assertValidIp'],
+                    EmailServiceClient::TRUSTED_IPS_CONFIG => $this->emailServiceConfig['validIpRanges'],
                 ]
             );
         }
@@ -95,7 +95,7 @@ class Emailer extends Component
         ];
         
         foreach ($requiredParams as $param) {
-            if ( ! isset($this->config[$param])) {
+            if ( ! isset($this->emailServiceConfig[$param])) {
                 throw new ServerErrorHttpException(
                     'Missing email service configuration for ' . $param,
                     1502311757

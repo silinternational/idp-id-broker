@@ -48,7 +48,7 @@ return [
         ],
         'emailer' => [
             'class' => Emailer::class,
-            'config' => $emailServiceConfig,
+            'emailServiceConfig' => $emailServiceConfig,
             
             'sendInviteEmails' => Env::get('SEND_INVITE_EMAILS', false),
             'sendWelcomeEmails' => Env::get('SEND_WELCOME_EMAILS', false),
