@@ -5,6 +5,7 @@ use common\models\EmailLog;
 use common\models\User;
 use Sil\EmailService\Client\EmailServiceClient;
 use yii\base\Component;
+use yii\helpers\Inflector;
 use yii\web\ServerErrorHttpException;
 
 class Emailer extends Component
@@ -56,6 +57,11 @@ class Emailer extends Component
         }
         
         return $this->emailServiceClient;
+    }
+    
+    protected function getViewForMessage(string $messageType)
+    {
+        return '@app/common/mail/' . Inflector::slug($messageType);
     }
     
     /**
