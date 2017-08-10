@@ -1,5 +1,6 @@
 <?php
 
+use common\components\Emailer;
 use common\ldap\Ldap;
 use Sil\JsonSyslog\JsonSyslogTarget;
 use Sil\Log\EmailTarget;
@@ -22,6 +23,18 @@ $mailerUsername    = Env::get('MAILER_USERNAME');
 $mailerPassword    = Env::get('MAILER_PASSWORD');
 $notificationEmail = Env::get('NOTIFICATION_EMAIL', 'oncall@example.org');
 
+/*
+ * If using Email Service, the following ENV vars should be set:
+ *  - EMAIL_SERVICE_accessToken
+ *  - EMAIL_SERVICE_assertValidIp
+ *  - EMAIL_SERVICE_baseUrl
+ *  - EMAIL_SERVICE_validIpRanges
+ */
+$emailServiceConfig = Env::getArrayFromPrefix('EMAIL_SERVICE_');
+
+// Re-retrieve the validIpRanges as an array.
+$emailServiceConfig['validIpRanges'] = Env::getArray('EMAIL_SERVICE_validIpRanges');
+
 return [
     'id' => 'app-common',
     'bootstrap' => ['log'],
@@ -32,6 +45,10 @@ return [
             'username' => $mysqlUser,
             'password' => $mysqlPassword,
             'charset' => 'utf8',
+        ],
+        'emailer' => [
+            'class' => Emailer::class,
+            'config' => $emailServiceConfig,
         ],
         'ldap' => [
             'class' => Ldap::class,
