@@ -1,6 +1,8 @@
 <?php
 namespace common\components;
 
+use common\models\EmailLog;
+use common\models\User;
 use Sil\EmailService\Client\EmailServiceClient;
 use yii\base\Component;
 use yii\web\ServerErrorHttpException;
@@ -16,6 +18,9 @@ class Emailer extends Component
     
     /** @var EmailServiceClient */
     private $emailServiceClient = null;
+    
+    public $sendInviteEmails = false;
+    public $sendWelcomeEmails = false;
     
     /**
      * Use the email service to send an email.
@@ -77,5 +82,32 @@ class Emailer extends Component
         }
         
         parent::init();
+    }
+    
+    /**
+     * Whether we should send an invite message to the given User.
+     *
+     * @param User $user The User in question.
+     * @param bool $isNewUser Whether the User record was just created (insert,
+     *     not update).
+     * @return bool
+     */
+    public function shouldSendInviteMessageTo($user, $isNewUser)
+    {
+        return $this->sendInviteEmails
+            && $isNewUser
+            && !$user->hasReceivedMessage(EmailLog::MESSAGE_TYPE_INVITE);
+    }
+    
+    /**
+     * Whether we should send a welcome message to the given User.
+     *
+     * @param User $user The User in question.
+     * @return bool
+     */
+    public function shouldSendWelcomeMessageTo($user)
+    {
+        return $this->sendWelcomeEmails
+            && !$user->hasReceivedMessage(EmailLog::MESSAGE_TYPE_WELCOME);
     }
 }
