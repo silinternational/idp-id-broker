@@ -9,7 +9,6 @@ use Yii;
  *
  * @property integer $id
  * @property integer $user_id
- * @property string $to_address
  * @property string $message_type
  * @property string $sent_utc
  *
@@ -31,11 +30,10 @@ class EmailLogBase extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['user_id', 'to_address', 'sent_utc'], 'required'],
+            [['user_id', 'sent_utc'], 'required'],
             [['user_id'], 'integer'],
             [['message_type'], 'string'],
             [['sent_utc'], 'safe'],
-            [['to_address'], 'string', 'max' => 255],
             [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['user_id' => 'id']],
         ];
     }
@@ -48,7 +46,6 @@ class EmailLogBase extends \yii\db\ActiveRecord
         return [
             'id' => Yii::t('app', 'ID'),
             'user_id' => Yii::t('app', 'User ID'),
-            'to_address' => Yii::t('app', 'To Address'),
             'message_type' => Yii::t('app', 'Message Type'),
             'sent_utc' => Yii::t('app', 'Sent Utc'),
         ];
