@@ -41,7 +41,7 @@ class Emailer extends Component
      * @param string $subject The subject.
      * @param string $htmlBody The email body (as an HTML string).
      */
-    public function email(string $toAddress, string $subject, string $htmlBody)
+    protected function email(string $toAddress, string $subject, string $htmlBody)
     {
         $this->getEmailServiceClient()->email([
             'to_address' => $toAddress,
