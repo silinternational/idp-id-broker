@@ -79,7 +79,7 @@ class EmailContext implements Context
     /**
      * @Then a(n) :messageType email to that user should have been logged
      */
-    public function theEmailShouldHaveBeenLogged($messageType)
+    public function aEmailToThatUserShouldHaveBeenLogged($messageType)
     {
         $emailLogs = EmailLog::findAll([
             'message_type' => $messageType,
