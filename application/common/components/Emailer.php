@@ -77,7 +77,7 @@ class Emailer extends Component
     
     protected function getViewForMessage(string $messageType)
     {
-        return '@app/common/mail/' . Inflector::slug($messageType);
+        return '@common/mail/' . Inflector::slug($messageType);
     }
     
     /**
