@@ -18,7 +18,7 @@ class Emailer extends Component
     public $emailServiceConfig = [];
     
     /** @var EmailServiceClient */
-    private $emailServiceClient = null;
+    protected $emailServiceClient = null;
     
     public $sendInviteEmails = false;
     public $sendWelcomeEmails = false;
