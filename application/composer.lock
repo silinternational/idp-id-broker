@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "530ee3302dd6030ccd5084529a11a2fb",
+    "content-hash": "3cf44b7f24f9ecd31c9c2fb6b7d521ad",
     "packages": [
         {
             "name": "adldap2/adldap2",
@@ -1214,16 +1214,16 @@
         },
         {
             "name": "silinternational/email-service-php-client",
-            "version": "1.0",
+            "version": "2.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/silinternational/email-service-php-client.git",
-                "reference": "5ca66edc63db3624768128e39125990dfab7dca9"
+                "reference": "5624bc85954f13310a30b2ca07657a25aa4318db"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/silinternational/email-service-php-client/zipball/5ca66edc63db3624768128e39125990dfab7dca9",
-                "reference": "5ca66edc63db3624768128e39125990dfab7dca9",
+                "url": "https://api.github.com/repos/silinternational/email-service-php-client/zipball/5624bc85954f13310a30b2ca07657a25aa4318db",
+                "reference": "5624bc85954f13310a30b2ca07657a25aa4318db",
                 "shasum": ""
             },
             "require": {
@@ -1264,7 +1264,7 @@
                 "email",
                 "php client"
             ],
-            "time": "2017-07-24T20:22:26+00:00"
+            "time": "2017-08-11T15:07:27+00:00"
         },
         {
             "name": "silinternational/php-env",
@@ -1385,41 +1385,50 @@
             "time": "2017-04-13T14:30:44+00:00"
         },
         {
-            "name": "silinternational/yii2-jsonsyslog",
-            "version": "1.0.0",
+            "name": "silinternational/yii2-json-log-targets",
+            "version": "0.3.0",
             "source": {
                 "type": "git",
-                "url": "https://github.com/silinternational/yii2-jsonsyslog.git",
-                "reference": "d3a9326deff4ececbdbc84d0963185f5849c94cc"
+                "url": "https://github.com/silinternational/yii2-json-log-targets.git",
+                "reference": "58d4867160d9c3efce93830a9a803ffe25a5d177"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/silinternational/yii2-jsonsyslog/zipball/d3a9326deff4ececbdbc84d0963185f5849c94cc",
-                "reference": "d3a9326deff4ececbdbc84d0963185f5849c94cc",
+                "url": "https://api.github.com/repos/silinternational/yii2-json-log-targets/zipball/58d4867160d9c3efce93830a9a803ffe25a5d177",
+                "reference": "58d4867160d9c3efce93830a9a803ffe25a5d177",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.4.0",
-                "yiisoft/yii2": "2.*"
+                "fillup/fake-bower-assets": "*",
+                "php": ">=5.6",
+                "roave/security-advisories": "dev-master",
+                "silinternational/email-service-php-client": "^2.0.0",
+                "yiisoft/yii2": "^2.0"
+            },
+            "require-dev": {
+                "behat/behat": "^3.3",
+                "phpunit/phpunit": "^6.2 || ^5.7"
             },
             "type": "library",
             "autoload": {
                 "psr-4": {
-                    "Sil\\JsonSyslog\\": "src/"
+                    "Sil\\JsonLog\\": "src/"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
-            "description": "Yii2 log target for sending data to Syslog as a JSON encoded string",
+            "description": "A collection of Yii2 log targets that format the log message as a JSON string.",
             "keywords": [
+                "file",
                 "json",
                 "log",
                 "syslog",
+                "target",
                 "yii2"
             ],
-            "time": "2015-08-19T15:07:38+00:00"
+            "time": "2017-08-11T15:10:24+00:00"
         },
         {
             "name": "swiftmailer/swiftmailer",
