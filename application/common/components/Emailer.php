@@ -76,8 +76,6 @@ class Emailer extends Component
     {
         if ($this->emailServiceClient === null) {
             
-            $this->assertConfigIsValid();
-            
             $this->emailServiceClient = new EmailServiceClient(
                 $this->emailServiceConfig['baseUrl'],
                 $this->emailServiceConfig['accessToken'],
@@ -108,6 +106,8 @@ class Emailer extends Component
      */
     public function init()
     {
+        $this->assertConfigIsValid();
+        
         $this->subjects = [
             EmailLog::MESSAGE_TYPE_INVITE => $this->subjectForInvite,
             EmailLog::MESSAGE_TYPE_WELCOME => $this->subjectForWelcome,
