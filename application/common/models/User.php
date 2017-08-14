@@ -228,7 +228,7 @@ class User extends UserBase
      * an email to them.
      *
      * NOTE: The resulting array uses camelCased attribute names for keys, so
-     *       the User's "employee_id" with have a key of "employeeId".
+     *       the User's "employee_id" will have a key of "employeeId".
      *
      * @return array
      */
