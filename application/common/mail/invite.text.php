@@ -14,10 +14,8 @@ use yii\helpers\Html as yHtml;
  * @var string $lastSyncedUtc
  */
 ?>
-<p>
-    <?php /** @todo Write the content for the welcome email. */ ?>
-</p>
-<p>
-    Thanks!
-    - <i><?php /** @todo Add a signature/name to the welcome email. */ ?></i>
-</p>
+
+<?php /** @todo Write the content for the invite (text) email. */ ?>
+
+Thanks!
+ - <?php /** @todo Add a signature/name to the invite (text) email. */ ?>

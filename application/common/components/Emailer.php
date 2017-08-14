@@ -3,7 +3,9 @@ namespace common\components;
 
 use common\models\EmailLog;
 use common\models\User;
+use InvalidArgumentException;
 use Sil\EmailService\Client\EmailServiceClient;
+use Webmozart\Assert\Assert;
 use yii\base\Component;
 use yii\helpers\Inflector;
 use yii\web\ServerErrorHttpException;
@@ -58,14 +60,20 @@ class Emailer extends Component
      *
      * @param string $toAddress The recipient's email address.
      * @param string $subject The subject.
-     * @param string $htmlBody The email body (as an HTML string).
+     * @param string $htmlBody The email body (as HTML).
+     * @param string $textBody The email body (as plain text).
      */
-    protected function email(string $toAddress, string $subject, string $htmlBody)
-    {
+    protected function email(
+        string $toAddress,
+        string $subject,
+        string $htmlBody,
+        string $textBody
+    ) {
         $this->getEmailServiceClient()->email([
             'to_address' => $toAddress,
             'subject' => $subject,
             'html_body' => $htmlBody,
+            'text_body' => $textBody,
         ]);
     }
     
@@ -94,9 +102,15 @@ class Emailer extends Component
         return $this->subjects[$messageType] ?? null;
     }
     
-    protected function getViewForMessage(string $messageType)
+    protected function getViewForMessage(string $messageType, string $format)
     {
-        return '@common/mail/' . Inflector::slug($messageType);
+        Assert::oneOf($format, ['html', 'text']);
+        
+        return sprintf(
+            '@common/mail/%s.%s',
+            Inflector::slug($messageType),
+            $format
+        );
     }
     
     /**
@@ -125,13 +139,15 @@ class Emailer extends Component
      */
     public function sendMessageTo(string $messageType, User $user)
     {
+        $userAttributesForEmail = $user->getAttributesForEmail();
+        $htmlView = $this->getViewForMessage($messageType, 'html');
+        $textView = $this->getViewForMessage($messageType, 'text');
+        
         $this->email(
             $user->email,
             $this->getSubjectForMessage($messageType),
-            \Yii::$app->view->render(
-                $this->getViewForMessage($messageType),
-                $user->getAttributesForEmail()
-            )
+            \Yii::$app->view->render($htmlView, $userAttributesForEmail),
+            \Yii::$app->view->render($textView, $userAttributesForEmail)
         );
         
         EmailLog::logMessage($messageType, $user->id);
