@@ -34,6 +34,25 @@ class Emailer extends Component
     public $subjectForInvite = 'Your New Account';
     public $subjectForWelcome = 'Welcome';
     
+    protected function assertConfigIsValid()
+    {
+        $requiredParams = [
+            'accessToken',
+            'assertValidIp',
+            'baseUrl',
+            'validIpRanges',
+        ];
+        
+        foreach ($requiredParams as $param) {
+            if ( ! isset($this->emailServiceConfig[$param])) {
+                throw new ServerErrorHttpException(
+                    'Missing email service configuration for ' . $param,
+                    1502311757
+                );
+            }
+        }
+    }
+    
     /**
      * Use the email service to send an email.
      *
@@ -56,6 +75,8 @@ class Emailer extends Component
     protected function getEmailServiceClient()
     {
         if ($this->emailServiceClient === null) {
+            
+            $this->assertConfigIsValid();
             
             $this->emailServiceClient = new EmailServiceClient(
                 $this->emailServiceConfig['baseUrl'],
@@ -87,22 +108,6 @@ class Emailer extends Component
      */
     public function init()
     {
-        $requiredParams = [
-            'accessToken',
-            'assertValidIp',
-            'baseUrl',
-            'validIpRanges',
-        ];
-        
-        foreach ($requiredParams as $param) {
-            if ( ! isset($this->emailServiceConfig[$param])) {
-                throw new ServerErrorHttpException(
-                    'Missing email service configuration for ' . $param,
-                    1502311757
-                );
-            }
-        }
-        
         $this->subjects = [
             EmailLog::MESSAGE_TYPE_INVITE => $this->subjectForInvite,
             EmailLog::MESSAGE_TYPE_WELCOME => $this->subjectForWelcome,
