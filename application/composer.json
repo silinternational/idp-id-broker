@@ -6,7 +6,7 @@
     "adldap2/adldap2": "^6.1",
     "fillup/fake-bower-assets": "2.0.9",
     "roave/security-advisories": "dev-master",
-    "silinternational/email-service-php-client": "^1.0",
+    "silinternational/email-service-php-client": "^2.0",
     "silinternational/php-env": "^2.0.1",
     "yiisoft/yii2": "^2.0.11",
     "yiisoft/yii2-gii": "*",
