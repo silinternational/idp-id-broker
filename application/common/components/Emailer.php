@@ -107,7 +107,7 @@ class Emailer extends Component
         Assert::oneOf($format, ['html', 'text']);
         
         return sprintf(
-            '@common/mail/%s.%s',
+            '@common/mail/%s.%s.php',
             Inflector::slug($messageType),
             $format
         );
