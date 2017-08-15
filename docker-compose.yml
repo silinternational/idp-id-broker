@@ -87,6 +87,15 @@ services:
         # docker-compose run --rm test vendor/bin/behat --stop-on-failure features/user.feature
         # docker-compose run --rm test vendor/bin/behat --stop-on-failure features/user.feature:306
 
+    phpmyadmin:
+        image: silintl/phpmyadmin
+        ports:
+            - "8081:80"
+        depends_on:
+            - db
+        env_file:
+            - ./local.env
+
 networks:
     default:
         driver: bridge

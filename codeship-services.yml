@@ -19,6 +19,10 @@ app:
     command: /data/run-tests.sh
     environment:
         APP_ENV: test
+        EMAIL_SERVICE_accessToken: fake-abc-123
+        EMAIL_SERVICE_assertValidIp: "false"
+        EMAIL_SERVICE_baseUrl: http://email
+        EMAIL_SERVICE_validIpRanges: 192.168.0.0/16
         IDP_NAME: Test
         MYSQL_HOST: db
         MYSQL_DATABASE: test

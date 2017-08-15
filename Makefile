@@ -3,6 +3,9 @@ start: app
 app: db deps
 	docker-compose up -d app
 
+bash:
+	docker-compose run --rm cli bash
+
 deps:
 	docker-compose run --rm cli composer install
 
