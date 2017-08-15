@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "530ee3302dd6030ccd5084529a11a2fb",
+    "content-hash": "95d1b79753c14721bfd4167b37d5274c",
     "packages": [
         {
             "name": "adldap2/adldap2",
@@ -1214,16 +1214,16 @@
         },
         {
             "name": "silinternational/email-service-php-client",
-            "version": "1.0",
+            "version": "2.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/silinternational/email-service-php-client.git",
-                "reference": "5ca66edc63db3624768128e39125990dfab7dca9"
+                "reference": "5624bc85954f13310a30b2ca07657a25aa4318db"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/silinternational/email-service-php-client/zipball/5ca66edc63db3624768128e39125990dfab7dca9",
-                "reference": "5ca66edc63db3624768128e39125990dfab7dca9",
+                "url": "https://api.github.com/repos/silinternational/email-service-php-client/zipball/5624bc85954f13310a30b2ca07657a25aa4318db",
+                "reference": "5624bc85954f13310a30b2ca07657a25aa4318db",
                 "shasum": ""
             },
             "require": {
@@ -1264,7 +1264,7 @@
                 "email",
                 "php client"
             ],
-            "time": "2017-07-24T20:22:26+00:00"
+            "time": "2017-08-11T15:07:27+00:00"
         },
         {
             "name": "silinternational/php-env",

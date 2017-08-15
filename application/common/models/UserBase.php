@@ -21,6 +21,7 @@ use Yii;
  * @property string $last_changed_utc
  * @property string $last_synced_utc
  *
+ * @property EmailLog[] $emailLogs
  * @property Password $currentPassword
  */
 class UserBase extends \yii\db\ActiveRecord
@@ -72,6 +73,14 @@ class UserBase extends \yii\db\ActiveRecord
             'last_changed_utc' => Yii::t('app', 'Last Changed Utc'),
             'last_synced_utc' => Yii::t('app', 'Last Synced Utc'),
         ];
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getEmailLogs()
+    {
+        return $this->hasMany(EmailLog::className(), ['user_id' => 'id']);
     }
 
     /**
