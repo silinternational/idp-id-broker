@@ -3,7 +3,6 @@
 use common\components\Emailer;
 use common\ldap\Ldap;
 use Sil\JsonLog\target\JsonSyslogTarget;
-use Sil\Log\EmailTarget;
 use Sil\JsonLog\target\EmailServiceTarget;
 use Sil\PhpEnv\Env;
 use Sil\Psr3Adapters\Psr3Yii2Logger;
