@@ -108,15 +108,15 @@ return [
                     'logVars' => [], // Disable logging of _SERVER, _POST, etc.
                     'message' => [
                         'to' => $notificationEmail,
-                        'subject' => 'ALERT - ' . $idpName . ' ID Broker [' . $appEnv .']',
+                        'subject' => 'ALERT - ' . $idpName . ' ID Broker [' . YII_ENV .']',
                     ],
                     'baseUrl' => $emailServiceConfig['baseUrl'],
                     'accessToken' => $emailServiceConfig['accessToken'],
                     'assertValidIp' => $emailServiceConfig['assertValidIp'],
                     'validIpRanges' => $emailServiceConfig['validIpRanges'],
-                    'prefix' => function($message) use ($appEnv) {
+                    'prefix' => function ($message) {
                         $prefixData = [
-                            'env' => $appEnv,
+                            'env' => YII_ENV,
                         ];
                         
                         try {
