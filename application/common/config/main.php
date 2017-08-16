@@ -96,6 +96,7 @@ return [
                 ],
                 [
                     'class' => EmailServiceTarget::class,
+                    'categories' => ['application'], // stick to messages from this app, not all of Yii's built-in messaging.
                     'except' => [
                         'yii\web\HttpException:400',
                         'yii\web\HttpException:401',
