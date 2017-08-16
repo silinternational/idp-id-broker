@@ -108,7 +108,7 @@ return [
                     'logVars' => [], // Disable logging of _SERVER, _POST, etc.
                     'message' => [
                         'to' => $notificationEmail,
-                        'subject' => 'ALERT - ' . $idpName . ' ID Broker [' . YII_ENV .']',
+                        'subject' => 'ERROR - ' . $idpName . ' ID Broker [' . YII_ENV .']',
                     ],
                     'baseUrl' => $emailServiceConfig['baseUrl'],
                     'accessToken' => $emailServiceConfig['accessToken'],
