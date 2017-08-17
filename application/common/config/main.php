@@ -2,8 +2,8 @@
 
 use common\components\Emailer;
 use common\ldap\Ldap;
-use Sil\JsonSyslog\JsonSyslogTarget;
-use Sil\Log\EmailTarget;
+use Sil\JsonLog\target\JsonSyslogTarget;
+use Sil\JsonLog\target\EmailServiceTarget;
 use Sil\PhpEnv\Env;
 use Sil\Psr3Adapters\Psr3Yii2Logger;
 use yii\db\Connection;
@@ -95,15 +95,40 @@ return [
                     },
                 ],
                 [
-                    'class' => EmailTarget::class,
+                    'class' => EmailServiceTarget::class,
                     'categories' => ['application'], // stick to messages from this app, not all of Yii's built-in messaging.
-                    'logVars' => [], // no need for default stuff: http://www.yiiframework.com/doc-2.0/yii-log-target.html#$logVars-detail
-                    'levels' => ['error'],
-                    'message' => [
-                        'from' => $mailerUsername,
-                        'to' => $notificationEmail,
-                        'subject' => "ERROR - $idpName-id-broker [".YII_ENV."] Error",
+                    'except' => [
+                        'yii\web\HttpException:400',
+                        'yii\web\HttpException:401',
+                        'yii\web\HttpException:404',
+                        'yii\web\HttpException:409',
+                        'Sil\EmailService\Client\EmailServiceClientException',
                     ],
+                    'levels' => ['error'],
+                    'logVars' => [], // Disable logging of _SERVER, _POST, etc.
+                    'message' => [
+                        'to' => $notificationEmail,
+                        'subject' => 'ERROR - ' . $idpName . ' ID Broker [' . YII_ENV .']',
+                    ],
+                    'baseUrl' => $emailServiceConfig['baseUrl'],
+                    'accessToken' => $emailServiceConfig['accessToken'],
+                    'assertValidIp' => $emailServiceConfig['assertValidIp'],
+                    'validIpRanges' => $emailServiceConfig['validIpRanges'],
+                    'prefix' => function ($message) {
+                        $prefixData = [
+                            'env' => YII_ENV,
+                        ];
+                        
+                        try {
+                            $request = \Yii::$app->request;
+                            $prefixData['url'] = $request->getUrl();
+                            $prefixData['method'] = $request->getMethod();
+                        } catch (\Exception $e) {
+                            $prefixData['url'] = 'not available';
+                        }
+                        
+                        return Json::encode($prefixData);
+                    },
                 ],
             ],
         ],
