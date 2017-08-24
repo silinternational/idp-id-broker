@@ -1,8 +1,9 @@
 <?php
 
+use common\components\Emailer;
 use common\ldap\Ldap;
-use Sil\JsonSyslog\JsonSyslogTarget;
-use Sil\Log\EmailTarget;
+use Sil\JsonLog\target\JsonSyslogTarget;
+use Sil\JsonLog\target\EmailServiceTarget;
 use Sil\PhpEnv\Env;
 use Sil\Psr3Adapters\Psr3Yii2Logger;
 use yii\db\Connection;
@@ -22,6 +23,18 @@ $mailerUsername    = Env::get('MAILER_USERNAME');
 $mailerPassword    = Env::get('MAILER_PASSWORD');
 $notificationEmail = Env::get('NOTIFICATION_EMAIL', 'oncall@example.org');
 
+/*
+ * If using Email Service, the following ENV vars should be set:
+ *  - EMAIL_SERVICE_accessToken
+ *  - EMAIL_SERVICE_assertValidIp
+ *  - EMAIL_SERVICE_baseUrl
+ *  - EMAIL_SERVICE_validIpRanges
+ */
+$emailServiceConfig = Env::getArrayFromPrefix('EMAIL_SERVICE_');
+
+// Re-retrieve the validIpRanges as an array.
+$emailServiceConfig['validIpRanges'] = Env::getArray('EMAIL_SERVICE_validIpRanges');
+
 return [
     'id' => 'app-common',
     'bootstrap' => ['log'],
@@ -32,6 +45,16 @@ return [
             'username' => $mysqlUser,
             'password' => $mysqlPassword,
             'charset' => 'utf8',
+        ],
+        'emailer' => [
+            'class' => Emailer::class,
+            'emailServiceConfig' => $emailServiceConfig,
+            
+            'sendInviteEmails' => Env::get('SEND_INVITE_EMAILS', false),
+            'sendWelcomeEmails' => Env::get('SEND_WELCOME_EMAILS', false),
+            
+            'subjectForInvite' => Env::get('SUBJECT_FOR_INVITE', false),
+            'subjectForWelcome' => Env::get('SUBJECT_FOR_WELCOME', false),
         ],
         'ldap' => [
             'class' => Ldap::class,
@@ -72,15 +95,40 @@ return [
                     },
                 ],
                 [
-                    'class' => EmailTarget::class,
+                    'class' => EmailServiceTarget::class,
                     'categories' => ['application'], // stick to messages from this app, not all of Yii's built-in messaging.
-                    'logVars' => [], // no need for default stuff: http://www.yiiframework.com/doc-2.0/yii-log-target.html#$logVars-detail
-                    'levels' => ['error'],
-                    'message' => [
-                        'from' => $mailerUsername,
-                        'to' => $notificationEmail,
-                        'subject' => "ERROR - $idpName-id-broker [".YII_ENV."] Error",
+                    'except' => [
+                        'yii\web\HttpException:400',
+                        'yii\web\HttpException:401',
+                        'yii\web\HttpException:404',
+                        'yii\web\HttpException:409',
+                        'Sil\EmailService\Client\EmailServiceClientException',
                     ],
+                    'levels' => ['error'],
+                    'logVars' => [], // Disable logging of _SERVER, _POST, etc.
+                    'message' => [
+                        'to' => $notificationEmail,
+                        'subject' => 'ERROR - ' . $idpName . ' ID Broker [' . YII_ENV .']',
+                    ],
+                    'baseUrl' => $emailServiceConfig['baseUrl'],
+                    'accessToken' => $emailServiceConfig['accessToken'],
+                    'assertValidIp' => $emailServiceConfig['assertValidIp'],
+                    'validIpRanges' => $emailServiceConfig['validIpRanges'],
+                    'prefix' => function ($message) {
+                        $prefixData = [
+                            'env' => YII_ENV,
+                        ];
+                        
+                        try {
+                            $request = \Yii::$app->request;
+                            $prefixData['url'] = $request->getUrl();
+                            $prefixData['method'] = $request->getMethod();
+                        } catch (\Exception $e) {
+                            $prefixData['url'] = 'not available';
+                        }
+                        
+                        return Json::encode($prefixData);
+                    },
                 ],
             ],
         ],
