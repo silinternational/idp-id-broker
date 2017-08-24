@@ -1,6 +1,6 @@
 start: app
 
-app: db deps ldap
+app: db deps
 	docker-compose up -d app
 
 bash:
