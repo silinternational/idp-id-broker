@@ -12,6 +12,9 @@ use yii\web\ServerErrorHttpException;
 
 class Emailer extends Component
 {
+    const SUBJECT_INVITE_DEFAULT = 'Your New Account';
+    const SUBJECT_WELCOME_DEFAULT = 'Welcome';
+    
     /**
      * The configuration for the email-service client.
      *
@@ -33,8 +36,8 @@ class Emailer extends Component
      */
     protected $subjects;
     
-    public $subjectForInvite = 'Your New Account';
-    public $subjectForWelcome = 'Welcome';
+    public $subjectForInvite;
+    public $subjectForWelcome;
     
     protected function assertConfigIsValid()
     {
@@ -131,12 +134,15 @@ class Emailer extends Component
      */
     public function init()
     {
-        $this->assertConfigIsValid();
+        $this->subjectForInvite = $this->subjectForInvite ?? self::SUBJECT_INVITE_DEFAULT;
+        $this->subjectForWelcome = $this->subjectForWelcome ?? self::SUBJECT_WELCOME_DEFAULT;
         
         $this->subjects = [
             EmailLog::MESSAGE_TYPE_INVITE => $this->subjectForInvite,
             EmailLog::MESSAGE_TYPE_WELCOME => $this->subjectForWelcome,
         ];
+        
+        $this->assertConfigIsValid();
         
         parent::init();
     }
