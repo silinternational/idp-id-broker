@@ -39,6 +39,11 @@ class Emailer extends Component
     public $subjectForInvite;
     public $subjectForWelcome;
     
+    /**
+     * Assert that the given configuration values are acceptable.
+     *
+     * @throws InvalidArgumentException
+     */
     protected function assertConfigIsValid()
     {
         $requiredParams = [
@@ -50,10 +55,20 @@ class Emailer extends Component
         
         foreach ($requiredParams as $param) {
             if ( ! isset($this->emailServiceConfig[$param])) {
-                throw new ServerErrorHttpException(
+                throw new InvalidArgumentException(
                     'Missing email service configuration for ' . $param,
                     1502311757
                 );
+            }
+        }
+        
+        foreach ($this->subjects as $messageType => $subject) {
+            if (empty($subject)) {
+                throw new InvalidArgumentException(sprintf(
+                    'Subject (for %s message) cannot be empty. Given: %s',
+                    var_export($messageType, true),
+                    var_export($subject, true)
+                ));
             }
         }
     }
@@ -128,9 +143,8 @@ class Emailer extends Component
     }
     
     /**
-     * Ensure that we have the required configuration data.
-     *
-     * @throws ServerErrorHttpException
+     * Set up various values, using defaults when needed, and ensure the values
+     * we end up with are valid.
      */
     public function init()
     {
