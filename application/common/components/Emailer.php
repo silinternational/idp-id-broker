@@ -96,6 +96,17 @@ class Emailer extends Component
         
         return $this->emailServiceClient;
     }
+
+    /**
+     * Ping the /site/status URL, and throw an exception if there's a problem.
+     *
+     * @return string "OK".
+     * @throws Exception
+     */
+    public function getSiteStatus()
+    {
+        return $this->getEmailServiceClient()->getSiteStatus();
+    }
     
     protected function getSubjectForMessage(string $messageType)
     {
