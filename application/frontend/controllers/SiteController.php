@@ -5,7 +5,7 @@ use Exception;
 use frontend\components\BaseRestController;
 use Yii;
 use yii\web\NotFoundHttpException;
-use yii\web\ServerErrorHttpException;
+use yii\web\ServerErrorHttpException as Http500;
 
 class SiteController extends BaseRestController
 {
@@ -23,13 +23,35 @@ class SiteController extends BaseRestController
 
     public function actionStatus()
     {
+        /* @var $webApp yii\web\Application */
+        $webApp = Yii::$app;
+        
         try {
-            // db comms are a good indication of health
-            Yii::$app->db->open();
+            $dbComponent = $webApp->get('db');
         } catch (Exception $e) {
-            throw new ServerErrorHttpException(
-                'Database connection problem.', $e->getCode()
-            );
+            Yii::error('DB config problem: ' . $e->getMessage());
+            throw new Http500('DB config problem.');
+        }
+        
+        try {
+            $dbComponent->open();
+        } catch (Exception $e) {
+            Yii::error('DB connection problem: ' . $e->getMessage());
+            throw new Http500('DB connection problem.', $e->getCode());
+        }
+        
+        try {
+            $emailer = $webApp->get('emailer');
+        } catch (Exception $e) {
+            Yii::error('Emailer config problem: ' . $e->getMessage());
+            throw new Http500('Emailer config problem.');
+        }
+        
+        try {
+            $emailer->getSiteStatus();
+        } catch (Exception $e) {
+            Yii::error('Email Service problem: ' . $e->getMessage());
+            throw new Http500('Email Service problem.', $e->getCode());
         }
 
         Yii::$app->response->statusCode = 204;

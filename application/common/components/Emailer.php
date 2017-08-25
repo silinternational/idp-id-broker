@@ -12,6 +12,9 @@ use yii\web\ServerErrorHttpException;
 
 class Emailer extends Component
 {
+    const SUBJECT_INVITE_DEFAULT = 'Your New Account';
+    const SUBJECT_WELCOME_DEFAULT = 'Welcome';
+    
     /**
      * The configuration for the email-service client.
      *
@@ -33,9 +36,14 @@ class Emailer extends Component
      */
     protected $subjects;
     
-    public $subjectForInvite = 'Your New Account';
-    public $subjectForWelcome = 'Welcome';
+    public $subjectForInvite;
+    public $subjectForWelcome;
     
+    /**
+     * Assert that the given configuration values are acceptable.
+     *
+     * @throws InvalidArgumentException
+     */
     protected function assertConfigIsValid()
     {
         $requiredParams = [
@@ -47,10 +55,20 @@ class Emailer extends Component
         
         foreach ($requiredParams as $param) {
             if ( ! isset($this->emailServiceConfig[$param])) {
-                throw new ServerErrorHttpException(
+                throw new InvalidArgumentException(
                     'Missing email service configuration for ' . $param,
                     1502311757
                 );
+            }
+        }
+        
+        foreach ($this->subjects as $messageType => $subject) {
+            if (empty($subject)) {
+                throw new InvalidArgumentException(sprintf(
+                    'Subject (for %s message) cannot be empty. Given: %s',
+                    var_export($messageType, true),
+                    var_export($subject, true)
+                ));
             }
         }
     }
@@ -96,6 +114,17 @@ class Emailer extends Component
         
         return $this->emailServiceClient;
     }
+
+    /**
+     * Ping the /site/status URL, and throw an exception if there's a problem.
+     *
+     * @return string "OK".
+     * @throws Exception
+     */
+    public function getSiteStatus()
+    {
+        return $this->getEmailServiceClient()->getSiteStatus();
+    }
     
     protected function getSubjectForMessage(string $messageType)
     {
@@ -114,18 +143,20 @@ class Emailer extends Component
     }
     
     /**
-     * Ensure that we have the required configuration data.
-     *
-     * @throws ServerErrorHttpException
+     * Set up various values, using defaults when needed, and ensure the values
+     * we end up with are valid.
      */
     public function init()
     {
-        $this->assertConfigIsValid();
+        $this->subjectForInvite = $this->subjectForInvite ?? self::SUBJECT_INVITE_DEFAULT;
+        $this->subjectForWelcome = $this->subjectForWelcome ?? self::SUBJECT_WELCOME_DEFAULT;
         
         $this->subjects = [
             EmailLog::MESSAGE_TYPE_INVITE => $this->subjectForInvite,
             EmailLog::MESSAGE_TYPE_WELCOME => $this->subjectForWelcome,
         ];
+        
+        $this->assertConfigIsValid();
         
         parent::init();
     }
