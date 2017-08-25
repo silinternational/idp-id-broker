@@ -32,6 +32,15 @@ class SiteController extends BaseRestController
                 'Database connection problem.', $e->getCode()
             );
         }
+        
+        try {
+            Yii::$app->emailer->getSiteStatus();
+        } catch (Exception $e) {
+            Yii::error('Email Service problem: ' . $e->getMessage());
+            throw new ServerErrorHttpException(
+                'Email Service seems to be down.', $e->getCode()
+            );
+        }
 
         Yii::$app->response->statusCode = 204;
     }
