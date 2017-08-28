@@ -8,7 +8,6 @@ use Sil\PhpEnv\Env;
 use Sil\Psr3Adapters\Psr3Yii2Logger;
 use yii\db\Connection;
 use yii\helpers\Json;
-use yii\swiftmailer\Mailer;
 use yii\web\Request;
 
 $idpName       = Env::requireEnv('IDP_NAME');
@@ -17,10 +16,6 @@ $mysqlDatabase = Env::requireEnv('MYSQL_DATABASE');
 $mysqlUser     = Env::requireEnv('MYSQL_USER');
 $mysqlPassword = Env::requireEnv('MYSQL_PASSWORD');
 
-$mailerUseFiles    = Env::get('MAILER_USEFILES', false);
-$mailerHost        = Env::get('MAILER_HOST');
-$mailerUsername    = Env::get('MAILER_USERNAME');
-$mailerPassword    = Env::get('MAILER_PASSWORD');
 $notificationEmail = Env::get('NOTIFICATION_EMAIL', 'oncall@example.org');
 
 /*
@@ -130,18 +125,6 @@ return [
                         return Json::encode($prefixData);
                     },
                 ],
-            ],
-        ],
-        'mailer' => [
-            'class' => Mailer::class,
-            'useFileTransport' => $mailerUseFiles,
-            'transport' => [
-                'class' => 'Swift_SmtpTransport',
-                'host' => $mailerHost,
-                'username' => $mailerUsername,
-                'password' => $mailerPassword,
-                'port' => '465',
-                'encryption' => 'ssl',
             ],
         ],
     ],
