@@ -1,34 +1,17 @@
 <?php
 namespace Sil\SilIdBroker\Behat\Context;
 
-use Behat\Behat\Context\Context;
 use Behat\Behat\Tester\Exception\PendingException;
 use common\models\EmailLog;
 use common\models\User;
-use Sil\SilIdBroker\Behat\Context\fakes\FakeEmailer;
+use Sil\SilIdBroker\Behat\Context\YiiContext;
 use Webmozart\Assert\Assert;
-use Yii;
 
-class EmailContext implements Context
+class EmailContext extends YiiContext
 {
-    /** @var FakeEmailer */
-    protected $fakeEmailer;
-    
     /** @var User */
     protected $tempUser;
     
-    public function __construct()
-    {
-        $this->fakeEmailer = new FakeEmailer([
-            'emailServiceConfig' => [
-                'accessToken' => 'fake-token-123',
-                'assertValidIp' => false,
-                'baseUrl' => 'http://fake-url',
-                'validIpRanges' => ['192.168.0.0/16'],
-            ],
-        ]);
-    }
-
     /**
      * @Then a(n) :messageType email should have been sent to them
      */
@@ -38,7 +21,10 @@ class EmailContext implements Context
             $messageType,
             $this->tempUser
         );
-        Assert::greaterThan(count($matchingFakeEmails), 0);
+        Assert::greaterThan(count($matchingFakeEmails), 0, sprintf(
+            'Did not find any %s emails sent to that user.',
+            $messageType
+        ));
     }
 
     /**
@@ -103,18 +89,16 @@ class EmailContext implements Context
         );
     }
     
-    protected function giveYiiFakeEmailer()
-    {
-        Yii::$app->set('emailer', $this->fakeEmailer);
-    }
-
     /**
      * @When I create a new user
      */
     public function iCreateANewUser()
     {
-        $this->giveYiiFakeEmailer();
-        
+        $this->tempUser = $this->createNewUser();
+    }
+    
+    protected function createNewUser()
+    {
         $employeeId = uniqid();
         $user = new User([
             'employee_id' => strval($employeeId),
@@ -130,7 +114,7 @@ class EmailContext implements Context
             );
         }
         $user->refresh();
-        $this->tempUser = $user;
+        return $user;
     }
 
     /**
@@ -185,5 +169,80 @@ class EmailContext implements Context
     public function weAreNotConfiguredToSendWelcomeEmails()
     {
         $this->fakeEmailer->sendWelcomeEmails = false;
+    }
+
+    /**
+     * @Given a user already exists
+     */
+    public function aUserAlreadyExists()
+    {
+        $this->tempUser = $this->createNewUser();
+    }
+
+    /**
+     * @Given that user does NOT have a password
+     */
+    public function thatUserDoesNotHaveAPassword()
+    {
+        Assert::null(
+            $this->tempUser->current_password_id,
+            'The user already has a password, but this test needs a user '
+            . 'without a password.'
+        );
+    }
+
+    /**
+     * @When I give that user a password
+     */
+    public function iGiveThatUserAPassword()
+    {
+        $this->setPasswordForUser(
+            $this->tempUser,
+            base64_encode(random_bytes(33)) // Random password
+        );
+    }
+    
+    protected function setPasswordForUser(User $user, string $newPassword)
+    {
+        $oldScenario = $user->scenario;
+        $user->scenario = User::SCENARIO_UPDATE_PASSWORD;
+        $user->password = $newPassword;
+        $savedPassword = $user->save();
+        Assert::true($savedPassword, 'Failed to give user a password.');
+        $user->scenario = $oldScenario;
+    }
+
+    /**
+     * @Given that user DOES have a password
+     */
+    public function thatUserDoesHaveAPassword()
+    {
+        $this->setPasswordForUser(
+            $this->tempUser,
+            base64_encode(random_bytes(33)) // Random password
+        );
+        $this->tempUser->refresh();
+        Assert::notNull($this->tempUser->current_password_id);
+    }
+
+    /**
+     * @When I save changes to that user
+     */
+    public function iSaveChangesToThatUser()
+    {
+        $this->tempUser->first_name .= ' (changed)';
+        Assert::true(
+            $this->tempUser->save(),
+            var_export($this->tempUser->getFirstErrors(), true)
+        );
+    }
+
+    /**
+     * @Given I remove records of any emails that have been sent
+     */
+    public function iRemoveRecordsOfAnyEmailsThatHaveBeenSent()
+    {
+        $this->fakeEmailer->forgetFakeEmailsSent();
+        EmailLog::deleteAll();
     }
 }

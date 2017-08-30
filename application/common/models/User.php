@@ -355,7 +355,7 @@ class User extends UserBase
             $emailer->sendMessageTo(EmailLog::MESSAGE_TYPE_INVITE, $this);
         }
         
-        if ($emailer->shouldSendWelcomeMessageTo($this)) {
+        if ($emailer->shouldSendWelcomeMessageTo($this, $changedAttributes)) {
             $emailer->sendMessageTo(EmailLog::MESSAGE_TYPE_WELCOME, $this);
         }
     }
