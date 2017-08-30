@@ -1,34 +1,17 @@
 <?php
 namespace Sil\SilIdBroker\Behat\Context;
 
-use Behat\Behat\Context\Context;
 use Behat\Behat\Tester\Exception\PendingException;
 use common\models\EmailLog;
 use common\models\User;
-use Sil\SilIdBroker\Behat\Context\fakes\FakeEmailer;
+use Sil\SilIdBroker\Behat\Context\YiiContext;
 use Webmozart\Assert\Assert;
-use Yii;
 
-class EmailContext implements Context
+class EmailContext extends YiiContext
 {
-    /** @var FakeEmailer */
-    protected $fakeEmailer;
-    
     /** @var User */
     protected $tempUser;
     
-    public function __construct()
-    {
-        $this->fakeEmailer = new FakeEmailer([
-            'emailServiceConfig' => [
-                'accessToken' => 'fake-token-123',
-                'assertValidIp' => false,
-                'baseUrl' => 'http://fake-url',
-                'validIpRanges' => ['192.168.0.0/16'],
-            ],
-        ]);
-    }
-
     /**
      * @Then a(n) :messageType email should have been sent to them
      */
@@ -103,18 +86,11 @@ class EmailContext implements Context
         );
     }
     
-    protected function giveYiiFakeEmailer()
-    {
-        Yii::$app->set('emailer', $this->fakeEmailer);
-    }
-
     /**
      * @When I create a new user
      */
     public function iCreateANewUser()
     {
-        $this->giveYiiFakeEmailer();
-        
         $employeeId = uniqid();
         $user = new User([
             'employee_id' => strval($employeeId),
