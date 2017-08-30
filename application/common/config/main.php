@@ -103,7 +103,7 @@ return [
                     'levels' => ['error'],
                     'logVars' => [], // Disable logging of _SERVER, _POST, etc.
                     'message' => [
-                        'to' => $notificationEmail,
+                        'to' => $notificationEmail ?? '(disabled)',
                         'subject' => 'ERROR - ' . $idpName . ' ID Broker [' . YII_ENV .']',
                     ],
                     'baseUrl' => $emailServiceConfig['baseUrl'],
