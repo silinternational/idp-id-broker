@@ -203,11 +203,16 @@ class Emailer extends Component
      * Whether we should send a welcome message to the given User.
      *
      * @param User $user The User in question.
+     * @param array $oldAttributeValues The old attribute values (whereas the
+     *     User object already has the new, updated values).
      * @return bool
      */
-    public function shouldSendWelcomeMessageTo($user)
+    public function shouldSendWelcomeMessageTo($user, $oldAttributeValues)
     {
         return $this->sendWelcomeEmails
+            && array_key_exists('current_password_id', $oldAttributeValues)
+            && ($oldAttributeValues['current_password_id'] === null)
+            && !empty($user->current_password_id)
             && !$user->hasReceivedMessage(EmailLog::MESSAGE_TYPE_WELCOME);
     }
 }
