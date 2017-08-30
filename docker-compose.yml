@@ -33,6 +33,45 @@ services:
             LDAP_USE_TLS: "false"
             #MIGRATE_PW_FROM_LDAP: # Set this in your local.env file.
 
+    appfortests:
+        build: ./
+        volumes_from:
+            - data
+        ports:
+            - "8082:80"
+        depends_on:
+            - appfortestsdb
+        environment:
+            API_ACCESS_KEYS: api-test-NOTASECRET
+            APP_ENV: test
+            EMAIL_SERVICE_accessToken: dummy
+            EMAIL_SERVICE_assertValidIp: "false"
+            EMAIL_SERVICE_baseUrl: dummy
+            IDP_NAME: test
+            LDAP_BASE_DN: dc=acme,dc=org
+            LDAP_ADMIN_USERNAME: cn=Manager,dc=acme,dc=org
+            LDAP_ADMIN_PASSWORD: admin
+            LDAP_DOMAIN_CONTROLLERS: ldap
+            LDAP_USE_SSL: "false"
+            LDAP_USE_TLS: "false"
+            MIGRATE_PW_FROM_LDAP: "true"
+            MYSQL_ROOT_PASSWORD: r00tp@ss!
+            MYSQL_HOST: appfortestsdb
+            MYSQL_DATABASE: appfortests
+            MYSQL_USER: appfortests
+            MYSQL_PASSWORD: appfortests
+            MIGRATE_PW_FROM_LDAP: "true"
+
+    appfortestsdb:
+        image: silintl/mariadb:latest
+        ports:
+            - "3306"
+        environment:
+            MYSQL_ROOT_PASSWORD: r00tp@ss!
+            MYSQL_DATABASE: appfortests
+            MYSQL_USER: appfortests
+            MYSQL_PASSWORD: appfortests
+
     cli:
         image: silintl/php7:latest
         volumes_from:
@@ -76,12 +115,22 @@ services:
             - data
         working_dir: /data
         depends_on:
-            - app
-        env_file:
-            - ./local.env
+            - appfortests
         environment:
-            TEST_SERVER_HOSTNAME: app
+            TEST_SERVER_HOSTNAME: appfortests
+            API_ACCESS_KEYS: api-test-NOTASECRET
             APP_ENV: test
+            IDP_NAME: test
+            LDAP_BASE_DN: dc=acme,dc=org
+            LDAP_ADMIN_USERNAME: cn=Manager,dc=acme,dc=org
+            LDAP_ADMIN_PASSWORD: admin
+            LDAP_DOMAIN_CONTROLLERS: ldap
+            LDAP_USE_SSL: "false"
+            LDAP_USE_TLS: "false"
+            MYSQL_DATABASE: appfortests
+            MYSQL_HOST: appfortestsdb
+            MYSQL_PASSWORD: appfortests
+            MYSQL_USER: appfortests
         command: ./run-tests.sh
         # running isolated tests
         # docker-compose run --rm test vendor/bin/behat --stop-on-failure features/user.feature
