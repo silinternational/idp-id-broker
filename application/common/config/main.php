@@ -16,7 +16,7 @@ $mysqlDatabase = Env::requireEnv('MYSQL_DATABASE');
 $mysqlUser     = Env::requireEnv('MYSQL_USER');
 $mysqlPassword = Env::requireEnv('MYSQL_PASSWORD');
 
-$notificationEmail = Env::get('NOTIFICATION_EMAIL', 'oncall@example.org');
+$alertsEmail = Env::get('ALERTS_EMAIL');
 
 /*
  * If using Email Service, the following ENV vars should be set:
@@ -92,6 +92,7 @@ return [
                 [
                     'class' => EmailServiceTarget::class,
                     'categories' => ['application'], // stick to messages from this app, not all of Yii's built-in messaging.
+                    'enabled' => !empty($alertsEmail),
                     'except' => [
                         'yii\web\HttpException:400',
                         'yii\web\HttpException:401',
@@ -102,7 +103,7 @@ return [
                     'levels' => ['error'],
                     'logVars' => [], // Disable logging of _SERVER, _POST, etc.
                     'message' => [
-                        'to' => $notificationEmail,
+                        'to' => $alertsEmail,
                         'subject' => 'ERROR - ' . $idpName . ' ID Broker [' . YII_ENV .']',
                     ],
                     'baseUrl' => $emailServiceConfig['baseUrl'],
