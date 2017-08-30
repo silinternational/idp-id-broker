@@ -26,6 +26,11 @@ class FakeEmailer extends Emailer
         return $this->emailServiceClient;
     }
     
+    public function forgetFakeEmailsSent()
+    {
+        return $this->getEmailServiceClient()->emailsSent = [];
+    }
+    
     public function getFakeEmailsSent()
     {
         return $this->getEmailServiceClient()->emailsSent;

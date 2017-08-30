@@ -21,7 +21,10 @@ class EmailContext extends YiiContext
             $messageType,
             $this->tempUser
         );
-        Assert::greaterThan(count($matchingFakeEmails), 0);
+        Assert::greaterThan(count($matchingFakeEmails), 0, sprintf(
+            'Did not find any %s emails sent to that user.',
+            $messageType
+        ));
     }
 
     /**
@@ -91,6 +94,11 @@ class EmailContext extends YiiContext
      */
     public function iCreateANewUser()
     {
+        $this->tempUser = $this->createNewUser();
+    }
+    
+    protected function createNewUser()
+    {
         $employeeId = uniqid();
         $user = new User([
             'employee_id' => strval($employeeId),
@@ -106,7 +114,7 @@ class EmailContext extends YiiContext
             );
         }
         $user->refresh();
-        $this->tempUser = $user;
+        return $user;
     }
 
     /**
@@ -161,5 +169,80 @@ class EmailContext extends YiiContext
     public function weAreNotConfiguredToSendWelcomeEmails()
     {
         $this->fakeEmailer->sendWelcomeEmails = false;
+    }
+
+    /**
+     * @Given a user already exists
+     */
+    public function aUserAlreadyExists()
+    {
+        $this->tempUser = $this->createNewUser();
+    }
+
+    /**
+     * @Given that user does NOT have a password
+     */
+    public function thatUserDoesNotHaveAPassword()
+    {
+        Assert::null(
+            $this->tempUser->current_password_id,
+            'The user already has a password, but this test needs a user '
+            . 'without a password.'
+        );
+    }
+
+    /**
+     * @When I give that user a password
+     */
+    public function iGiveThatUserAPassword()
+    {
+        $this->setPasswordForUser(
+            $this->tempUser,
+            base64_encode(random_bytes(33)) // Random password
+        );
+    }
+    
+    protected function setPasswordForUser(User $user, string $newPassword)
+    {
+        $oldScenario = $user->scenario;
+        $user->scenario = User::SCENARIO_UPDATE_PASSWORD;
+        $user->password = $newPassword;
+        $savedPassword = $user->save();
+        Assert::true($savedPassword, 'Failed to give user a password.');
+        $user->scenario = $oldScenario;
+    }
+
+    /**
+     * @Given that user DOES have a password
+     */
+    public function thatUserDoesHaveAPassword()
+    {
+        $this->setPasswordForUser(
+            $this->tempUser,
+            base64_encode(random_bytes(33)) // Random password
+        );
+        $this->tempUser->refresh();
+        Assert::notNull($this->tempUser->current_password_id);
+    }
+
+    /**
+     * @When I save changes to that user
+     */
+    public function iSaveChangesToThatUser()
+    {
+        $this->tempUser->first_name .= ' (changed)';
+        Assert::true(
+            $this->tempUser->save(),
+            var_export($this->tempUser->getFirstErrors(), true)
+        );
+    }
+
+    /**
+     * @Given I remove records of any emails that have been sent
+     */
+    public function iRemoveRecordsOfAnyEmailsThatHaveBeenSent()
+    {
+        $this->fakeEmailer->forgetFakeEmailsSent();
+        EmailLog::deleteAll();
     }
 }
