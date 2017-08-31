@@ -3,6 +3,7 @@
 namespace common\models;
 
 use Closure;
+use common\components\Emailer;
 use common\helpers\MySqlDateTime;
 use common\ldap\Ldap;
 use Exception;
@@ -25,6 +26,16 @@ class User extends UserBase
     /** @var Ldap */
     private $ldap;
 
+    /**
+     * {@inheritdoc}
+     */
+    public function afterSave($insert, $changedAttributes)
+    {
+        parent::afterSave($insert, $changedAttributes);
+        
+        $this->sendAppropriateMessages($insert, $changedAttributes);
+    }
+    
     public function setLdap(Ldap $ldap)
     {
         $this->ldap = $ldap;
@@ -212,6 +223,38 @@ class User extends UserBase
         return User::findOne(['email' => $email]);
     }
 
+    /**
+     * Get the list of attributes about this User that are safe to include in
+     * an email to them.
+     *
+     * NOTE: The resulting array uses camelCased attribute names for keys, so
+     *       the User's "employee_id" will have a key of "employeeId".
+     *
+     * @return array
+     */
+    public function getAttributesForEmail()
+    {
+        return [
+            'employeeId' => $this->employee_id,
+            'firstName' => $this->first_name,
+            'lastName' => $this->last_name,
+            'displayName' => $this->display_name,
+            'username' => $this->username,
+            'email' => $this->email,
+            'active' => $this->active,
+            'locked' => $this->locked,
+            'lastChangedUtc' => $this->last_changed_utc,
+            'lastSyncedUtc' => $this->last_synced_utc,
+        ];
+    }
+    
+    public function hasReceivedMessage(string $messageType)
+    {
+        return $this->getEmailLogs()->where([
+            'message_type' => $messageType,
+        ])->exists();
+    }
+    
     private function validateExpiration(): Closure
     {
         return function ($attributeName) {
@@ -301,6 +344,20 @@ class User extends UserBase
         }
 
         return parent::save($runValidation, $attributeNames);
+    }
+    
+    protected function sendAppropriateMessages($isNewUser, $changedAttributes)
+    {
+        /* @var $emailer Emailer */
+        $emailer = \Yii::$app->emailer;
+        
+        if ($emailer->shouldSendInviteMessageTo($this, $isNewUser)) {
+            $emailer->sendMessageTo(EmailLog::MESSAGE_TYPE_INVITE, $this);
+        }
+        
+        if ($emailer->shouldSendWelcomeMessageTo($this, $changedAttributes)) {
+            $emailer->sendMessageTo(EmailLog::MESSAGE_TYPE_WELCOME, $this);
+        }
     }
 
     private function updatePassword(): bool

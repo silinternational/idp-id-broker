@@ -3,6 +3,12 @@ start: app
 app: db deps
 	docker-compose up -d app
 
+appfortests: db deps
+	docker-compose up -d appfortests
+
+bash:
+	docker-compose run --rm cli bash
+
 deps:
 	docker-compose run --rm cli composer install
 
@@ -31,7 +37,7 @@ rmldap:
 quicktest:
 	docker-compose run --rm test bash -c "vendor/bin/behat --stop-on-failure --strict --append-snippets"
 
-test: app rmldap ldap ldapload
+test: appfortests rmldap ldap ldapload
 	docker-compose run --rm test
 
 clean:

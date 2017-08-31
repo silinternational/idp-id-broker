@@ -1,20 +1,14 @@
 <?php
 
+use common\components\Emailer;
 use common\ldap\Ldap;
-use Sil\JsonSyslog\JsonSyslogTarget;
-use Sil\Log\EmailTarget;
+use Sil\JsonLog\target\JsonSyslogTarget;
+use Sil\JsonLog\target\EmailServiceTarget;
 use Sil\PhpEnv\Env;
 use Sil\Psr3Adapters\Psr3Yii2Logger;
 use yii\db\Connection;
 use yii\helpers\Json;
-use yii\swiftmailer\Mailer;
 use yii\web\Request;
-
-$idpName       = null;
-$mysqlHost     = null;
-$mysqlDatabase = null;
-$mysqlUser     = null;
-$mysqlPassword = null;
 
 $idpName       = Env::requireEnv('IDP_NAME');
 $mysqlHost     = Env::requireEnv('MYSQL_HOST');
@@ -22,11 +16,19 @@ $mysqlDatabase = Env::requireEnv('MYSQL_DATABASE');
 $mysqlUser     = Env::requireEnv('MYSQL_USER');
 $mysqlPassword = Env::requireEnv('MYSQL_PASSWORD');
 
-$mailerUseFiles    = Env::get('MAILER_USEFILES', false);
-$mailerHost        = Env::get('MAILER_HOST');
-$mailerUsername    = Env::get('MAILER_USERNAME');
-$mailerPassword    = Env::get('MAILER_PASSWORD');
-$notificationEmail = Env::get('NOTIFICATION_EMAIL', 'oncall@example.org');
+$notificationEmail = Env::get('NOTIFICATION_EMAIL');
+
+/*
+ * If using Email Service, the following ENV vars should be set:
+ *  - EMAIL_SERVICE_accessToken
+ *  - EMAIL_SERVICE_assertValidIp
+ *  - EMAIL_SERVICE_baseUrl
+ *  - EMAIL_SERVICE_validIpRanges
+ */
+$emailServiceConfig = Env::getArrayFromPrefix('EMAIL_SERVICE_');
+
+// Re-retrieve the validIpRanges as an array.
+$emailServiceConfig['validIpRanges'] = Env::getArray('EMAIL_SERVICE_validIpRanges');
 
 return [
     'id' => 'app-common',
@@ -38,6 +40,16 @@ return [
             'username' => $mysqlUser,
             'password' => $mysqlPassword,
             'charset' => 'utf8',
+        ],
+        'emailer' => [
+            'class' => Emailer::class,
+            'emailServiceConfig' => $emailServiceConfig,
+            
+            'sendInviteEmails' => Env::get('SEND_INVITE_EMAILS', false),
+            'sendWelcomeEmails' => Env::get('SEND_WELCOME_EMAILS', false),
+            
+            'subjectForInvite' => Env::get('SUBJECT_FOR_INVITE'),
+            'subjectForWelcome' => Env::get('SUBJECT_FOR_WELCOME'),
         ],
         'ldap' => [
             'class' => Ldap::class,
@@ -78,28 +90,42 @@ return [
                     },
                 ],
                 [
-                    'class' => EmailTarget::class,
+                    'class' => EmailServiceTarget::class,
                     'categories' => ['application'], // stick to messages from this app, not all of Yii's built-in messaging.
-                    'logVars' => [], // no need for default stuff: http://www.yiiframework.com/doc-2.0/yii-log-target.html#$logVars-detail
-                    'levels' => ['error'],
-                    'message' => [
-                        'from' => $mailerUsername,
-                        'to' => $notificationEmail,
-                        'subject' => "ERROR - $idpName-id-broker [".YII_ENV."] Error",
+                    'enabled' => !empty($notificationEmail),
+                    'except' => [
+                        'yii\web\HttpException:400',
+                        'yii\web\HttpException:401',
+                        'yii\web\HttpException:404',
+                        'yii\web\HttpException:409',
+                        'Sil\EmailService\Client\EmailServiceClientException',
                     ],
+                    'levels' => ['error'],
+                    'logVars' => [], // Disable logging of _SERVER, _POST, etc.
+                    'message' => [
+                        'to' => $notificationEmail ?? '(disabled)',
+                        'subject' => 'ERROR - ' . $idpName . ' ID Broker [' . YII_ENV .']',
+                    ],
+                    'baseUrl' => $emailServiceConfig['baseUrl'],
+                    'accessToken' => $emailServiceConfig['accessToken'],
+                    'assertValidIp' => $emailServiceConfig['assertValidIp'],
+                    'validIpRanges' => $emailServiceConfig['validIpRanges'],
+                    'prefix' => function ($message) {
+                        $prefixData = [
+                            'env' => YII_ENV,
+                        ];
+                        
+                        try {
+                            $request = \Yii::$app->request;
+                            $prefixData['url'] = $request->getUrl();
+                            $prefixData['method'] = $request->getMethod();
+                        } catch (\Exception $e) {
+                            $prefixData['url'] = 'not available';
+                        }
+                        
+                        return Json::encode($prefixData);
+                    },
                 ],
-            ],
-        ],
-        'mailer' => [
-            'class' => Mailer::class,
-            'useFileTransport' => $mailerUseFiles,
-            'transport' => [
-                'class' => 'Swift_SmtpTransport',
-                'host' => $mailerHost,
-                'username' => $mailerUsername,
-                'password' => $mailerPassword,
-                'port' => '465',
-                'encryption' => 'ssl',
             ],
         ],
     ],
