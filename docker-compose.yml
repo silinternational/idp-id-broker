@@ -120,6 +120,9 @@ services:
             TEST_SERVER_HOSTNAME: appfortests
             API_ACCESS_KEYS: api-test-NOTASECRET
             APP_ENV: test
+            EMAIL_SERVICE_accessToken: dummy
+            EMAIL_SERVICE_assertValidIp: "false"
+            EMAIL_SERVICE_baseUrl: dummy
             IDP_NAME: test
             LDAP_BASE_DN: dc=acme,dc=org
             LDAP_ADMIN_USERNAME: cn=Manager,dc=acme,dc=org
