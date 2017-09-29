@@ -258,6 +258,37 @@ schemas:
         },
         "type": "object"
       }
+  - MfaCreation: |
+        {
+          "$schema": "http://json-schema.org/draft-03/schema",
+          "properties": {
+            "employee_id": {
+              "required": true,
+              "type": "string"
+            },
+            "type": {
+              "required": true,
+              "type": "string",
+              "enum": ["backupcode", "totp", "u2f"]
+            }
+          },
+          "type": "object"
+        }
+  - MfaCreationResponse: |
+      {
+        "$schema": "http://json-schema.org/draft-03/schema",
+        "properties": {
+          "id": {
+            "required": true,
+            "type": "integer"
+          },
+          "data": {
+            "required": true,
+            "type": "object"
+          }
+        },
+        "type": "object"
+      }
 
 /authentication:
   post:
@@ -513,7 +544,18 @@ schemas:
                   "code": 0,
                   "status": 500
                 }
+    /mfa:
+      get:
+        description: Get a list of configured MFA devices for user
+        responses:
+          200:
+            body:
+              application/json:
+                schema: UserMfaList
+                example: |
+                  {
 
+                  }
     /password:
       put:
         description: Set the password for a User.
@@ -656,3 +698,84 @@ schemas:
                     }
                   ]
 # TODO: need docs for new search api, i.e., /user?username=AAA&email=AAA@example.org
+/mfa:
+  post:
+    description: Create a new mfa record.
+    body:
+      application/json:
+        schema: MfaCreation
+        example: |
+          {
+            "employee_id": "12345",
+            "first_name": "John",
+            "last_name": "Smith",
+            "username": "john_smith",
+            "email": "john_smith@example.com"
+          }
+    responses:
+      200:
+        description: The new user record was created.
+        body:
+          application/json:
+            schema: MfaCreationResponse
+            example: |
+              {
+                "id": 3,
+                "data": [
+                  "51231235",
+                  "74475261",
+                  "72412792",
+                  "23221473",
+                  "30936163",
+                  "09641891",
+                  "99517242",
+                  "08751652",
+                  "32842734",
+                  "25937677"
+                ]
+              }
+      400:
+        description: The given user data does not satisfy some validation rule.
+      500:
+        description: The server encountered an error
+  /{id}:
+    delete:
+      description: Delete an MFA configuration
+      responses:
+        204:
+        404:
+        500:
+    /verify:
+      post:
+        description: Verify the value provided for this MFA device
+        body:
+          application/json:
+            example: |
+              {
+                "value": "01234987"
+              }
+        responses:
+          200:
+            description: Value provided passed verification
+            body:
+              application/json:
+                schema: ReturnedUser
+                example: |
+                  {
+                    "uuid": "11111111-aaaa-1111-aaaa-111111111111",
+                    "employee_id": "12345",
+                    "first_name": "John",
+                    "last_name": "Smith",
+                    "display_name": "John Smith",
+                    "username": "john_smith",
+                    "email": "john_smith@example.com",
+                    "active": "yes",
+                    "locked": "no",
+                    "password": {
+                      "created_utc":"2017-05-24 14:04:51 UTC",
+                      "expires_on":"2018-05-24 23:59:59 UTC",
+                      "grace_period_ends_on":"2018-06-23 23:59:59 UTC"
+                    }
+                  }
+          400:
+          404:

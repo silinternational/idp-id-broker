@@ -22,6 +22,7 @@ use Yii;
  * @property string $last_synced_utc
  *
  * @property EmailLog[] $emailLogs
+ * @property Mfa[] $mfas
  * @property Password $currentPassword
  */
 class UserBase extends \yii\db\ActiveRecord
@@ -81,6 +82,14 @@ class UserBase extends \yii\db\ActiveRecord
     public function getEmailLogs()
     {
         return $this->hasMany(EmailLog::className(), ['user_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getMfas()
+    {
+        return $this->hasMany(Mfa::className(), ['user_id' => 'id']);
     }
 
     /**

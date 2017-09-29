@@ -1,6 +1,9 @@
 <?php
 
 use common\components\Emailer;
+use common\components\MfaBackendBackupcode;
+use common\components\MfaBackendTotp;
+use common\components\MfaBackendU2f;
 use common\ldap\Ldap;
 use Sil\JsonLog\target\JsonSyslogTarget;
 use Sil\JsonLog\target\EmailServiceTarget;
@@ -17,6 +20,8 @@ $mysqlUser     = Env::requireEnv('MYSQL_USER');
 $mysqlPassword = Env::requireEnv('MYSQL_PASSWORD');
 
 $notificationEmail = Env::get('NOTIFICATION_EMAIL');
+
+$mfaNumBackupCodes = Env::get('MFA_NUM_BACKUPCODES', 10);
 
 /*
  * If using Email Service, the following ENV vars should be set:
@@ -62,6 +67,16 @@ return [
             'use_tls' => Env::get('LDAP_USE_TLS', true),
             'timeout' => Env::get('LDAP_TIMEOUT', 5),
             'logger' => new Psr3Yii2Logger(),
+        ],
+        'backupcode' => [
+            'class' => MfaBackendBackupcode::class,
+            'numBackupCodes' => $mfaNumBackupCodes,
+        ],
+        'totp' => [
+            'class' => MfaBackendTotp::class,
+        ],
+        'u2f' => [
+            'class' => MfaBackendU2f::class,
         ],
         // http://www.yiiframework.com/doc-2.0/guide-runtime-logging.html
         'log' => [
