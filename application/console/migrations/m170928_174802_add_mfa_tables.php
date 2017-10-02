@@ -6,6 +6,8 @@ class m170928_174802_add_mfa_tables extends Migration
 {
     public function safeUp()
     {
+        $this->addColumn('{{user}}','require_mfa',"enum('no','yes')");
+
         $this->createTable(
             '{{mfa}}',
             [

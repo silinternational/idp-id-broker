@@ -15,7 +15,7 @@ class AuthenticationController extends BaseRestController
      * @return User upon successful authentication, i.e., "creation".
      * @throws BadRequestHttpException
      */
-    public function actionCreate(): User
+    public function actionCreate(): array
     {
         $migratePasswords = Yii::$app->params['migratePasswordsFromLdap'];
 

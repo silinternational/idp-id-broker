@@ -20,6 +20,7 @@ use Yii;
  * @property string $locked
  * @property string $last_changed_utc
  * @property string $last_synced_utc
+ * @property string $require_mfa
  *
  * @property EmailLog[] $emailLogs
  * @property Mfa[] $mfas
@@ -43,7 +44,7 @@ class UserBase extends \yii\db\ActiveRecord
         return [
             [['uuid', 'employee_id', 'first_name', 'last_name', 'username', 'email', 'active', 'locked', 'last_changed_utc', 'last_synced_utc'], 'required'],
             [['current_password_id'], 'integer'],
-            [['active', 'locked'], 'string'],
+            [['active', 'locked', 'require_mfa'], 'string'],
             [['last_changed_utc', 'last_synced_utc'], 'safe'],
             [['uuid'], 'string', 'max' => 64],
             [['employee_id', 'first_name', 'last_name', 'display_name', 'username', 'email'], 'string', 'max' => 255],
@@ -73,6 +74,7 @@ class UserBase extends \yii\db\ActiveRecord
             'locked' => Yii::t('app', 'Locked'),
             'last_changed_utc' => Yii::t('app', 'Last Changed Utc'),
             'last_synced_utc' => Yii::t('app', 'Last Synced Utc'),
+            'require_mfa' => Yii::t('app', 'Require Mfa'),
         ];
     }
 

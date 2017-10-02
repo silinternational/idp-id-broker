@@ -89,6 +89,9 @@ class User extends UserBase
                 'locked', 'default', 'value' => 'no', 'on' => self::SCENARIO_NEW_USER
             ],
             [
+                'require_mfa', 'default', 'value' => 'no', 'on' => self::SCENARIO_NEW_USER
+            ],
+            [
                 ['active', 'locked'], 'in', 'range' => ['yes', 'no'],
             ],
             [
@@ -326,6 +329,15 @@ class User extends UserBase
             'email',
             'active',
             'locked',
+            'prompt_for_mfa' => function ($model) {
+                if ($model->require_mfa == 'yes' || count($model->mfas) > 0) {
+                    return 'yes';
+                }
+                return 'no';
+            },
+            'mfa_options' => function ($model) {
+                return $model->mfas;
+            }
         ];
 
         if ($this->current_password_id !== null) {

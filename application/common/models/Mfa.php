@@ -35,6 +35,17 @@ class Mfa extends MfaBase
         ], parent::rules());
     }
 
+    public function fields(): array
+    {
+        return [
+            'id',
+            'type',
+            'data' => function($model) {
+                return '';
+            }
+        ];
+    }
+
     /**
      * Before deleting, if this is a TYPE_BACKUPCODE record, delete all the backup codes first
      * @return bool
