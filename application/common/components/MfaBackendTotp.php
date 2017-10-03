@@ -86,6 +86,7 @@ class MfaBackendTotp extends Component implements MfaBackendInterface
      * @param string $value Value provided by user, such as TOTP number or U2F challenge response
      * @return bool
      * @throws NotFoundHttpException
+     * @throws ServerErrorHttpException
      */
     public function verify(int $mfaId, string $value): bool
     {
@@ -94,7 +95,13 @@ class MfaBackendTotp extends Component implements MfaBackendInterface
             throw new NotFoundHttpException('MFA configuration not found');
         }
 
-        return $this->client->validateTotp($mfa->external_uuid, $value);
+        $this->client->validateTotp($mfa->external_uuid, $value);
+        $mfa->verified = 1;
+        if ( ! $mfa->save()) {
+            throw new ServerErrorHttpException();
+        }
+
+        return true;
     }
 
     /**

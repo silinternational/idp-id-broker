@@ -101,7 +101,7 @@ class MfaController extends BaseRestController
             );
         }
 
-        return Mfa::findAll(['user_id' => $user->id]);
+        return Mfa::findAll(['user_id' => $user->id, 'verified' => 1]);
     }
 
     /**
