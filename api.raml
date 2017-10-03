@@ -707,14 +707,11 @@ schemas:
         example: |
           {
             "employee_id": "12345",
-            "first_name": "John",
-            "last_name": "Smith",
-            "username": "john_smith",
-            "email": "john_smith@example.com"
+            "type": "backupcode"
           }
     responses:
       200:
-        description: The new user record was created.
+        description: The new mfa record was created.
         body:
           application/json:
             schema: MfaCreationResponse
@@ -735,7 +732,7 @@ schemas:
                 ]
               }
       400:
-        description: The given user data does not satisfy some validation rule.
+        description: The given mfa data does not satisfy some validation rule.
       500:
         description: The server encountered an error
   /{id}:
