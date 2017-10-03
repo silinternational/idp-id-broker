@@ -44,7 +44,11 @@ class Authentication
              * If MFA is required, only return MFA fields, otherwise return full user
              */
             if ($userArray['prompt_for_mfa'] == 'yes') {
-                $this->authenticatedUser = $user->toArray(['prompt_for_mfa', 'mfa_options']);
+                $this->authenticatedUser = $user->toArray([
+                    'employee_id',
+                    'prompt_for_mfa',
+                    'mfa_options',
+                ]);
             } else {
                 $this->authenticatedUser = $userArray;
             }
