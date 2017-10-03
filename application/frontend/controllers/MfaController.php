@@ -25,12 +25,12 @@ class MfaController extends BaseRestController
             throw new BadRequestHttpException('The provided type is not a supported MFA type', 1506695647);
         }
 
-        $userId = $req->getBodyParams('employee_id');
-        if ( is_null($userId)) {
-            throw new BadRequestHttpException('userId must be a valid User ID', 1506695722);
+        $employeeId = $req->getBodyParams('employee_id');
+        if ( is_null($employeeId)) {
+            throw new BadRequestHttpException('employee_id is required', 1506695722);
         }
 
-        $user = User::findOne(['employee_id' => $userId]);
+        $user = User::findOne(['employee_id' => $employeeId]);
         if ($user === null) {
             throw new BadRequestHttpException('User not found', 1506695733);
         }
@@ -56,16 +56,26 @@ class MfaController extends BaseRestController
             throw new BadRequestHttpException('Value is required for verification', 1506697678);
         }
 
-        // Strip spaces from $value
-        $value = str_replace(' ', '', $value);
+        $employeeId = $req->getBodyParam('employee_id');
+        if ($employeeId == null) {
+            throw new BadRequestHttpException("employee_id is required");
+        }
 
-        $mfa = Mfa::findOne(['id' => $id]);
+        $user = User::findOne(['employee_id' => $employeeId]);
+        if ($user == null) {
+            throw new BadRequestHttpException("Invalid employee_id");
+        }
+
+        $mfa = Mfa::findOne(['id' => $id, 'user_id' => $user->id]);
         if ($mfa === null) {
             throw new NotFoundHttpException(
                 sprintf('MFA record for id %s not found', $id),
                 1506697604
             );
         }
+
+        // Strip spaces from $value
+        $value = str_replace(' ', '', $value);
 
         $mfaBackend = $this->getBackendForType($mfa->type);
         if ( !  $mfaBackend->verify($mfa->id, $value)){
@@ -98,20 +108,32 @@ class MfaController extends BaseRestController
      * Delete MFA record
      * @param int $id
      * @return false|int
+     * @throws BadRequestHttpException
      * @throws NotFoundHttpException
      * @throws ServerErrorHttpException
      */
     public function actionDelete(int $id)
     {
-        $mfa = Mfa::findOne(['id' => $id]);
-        if ($mfa !== null) {
-            if ($mfa->delete() !== false) {
-                \Yii::$app->response->statusCode = 204;
-                return;
-            }
-            throw new ServerErrorHttpException("Unable to delete MFA configuration");
+        $employeeId = \Yii::$app->request->getBodyParam('employee_id');
+        if ($employeeId == null) {
+            throw new BadRequestHttpException("employee_id is required");
         }
-        throw new NotFoundHttpException();
+
+        $user = User::findOne(['employee_id' => $employeeId]);
+        if ($user == null) {
+            throw new BadRequestHttpException("Invalid employee_id");
+        }
+
+        $mfa = Mfa::findOne(['id' => $id, 'user_id' => $user->id]);
+        if ($mfa === null) {
+            throw new NotFoundHttpException(
+                sprintf('MFA record for id %s not found', $id),
+                1506697614
+            );
+        }
+
+        $mfaBackend = $this->getBackendForType($mfa->type);
+        $mfaBackend->delete($mfa->id);
     }
 
     /**

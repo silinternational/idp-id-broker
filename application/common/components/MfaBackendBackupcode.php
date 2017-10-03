@@ -4,6 +4,7 @@ namespace common\components;
 use common\models\Mfa;
 use common\models\MfaBackupcode;
 use yii\base\Component;
+use yii\web\NotFoundHttpException;
 use yii\web\ServerErrorHttpException;
 
 class MfaBackendBackupcode extends Component implements MfaBackendInterface
@@ -68,5 +69,24 @@ class MfaBackendBackupcode extends Component implements MfaBackendInterface
     public function verify(int $mfaId, string $value): bool
     {
         return MfaBackupcode::validateAndRemove($mfaId, $value);
+    }
+
+    /**
+     * Delete MFA backend configuration
+     * @param int $mfaId
+     * @return void
+     * @throws NotFoundHttpException
+     * @throws ServerErrorHttpException
+     */
+    public function delete(int $mfaId)
+    {
+        $mfa = Mfa::findOne(['id' => $mfaId]);
+        if ($mfa == null) {
+            throw new NotFoundHttpException();
+        }
+
+        if ($mfa->delete() === false) {
+            throw new ServerErrorHttpException("Unable to delete MFA configuration");
+        }
     }
 }

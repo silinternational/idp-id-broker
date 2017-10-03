@@ -25,4 +25,11 @@ interface MfaBackendInterface {
      */
     public function verify(int $mfaId, string $value): bool;
 
+    /**
+     * Delete MFA backend configuration
+     * @param int $mfaId
+     * @return void
+     */
+    public function delete(int $mfaId);
+
 }

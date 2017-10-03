@@ -738,17 +738,24 @@ schemas:
   /{id}:
     delete:
       description: Delete an MFA configuration
+      body:
+        application/json:
+          example: |
+            {
+              "employee_id": "12345"
+            }
       responses:
         204:
         404:
         500:
     /verify:
       post:
-        description: Verify the value provided for this MFA device
+        description: Verify the value provided for this MFA device.
         body:
           application/json:
             example: |
               {
+                "employee_id": "12345",
                 "value": "01234987"
               }
         responses:

@@ -10,18 +10,22 @@ use Sil\JsonLog\target\EmailServiceTarget;
 use Sil\PhpEnv\Env;
 use Sil\Psr3Adapters\Psr3Yii2Logger;
 use yii\db\Connection;
+use yii\helpers\ArrayHelper;
 use yii\helpers\Json;
 use yii\web\Request;
 
-$idpName       = Env::requireEnv('IDP_NAME');
-$mysqlHost     = Env::requireEnv('MYSQL_HOST');
-$mysqlDatabase = Env::requireEnv('MYSQL_DATABASE');
-$mysqlUser     = Env::requireEnv('MYSQL_USER');
-$mysqlPassword = Env::requireEnv('MYSQL_PASSWORD');
+$idpName        = Env::requireEnv('IDP_NAME');
+$idpDisplayName = Env::get('IDP_DISPLAY_NAME', $idpName);
+$mysqlHost      = Env::requireEnv('MYSQL_HOST');
+$mysqlDatabase  = Env::requireEnv('MYSQL_DATABASE');
+$mysqlUser      = Env::requireEnv('MYSQL_USER');
+$mysqlPassword  = Env::requireEnv('MYSQL_PASSWORD');
 
 $notificationEmail = Env::get('NOTIFICATION_EMAIL');
 
 $mfaNumBackupCodes = Env::get('MFA_NUM_BACKUPCODES', 10);
+$mfaTotpConfig = Env::getArrayFromPrefix('MFA_TOTP_');
+$mfaU2fConfig = Env::getArrayFromPrefix('MFA_U2F_');
 
 /*
  * If using Email Service, the following ENV vars should be set:
@@ -72,12 +76,14 @@ return [
             'class' => MfaBackendBackupcode::class,
             'numBackupCodes' => $mfaNumBackupCodes,
         ],
-        'totp' => [
-            'class' => MfaBackendTotp::class,
-        ],
-        'u2f' => [
-            'class' => MfaBackendU2f::class,
-        ],
+        'totp' => ArrayHelper::merge(
+            ['class' => MfaBackendTotp::class],
+            $mfaTotpConfig
+        ),
+        'u2f' => ArrayHelper::merge(
+            ['class' => MfaBackendU2f::class],
+            $mfaU2fConfig
+        ),
         // http://www.yiiframework.com/doc-2.0/guide-runtime-logging.html
         'log' => [
             'targets' => [
@@ -145,6 +151,8 @@ return [
         ],
     ],
     'params' => [
+        'idpName' => $idpName,
+        'idpDisplayName' => $idpDisplayName,
         'migratePasswordsFromLdap' => Env::get('MIGRATE_PW_FROM_LDAP', false),
     ],
 ];
