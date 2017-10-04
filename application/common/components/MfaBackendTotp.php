@@ -95,13 +95,15 @@ class MfaBackendTotp extends Component implements MfaBackendInterface
             throw new NotFoundHttpException('MFA configuration not found');
         }
 
-        $this->client->validateTotp($mfa->external_uuid, $value);
-        $mfa->verified = 1;
-        if ( ! $mfa->save()) {
-            throw new ServerErrorHttpException();
-        }
+        if ($this->client->validateTotp($mfa->external_uuid, $value)) {
+            $mfa->verified = 1;
+            if ( ! $mfa->save()) {
+                throw new ServerErrorHttpException();
+            }
 
-        return true;
+            return true;
+        }
+        return false;
     }
 
     /**

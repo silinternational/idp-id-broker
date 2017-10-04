@@ -67,6 +67,7 @@ class MfaApiClient
             $this->callApi('totp/' . $uuid . '/validate', 'POST', [
                 'code' => $code,
             ]);
+
             return true;
         } catch (\Exception $e) {
             return false;
