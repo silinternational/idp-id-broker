@@ -12,10 +12,10 @@ class AuthenticationController extends BaseRestController
     /**
      * Authenticates the given user based on his/her password
      *
-     * @return User upon successful authentication, i.e., "creation".
+     * @return User|array Will return User object if MFA is not required, or array of MFA details if it is
      * @throws BadRequestHttpException
      */
-    public function actionCreate(): array
+    public function actionCreate()
     {
         $migratePasswords = Yii::$app->params['migratePasswordsFromLdap'];
 
@@ -28,6 +28,15 @@ class AuthenticationController extends BaseRestController
         $authenticatedUser = $authentication->getAuthenticatedUser();
 
         if ($authenticatedUser !== null) {
+            $mfaArray = $authenticatedUser->toArray([
+                'employee_id',
+                'prompt_for_mfa',
+                'mfa_options',
+            ]);
+            if ($mfaArray['prompt_for_mfa'] == 'yes') {
+                return $mfaArray;
+            }
+
             return $authenticatedUser;
         }
 
