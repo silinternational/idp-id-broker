@@ -1,4 +1,5 @@
 <?php
+
 namespace common\components;
 
 use GuzzleHttp\Client as GuzzleClient;
@@ -22,8 +23,8 @@ class MfaApiClient
             'base_uri' => $apiBaseUrl,
             'timeout' => 5,
             'headers' => [
-                'X-TOTP-APIKey' => $apiKey,
-                'X-TOTP-APISecret' => $apiSecret,
+                'X-MFA-APIKey' => $apiKey,
+                'X-MFA-APISecret' => $apiSecret,
                 'Content-type' => 'application/json',
             ],
         ]);
@@ -34,10 +35,10 @@ class MfaApiClient
      * @param string $username
      * @return array
      */
-    public function createTotp(string $username): array
+    public function createTotp(string $username, string $issuer): array
     {
         $response = $this->callApi('totp', 'POST', [
-            'issuer' => \Yii::$app->params['idpDisplayName'],
+            'issuer' => $issuer,
             'label' => $username,
         ]);
 
@@ -73,6 +74,46 @@ class MfaApiClient
             return false;
         }
     }
+
+
+    public function u2fCreateAuthentication(string $uuid): array
+    {
+        $response = $this->callApi('u2f/' . $uuid . '/auth', 'POST');
+
+        return Json::decode($response->getBody()->getContents());
+    }
+
+    public function u2fCreateRegistration(string $appId): array
+    {
+        $response = $this->callApi('u2f', 'POST', [
+            'appId' => $appId,
+        ]);
+
+        return Json::decode($response->getBody()->getContents());
+    }
+
+    public function u2fDelete(string $uuid): bool
+    {
+        $this->callApi('u2f/' . $uuid, 'DELETE');
+        return true;
+    }
+
+    public function u2fValidateAuthentication(string $uuid, string $signResultJson): bool
+    {
+        $this->callApi('u2f/' . $uuid . '/auth', 'PUT', [
+            'signResult' => $signResultJson,
+        ]);
+        return true;
+    }
+
+    public function u2fValidateRegistration(string $uuid, string $signResultJson): bool
+    {
+        $this->callApi('u2f/' . $uuid, 'PUT', [
+            'signResult' => $signResultJson,
+        ]);
+        return true;
+    }
+
 
     /**
      * @param string $path

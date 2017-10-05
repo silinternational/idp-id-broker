@@ -25,6 +25,11 @@ class MfaBackendTotp extends Component implements MfaBackendInterface
     public $apiSecret;
 
     /**
+     * @var string
+     */
+    public $issuer;
+
+    /**
      * @var MfaApiClient
      */
     public $client;
@@ -109,16 +114,23 @@ class MfaBackendTotp extends Component implements MfaBackendInterface
     /**
      * Delete MFA backend configuration
      * @param int $mfaId
-     * @return void
+     * @return bool
      * @throws NotFoundHttpException
+     * @throws ServerErrorHttpException
      */
-    public function delete(int $mfaId)
+    public function delete(int $mfaId): bool
     {
         $mfa = Mfa::findOne(['id' => $mfaId]);
         if ($mfa == null) {
             throw new NotFoundHttpException('MFA configuration not found');
         }
 
-        $this->client->deleteTotp($mfa->external_uuid);
+        if ($this->client->deleteTotp($mfa->external_uuid)) {
+            if ($mfa->delete() !== false) {
+                return true;
+            }
+        }
+
+        throw new ServerErrorHttpException("Unable to delete TOTP record");
     }
 }

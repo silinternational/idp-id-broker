@@ -24,7 +24,10 @@ $mysqlPassword  = Env::requireEnv('MYSQL_PASSWORD');
 $notificationEmail = Env::get('NOTIFICATION_EMAIL');
 
 $mfaNumBackupCodes = Env::get('MFA_NUM_BACKUPCODES', 10);
+
 $mfaTotpConfig = Env::getArrayFromPrefix('MFA_TOTP_');
+$mfaTotpConfig['issuer'] = $idpDisplayName;
+
 $mfaU2fConfig = Env::getArrayFromPrefix('MFA_U2F_');
 
 /*
