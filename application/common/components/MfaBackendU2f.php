@@ -102,6 +102,7 @@ class MfaBackendU2f extends Component implements MfaBackendInterface
      * @param string $value Value provided by user, such as TOTP number or U2F challenge response
      * @return bool
      * @throws NotFoundHttpException
+     * @throws ServerErrorHttpException
      */
     public function verify(int $mfaId, string $value): bool
     {
@@ -113,7 +114,16 @@ class MfaBackendU2f extends Component implements MfaBackendInterface
         if ($mfa->verified === 1) {
             return $this->client->u2fValidateAuthentication($mfa->external_uuid, $value);
         } else {
-            return $this->client->u2fValidateRegistration($mfa->external_uuid, $value);
+            if ($this->client->u2fValidateRegistration($mfa->external_uuid, $value)) {
+                $mfa->verified = 1;
+                if ( ! $mfa->save()) {
+                    throw new ServerErrorHttpException(
+                        "Unable to save U2F record after verification. Error: " . print_r($mfa->getFirstErrors(), true)
+                    );
+                }
+                return true;
+            }
+            return false;
         }
     }
 
