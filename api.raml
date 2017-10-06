@@ -782,4 +782,8 @@ schemas:
                     }
                   }
           400:
+            description: |
+              Value provided failed verification or was unacceptable for some
+              other reason (such as an invalid `employee_id`).
           404:
+            description: No MFA record found with that `id` and `employee_id`.
