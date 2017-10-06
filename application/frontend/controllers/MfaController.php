@@ -36,7 +36,7 @@ class MfaController extends BaseRestController
         }
 
         /** @var MfaBackendInterface $mfaBackend */
-        $mfaBackend = $this->getBackendForType($type);
+        $mfaBackend = Mfa::getBackendForType($type);
 
         return $mfaBackend->regInit($user->id);
     }
@@ -77,7 +77,7 @@ class MfaController extends BaseRestController
         // Strip spaces from $value
         $value = str_replace(' ', '', $value);
 
-        $mfaBackend = $this->getBackendForType($mfa->type);
+        $mfaBackend = Mfa::getBackendForType($mfa->type);
         if ( !  $mfaBackend->verify($mfa->id, $value)){
             throw new BadRequestHttpException();
         }
@@ -132,23 +132,7 @@ class MfaController extends BaseRestController
             );
         }
 
-        $mfaBackend = $this->getBackendForType($mfa->type);
+        $mfaBackend = Mfa::getBackendForType($mfa->type);
         $mfaBackend->delete($mfa->id);
-    }
-
-    /**
-     * @param string $type
-     * @return MfaBackendInterface
-     */
-    private function getBackendForType(string $type): MfaBackendInterface
-    {
-        switch ($type) {
-            case Mfa::TYPE_BACKUPCODE:
-                return\Yii::$app->backupcode;
-            case Mfa::TYPE_TOTP:
-                return \Yii::$app->totp;
-            case Mfa::TYPE_U2F:
-                return \Yii::$app->u2f;
-        }
     }
 }

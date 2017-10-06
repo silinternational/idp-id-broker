@@ -1,6 +1,7 @@
 <?php
 namespace common\models;
 
+use common\components\MfaBackendInterface;
 use common\helpers\MySqlDateTime;
 use yii\helpers\ArrayHelper;
 
@@ -41,7 +42,8 @@ class Mfa extends MfaBase
             'id',
             'type',
             'data' => function($model) {
-                return '';
+                $backend = self::getBackendForType($model->type);
+                return $backend->authInit($model->id);
             }
         ];
     }
@@ -70,5 +72,21 @@ class Mfa extends MfaBase
             return true;
         }
         return false;
+    }
+
+    /**
+     * @param string $type
+     * @return MfaBackendInterface
+     */
+    static function getBackendForType(string $type): MfaBackendInterface
+    {
+        switch ($type) {
+            case self::TYPE_BACKUPCODE:
+                return\Yii::$app->backupcode;
+            case self::TYPE_TOTP:
+                return \Yii::$app->totp;
+            case self::TYPE_U2F:
+                return \Yii::$app->u2f;
+        }
     }
 }
