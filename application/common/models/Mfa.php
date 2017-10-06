@@ -42,8 +42,12 @@ class Mfa extends MfaBase
             'id',
             'type',
             'data' => function($model) {
-                $backend = self::getBackendForType($model->type);
-                return $backend->authInit($model->id);
+                /** Mfa $model */
+                if ($model->verified === 1) {
+                    $backend = self::getBackendForType($model->type);
+                    return $backend->authInit($model->id);
+                }
+                return [];
             }
         ];
     }

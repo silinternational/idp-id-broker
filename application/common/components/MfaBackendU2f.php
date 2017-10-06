@@ -69,10 +69,7 @@ class MfaBackendU2f extends Component implements MfaBackendInterface
 
         unset($response['uuid']);
 
-        return [
-            'id' => $mfa->id,
-            'data' => $response,
-        ];
+        return $response;
     }
 
     /**
