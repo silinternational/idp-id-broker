@@ -19,6 +19,9 @@ class MfaApiClient
 
     public function __construct(string $apiBaseUrl, $apiKey, $apiSecret)
     {
+        if (substr($apiBaseUrl, -1) !== '/') {
+            throw new \InvalidArgumentException('The MFA apiBaseUrl must end with a slash (/).');
+        }
         $this->client = new GuzzleClient([
             'base_uri' => $apiBaseUrl,
             'timeout' => 5,
