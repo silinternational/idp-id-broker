@@ -86,7 +86,7 @@ class Mfa extends MfaBase
     {
         switch ($type) {
             case self::TYPE_BACKUPCODE:
-                return\Yii::$app->backupcode;
+                return \Yii::$app->backupcode;
             case self::TYPE_TOTP:
                 return \Yii::$app->totp;
             case self::TYPE_U2F:

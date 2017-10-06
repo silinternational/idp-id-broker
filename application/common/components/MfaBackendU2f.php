@@ -69,7 +69,10 @@ class MfaBackendU2f extends Component implements MfaBackendInterface
 
         unset($response['uuid']);
 
-        return $response;
+        return [
+            'id' => $mfa->id,
+            'data' => $response,
+        ];
     }
 
     /**
@@ -87,10 +90,9 @@ class MfaBackendU2f extends Component implements MfaBackendInterface
 
         $response = $this->client->u2fCreateAuthentication($mfa->external_uuid);
 
-        return [
-            'id' => $mfa->id,
-            'data' => $response,
-        ];
+        unset($response['uuid']);
+
+        return $response;
     }
 
     /**
