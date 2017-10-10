@@ -23,7 +23,7 @@ interface MfaBackendInterface {
      * @param string $value Value provided by user
      * @return bool
      */
-    public function verify(int $mfaId, string $value): bool;
+    public function verify(int $mfaId, $value): bool;
 
     /**
      * Delete MFA backend configuration

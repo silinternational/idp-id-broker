@@ -66,7 +66,7 @@ class MfaBackendBackupcode extends Component implements MfaBackendInterface
      * @return bool
      * @throws ServerErrorHttpException
      */
-    public function verify(int $mfaId, string $value): bool
+    public function verify(int $mfaId, $value): bool
     {
         return MfaBackupcode::validateAndRemove($mfaId, $value);
     }

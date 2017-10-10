@@ -103,7 +103,7 @@ class MfaBackendU2f extends Component implements MfaBackendInterface
      * @throws NotFoundHttpException
      * @throws ServerErrorHttpException
      */
-    public function verify(int $mfaId, string $value): bool
+    public function verify(int $mfaId, $value): bool
     {
         $mfa = Mfa::findOne(['id' => $mfaId]);
         if ($mfa == null) {
