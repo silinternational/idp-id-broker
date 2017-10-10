@@ -101,7 +101,7 @@ class MfaApiClient
         return true;
     }
 
-    public function u2fValidateAuthentication(string $uuid, string $signResultJson): bool
+    public function u2fValidateAuthentication(string $uuid, $signResultJson): bool
     {
         $this->callApi('u2f/' . $uuid . '/auth', 'PUT', [
             'signResult' => $signResultJson,
@@ -109,7 +109,7 @@ class MfaApiClient
         return true;
     }
 
-    public function u2fValidateRegistration(string $uuid, string $signResultJson): bool
+    public function u2fValidateRegistration(string $uuid, $signResultJson): bool
     {
         $this->callApi('u2f/' . $uuid, 'PUT', [
             'signResult' => $signResultJson,
