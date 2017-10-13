@@ -1,6 +1,7 @@
 <?php
 namespace common\models;
 
+use common\helpers\MySqlDateTime;
 use common\ldap\Ldap;
 
 /**
@@ -39,6 +40,18 @@ class Authentication
         $user->password = $password;
 
         if ($user->validate()) {
+            /*
+             * Update last_login_utc, if unable to save log error and proceed without stopping user
+             */
+            $user->last_login_utc = MySqlDateTime::now();
+            if ( ! $user->save() ){
+                \Yii::error([
+                    'action' => 'save last_login_utc for user after authentication',
+                    'status' => 'error',
+                    'message' => $user->getFirstErrors(),
+                ]);
+            }
+
             $this->authenticatedUser = $user;
         } else {
             $this->errors = $user->getErrors();

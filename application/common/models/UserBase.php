@@ -21,6 +21,8 @@ use Yii;
  * @property string $last_changed_utc
  * @property string $last_synced_utc
  * @property string $require_mfa
+ * @property string $nag_for_mfa_after
+ * @property string $last_login_utc
  *
  * @property EmailLog[] $emailLogs
  * @property Mfa[] $mfas
@@ -42,10 +44,10 @@ class UserBase extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['uuid', 'employee_id', 'first_name', 'last_name', 'username', 'email', 'active', 'locked', 'last_changed_utc', 'last_synced_utc'], 'required'],
+            [['uuid', 'employee_id', 'first_name', 'last_name', 'username', 'email', 'active', 'locked', 'last_changed_utc', 'last_synced_utc', 'nag_for_mfa_after'], 'required'],
             [['current_password_id'], 'integer'],
             [['active', 'locked', 'require_mfa'], 'string'],
-            [['last_changed_utc', 'last_synced_utc'], 'safe'],
+            [['last_changed_utc', 'last_synced_utc', 'nag_for_mfa_after', 'last_login_utc'], 'safe'],
             [['uuid'], 'string', 'max' => 64],
             [['employee_id', 'first_name', 'last_name', 'display_name', 'username', 'email'], 'string', 'max' => 255],
             [['employee_id'], 'unique'],
@@ -75,6 +77,8 @@ class UserBase extends \yii\db\ActiveRecord
             'last_changed_utc' => Yii::t('app', 'Last Changed Utc'),
             'last_synced_utc' => Yii::t('app', 'Last Synced Utc'),
             'require_mfa' => Yii::t('app', 'Require Mfa'),
+            'nag_for_mfa_after' => Yii::t('app', 'Nag For Mfa After'),
+            'last_login_utc' => Yii::t('app', 'Last Login Utc'),
         ];
     }
 

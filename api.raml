@@ -93,6 +93,24 @@ schemas:
             "type": "string",
             "enum": ["yes", "no"]
           },
+          "last_login_utc": {
+            "required": false,
+            "type": "string"
+          },
+          "prompt_for_mfa": {
+            "required": true,
+            "type": "string",
+            "enum": ["yes","no"]
+          },
+          "nag_for_mfa": {
+            "required": true,
+            "type": "string",
+            "enum": ["yes","no"]
+          },
+          "mfa_options": {
+            "required": true,
+            "type": "array"
+          },
           "password": {
             "required": false,
             "type": "object",
@@ -320,6 +338,23 @@ schemas:
                 "email": "john_smith@example.com",
                 "active": "yes",
                 "locked": "no",
+                "last_login_utc": "2017-05-24 14:04:51 UTC",
+                "prompt_for_mfa": "yes",
+                "nag_for_mfa": "no",
+                "mfa_options": [
+                  {
+                    "id": 123,
+                    "type": "totp"
+                  },
+                  {
+                    "id": 234,
+                    "type": "u2f"
+                  },
+                  {
+                    "id": 345,
+                    "type": "backupcode"
+                  },
+                ],
                 "password": {
                   "created_utc":"2017-05-24 14:04:51 UTC",
                   "expires_on":"2018-05-24 23:59:59 UTC",
@@ -380,6 +415,23 @@ schemas:
                     "email": "john_smith@example.com",
                     "active": "yes",
                     "locked": "no",
+                    "last_login_utc": "2017-05-24 14:04:51 UTC",
+                    "prompt_for_mfa": "yes",
+                    "nag_for_mfa": "no",
+                    "mfa_options": [
+                      {
+                        "id": 123,
+                        "type": "totp"
+                      },
+                      {
+                        "id": 234,
+                        "type": "u2f"
+                      },
+                      {
+                        "id": 345,
+                        "type": "backupcode"
+                      },
+                    ],
                     "password": {
                       "created_utc":"2017-05-24 14:04:51",
                       "expires_on":"2018-05-24",
@@ -395,7 +447,24 @@ schemas:
                     "username": "jane_smith",
                     "email": "jane_smith@example.com",
                     "active": "yes",
-                    "locked": "no"
+                    "locked": "no",
+                    "last_login_utc": "2017-05-24 14:04:51 UTC",
+                    "prompt_for_mfa": "yes",
+                    "nag_for_mfa": "no",
+                    "mfa_options": [
+                      {
+                        "id": 123,
+                        "type": "totp"
+                      },
+                      {
+                        "id": 234,
+                        "type": "u2f"
+                      },
+                      {
+                        "id": 345,
+                        "type": "backupcode"
+                      },
+                    ]
                   }
                 ]
   post:
@@ -427,7 +496,10 @@ schemas:
                 "username": "john_smith",
                 "email": "john_smith@example.com",
                 "active": "yes",
-                "locked": "no"
+                "locked": "no",
+                "prompt_for_mfa": "no",
+                "nag_for_mfa": "yes",
+                "mfa_options": []
               }
       422:
         description: The given user data does not satisfy some validation rule.

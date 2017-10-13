@@ -57,6 +57,7 @@ class User extends UserBase
             'email',
             'active',
             'locked',
+            'nag_for_mfa_after',
         ];
 
         $scenarios[self::SCENARIO_UPDATE_USER] = [
@@ -90,6 +91,9 @@ class User extends UserBase
             ],
             [
                 'require_mfa', 'default', 'value' => 'no', 'on' => self::SCENARIO_NEW_USER
+            ],
+            [
+                'nag_for_mfa_after', 'default', 'value' => MySqlDateTime::today(),
             ],
             [
                 ['active', 'locked'], 'in', 'range' => ['yes', 'no'],
@@ -248,6 +252,7 @@ class User extends UserBase
             'locked' => $this->locked,
             'lastChangedUtc' => $this->last_changed_utc,
             'lastSyncedUtc' => $this->last_synced_utc,
+            'lastLoginUtc' => $this->last_login_utc,
         ];
     }
     
@@ -317,6 +322,7 @@ class User extends UserBase
      */
     public function fields(): array
     {
+        $promptForMfa = $this->isPromptForMfa() ? 'yes' : 'no';
         $fields = [
             'uuid',
             'employee_id',
@@ -329,15 +335,19 @@ class User extends UserBase
             'email',
             'active',
             'locked',
-            'prompt_for_mfa' => function ($model) {
-                if ($model->require_mfa == 'yes' || count($model->mfas) > 0) {
+            'last_login_utc',
+            'prompt_for_mfa' => function($model) use ($promptForMfa) {
+                return $promptForMfa;
+            },
+            'nag_for_mfa' => function($model) use ($promptForMfa) {
+                if ($promptForMfa == 'no' && strtotime($model->nag_for_mfa_after) < time()) {
                     return 'yes';
                 }
                 return 'no';
             },
             'mfa_options' => function ($model) {
                 return $model->mfas;
-            }
+            },
         ];
 
         if ($this->current_password_id !== null) {
@@ -508,4 +518,18 @@ class User extends UserBase
 
         return $labels;
     }
+
+    /**
+     * @return bool
+     */
+    public function isPromptForMfa(): bool
+    {
+        if ($this->scenario == self::SCENARIO_AUTHENTICATE) {
+            if (strtolower($this->require_mfa == 'yes') || count($this->mfas) > 0) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 }
