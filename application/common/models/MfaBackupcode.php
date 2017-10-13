@@ -96,9 +96,10 @@ class MfaBackupcode extends MfaBackupcodeBase
 
     /**
      * @param int $mfaId
+     * @return bool
      * @throws ServerErrorHttpException
      */
-    public static function deleteCodesForMfaId(int $mfaId)
+    public static function deleteCodesForMfaId(int $mfaId): bool
     {
         $existing = self::find()->where(['mfa_id' => $mfaId])->all();
         if ($existing) {
@@ -117,5 +118,6 @@ class MfaBackupcode extends MfaBackupcodeBase
                 }
             }
         }
+        return true;
     }
 }

@@ -110,19 +110,13 @@ class MfaBackendU2f extends Component implements MfaBackendInterface
      * @throws NotFoundHttpException
      * @throws ServerErrorHttpException
      */
-    public function delete(int $mfaId)
+    public function delete(int $mfaId): bool
     {
         $mfa = Mfa::findOne(['id' => $mfaId]);
         if ($mfa == null) {
             throw new NotFoundHttpException("MFA record for given ID not found");
         }
 
-        if ($this->client->u2fDelete($mfa->external_uuid)) {
-            if ($mfa->delete() !== false) {
-                return true;
-            }
-        }
-
-        throw new ServerErrorHttpException("Unable to delete U2F record");
+        return $this->client->u2fDelete($mfa->external_uuid);
     }
 }

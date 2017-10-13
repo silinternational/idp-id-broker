@@ -63,15 +63,6 @@ class MfaBackendBackupcode extends Component implements MfaBackendInterface
      */
     public function delete(int $mfaId): bool
     {
-        $mfa = Mfa::findOne(['id' => $mfaId]);
-        if ($mfa == null) {
-            throw new NotFoundHttpException();
-        }
-
-        if ($mfa->delete() !== false) {
-            return true;
-        }
-
-        throw new ServerErrorHttpException("Unable to delete Backup Codes configuration");
+        return MfaBackupcode::deleteCodesForMfaId($mfaId);
     }
 }

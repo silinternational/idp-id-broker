@@ -28,8 +28,8 @@ interface MfaBackendInterface {
     /**
      * Delete MFA backend configuration
      * @param int $mfaId
-     * @return void
+     * @return bool
      */
-    public function delete(int $mfaId);
+    public function delete(int $mfaId): bool;
 
 }
