@@ -43,6 +43,8 @@ class Mfa extends MfaBase
         return [
             'id',
             'type',
+            'created_utc',
+            'last_used_utc',
             'data' => function($model) {
                 /** @var Mfa $model */
                 if ($model->user->scenario === User::SCENARIO_AUTHENTICATE && $model->verified === 1) {
