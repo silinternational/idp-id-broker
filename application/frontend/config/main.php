@@ -60,5 +60,6 @@ return [
         'passwordReuseLimit'            => Env::get('PASSWORD_REUSE_LIMIT', 10),
         'passwordLifespan'              => Env::get('PASSWORD_LIFESPAN', '+1 year'),
         'passwordExpirationGracePeriod' => Env::get('PASSWORD_EXPIRATION_GRACE_PERIOD', '+30 days'),
+        'mfaNagInterval'                => Env::get('MFA_NAG_INTERVAL', '+30 days'),
     ],
 ];

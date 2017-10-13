@@ -20,4 +20,14 @@ class MySqlDateTime
     {
         return gmdate(self::MYSQL_DATE_FORMAT, $timestamp);
     }
+
+    /**
+     * Get a relative data based on given string
+     * @param string $difference
+     * @return false|string
+     */
+    public static function relative(string $difference = '+30 days')
+    {
+        return self::formatDate(strtotime($difference));
+    }
 }
