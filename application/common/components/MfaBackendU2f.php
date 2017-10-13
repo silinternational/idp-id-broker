@@ -49,30 +49,7 @@ class MfaBackendU2f extends Component implements MfaBackendInterface
      */
     public function regInit(int $userId): array
     {
-        $user = User::findOne(['id' => $userId]);
-        if ($user == null) {
-            throw new NotFoundHttpException("User not found when trying to create new TOTP configuration");
-        }
-
-        $response = $this->client->u2fCreateRegistration($this->appId);
-
-        $mfa = new Mfa();
-        $mfa->user_id = $userId;
-        $mfa->type = Mfa::TYPE_U2F;
-        $mfa->external_uuid = $response['uuid'];
-        $mfa->verified = 0;
-        if ( ! $mfa->save()) {
-            throw new ServerErrorHttpException(
-                "Unable to save new U2F configuration. Error: " . print_r($mfa->getFirstErrors(), true)
-            );
-        }
-
-        unset($response['uuid']);
-
-        return [
-            'id' => $mfa->id,
-            'data' => $response,
-        ];
+        return $this->client->u2fCreateRegistration($this->appId);
     }
 
     /**

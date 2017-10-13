@@ -23,30 +23,13 @@ class MfaBackendBackupcode extends Component implements MfaBackendInterface
      */
     public function regInit(int $userId): array
     {
-        // Check if user already has backup codes mfa backend to use
+        // Get existing MFA record for backupcode to create/update codes for
         $mfa = Mfa::findOne(['user_id' => $userId, 'type' => Mfa::TYPE_BACKUPCODE]);
         if ($mfa === null) {
-            $mfa = new Mfa();
-            $mfa->type = Mfa::TYPE_BACKUPCODE;
-            $mfa->user_id = $userId;
-            $mfa->verified = 1;
-            if ( ! $mfa->save()) {
-                \Yii::error([
-                    'action' => 'mfa-reg-init',
-                    'mfa-type' => Mfa::TYPE_BACKUPCODE,
-                    'status' => 'error',
-                    'error' => $mfa->getFirstErrors(),
-                ]);
-                throw new ServerErrorHttpException("Unable to save new mfa record, error: " . print_r($mfa->getFirstErrors(), true), 1506695238);
-            }
+            throw new ServerErrorHttpException("A backupcode MFA record does not exist for this user", 1507904428);
         }
 
-        $codes = MfaBackupcode::createBackupCodes($mfa->id, $this->numBackupCodes);
-
-        return [
-            'id' => $mfa->id,
-            'data' => $codes,
-        ];
+        return MfaBackupcode::createBackupCodes($mfa->id, $this->numBackupCodes);
     }
 
     /**

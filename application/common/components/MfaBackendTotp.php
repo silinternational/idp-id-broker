@@ -54,25 +54,7 @@ class MfaBackendTotp extends Component implements MfaBackendInterface
             throw new NotFoundHttpException("User not found when trying to create new TOTP configuration");
         }
 
-        $response = $this->client->createTotp($user->username, \Yii::$app->params['idpDisplayName']);
-
-        $mfa = new Mfa();
-        $mfa->user_id = $userId;
-        $mfa->type = Mfa::TYPE_TOTP;
-        $mfa->external_uuid = $response['uuid'];
-        $mfa->verified = 0;
-        if ( ! $mfa->save()) {
-            throw new ServerErrorHttpException(
-                "Unable to save new TOTP configuration. Error: " . print_r($mfa->getFirstErrors(), true)
-            );
-        }
-
-        unset($response['uuid']);
-
-        return [
-            'id' => $mfa->id,
-            'data' => $response,
-        ];
+        return $this->client->createTotp($user->username, \Yii::$app->params['idpDisplayName']);
     }
 
     /**

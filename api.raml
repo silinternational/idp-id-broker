@@ -831,28 +831,8 @@ schemas:
                 "value": "01234987"
               }
         responses:
-          200:
+          204:
             description: Value provided passed verification
-            body:
-              application/json:
-                schema: ReturnedUser
-                example: |
-                  {
-                    "uuid": "11111111-aaaa-1111-aaaa-111111111111",
-                    "employee_id": "12345",
-                    "first_name": "John",
-                    "last_name": "Smith",
-                    "display_name": "John Smith",
-                    "username": "john_smith",
-                    "email": "john_smith@example.com",
-                    "active": "yes",
-                    "locked": "no",
-                    "password": {
-                      "created_utc":"2017-05-24 14:04:51 UTC",
-                      "expires_on":"2018-05-24 23:59:59 UTC",
-                      "grace_period_ends_on":"2018-06-23 23:59:59 UTC"
-                    }
-                  }
           400:
             description: |
               Value provided failed verification or was unacceptable for some

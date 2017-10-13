@@ -35,10 +35,7 @@ class MfaController extends BaseRestController
             throw new BadRequestHttpException('User not found', 1506695733);
         }
 
-        /** @var MfaBackendInterface $mfaBackend */
-        $mfaBackend = Mfa::getBackendForType($type);
-
-        return $mfaBackend->regInit($user->id);
+        return Mfa::create($user->id, $type);
     }
 
     /**
@@ -74,15 +71,17 @@ class MfaController extends BaseRestController
             );
         }
 
-        // Strip spaces from $value
-        $value = str_replace(' ', '', $value);
+        // Strip spaces from $value if string
+        if (is_string($value)) {
+            $value = str_replace(' ', '', $value);
+        }
 
-        $mfaBackend = Mfa::getBackendForType($mfa->type);
-        if ( !  $mfaBackend->verify($mfa->id, $value)){
+        if ( !  $mfa->verify($value)){
             throw new BadRequestHttpException();
         }
 
-        return $mfa->user;
+        \Yii::$app->response->statusCode = 204;
+        return null;
     }
 
     /**
@@ -132,7 +131,6 @@ class MfaController extends BaseRestController
             );
         }
 
-        $mfaBackend = Mfa::getBackendForType($mfa->type);
-        $mfaBackend->delete($mfa->id);
+        return $mfa->delete();
     }
 }
