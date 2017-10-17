@@ -97,19 +97,25 @@ schemas:
             "required": false,
             "type": "string"
           },
-          "prompt_for_mfa": {
+          "mfa": {
             "required": true,
-            "type": "string",
-            "enum": ["yes","no"]
-          },
-          "nag_for_mfa": {
-            "required": true,
-            "type": "string",
-            "enum": ["yes","no"]
-          },
-          "mfa_options": {
-            "required": true,
-            "type": "array"
+            "type": "object",
+            "properties": {
+              "prompt": {
+                "required": true,
+                "type": "string",
+                "enum": ["yes","no"]
+              },
+              "nag": {
+                "required": true,
+                "type": "string",
+                "enum": ["yes","no"]
+              },
+              "options": {
+                "required": true,
+                "type": "array"
+              }
+            }
           },
           "password": {
             "required": false,
@@ -339,22 +345,24 @@ schemas:
                 "active": "yes",
                 "locked": "no",
                 "last_login_utc": "2017-05-24 14:04:51 UTC",
-                "prompt_for_mfa": "yes",
-                "nag_for_mfa": "no",
-                "mfa_options": [
-                  {
-                    "id": 123,
-                    "type": "totp"
-                  },
-                  {
-                    "id": 234,
-                    "type": "u2f"
-                  },
-                  {
-                    "id": 345,
-                    "type": "backupcode"
-                  },
-                ],
+                "mfa": {
+                  "prompt": "yes",
+                  "nag": "no",
+                  "options": [
+                     {
+                       "id": 123,
+                       "type": "totp"
+                     },
+                     {
+                       "id": 234,
+                       "type": "u2f"
+                     },
+                     {
+                       "id": 345,
+                       "type": "backupcode"
+                     },
+                   ]
+                },
                 "password": {
                   "created_utc":"2017-05-24 14:04:51 UTC",
                   "expires_on":"2018-05-24 23:59:59 UTC",
@@ -416,22 +424,24 @@ schemas:
                     "active": "yes",
                     "locked": "no",
                     "last_login_utc": "2017-05-24 14:04:51 UTC",
-                    "prompt_for_mfa": "yes",
-                    "nag_for_mfa": "no",
-                    "mfa_options": [
-                      {
-                        "id": 123,
-                        "type": "totp"
-                      },
-                      {
-                        "id": 234,
-                        "type": "u2f"
-                      },
-                      {
-                        "id": 345,
-                        "type": "backupcode"
-                      },
-                    ],
+                    "mfa": {
+                      "prompt": "yes",
+                      "nag": "no",
+                      "options": [
+                         {
+                           "id": 123,
+                           "type": "totp"
+                         },
+                         {
+                           "id": 234,
+                           "type": "u2f"
+                         },
+                         {
+                           "id": 345,
+                           "type": "backupcode"
+                         },
+                       ]
+                    },
                     "password": {
                       "created_utc":"2017-05-24 14:04:51",
                       "expires_on":"2018-05-24",
@@ -449,22 +459,24 @@ schemas:
                     "active": "yes",
                     "locked": "no",
                     "last_login_utc": "2017-05-24 14:04:51 UTC",
-                    "prompt_for_mfa": "yes",
-                    "nag_for_mfa": "no",
-                    "mfa_options": [
-                      {
-                        "id": 123,
-                        "type": "totp"
-                      },
-                      {
-                        "id": 234,
-                        "type": "u2f"
-                      },
-                      {
-                        "id": 345,
-                        "type": "backupcode"
-                      },
-                    ]
+                    "mfa": {
+                      "prompt": "yes",
+                      "nag": "no",
+                      "options": [
+                         {
+                           "id": 123,
+                           "type": "totp"
+                         },
+                         {
+                           "id": 234,
+                           "type": "u2f"
+                         },
+                         {
+                           "id": 345,
+                           "type": "backupcode"
+                         },
+                       ]
+                    }
                   }
                 ]
   post:
@@ -497,9 +509,11 @@ schemas:
                 "email": "john_smith@example.com",
                 "active": "yes",
                 "locked": "no",
-                "prompt_for_mfa": "no",
-                "nag_for_mfa": "yes",
-                "mfa_options": []
+                "mfa": {
+                  "prompt": "no",
+                  "nag": "yes",
+                  "options": []
+                }
               }
       422:
         description: The given user data does not satisfy some validation rule.

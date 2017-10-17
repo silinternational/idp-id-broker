@@ -336,17 +336,8 @@ class User extends UserBase
             'active',
             'locked',
             'last_login_utc',
-            'prompt_for_mfa' => function($model) use ($promptForMfa) {
-                return $promptForMfa;
-            },
-            'nag_for_mfa' => function($model) use ($promptForMfa) {
-                if ($promptForMfa == 'no' && strtotime($model->nag_for_mfa_after) < time()) {
-                    return 'yes';
-                }
-                return 'no';
-            },
-            'mfa_options' => function ($model) {
-                return $model->mfas;
+            'mfa' => function ($model) {
+                return $this->getMfaFields();
             },
         ];
 
@@ -357,6 +348,19 @@ class User extends UserBase
         }
 
         return $fields;
+    }
+
+    /**
+     * @return array MFA related properties
+     */
+    public function getMfaFields()
+    {
+        $promptForMfa = $this->isPromptForMfa() ? 'yes' : 'no';
+        return [
+            'prompt'  => $promptForMfa,
+            'nag'     => ($promptForMfa == 'no' && strtotime($this->nag_for_mfa_after) < time()) ? 'yes' : 'no',
+            'options' => $this->mfas,
+        ];
     }
 
     public function save($runValidation = true, $attributeNames = null)
