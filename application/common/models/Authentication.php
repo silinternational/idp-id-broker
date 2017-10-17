@@ -40,12 +40,17 @@ class Authentication
         $user->password = $password;
 
         if ($user->validate()) {
+
+            $this->authenticatedUser = $user;
+
             /*
              * Update last_login_utc and nag_for_mfa_after if unable to save log
              * error and proceed without stopping user
              */
             $user->last_login_utc = MySqlDateTime::now();
-            $user->nag_for_mfa_after = MySqlDateTime::relative(\Yii::$app->params['mfaNagInterval']);
+            if (strtotime($user->nag_for_mfa_after) < time()) {
+                $user->nag_for_mfa_after = MySqlDateTime::relative(\Yii::$app->params['mfaNagInterval']);
+            }
             if ( ! $user->save() ){
                 \Yii::error([
                     'action' => 'save last_login_utc and nag_for_mfa_after for user after authentication',
@@ -53,8 +58,6 @@ class Authentication
                     'message' => $user->getFirstErrors(),
                 ]);
             }
-
-            $this->authenticatedUser = $user;
         } else {
             $this->errors = $user->getErrors();
         }
