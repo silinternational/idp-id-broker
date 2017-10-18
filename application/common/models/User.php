@@ -359,8 +359,19 @@ class User extends UserBase
         return [
             'prompt'  => $promptForMfa,
             'nag'     => ($promptForMfa == 'no' && strtotime($this->nag_for_mfa_after) < time()) ? 'yes' : 'no',
-            'options' => $this->mfas,
+            'options' => $this->getVerifiedMfaOptions(),
         ];
+    }
+
+    public function getVerifiedMfaOptions()
+    {
+        $mfas = [];
+        foreach ($this->mfas as $mfaOption) {
+            if ($mfaOption->verified === 1) {
+                $mfas[] = $mfaOption;
+            }
+        }
+        return $mfas;
     }
 
     public function save($runValidation = true, $attributeNames = null)
