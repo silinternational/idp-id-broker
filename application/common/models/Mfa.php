@@ -47,7 +47,9 @@ class Mfa extends MfaBase
             'last_used_utc',
             'data' => function($model) {
                 /** @var Mfa $model */
-                if ($model->user->scenario === User::SCENARIO_AUTHENTICATE && $model->verified === 1) {
+                // TODO can we only do this for User::SCENARIO_AUTHENTICATE?
+//                if ($model->user->scenario === User::SCENARIO_AUTHENTICATE && $model->verified === 1) {
+                if ($model->verified === 1) {
                     return $model->authInit();
                 }
                 return [];
