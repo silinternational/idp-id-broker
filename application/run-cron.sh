@@ -7,10 +7,17 @@ else
     sed -i /etc/rsyslog.conf -e "s/LOGENTRIESKEY/${LOGENTRIES_KEY}/"
     # Start syslog
     rsyslogd
-    
-    # Give syslog time to fully start up.
     sleep 10
 fi
 
-# Run apache in foreground
-apache2ctl -D FOREGROUND
+# fix folder permissions
+chown -R www-data:www-data \
+  /data/console/runtime/ \
+  /data/frontend/runtime/ \
+  /data/frontend/web/assets/
+
+# Run database migrations
+runny /data/yii migrate --interactive=0
+
+# Start cron daemon
+cron -f

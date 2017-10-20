@@ -33,6 +33,16 @@ services:
             LDAP_USE_TLS: "false"
             #MIGRATE_PW_FROM_LDAP: # Set this in your local.env file.
 
+    cron:
+        build: ./
+        volumes_from:
+            - data
+        depends_on:
+            - db
+        env_file:
+            - ./local.env
+        command: ["/data/run-cron.sh"]
+
     appfortests:
         build: ./
         volumes_from:

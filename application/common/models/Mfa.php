@@ -47,9 +47,7 @@ class Mfa extends MfaBase
             'last_used_utc',
             'data' => function($model) {
                 /** @var Mfa $model */
-                // TODO can we only do this for User::SCENARIO_AUTHENTICATE?
-//                if ($model->user->scenario === User::SCENARIO_AUTHENTICATE && $model->verified === 1) {
-                if ($model->verified === 1) {
+                if ($model->verified === 1 && $model->scenario === User::SCENARIO_AUTHENTICATE) {
                     return $model->authInit();
                 }
                 return [];
@@ -204,5 +202,20 @@ class Mfa extends MfaBase
             'data' => $results,
         ];
 
+    }
+
+    /**
+     * Remove records that were not verified within the given time frame
+     * @param int $maxAgeHours
+     */
+    public static function removeOldUnverifiedRecords($maxAgeHours = 2)
+    {
+        $removeOlderThan = MySqlDateTime::relative('-' . $maxAgeHours . ' hours');
+        $mfas = self::find()->where(['verified' => 0])
+            ->andWhere(['<', 'created_utc', $removeOlderThan])->all();
+
+        foreach ($mfas as $mfa) {
+            $mfa->delete();
+        }
     }
 }

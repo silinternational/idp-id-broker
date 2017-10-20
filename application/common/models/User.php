@@ -368,6 +368,7 @@ class User extends UserBase
         $mfas = [];
         foreach ($this->mfas as $mfaOption) {
             if ($mfaOption->verified === 1) {
+                $mfaOption->scenario = $this->scenario;
                 $mfas[] = $mfaOption;
             }
         }
