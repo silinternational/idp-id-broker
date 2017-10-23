@@ -16,6 +16,7 @@ class m170928_174802_add_mfa_tables extends Migration
                 'user_id' => 'int(11) not null',
                 'type' => "enum('totp','u2f','backupcode') not null",
                 'external_uuid' => 'varchar(64) null',
+                'label' => 'varchar(64) null',
                 'verified' => 'tinyint(1) not null',
                 'created_utc' => 'datetime not null',
                 'last_used_utc' => 'datetime null',
@@ -32,6 +33,7 @@ class m170928_174802_add_mfa_tables extends Migration
                 'mfa_id' => 'int(11) not null',
                 'value' => 'varchar(255) not null',
                 'created_utc' => 'datetime not null',
+                'expires_utc' => 'datetime null',
             ],
             "ENGINE=InnoDB DEFAULT CHARSET=utf8"
         );

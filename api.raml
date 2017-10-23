@@ -294,6 +294,10 @@ schemas:
               "required": true,
               "type": "string",
               "enum": ["backupcode", "totp", "u2f"]
+            },
+            "label": {
+              "required": false,
+              "type": "string"
             }
           },
           "type": "object"
@@ -355,7 +359,8 @@ schemas:
                      },
                      {
                        "id": 234,
-                       "type": "u2f"
+                       "type": "u2f",
+                       "label": "Blue YubiKey"
                      },
                      {
                        "id": 345,

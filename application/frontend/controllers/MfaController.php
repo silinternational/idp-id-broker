@@ -35,7 +35,9 @@ class MfaController extends BaseRestController
             throw new BadRequestHttpException('User not found', 1506695733);
         }
 
-        return Mfa::create($user->id, $type);
+        $label = $req->getBodyParam('label');
+
+        return Mfa::create($user->id, $type, $label);
     }
 
     /**

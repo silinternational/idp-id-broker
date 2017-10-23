@@ -11,6 +11,7 @@ use Yii;
  * @property integer $mfa_id
  * @property string $value
  * @property string $created_utc
+ * @property string $expires_utc
  *
  * @property Mfa $mfa
  */
@@ -32,7 +33,7 @@ class MfaBackupcodeBase extends \yii\db\ActiveRecord
         return [
             [['mfa_id', 'value', 'created_utc'], 'required'],
             [['mfa_id'], 'integer'],
-            [['created_utc'], 'safe'],
+            [['created_utc', 'expires_utc'], 'safe'],
             [['value'], 'string', 'max' => 255],
             [['mfa_id'], 'exist', 'skipOnError' => true, 'targetClass' => Mfa::className(), 'targetAttribute' => ['mfa_id' => 'id']],
         ];
@@ -48,6 +49,7 @@ class MfaBackupcodeBase extends \yii\db\ActiveRecord
             'mfa_id' => Yii::t('app', 'Mfa ID'),
             'value' => Yii::t('app', 'Value'),
             'created_utc' => Yii::t('app', 'Created Utc'),
+            'expires_utc' => Yii::t('app', 'Expires Utc'),
         ];
     }
 

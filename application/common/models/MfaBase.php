@@ -11,6 +11,7 @@ use Yii;
  * @property integer $user_id
  * @property string $type
  * @property string $external_uuid
+ * @property string $label
  * @property integer $verified
  * @property string $created_utc
  * @property string $last_used_utc
@@ -38,7 +39,7 @@ class MfaBase extends \yii\db\ActiveRecord
             [['user_id', 'verified'], 'integer'],
             [['type'], 'string'],
             [['created_utc', 'last_used_utc'], 'safe'],
-            [['external_uuid'], 'string', 'max' => 64],
+            [['external_uuid', 'label'], 'string', 'max' => 64],
             [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['user_id' => 'id']],
         ];
     }
@@ -53,6 +54,7 @@ class MfaBase extends \yii\db\ActiveRecord
             'user_id' => Yii::t('app', 'User ID'),
             'type' => Yii::t('app', 'Type'),
             'external_uuid' => Yii::t('app', 'External Uuid'),
+            'label' => Yii::t('app', 'Label'),
             'verified' => Yii::t('app', 'Verified'),
             'created_utc' => Yii::t('app', 'Created Utc'),
             'last_used_utc' => Yii::t('app', 'Last Used Utc'),

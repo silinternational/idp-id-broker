@@ -43,6 +43,7 @@ class Mfa extends MfaBase
         return [
             'id',
             'type',
+            'label',
             'created_utc',
             'last_used_utc',
             'data' => function($model) {
@@ -135,7 +136,7 @@ class Mfa extends MfaBase
      * @throws BadRequestHttpException
      * @throws ServerErrorHttpException
      */
-    public static function create(int $userId, string $type): array
+    public static function create(int $userId, string $type, string $label = null): array
     {
         /*
          * Make sure $type is valid
@@ -167,6 +168,12 @@ class Mfa extends MfaBase
         $mfa->user_id = $userId;
         $mfa->type = $type;
         $mfa->verified = ($type == self::TYPE_BACKUPCODE) ? 1 : 0;
+
+        if (empty($label)) {
+            $existingCount = count($user->mfas);
+            $label = sprintf("2SV #%s", $existingCount+1);
+        }
+        $mfa->label = $label;
 
         if ( ! $mfa->save()) {
             \Yii::error([
