@@ -78,7 +78,7 @@ class MfaController extends BaseRestController
             $value = str_replace(' ', '', $value);
         }
 
-        if ( !  $mfa->verify($value)){
+        if ( ! $mfa->verify($value)){
             throw new BadRequestHttpException();
         }
 

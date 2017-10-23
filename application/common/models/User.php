@@ -322,7 +322,6 @@ class User extends UserBase
      */
     public function fields(): array
     {
-        $promptForMfa = $this->isPromptForMfa() ? 'yes' : 'no';
         $fields = [
             'uuid',
             'employee_id',
@@ -337,7 +336,7 @@ class User extends UserBase
             'locked',
             'last_login_utc',
             'mfa' => function ($model) {
-                return $this->getMfaFields();
+                return $model->getMfaFields();
             },
         ];
 

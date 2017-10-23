@@ -83,9 +83,11 @@ class MfaBackendTotp extends Component implements MfaBackendInterface
         }
 
         if ($this->client->validateTotp($mfa->external_uuid, $value)) {
-            $mfa->verified = 1;
-            if ( ! $mfa->save()) {
-                throw new ServerErrorHttpException();
+            if ($mfa->verified != 1) {
+                $mfa->verified = 1;
+                if ( ! $mfa->save()) {
+                    throw new ServerErrorHttpException();
+                }
             }
 
             return true;

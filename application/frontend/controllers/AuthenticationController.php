@@ -12,7 +12,7 @@ class AuthenticationController extends BaseRestController
     /**
      * Authenticates the given user based on his/her password
      *
-     * @return User Will return User object if MFA is not required, or array of MFA details if it is
+     * @return User
      * @throws BadRequestHttpException
      */
     public function actionCreate(): User

@@ -9,12 +9,24 @@ use yii\helpers\Json;
 
 class MfaApiClient
 {
+    /**
+     * @var string
+     */
     public $apiBaseUrl;
 
+    /**
+     * @var string
+     */
     public $apiKey;
 
+    /**
+     * @var string
+     */
     public $apiSecret;
 
+    /**
+     * @var GuzzleClient
+     */
     public $client;
 
     public function __construct(string $apiBaseUrl, $apiKey, $apiSecret)

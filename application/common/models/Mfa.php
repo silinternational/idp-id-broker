@@ -27,11 +27,6 @@ class Mfa extends MfaBase
             [
                 'type', 'in', 'range' => [self::TYPE_TOTP, self::TYPE_U2F, self::TYPE_BACKUPCODE]
             ],
-//            [
-//                'external_uuid', 'required', 'when' => function($model) {
-//                    return ($model->type === self::TYPE_TOTP || $model->type === self::TYPE_U2F);
-//                }
-//            ],
             [
                 'verified', 'default', 'value' => 0,
             ],
@@ -175,6 +170,9 @@ class Mfa extends MfaBase
         }
         $mfa->label = $label;
 
+        /*
+         * Save $mfa before calling backend->regInit because type backupcode needs mfa record to exist first
+         */
         if ( ! $mfa->save()) {
             \Yii::error([
                 'action' => 'create mfa',
