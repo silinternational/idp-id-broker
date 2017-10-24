@@ -642,11 +642,35 @@ schemas:
           200:
             body:
               application/json:
-                schema: UserMfaList
                 example: |
-                  {
-
-                  }
+                  [
+                      {
+                          "id": 7,
+                          "type": "backupcode",
+                          "label": "2SV #1",
+                          "created_utc": "2017-10-24T20:40:47+00:00",
+                          "last_used_utc": null,
+                          "data": {
+                              "count": 10
+                          }
+                      },
+                      {
+                          "id": 8,
+                          "type": "u2f",
+                          "label": "2SV #2",
+                          "created_utc": "2017-10-24T20:40:57+00:00",
+                          "last_used_utc": null,
+                          "data": []
+                      },
+                      {
+                          "id": 9,
+                          "type": "totp",
+                          "label": "2SV #3",
+                          "created_utc": "2017-10-24T20:41:05+00:00",
+                          "last_used_utc": null,
+                          "data": []
+                      }
+                  ]
     /password:
       put:
         description: Set the password for a User.
