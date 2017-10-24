@@ -42,11 +42,15 @@ class Mfa extends MfaBase
             'created_utc',
             'last_used_utc',
             'data' => function($model) {
+                $data = [];
                 /** @var Mfa $model */
                 if ($model->verified === 1 && $model->scenario === User::SCENARIO_AUTHENTICATE) {
-                    return $model->authInit();
+                    $data += $model->authInit();
                 }
-                return [];
+                if ($model->type === self::TYPE_BACKUPCODE) {
+                    $data += ['count' => count($model->mfaBackupcodes)];
+                }
+                return $data;
             }
         ];
     }
