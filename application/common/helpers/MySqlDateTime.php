@@ -22,7 +22,7 @@ class MySqlDateTime
     }
 
     /**
-     * Get a relative data based on given string
+     * Get a relative date based on given string
      * @param string $difference
      * @return false|string
      */

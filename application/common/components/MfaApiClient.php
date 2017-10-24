@@ -36,7 +36,7 @@ class MfaApiClient
         }
         $this->client = new GuzzleClient([
             'base_uri' => $apiBaseUrl,
-            'timeout' => 5,
+            'timeout' => 30,
             'headers' => [
                 'X-MFA-APIKey' => $apiKey,
                 'X-MFA-APISecret' => $apiSecret,
@@ -76,21 +76,22 @@ class MfaApiClient
      * @param string $uuid
      * @param string $code
      * @return bool
+     * @throws \Exception
      */
     public function validateTotp(string $uuid, string $code): bool
     {
-        try {
-            $this->callApi('totp/' . $uuid . '/validate', 'POST', [
-                'code' => $code,
-            ]);
+        $this->callApi('totp/' . $uuid . '/validate', 'POST', [
+            'code' => $code,
+        ]);
 
-            return true;
-        } catch (\Exception $e) {
-            return false;
-        }
+        return true;
     }
 
-
+    /**
+     * @param string $uuid
+     * @return array
+     * @throws \Exception
+     */
     public function u2fCreateAuthentication(string $uuid): array
     {
         $response = $this->callApi('u2f/' . $uuid . '/auth', 'POST');

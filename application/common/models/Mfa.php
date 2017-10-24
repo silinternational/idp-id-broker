@@ -73,7 +73,7 @@ class Mfa extends MfaBase
     }
 
     /**
-     * Check if given type is a v
+     * Check if given type is valid
      * @param string $type
      * @return bool
      */
@@ -89,7 +89,7 @@ class Mfa extends MfaBase
      * @param string $type
      * @return MfaBackendInterface
      */
-    static function getBackendForType(string $type): MfaBackendInterface
+    public static function getBackendForType(string $type): MfaBackendInterface
     {
         switch ($type) {
             case self::TYPE_BACKUPCODE:
@@ -231,7 +231,14 @@ class Mfa extends MfaBase
             ->andWhere(['<', 'created_utc', $removeOlderThan])->all();
 
         foreach ($mfas as $mfa) {
-            $mfa->delete();
+            if ($mfa->delete() === false) {
+                \Yii::error([
+                    'action' => 'delete old unverified mfa records',
+                    'status' => 'error',
+                    'error' => $mfa->getFirstErrors(),
+                    'mfa_id' => $mfa->id,
+                ]);
+            }
         }
     }
 }

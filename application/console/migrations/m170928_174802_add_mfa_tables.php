@@ -43,6 +43,8 @@ class m170928_174802_add_mfa_tables extends Migration
 
     public function safeDown()
     {
+        $this->dropColumn('{{user}}','require_mfa');
+        $this->dropColumn('{{user}}','nag_for_mfa_after');
         $this->dropTable('{{mfa_backupcode}}');
         $this->dropTable('{{mfa}}');
     }

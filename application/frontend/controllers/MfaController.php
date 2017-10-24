@@ -25,7 +25,7 @@ class MfaController extends BaseRestController
             throw new BadRequestHttpException('The provided type is not a supported MFA type', 1506695647);
         }
 
-        $employeeId = $req->getBodyParams('employee_id');
+        $employeeId = $req->getBodyParam('employee_id');
         if ( is_null($employeeId)) {
             throw new BadRequestHttpException('employee_id is required', 1506695722);
         }
@@ -133,6 +133,17 @@ class MfaController extends BaseRestController
             );
         }
 
-        return $mfa->delete();
+        if ($mfa->delete() === false) {
+            \Yii::error([
+                'action' => 'delete mfa',
+                'status' => 'error',
+                'error' => $mfa->getFirstErrors(),
+                'mfa_id' => $mfa->id,
+            ]);
+            throw new ServerErrorHttpException("Unable to delete MFA option", 1508877279);
+        }
+
+        \Yii::$app->response->statusCode = 204;
+        return null;
     }
 }
