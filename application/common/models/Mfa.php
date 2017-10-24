@@ -39,8 +39,15 @@ class Mfa extends MfaBase
             'id',
             'type',
             'label',
-            'created_utc',
-            'last_used_utc',
+            'created_utc' => function($model) {
+                return date('c', strtotime($model->created_utc));
+            },
+            'last_used_utc' => function($model) {
+                if ($model->last_used_utc !== null) {
+                    return date('c', strtotime($model->last_used_utc));
+                }
+                return null;
+            },
             'data' => function($model) {
                 $data = [];
                 /** @var Mfa $model */
