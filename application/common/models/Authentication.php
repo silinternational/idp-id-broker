@@ -41,7 +41,7 @@ class Authentication
 
         if ($user->validate()) {
 
-            $this->authenticatedUser = $user;
+            $this->authenticatedUser = clone $user;
 
             /*
              * Update last_login_utc and nag_for_mfa_after if unable to save log
