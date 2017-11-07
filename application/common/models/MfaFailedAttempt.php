@@ -7,6 +7,8 @@ use yii\helpers\ArrayHelper;
 
 class MfaFailedAttempt extends MfaFailedAttemptBase
 {
+    const RECENT_FAILURE_LIMIT = 5;
+    
     /**
      * @inheritdoc
      */

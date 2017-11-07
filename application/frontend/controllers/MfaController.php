@@ -8,6 +8,7 @@ use frontend\components\BaseRestController;
 use yii\web\BadRequestHttpException;
 use yii\web\NotFoundHttpException;
 use yii\web\ServerErrorHttpException;
+use yii\web\TooManyRequestsHttpException;
 
 class MfaController extends BaseRestController
 {
@@ -45,6 +46,7 @@ class MfaController extends BaseRestController
      * @param int $id
      * @throws BadRequestHttpException
      * @throws NotFoundHttpException
+     * @throws TooManyRequestsHttpException
      * @return User
      */
     public function actionVerify(int $id)
