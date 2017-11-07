@@ -1,16 +1,23 @@
 Feature: Rate-limiting MFA attempts to protect against brute force attacks
 
+  Scenario: Recording failed MFA attempts
+    Given I have a user with backup codes available
+      And that MFA method has no recent failures
+    When I submit an incorrect backup code
+    Then that MFA method should have 1 recent failure
+
   Scenario: Correct MFA value without any failed attempts
     Given I have a user with backup codes available
       And that MFA method has no recent failures
     When I submit a correct backup code
     Then the backup code should be accepted
 
-  Scenario: Allow some failed MFA attempts
+  Scenario: Allow some failed MFA attempts (and resetting after success)
     Given I have a user with backup codes available
       And that MFA method has nearly too many recent failures
     When I submit a correct backup code
     Then the backup code should be accepted
+      And that MFA method should have 0 recent failures
 
   Scenario: Prevent too many failed MFA attempts
     Given I have a user with backup codes available
