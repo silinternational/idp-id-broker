@@ -882,3 +882,6 @@ schemas:
               other reason (such as an invalid `employee_id`).
           404:
             description: No MFA record found with that `id` and `employee_id`.
+          429:
+            description: |
+              Too many failed attempts for this MFA record recently.
