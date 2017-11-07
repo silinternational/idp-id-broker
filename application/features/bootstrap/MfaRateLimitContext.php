@@ -81,7 +81,7 @@ class MfaRateLimitContext extends YiiContext
      */
     public function iHaveAUserWithBackupCodesAvailable()
     {
-        $user = $this->createNewUserInDatabase('has_backupcodes' . uniqid());
+        $user = $this->createNewUserInDatabase('has_backupcodes');
         $mfaCreateResult = Mfa::create($user->id, Mfa::TYPE_BACKUPCODE);
         
         $this->mfaId = $mfaCreateResult['id'];
