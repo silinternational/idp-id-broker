@@ -18,6 +18,7 @@ use Yii;
  *
  * @property User $user
  * @property MfaBackupcode[] $mfaBackupcodes
+ * @property MfaFailedAttempt[] $mfaFailedAttempts
  */
 class MfaBase extends \yii\db\ActiveRecord
 {
@@ -75,5 +76,13 @@ class MfaBase extends \yii\db\ActiveRecord
     public function getMfaBackupcodes()
     {
         return $this->hasMany(MfaBackupcode::className(), ['mfa_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getMfaFailedAttempts()
+    {
+        return $this->hasMany(MfaFailedAttempt::className(), ['mfa_id' => 'id']);
     }
 }
