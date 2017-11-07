@@ -302,6 +302,15 @@ class Mfa extends MfaBase
                 1510083458
             );
         }
+        
+        if ($this->hasTooManyRecentFailures()) {
+            /* @var $emailer Emailer */
+            $emailer = \Yii::$app->emailer;
+            $emailer->sendMessageTo(
+                EmailLog::MESSAGE_TYPE_MFA_RATE_LIMIT,
+                $this->user
+            );
+        }
     }
 
     /**

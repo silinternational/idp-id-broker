@@ -17,7 +17,7 @@ class EmailContext extends YiiContext
      */
     public function aEmailShouldHaveBeenSentToThem($messageType)
     {
-        $matchingFakeEmails = $this->getFakeEmailsOfTypeSentToUser(
+        $matchingFakeEmails = $this->fakeEmailer->getFakeEmailsOfTypeSentToUser(
             $messageType,
             $this->tempUser
         );
@@ -32,7 +32,7 @@ class EmailContext extends YiiContext
      */
     public function aEmailShouldNotHaveBeenSentToThem($messageType)
     {
-        $matchingFakeEmails = $this->getFakeEmailsOfTypeSentToUser(
+        $matchingFakeEmails = $this->fakeEmailer->getFakeEmailsOfTypeSentToUser(
             $messageType,
             $this->tempUser
         );
@@ -58,34 +58,6 @@ class EmailContext extends YiiContext
         Assert::false(
             $this->tempUser->hasReceivedMessage($messageType),
             'User::hasReceivedMessage() unexpectedly returned true.'
-        );
-    }
-    
-    /**
-     * Get the actual email data (from our FakeEmailer) of any emails sent to
-     * the given user and of the specified type.
-     *
-     * @param string $messageType The type of message.
-     * @param User $user The User in question.
-     * @return array[]
-     */
-    protected function getFakeEmailsOfTypeSentToUser(
-        string $messageType,
-        User $user
-    ) {
-        $fakeEmailer = $this->fakeEmailer;
-        $fakeEmailsSent = $fakeEmailer->getFakeEmailsSent();
-        
-        return array_filter(
-            $fakeEmailsSent,
-            function ($fakeEmail) use ($fakeEmailer, $messageType, $user) {
-                
-                $subject = $fakeEmail['subject'] ?? '';
-                $toAddress = $fakeEmail['to_address'] ?? '';
-                
-                return $fakeEmailer->isSubjectForMessageType($subject, $messageType)
-                    && ($toAddress === $user->email);
-            }
         );
     }
     

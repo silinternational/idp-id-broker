@@ -2,6 +2,7 @@
 namespace Sil\SilIdBroker\Behat\Context;
 
 use Behat\Behat\Tester\Exception\PendingException;
+use common\models\EmailLog;
 use common\models\Mfa;
 use common\models\MfaFailedAttempt;
 use common\models\User;
@@ -191,5 +192,23 @@ class MfaRateLimitContext extends YiiContext
             $this->mfaVerifyException,
             TooManyRequestsHttpException::class
         );
+    }
+
+    /**
+     * @Then an MFA rate-limit email should have been sent to that user
+     */
+    public function anEmailShouldHaveBeenSentToThatUser()
+    {
+        $mfa = Mfa::findOne($this->mfaId);
+        Assert::notNull($mfa);
+        
+        $matchingFakeEmails = $this->fakeEmailer->getFakeEmailsOfTypeSentToUser(
+            EmailLog::MESSAGE_TYPE_MFA_RATE_LIMIT,
+            $mfa->user
+        );
+        Assert::greaterThan(count($matchingFakeEmails), 0, sprintf(
+            'Did not find any %s emails sent to that user.',
+            EmailLog::MESSAGE_TYPE_MFA_RATE_LIMIT
+        ));
     }
 }

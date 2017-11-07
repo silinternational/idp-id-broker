@@ -58,9 +58,11 @@ return [
             'emailServiceConfig' => $emailServiceConfig,
             
             'sendInviteEmails' => Env::get('SEND_INVITE_EMAILS', false),
+            'sendMfaRateLimitEmails' => Env::get('SEND_MFA_RATE_LIMIT_EMAILS', true),
             'sendWelcomeEmails' => Env::get('SEND_WELCOME_EMAILS', false),
             
             'subjectForInvite' => Env::get('SUBJECT_FOR_INVITE'),
+            'subjectForMfaRateLImit' => Env::get('SUBJECT_FOR_MFA_RATE_LIMIT'),
             'subjectForWelcome' => Env::get('SUBJECT_FOR_WELCOME'),
         ],
         'ldap' => [

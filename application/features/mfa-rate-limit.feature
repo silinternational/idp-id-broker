@@ -24,3 +24,4 @@ Feature: Rate-limiting MFA attempts to protect against brute force attacks
       And that MFA method has too many recent failures
     When I submit a correct backup code
     Then I should be told to wait and try later
+      And an MFA rate-limit email should have been sent to that user
