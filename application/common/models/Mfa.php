@@ -68,6 +68,19 @@ class Mfa extends MfaBase
      */
     public function beforeDelete()
     {
+        foreach ($this->mfaFailedAttempts as $mfaFailedAttempt) {
+            if (!$mfaFailedAttempt->delete()) {
+                \Yii::error([
+                    'action' => 'delete failed attempts with mfa record',
+                    'status' => 'error',
+                    'error' => $mfaFailedAttempt->getFirstErrors(),
+                    'mfa_id' => $this->id,
+                    'mfa_failed_attempt_id' => $mfaFailedAttempt->id,
+                ]);
+                // NOTE: Continue even if this deletion fails.
+            }
+        }
+        
         $backend = self::getBackendForType($this->type);
         return $backend->delete($this->id);
     }
