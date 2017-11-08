@@ -8,6 +8,7 @@ use common\models\MfaFailedAttempt;
 use common\models\User;
 use Sil\SilIdBroker\Behat\Context\fakes\FakeOfflineLdap;
 use Webmozart\Assert\Assert;
+use Yii;
 use yii\web\TooManyRequestsHttpException;
 
 class MfaRateLimitContext extends YiiContext
@@ -210,5 +211,16 @@ class MfaRateLimitContext extends YiiContext
             'Did not find any %s emails sent to that user.',
             EmailLog::MESSAGE_TYPE_MFA_RATE_LIMIT
         ));
+    }
+
+    /**
+     * @Then that MFA rate-limit activation should have been logged
+     */
+    public function thatMfaRateLimitActivationShouldHaveBeenLogged()
+    {
+        Yii::getLogger()->flush();
+        
+        $loggedMessagesJson = $this->fakeLogTarget->getLoggedMessagesJson();
+        Assert::contains($loggedMessagesJson, 'MFA rate limit triggered');
     }
 }

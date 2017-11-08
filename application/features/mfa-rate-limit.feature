@@ -25,3 +25,4 @@ Feature: Rate-limiting MFA attempts to protect against brute force attacks
     When I submit a correct backup code
     Then I should be told to wait and try later
       And an MFA rate-limit email should have been sent to that user
+      And that MFA rate-limit activation should have been logged

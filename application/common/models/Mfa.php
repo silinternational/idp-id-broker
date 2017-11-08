@@ -304,6 +304,14 @@ class Mfa extends MfaBase
         }
         
         if ($this->hasTooManyRecentFailures()) {
+            \Yii::warning([
+                'action' => 'MFA rate limit triggered',
+                'mfa_id' => $this->id,
+                'mfa_type' => $this->type,
+                'status' => 'warning',
+                'user' => $this->user->email,
+            ]);
+            
             /* @var $emailer Emailer */
             $emailer = \Yii::$app->emailer;
             $emailer->sendMessageTo(
