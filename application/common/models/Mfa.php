@@ -272,7 +272,7 @@ class Mfa extends MfaBase
      */
     public function countRecentFailures()
     {
-        $cutoffForRecent = MySqlDateTime::relative('-5 minutes');
+        $cutoffForRecent = MySqlDateTime::relativeTime('-5 minutes');
         
         return $this->getMfaFailedAttempts()->where(
             ['>', 'at_utc', $cutoffForRecent]

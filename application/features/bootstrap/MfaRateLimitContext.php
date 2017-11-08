@@ -2,6 +2,7 @@
 namespace Sil\SilIdBroker\Behat\Context;
 
 use Behat\Behat\Tester\Exception\PendingException;
+use common\helpers\MySqlDateTime;
 use common\models\EmailLog;
 use common\models\Mfa;
 use common\models\MfaFailedAttempt;
@@ -96,9 +97,7 @@ class MfaRateLimitContext extends YiiContext
      */
     public function thatMfaMethodHasNoRecentFailures()
     {
-        $mfa = Mfa::findOne($this->mfaId);
-        Assert::notNull($mfa);
-        Assert::same((string)$mfa->getMfaFailedAttempts()->count(), '0');
+        $this->thatMfaMethodShouldHaveRecentFailure(0);
     }
 
     /**
@@ -138,7 +137,7 @@ class MfaRateLimitContext extends YiiContext
         $mfa = Mfa::findOne($this->mfaId);
         Assert::notNull($mfa);
         Assert::same(
-            (string)$mfa->getMfaFailedAttempts()->count(),
+            (string)$mfa->countRecentFailures(),
             (string)$number
         );
     }
@@ -222,5 +221,28 @@ class MfaRateLimitContext extends YiiContext
         
         $loggedMessagesJson = $this->fakeLogTarget->getLoggedMessagesJson();
         Assert::contains($loggedMessagesJson, 'MFA rate limit triggered');
+    }
+
+    /**
+     * @Given that MFA method had too many failures, but they are not recent
+     */
+    public function thatMfaMethodHadTooManyFailuresButTheyAreNotRecent()
+    {
+        $mfa = Mfa::findOne($this->mfaId);
+        Assert::notNull($mfa);
+        
+        $notRecent = MySqlDateTime::relativeTime('-6 minutes');
+        for ($i = 0; $i <= MfaFailedAttempt::RECENT_FAILURE_LIMIT; $i++) {
+            $mfaFailedAttempt = new MfaFailedAttempt([
+                'mfa_id' => $mfa->id,
+                'at_utc' => $notRecent,
+            ]);
+            Assert::true($mfaFailedAttempt->save());
+            Assert::true($mfaFailedAttempt->refresh());
+            Assert::same($mfaFailedAttempt->at_utc, $notRecent, json_encode([
+                'at_utc' => $mfaFailedAttempt->at_utc,
+                'notRecent' => $notRecent,
+            ], JSON_PRETTY_PRINT));
+        }
     }
 }
