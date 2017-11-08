@@ -266,7 +266,7 @@ class Mfa extends MfaBase
      * Get the number of "recent" failed attempts to verify a value for this
      * MFA record.
      *
-     * @return int The number of failed attempts (as an integer).
+     * @return int|string The number of failed attempts.
      *
      *     NOTE: Yii sometimes returns integers from the database as strings.
      */
