@@ -31,7 +31,6 @@ services:
             LDAP_DOMAIN_CONTROLLERS: ldap
             LDAP_USE_SSL: "false"
             LDAP_USE_TLS: "false"
-            #MIGRATE_PW_FROM_LDAP: # Set this in your local.env file.
 
     cron:
         build: ./
