@@ -12,9 +12,7 @@ fi
 
 # fix folder permissions
 chown -R www-data:www-data \
-  /data/console/runtime/ \
-  /data/frontend/runtime/ \
-  /data/frontend/web/assets/
+  /data/console/runtime/
 
 # Run database migrations
 runny /data/yii migrate --interactive=0
