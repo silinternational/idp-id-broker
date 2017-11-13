@@ -13,6 +13,7 @@ use yii\web\ServerErrorHttpException;
 class Emailer extends Component
 {
     const SUBJECT_INVITE_DEFAULT = 'Your New Account';
+    const SUBJECT_MFA_RATE_LIMIT_DEFAULT = 'Too Many 2-Step Verification Attempts';
     const SUBJECT_WELCOME_DEFAULT = 'Welcome';
     
     /**
@@ -26,6 +27,7 @@ class Emailer extends Component
     protected $emailServiceClient = null;
     
     public $sendInviteEmails = false;
+    public $sendMfaRateLimitEmails = true;
     public $sendWelcomeEmails = false;
     
     /**
@@ -37,6 +39,7 @@ class Emailer extends Component
     protected $subjects;
     
     public $subjectForInvite;
+    public $subjectForMfaRateLimit;
     public $subjectForWelcome;
     
     /**
@@ -149,10 +152,12 @@ class Emailer extends Component
     public function init()
     {
         $this->subjectForInvite = $this->subjectForInvite ?? self::SUBJECT_INVITE_DEFAULT;
+        $this->subjectForMfaRateLimit = $this->subjectForMfaRateLimit ?? self::SUBJECT_MFA_RATE_LIMIT_DEFAULT;
         $this->subjectForWelcome = $this->subjectForWelcome ?? self::SUBJECT_WELCOME_DEFAULT;
         
         $this->subjects = [
             EmailLog::MESSAGE_TYPE_INVITE => $this->subjectForInvite,
+            EmailLog::MESSAGE_TYPE_MFA_RATE_LIMIT => $this->subjectForMfaRateLimit,
             EmailLog::MESSAGE_TYPE_WELCOME => $this->subjectForWelcome,
         ];
         

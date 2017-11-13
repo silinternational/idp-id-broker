@@ -36,6 +36,28 @@ class User extends UserBase
         $this->sendAppropriateMessages($insert, $changedAttributes);
     }
     
+    public function beforeDelete()
+    {
+        if (! parent::beforeDelete()) {
+            return false;
+        }
+
+        foreach ($this->mfas as $mfa) {
+            if (! $mfa->delete()) {
+                \Yii::error([
+                    'action' => 'delete mfa record before deleting user',
+                    'status' => 'error',
+                    'error' => $mfa->getFirstErrors(),
+                    'mfa_id' => $mfa->id,
+                    'user_id' => $this->id,
+                ]);
+                return false;
+            }
+        }
+        
+        return true;
+    }
+    
     public function setLdap(Ldap $ldap)
     {
         $this->ldap = $ldap;

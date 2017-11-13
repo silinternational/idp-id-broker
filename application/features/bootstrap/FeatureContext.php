@@ -42,7 +42,9 @@ class FeatureContext extends YiiContext
      */
     public function theUserStoreIsEmpty()
     {
-        User::deleteAll();
+        foreach (User::find()->all() as $user) {
+            Assert::notSame($user->delete(), false);
+        }
     }
 
     /**

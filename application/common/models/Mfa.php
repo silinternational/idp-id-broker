@@ -6,6 +6,7 @@ use common\helpers\MySqlDateTime;
 use yii\helpers\ArrayHelper;
 use yii\web\BadRequestHttpException;
 use yii\web\ServerErrorHttpException;
+use yii\web\TooManyRequestsHttpException;
 
 /**
  * Class Mfa
@@ -68,6 +69,8 @@ class Mfa extends MfaBase
      */
     public function beforeDelete()
     {
+        $this->clearFailedAttempts('when deleting mfa record');
+        
         $backend = self::getBackendForType($this->type);
         return $backend->delete($this->id);
     }
@@ -110,6 +113,12 @@ class Mfa extends MfaBase
         return $backend->authInit($this->id);
 
     }
+    
+    protected function hasTooManyRecentFailures()
+    {
+        $numRecentFailures = $this->countRecentFailures();
+        return ($numRecentFailures >= MfaFailedAttempt::RECENT_FAILURE_LIMIT);
+    }
 
     /**
      * @param string|array $value
@@ -117,6 +126,12 @@ class Mfa extends MfaBase
      */
     public function verify($value): bool
     {
+        if ($this->hasTooManyRecentFailures()) {
+            throw new TooManyRequestsHttpException(
+                'Too many recent failed attempts for this MFA'
+            );
+        }
+        
         $backend = self::getBackendForType($this->type);
         if ($backend->verify($this->id, $value) === true) {
             $this->last_used_utc = MySqlDateTime::now();
@@ -129,9 +144,11 @@ class Mfa extends MfaBase
                     'error' => $this->getFirstErrors(),
                 ]);
             }
+            $this->clearFailedAttempts('after successful verification');
             return true;
         }
 
+        $this->recordFailedAttempt();
         return false;
     }
 
@@ -218,6 +235,90 @@ class Mfa extends MfaBase
             'data' => $results,
         ];
 
+    }
+
+    /**
+     * Attempt to delete any failed-attempt records for this MFA. If any of
+     * the records fail to delete, log an error but keep going (without throwing
+     * any exceptions).
+     *
+     * @param string $context A description (for logging, if this fails) of why
+     *     we're trying to clear the failed attempts for this MFA record.
+     *     Example: 'while deleting mfa record' or 'after successful verification'.
+     */
+    public function clearFailedAttempts($context)
+    {
+        foreach ($this->mfaFailedAttempts as $mfaFailedAttempt) {
+            if (!$mfaFailedAttempt->delete()) {
+                \Yii::error([
+                    'action' => 'delete failed attempts ' . $context,
+                    'status' => 'error',
+                    'error' => $mfaFailedAttempt->getFirstErrors(),
+                    'mfa_id' => $this->id,
+                    'mfa_failed_attempt_id' => $mfaFailedAttempt->id,
+                ]);
+                // NOTE: Continue even if this deletion fails.
+            }
+        }
+    }
+    
+    /**
+     * Get the number of "recent" failed attempts to verify a value for this
+     * MFA record.
+     *
+     * @return int|string The number of failed attempts.
+     *
+     *     NOTE: Yii sometimes returns integers from the database as strings.
+     */
+    public function countRecentFailures()
+    {
+        $cutoffForRecent = MySqlDateTime::relativeTime('-5 minutes');
+        
+        return $this->getMfaFailedAttempts()->where(
+            ['>', 'at_utc', $cutoffForRecent]
+        )->count();
+    }
+    
+    /**
+     * Record a failed verification attempt for this MFA. If unable to do so for
+     * some reason, fail loudly (because we need to know about and fix this).
+     *
+     * @throws ServerErrorHttpException
+     */
+    public function recordFailedAttempt()
+    {
+        $mfaFailedAttempt = new MfaFailedAttempt([
+            'mfa_id' => $this->id,
+        ]);
+        if (!$mfaFailedAttempt->save()) {
+            \Yii::error([
+                'action' => 'record mfa failed attempt',
+                'status' => 'error',
+                'error' => $mfaFailedAttempt->getFirstErrors(),
+                'mfa_id' => $this->id,
+            ]);
+            throw new ServerErrorHttpException(
+                'Failed to record failed attempt for this MFA',
+                1510083458
+            );
+        }
+        
+        if ($this->hasTooManyRecentFailures()) {
+            \Yii::warning([
+                'action' => 'MFA rate limit triggered',
+                'mfa_id' => $this->id,
+                'mfa_type' => $this->type,
+                'status' => 'warning',
+                'user' => $this->user->email,
+            ]);
+            
+            /* @var $emailer Emailer */
+            $emailer = \Yii::$app->emailer;
+            $emailer->sendMessageTo(
+                EmailLog::MESSAGE_TYPE_MFA_RATE_LIMIT,
+                $this->user
+            );
+        }
     }
 
     /**
