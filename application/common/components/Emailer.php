@@ -13,7 +13,7 @@ use yii\web\ServerErrorHttpException;
 class Emailer extends Component
 {
     const SUBJECT_INVITE_DEFAULT = 'Your New Account';
-    const SUBJECT_MFA_RATE_LIMIT_DEFAULT = 'Incorrect 2-Step Verification Attempts';
+    const SUBJECT_MFA_RATE_LIMIT_DEFAULT = 'Too Many 2-Step Verification Attempts';
     const SUBJECT_WELCOME_DEFAULT = 'Welcome';
     
     /**
