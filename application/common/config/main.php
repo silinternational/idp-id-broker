@@ -1,22 +1,34 @@
 <?php
 
 use common\components\Emailer;
+use common\components\MfaBackendBackupcode;
+use common\components\MfaBackendTotp;
+use common\components\MfaBackendU2f;
 use common\ldap\Ldap;
 use Sil\JsonLog\target\JsonSyslogTarget;
 use Sil\JsonLog\target\EmailServiceTarget;
 use Sil\PhpEnv\Env;
 use Sil\Psr3Adapters\Psr3Yii2Logger;
 use yii\db\Connection;
+use yii\helpers\ArrayHelper;
 use yii\helpers\Json;
 use yii\web\Request;
 
-$idpName       = Env::requireEnv('IDP_NAME');
-$mysqlHost     = Env::requireEnv('MYSQL_HOST');
-$mysqlDatabase = Env::requireEnv('MYSQL_DATABASE');
-$mysqlUser     = Env::requireEnv('MYSQL_USER');
-$mysqlPassword = Env::requireEnv('MYSQL_PASSWORD');
+$idpName        = Env::requireEnv('IDP_NAME');
+$idpDisplayName = Env::get('IDP_DISPLAY_NAME', $idpName);
+$mysqlHost      = Env::requireEnv('MYSQL_HOST');
+$mysqlDatabase  = Env::requireEnv('MYSQL_DATABASE');
+$mysqlUser      = Env::requireEnv('MYSQL_USER');
+$mysqlPassword  = Env::requireEnv('MYSQL_PASSWORD');
 
 $notificationEmail = Env::get('NOTIFICATION_EMAIL');
+
+$mfaNumBackupCodes = Env::get('MFA_NUM_BACKUPCODES', 10);
+
+$mfaTotpConfig = Env::getArrayFromPrefix('MFA_TOTP_');
+$mfaTotpConfig['issuer'] = $idpDisplayName;
+
+$mfaU2fConfig = Env::getArrayFromPrefix('MFA_U2F_');
 
 /*
  * If using Email Service, the following ENV vars should be set:
@@ -46,9 +58,11 @@ return [
             'emailServiceConfig' => $emailServiceConfig,
             
             'sendInviteEmails' => Env::get('SEND_INVITE_EMAILS', false),
+            'sendMfaRateLimitEmails' => Env::get('SEND_MFA_RATE_LIMIT_EMAILS', true),
             'sendWelcomeEmails' => Env::get('SEND_WELCOME_EMAILS', false),
             
             'subjectForInvite' => Env::get('SUBJECT_FOR_INVITE'),
+            'subjectForMfaRateLimit' => Env::get('SUBJECT_FOR_MFA_RATE_LIMIT'),
             'subjectForWelcome' => Env::get('SUBJECT_FOR_WELCOME'),
         ],
         'ldap' => [
@@ -63,6 +77,18 @@ return [
             'timeout' => Env::get('LDAP_TIMEOUT', 5),
             'logger' => new Psr3Yii2Logger(),
         ],
+        'backupcode' => [
+            'class' => MfaBackendBackupcode::class,
+            'numBackupCodes' => $mfaNumBackupCodes,
+        ],
+        'totp' => ArrayHelper::merge(
+            ['class' => MfaBackendTotp::class],
+            $mfaTotpConfig
+        ),
+        'u2f' => ArrayHelper::merge(
+            ['class' => MfaBackendU2f::class],
+            $mfaU2fConfig
+        ),
         // http://www.yiiframework.com/doc-2.0/guide-runtime-logging.html
         'log' => [
             'targets' => [
@@ -130,6 +156,14 @@ return [
         ],
     ],
     'params' => [
-        'migratePasswordsFromLdap' => Env::get('MIGRATE_PW_FROM_LDAP', false),
+        'authorizedTokens'              => Env::getArray('API_ACCESS_KEYS'),
+        'idpName'                       => $idpName,
+        'idpDisplayName'                => $idpDisplayName,
+        'mfaNagInterval'                => Env::get('MFA_NAG_INTERVAL', '+30 days'),
+        'migratePasswordsFromLdap'      => Env::get('MIGRATE_PW_FROM_LDAP', false),
+        'passwordReuseLimit'            => Env::get('PASSWORD_REUSE_LIMIT', 10),
+        'passwordLifespan'              => Env::get('PASSWORD_LIFESPAN', '+1 year'),
+        'passwordMfaLifespanExtension'  => Env::get('PASSWORD_MFA_LIFESPAN_EXTENSION', '+1 year'),
+        'passwordExpirationGracePeriod' => Env::get('PASSWORD_EXPIRATION_GRACE_PERIOD', '+30 days'),
     ],
 ];

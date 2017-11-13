@@ -9,8 +9,16 @@ use yii\behaviors\AttributeBehavior;
 use yii\db\ActiveRecord;
 use yii\helpers\ArrayHelper;
 
+/**
+ * Class Password
+ * @package common\models
+ *
+ * @property User $user
+ */
 class Password extends PasswordBase
 {
+    const DATE_FORMAT = 'Y-m-d 23:59:59 \G\M\T';
+
     public $password;
 
     public function rules(): array
@@ -136,11 +144,11 @@ class Password extends PasswordBase
             'created_utc' => function ($model) {
                 return "{$model->created_utc} UTC";
             },
-            'expires_on' => function ($model) {
-                return "{$model->expires_on} 23:59:59 UTC";
+            'expires_on' => function (Password $model) {
+                return $model->getExpiresOn();
             },
             'grace_period_ends_on' => function ($model) {
-                return "{$model->grace_period_ends_on} 23:59:59 UTC";
+                return $model->getGracePeriodEndsOn();
             },
         ];
 
@@ -154,5 +162,41 @@ class Password extends PasswordBase
         $labels['created_utc'] = Yii::t('app', 'Created (UTC)');
 
         return $labels;
+    }
+
+    /**
+     * Calculate expires_on date based on if user has MFA configured
+     * @return string
+     */
+    public function getExpiresOn()
+    {
+        if (count($this->user->mfas) > 0) {
+            $expiresOnTimestamp = strtotime($this->expires_on . ' 23:59:59 UTC');
+            $extendedTimestamp = strtotime(\Yii::$app->params['passwordMfaLifespanExtension'], $expiresOnTimestamp);
+            return date(self::DATE_FORMAT, $extendedTimestamp);
+        }
+        return $this->expires_on . ' 23:59:59 UTC';
+    }
+
+    /**
+     * Calculate grace_period_ends_on based on if user has MFA configured
+     * @return string
+     */
+    public function getGracePeriodEndsOn()
+    {
+        if (count($this->user->mfas) > 0) {
+            $graceEndsOnTimestamp = strtotime($this->grace_period_ends_on . ' 23:59:59 UTC');
+            $extendedTimestamp = strtotime(\Yii::$app->params['passwordMfaLifespanExtension'], $graceEndsOnTimestamp);
+            return date(self::DATE_FORMAT, $extendedTimestamp);
+        }
+        return $this->grace_period_ends_on . ' 23:59:59 UTC';
+    }
+
+    /**
+     * @return User
+     */
+    public function getUser()
+    {
+        return $this->hasOne(User::className(), ['id' => 'user_id']);
     }
 }

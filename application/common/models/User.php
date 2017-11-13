@@ -36,6 +36,28 @@ class User extends UserBase
         $this->sendAppropriateMessages($insert, $changedAttributes);
     }
     
+    public function beforeDelete()
+    {
+        if (! parent::beforeDelete()) {
+            return false;
+        }
+
+        foreach ($this->mfas as $mfa) {
+            if (! $mfa->delete()) {
+                \Yii::error([
+                    'action' => 'delete mfa record before deleting user',
+                    'status' => 'error',
+                    'error' => $mfa->getFirstErrors(),
+                    'mfa_id' => $mfa->id,
+                    'user_id' => $this->id,
+                ]);
+                return false;
+            }
+        }
+        
+        return true;
+    }
+    
     public function setLdap(Ldap $ldap)
     {
         $this->ldap = $ldap;
@@ -57,6 +79,7 @@ class User extends UserBase
             'email',
             'active',
             'locked',
+            'nag_for_mfa_after',
         ];
 
         $scenarios[self::SCENARIO_UPDATE_USER] = [
@@ -87,6 +110,12 @@ class User extends UserBase
             ],
             [
                 'locked', 'default', 'value' => 'no', 'on' => self::SCENARIO_NEW_USER
+            ],
+            [
+                'require_mfa', 'default', 'value' => 'no', 'on' => self::SCENARIO_NEW_USER
+            ],
+            [
+                'nag_for_mfa_after', 'default', 'value' => MySqlDateTime::today(),
             ],
             [
                 ['active', 'locked'], 'in', 'range' => ['yes', 'no'],
@@ -245,6 +274,7 @@ class User extends UserBase
             'locked' => $this->locked,
             'lastChangedUtc' => $this->last_changed_utc,
             'lastSyncedUtc' => $this->last_synced_utc,
+            'lastLoginUtc' => $this->last_login_utc,
         ];
     }
     
@@ -259,7 +289,7 @@ class User extends UserBase
     {
         return function ($attributeName) {
             if ($this->currentPassword !== null) {
-                $gracePeriodEnds = strtotime("{$this->currentPassword->grace_period_ends_on} 23:59:59 UTC");
+                $gracePeriodEnds = strtotime($this->currentPassword->getGracePeriodEndsOn());
 
                 $now = time();
 
@@ -326,6 +356,10 @@ class User extends UserBase
             'email',
             'active',
             'locked',
+            'last_login_utc',
+            'mfa' => function ($model) {
+                return $model->getMfaFields();
+            },
         ];
 
         if ($this->current_password_id !== null) {
@@ -335,6 +369,31 @@ class User extends UserBase
         }
 
         return $fields;
+    }
+
+    /**
+     * @return array MFA related properties
+     */
+    public function getMfaFields()
+    {
+        $promptForMfa = $this->isPromptForMfa() ? 'yes' : 'no';
+        return [
+            'prompt'  => $promptForMfa,
+            'nag'     => ($promptForMfa == 'no' && strtotime($this->nag_for_mfa_after) < time()) ? 'yes' : 'no',
+            'options' => $this->getVerifiedMfaOptions(),
+        ];
+    }
+
+    public function getVerifiedMfaOptions()
+    {
+        $mfas = [];
+        foreach ($this->mfas as $mfaOption) {
+            if ($mfaOption->verified === 1) {
+                $mfaOption->scenario = $this->scenario;
+                $mfas[] = $mfaOption;
+            }
+        }
+        return $mfas;
     }
 
     public function save($runValidation = true, $attributeNames = null)
@@ -496,4 +555,18 @@ class User extends UserBase
 
         return $labels;
     }
+
+    /**
+     * @return bool
+     */
+    public function isPromptForMfa(): bool
+    {
+        if ($this->scenario == self::SCENARIO_AUTHENTICATE) {
+            if (strtolower($this->require_mfa == 'yes') || count($this->mfas) > 0) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 }

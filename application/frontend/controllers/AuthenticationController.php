@@ -12,7 +12,7 @@ class AuthenticationController extends BaseRestController
     /**
      * Authenticates the given user based on his/her password
      *
-     * @return User upon successful authentication, i.e., "creation".
+     * @return User
      * @throws BadRequestHttpException
      */
     public function actionCreate(): User

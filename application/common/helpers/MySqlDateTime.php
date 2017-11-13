@@ -20,4 +20,29 @@ class MySqlDateTime
     {
         return gmdate(self::MYSQL_DATE_FORMAT, $timestamp);
     }
+
+    public static function formatDateTime(int $timestamp)
+    {
+        return gmdate(self::MYSQL_DATETIME_FORMAT, $timestamp);
+    }
+
+    /**
+     * Get a relative date based on given string
+     * @param string $difference
+     * @return false|string
+     */
+    public static function relative(string $difference = '+30 days')
+    {
+        return self::formatDate(strtotime($difference));
+    }
+    
+    /**
+     * Get a relative date-time based on given string
+     * @param string $difference
+     * @return false|string
+     */
+    public static function relativeTime(string $difference = '+30 minutes')
+    {
+        return self::formatDateTime(strtotime($difference));
+    }
 }

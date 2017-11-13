@@ -4,6 +4,7 @@ namespace Sil\SilIdBroker\Behat\Context;
 
 use Behat\Behat\Context\Context;
 use Sil\SilIdBroker\Behat\Context\fakes\FakeEmailer;
+use Sil\SilIdBroker\Behat\Context\fakes\FakeLogTarget;
 use Yii;
 use yii\web\Application;
 
@@ -11,6 +12,9 @@ class YiiContext implements Context
 {
     /** @var FakeEmailer */
     protected $fakeEmailer;
+    
+    /** @var FakeLogTarget */
+    protected $fakeLogTarget;
     
     private static $application;
     
@@ -25,6 +29,17 @@ class YiiContext implements Context
             ],
         ]);
         Yii::$app->set('emailer', $this->fakeEmailer);
+        
+        $this->addFakeLogTarget();
+    }
+    
+    protected function addFakeLogTarget()
+    {
+        $this->fakeLogTarget = new FakeLogTarget([
+            'categories' => ['application'], // stick to messages from this app, not all of Yii's built-in messaging.
+            'logVars' => [], // no need for default stuff: http://www.yiiframework.com/doc-2.0/yii-log-target.html#$logVars-detail
+        ]);
+        Yii::$app->log->targets[] = $this->fakeLogTarget;
     }
 
     /**
