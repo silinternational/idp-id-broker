@@ -17,5 +17,17 @@ chown -R www-data:www-data \
 # Run database migrations
 runny /data/yii migrate --interactive=0
 
+# Dump env to a file
+touch /etc/cron.d/broker
+env | while read line ; do
+   echo "$line" >> /etc/cron.d/broker
+done
+
+# Add env vars to idp-cron to make available to scripts
+cat /etc/cron.d/broker-cron >> /etc/cron.d/broker
+
+# Remove original cron file without env vars
+rm -f /etc/cron.d/broker-cron
+
 # Start cron daemon
 cron -f
