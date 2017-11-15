@@ -18,16 +18,7 @@ chown -R www-data:www-data \
 runny /data/yii migrate --interactive=0
 
 # Dump env to a file
-touch /etc/cron.d/broker
-env | while read line ; do
-   echo "$line" >> /etc/cron.d/broker
-done
-
-# Add env vars to broker-cron to make available to scripts
-cat /etc/cron.d/broker-cron >> /etc/cron.d/broker
-
-# Remove original cron file without env vars
-rm -f /etc/cron.d/broker-cron
+env >> /etc/environment
 
 # Start cron daemon
 cron -f
