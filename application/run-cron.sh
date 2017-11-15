@@ -23,7 +23,7 @@ env | while read line ; do
    echo "$line" >> /etc/cron.d/broker
 done
 
-# Add env vars to idp-cron to make available to scripts
+# Add env vars to broker-cron to make available to scripts
 cat /etc/cron.d/broker-cron >> /etc/cron.d/broker
 
 # Remove original cron file without env vars
