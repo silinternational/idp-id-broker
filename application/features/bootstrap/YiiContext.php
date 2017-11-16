@@ -3,6 +3,7 @@
 namespace Sil\SilIdBroker\Behat\Context;
 
 use Behat\Behat\Context\Context;
+use Sil\Psr3Adapters\Psr3ConsoleLogger;
 use Sil\SilIdBroker\Behat\Context\fakes\FakeEmailer;
 use Sil\SilIdBroker\Behat\Context\fakes\FakeLogTarget;
 use Yii;
@@ -34,6 +35,7 @@ class YiiContext implements Context
                     'baseUrl' => 'http://fake-url',
                     'validIpRanges' => ['192.168.0.0/16'],
                 ],
+                'logger' => new Psr3ConsoleLogger(),
             ]
         ));
         Yii::$app->set('emailer', $this->fakeEmailer);

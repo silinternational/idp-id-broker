@@ -4,7 +4,9 @@ namespace common\components;
 use common\models\EmailLog;
 use common\models\User;
 use InvalidArgumentException;
+use Psr\Log\LoggerInterface;
 use Sil\EmailService\Client\EmailServiceClient;
+use Sil\Psr3Adapters\Psr3Yii2Logger;
 use Webmozart\Assert\Assert;
 use yii\base\Component;
 use yii\helpers\ArrayHelper;
@@ -26,6 +28,9 @@ class Emailer extends Component
     
     /** @var EmailServiceClient */
     protected $emailServiceClient = null;
+    
+    /** @var LoggerInterface */
+    public $logger = null;
     
     /**
      * Other values that should be made available to be inserted into emails.
@@ -161,6 +166,10 @@ class Emailer extends Component
      */
     public function init()
     {
+        if ($this->logger === null) {
+            $this->logger = new Psr3Yii2Logger();
+        }
+        
         $this->subjectForInvite = $this->subjectForInvite ?? self::SUBJECT_INVITE_DEFAULT;
         $this->subjectForMfaRateLimit = $this->subjectForMfaRateLimit ?? self::SUBJECT_MFA_RATE_LIMIT_DEFAULT;
         $this->subjectForWelcome = $this->subjectForWelcome ?? self::SUBJECT_WELCOME_DEFAULT;
