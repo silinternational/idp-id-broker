@@ -70,6 +70,8 @@ services:
             MYSQL_USER: appfortests
             MYSQL_PASSWORD: appfortests
             MIGRATE_PW_FROM_LDAP: "true"
+            PASSWORD_FORGOT_URL: https://www.example.com/forgot
+            SUPPORT_EMAIL: support@example.com
 
     appfortestsdb:
         image: silintl/mariadb:latest
@@ -143,6 +145,8 @@ services:
             MYSQL_HOST: appfortestsdb
             MYSQL_PASSWORD: appfortests
             MYSQL_USER: appfortests
+            PASSWORD_FORGOT_URL: https://www.example.com/forgot
+            SUPPORT_EMAIL: support@example.com
         command: ./run-tests.sh
         # running isolated tests
         # docker-compose run --rm test vendor/bin/behat --stop-on-failure features/user.feature

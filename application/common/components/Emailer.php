@@ -182,6 +182,8 @@ class Emailer extends Component
         
         $this->assertConfigIsValid();
         
+        $this->verifyOtherDataForEmailIsValid();
+        
         parent::init();
     }
     
@@ -242,5 +244,23 @@ class Emailer extends Component
             && ($oldAttributeValues['current_password_id'] === null)
             && !empty($user->current_password_id)
             && !$user->hasReceivedMessage(EmailLog::MESSAGE_TYPE_WELCOME);
+    }
+    
+    /**
+     * Verify that the other data provided for use in emails is acceptable. If
+     * any data is missing, log that error but let the email be sent anyway.
+     * We'd rather they get an incomplete email than no email.
+     */
+    protected function verifyOtherDataForEmailIsValid()
+    {
+        foreach ($this->otherDataForEmails as $keyForEmail => $valueForEmail) {
+            if (empty($valueForEmail)) {
+                $this->logger->critical(sprintf(
+                    'Missing a value for %s (for use in emails)',
+                    $keyForEmail
+                ));
+                $this->otherDataForEmails[$keyForEmail] = '(MISSING)';
+            }
+        }
     }
 }
