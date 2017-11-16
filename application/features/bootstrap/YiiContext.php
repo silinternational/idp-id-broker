@@ -6,6 +6,7 @@ use Behat\Behat\Context\Context;
 use Sil\SilIdBroker\Behat\Context\fakes\FakeEmailer;
 use Sil\SilIdBroker\Behat\Context\fakes\FakeLogTarget;
 use Yii;
+use yii\helpers\ArrayHelper;
 use yii\web\Application;
 
 class YiiContext implements Context
@@ -20,14 +21,21 @@ class YiiContext implements Context
     
     public function __construct()
     {
-        $this->fakeEmailer = new FakeEmailer([
-            'emailServiceConfig' => [
-                'accessToken' => 'fake-token-123',
-                'assertValidIp' => false,
-                'baseUrl' => 'http://fake-url',
-                'validIpRanges' => ['192.168.0.0/16'],
-            ],
-        ]);
+        $yiiCommonConfig = require __DIR__ . '/../../common/config/main.php';
+        $yiiEmailerConfig = $yiiCommonConfig['components']['emailer'];
+        unset($yiiEmailerConfig['class']);
+        
+        $this->fakeEmailer = new FakeEmailer(ArrayHelper::merge(
+            $yiiEmailerConfig,
+            [
+                'emailServiceConfig' => [
+                    'accessToken' => 'fake-token-123',
+                    'assertValidIp' => false,
+                    'baseUrl' => 'http://fake-url',
+                    'validIpRanges' => ['192.168.0.0/16'],
+                ],
+            ]
+        ));
         Yii::$app->set('emailer', $this->fakeEmailer);
         
         $this->addFakeLogTarget();
