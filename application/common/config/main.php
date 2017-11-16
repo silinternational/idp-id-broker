@@ -57,6 +57,14 @@ return [
             'class' => Emailer::class,
             'emailServiceConfig' => $emailServiceConfig,
             
+            'otherDataForEmails' => [
+                'emailSignature' => Env::get('EMAIL_SIGNATURE', $idpDisplayName . ' Help Desk'),
+                'idpDisplayName' => $idpDisplayName,
+                'passwordForgotUrl' => Env::get('PASSWORD_FORGOT_URL'),
+                'supportEmail' => Env::get('SUPPORT_EMAIL'),
+                'supportName' => Env::get('SUPPORT_NAME', 'support'),
+            ],
+            
             'sendInviteEmails' => Env::get('SEND_INVITE_EMAILS', false),
             'sendMfaRateLimitEmails' => Env::get('SEND_MFA_RATE_LIMIT_EMAILS', true),
             'sendWelcomeEmails' => Env::get('SEND_WELCOME_EMAILS', false),

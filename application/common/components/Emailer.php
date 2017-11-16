@@ -7,6 +7,7 @@ use InvalidArgumentException;
 use Sil\EmailService\Client\EmailServiceClient;
 use Webmozart\Assert\Assert;
 use yii\base\Component;
+use yii\helpers\ArrayHelper;
 use yii\helpers\Inflector;
 use yii\web\ServerErrorHttpException;
 
@@ -25,6 +26,15 @@ class Emailer extends Component
     
     /** @var EmailServiceClient */
     protected $emailServiceClient = null;
+    
+    /**
+     * Other values that should be made available to be inserted into emails.
+     * The keys should be camelCase and will be made available as variables
+     * (e.g. `$camelCase`) in the emailer's view files.
+     *
+     * @var array<string,mixed>
+     */
+    public $otherDataForEmails = [];
     
     public $sendInviteEmails = false;
     public $sendMfaRateLimitEmails = true;
@@ -175,15 +185,19 @@ class Emailer extends Component
      */
     public function sendMessageTo(string $messageType, User $user)
     {
-        $userAttributesForEmail = $user->getAttributesForEmail();
+        $dataForEmail = ArrayHelper::merge(
+            $user->getAttributesForEmail(),
+            $this->otherDataForEmails
+        );
+        
         $htmlView = $this->getViewForMessage($messageType, 'html');
         $textView = $this->getViewForMessage($messageType, 'text');
         
         $this->email(
             $user->email,
             $this->getSubjectForMessage($messageType),
-            \Yii::$app->view->render($htmlView, $userAttributesForEmail),
-            \Yii::$app->view->render($textView, $userAttributesForEmail)
+            \Yii::$app->view->render($htmlView, $dataForEmail),
+            \Yii::$app->view->render($textView, $dataForEmail)
         );
         
         EmailLog::logMessage($messageType, $user->id);
