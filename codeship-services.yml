@@ -37,6 +37,8 @@ app:
         LDAP_USE_SSL: false
         LDAP_USE_TLS: false
         MIGRATE_PW_FROM_LDAP: true
+        PASSWORD_FORGOT_URL: https://www.example.com/forgot
+        SUPPORT_EMAIL: support@example.com
 
 ldap:
     build:
