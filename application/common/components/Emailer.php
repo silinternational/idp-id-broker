@@ -239,9 +239,10 @@ class Emailer extends Component
      */
     public function shouldSendPasswordChangedMessageTo($user, $oldAttributeValues)
     {
+        $previousPasswordId = $oldAttributeValues['current_password_id'] ?? null;
+        
         return $this->sendPasswordChangedEmails
-            && !empty($user->current_password_id)
-            && ($user->current_password_id != $oldAttributeValues['current_password_id']);
+            && ($user->current_password_id != $previousPasswordId);
     }
     
     /**
