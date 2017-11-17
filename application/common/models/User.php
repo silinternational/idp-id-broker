@@ -267,7 +267,7 @@ class User extends UserBase
             'employeeId' => $this->employee_id,
             'firstName' => $this->first_name,
             'lastName' => $this->last_name,
-            'displayName' => $this->display_name,
+            'displayName' => $this->getDisplayName(),
             'username' => $this->username,
             'email' => $this->email,
             'active' => $this->active,
@@ -350,7 +350,7 @@ class User extends UserBase
             'first_name',
             'last_name',
             'display_name' => function ($model) {
-                return $model->display_name ?? "$model->first_name $model->last_name";
+                return $model->getDisplayName();
             },
             'username',
             'email',
@@ -371,6 +371,17 @@ class User extends UserBase
         return $fields;
     }
 
+    /**
+     * Get a display name for the user (either their display_name value, if
+     * set, or a combination of their first and last names).
+     *
+     * @return string
+     */
+    public function getDisplayName()
+    {
+        return $this->display_name ?? "$this->first_name $this->last_name";
+    }
+    
     /**
      * @return array MFA related properties
      */
