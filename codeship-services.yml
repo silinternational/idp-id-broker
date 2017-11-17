@@ -23,6 +23,7 @@ app:
         EMAIL_SERVICE_assertValidIp: "false"
         EMAIL_SERVICE_baseUrl: http://email
         EMAIL_SERVICE_validIpRanges: 192.168.0.0/16
+        EMAILER_CLASS: \Sil\SilIdBroker\Behat\Context\fakes\FakeEmailer
         IDP_NAME: Test
         MYSQL_HOST: db
         MYSQL_DATABASE: test
