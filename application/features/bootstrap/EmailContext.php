@@ -120,11 +120,11 @@ class EmailContext extends YiiContext
     }
     
     /**
-     * @Given we are configured to send welcome emails
+     * @Given we are configured to send password-changed emails
      */
-    public function weAreConfiguredToSendWelcomeEmails()
+    public function weAreConfiguredToSendPasswordChangedEmails()
     {
-        $this->fakeEmailer->sendWelcomeEmails = true;
+        $this->fakeEmailer->sendPasswordChangedEmails = true;
     }
 
     /**
@@ -136,11 +136,11 @@ class EmailContext extends YiiContext
     }
 
     /**
-     * @Given we are NOT configured to send welcome emails
+     * @Given we are NOT configured to send password-changed emails
      */
-    public function weAreNotConfiguredToSendWelcomeEmails()
+    public function weAreNotConfiguredToSendPasswordChangedEmails()
     {
-        $this->fakeEmailer->sendWelcomeEmails = false;
+        $this->fakeEmailer->sendPasswordChangedEmails = false;
     }
 
     /**
@@ -216,5 +216,13 @@ class EmailContext extends YiiContext
     {
         $this->fakeEmailer->forgetFakeEmailsSent();
         EmailLog::deleteAll();
+    }
+
+    /**
+     * @When I change that user's password
+     */
+    public function iChangeThatUsersPassword()
+    {
+        $this->iGiveThatUserAPassword();
     }
 }
