@@ -67,11 +67,11 @@ return [
             
             'sendInviteEmails' => Env::get('SEND_INVITE_EMAILS', false),
             'sendMfaRateLimitEmails' => Env::get('SEND_MFA_RATE_LIMIT_EMAILS', true),
-            'sendWelcomeEmails' => Env::get('SEND_WELCOME_EMAILS', false),
+            'sendPasswordChangedEmails' => Env::get('SEND_PASSWORD_CHANGED_EMAILS', true),
             
             'subjectForInvite' => Env::get('SUBJECT_FOR_INVITE'),
             'subjectForMfaRateLimit' => Env::get('SUBJECT_FOR_MFA_RATE_LIMIT'),
-            'subjectForWelcome' => Env::get('SUBJECT_FOR_WELCOME'),
+            'subjectForPasswordChanged' => Env::get('SUBJECT_FOR_PASSWORD_CHANGED'),
         ],
         'ldap' => [
             'class' => Ldap::class,

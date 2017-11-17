@@ -14,8 +14,10 @@ use yii\helpers\Html as yHtml;
  * @var string $lastSyncedUtc
  */
 ?>
-
-<?php /** @todo Write the content for the welcome (text) email. */ ?>
-
-Thanks!
- - <?php /** @todo Add a signature/name to the welcome (text) email. */ ?>
+<p>
+    <?php /** @todo Write the content for the password-changed (HTML) email. */ ?>
+</p>
+<p>
+    Thanks!
+    - <i><?php /** @todo Add a signature/name to the password-changed (HTML) email. */ ?></i>
+</p>

@@ -414,8 +414,8 @@ class User extends UserBase
             $emailer->sendMessageTo(EmailLog::MESSAGE_TYPE_INVITE, $this);
         }
         
-        if ($emailer->shouldSendWelcomeMessageTo($this, $changedAttributes)) {
-            $emailer->sendMessageTo(EmailLog::MESSAGE_TYPE_WELCOME, $this);
+        if ($emailer->shouldSendPasswordChangedMessageTo($this, $changedAttributes)) {
+            $emailer->sendMessageTo(EmailLog::MESSAGE_TYPE_PASSWORD_CHANGED, $this);
         }
     }
 
