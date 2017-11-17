@@ -56,6 +56,7 @@ services:
             EMAIL_SERVICE_accessToken: dummy
             EMAIL_SERVICE_assertValidIp: "false"
             EMAIL_SERVICE_baseUrl: dummy
+            EMAILER_CLASS: \Sil\SilIdBroker\Behat\Context\fakes\FakeEmailer
             IDP_NAME: test
             LDAP_BASE_DN: dc=acme,dc=org
             LDAP_ADMIN_USERNAME: cn=Manager,dc=acme,dc=org

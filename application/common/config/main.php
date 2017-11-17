@@ -30,6 +30,8 @@ $mfaTotpConfig['issuer'] = $idpDisplayName;
 
 $mfaU2fConfig = Env::getArrayFromPrefix('MFA_U2F_');
 
+$emailerClass = Env::get('EMAILER_CLASS', Emailer::class);
+
 /*
  * If using Email Service, the following ENV vars should be set:
  *  - EMAIL_SERVICE_accessToken
@@ -54,7 +56,7 @@ return [
             'charset' => 'utf8',
         ],
         'emailer' => [
-            'class' => Emailer::class,
+            'class' => $emailerClass,
             'emailServiceConfig' => $emailServiceConfig,
             
             'otherDataForEmails' => [
