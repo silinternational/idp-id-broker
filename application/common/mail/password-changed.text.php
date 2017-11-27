@@ -1,5 +1,4 @@
 <?php
-use common\helpers\MySqlDateTime;
 use yii\helpers\Html as yHtml;
 
 /**
@@ -34,8 +33,8 @@ Please remember that this account will be your primary means for logging into ma
 applications. It is also important to note that this account (username and password) is unique and will not be kept
 in sync with any other accounts you have.
 
-Password changed on: <?=yHtml::encode(MySqlDateTime::formatDateForHumans($lastChangedUtc))?>
-Password expires on: <?=yHtml::encode(MySqlDateTime::formatDateForHumans($passwordExpiresUtc))?>
+Password changed on: <?=yHtml::encode($lastChangedUtc)?>
+Password expires on: <?=yHtml::encode($passwordExpiresUtc)?>
 
 If you have not already done so, it is highly recommended that you configure recovery methods for
 the potential event that you forget your password. You can reset your password using your email address,

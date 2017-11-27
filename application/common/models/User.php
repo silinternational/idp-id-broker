@@ -272,14 +272,14 @@ class User extends UserBase
             'email' => $this->email,
             'active' => $this->active,
             'locked' => $this->locked,
-            'lastChangedUtc' => $this->last_changed_utc,
-            'lastSyncedUtc' => $this->last_synced_utc,
-            'lastLoginUtc' => $this->last_login_utc,
+            'lastChangedUtc' => MySqlDateTime::formatDateForHumans($this->last_changed_utc),
+            'lastSyncedUtc' => MySqlDateTime::formatDateForHumans($this->last_synced_utc),
+            'lastLoginUtc' => MySqlDateTime::formatDateForHumans($this->last_login_utc),
             'passwordExpiresUtc' => null, // Entry needed even if null.
             'isMfaEnabled' => count($this->mfas) > 0 ? true : false,
         ];
         if ($this->currentPassword !== null) {
-            $attrs['passwordExpiresUtc'] = $this->currentPassword->getGracePeriodEndsOn();
+            $attrs['passwordExpiresUtc'] = MySqlDateTime::formatDateForHumans($this->currentPassword->getGracePeriodEndsOn());
         }
         
         return $attrs;
