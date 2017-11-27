@@ -2,6 +2,7 @@
 namespace Sil\SilIdBroker\Behat\Context;
 
 use Behat\Behat\Tester\Exception\PendingException;
+use common\helpers\MySqlDateTime;
 use common\models\EmailLog;
 use common\models\User;
 use Sil\SilIdBroker\Behat\Context\YiiContext;
@@ -198,11 +199,11 @@ class EmailContext extends YiiContext
     }
 
     /**
-     * @When I save changes to that user
+     * @When I save changes to that user without changing the password
      */
-    public function iSaveChangesToThatUser()
+    public function iSaveChangesToThatUserWithoutChangingThePassword()
     {
-        $this->tempUser->first_name .= ' (changed)';
+        $this->tempUser->first_name .= ', changed ' . microtime();
         Assert::true(
             $this->tempUser->save(),
             var_export($this->tempUser->getFirstErrors(), true)

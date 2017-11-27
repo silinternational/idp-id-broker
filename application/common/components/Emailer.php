@@ -248,16 +248,16 @@ class Emailer extends Component
      * Whether we should send a password-changed message to the given User.
      *
      * @param User $user The User in question.
-     * @param array $oldAttributeValues The old attribute values (whereas the
-     *     User object already has the new, updated values).
+     * @param array $changedAttributes The old values for any attributes that
+     *     were changed (whereas the User object already has the new, updated
+     *     values). NOTE: This will only contain entries for attributes that
+     *     were changed!
      * @return bool
      */
-    public function shouldSendPasswordChangedMessageTo($user, $oldAttributeValues)
+    public function shouldSendPasswordChangedMessageTo($user, $changedAttributes)
     {
-        $previousPasswordId = $oldAttributeValues['current_password_id'] ?? null;
-        
         return $this->sendPasswordChangedEmails
-            && ($user->current_password_id != $previousPasswordId);
+            && array_key_exists('current_password_id', $changedAttributes);
     }
     
     /**
