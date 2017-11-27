@@ -135,6 +135,7 @@ services:
             EMAIL_SERVICE_accessToken: dummy
             EMAIL_SERVICE_assertValidIp: "false"
             EMAIL_SERVICE_baseUrl: dummy
+            HELP_CENTER_URL: https://www.example.com/help
             IDP_DISPLAY_NAME: Test
             IDP_NAME: test
             LDAP_BASE_DN: dc=acme,dc=org
@@ -148,6 +149,7 @@ services:
             MYSQL_PASSWORD: appfortests
             MYSQL_USER: appfortests
             PASSWORD_FORGOT_URL: https://www.example.com/forgot
+            PASSWORD_PROFILE_URL: https://www.example.com/profile
             SUPPORT_EMAIL: support@example.com
         command: ./run-tests.sh
         # running isolated tests
