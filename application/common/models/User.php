@@ -280,6 +280,8 @@ class User extends UserBase
         if ($this->currentPassword !== null) {
             $attrs['passwordExpiresUtc'] = $this->currentPassword->getGracePeriodEndsOn();
         }
+        
+        return $attrs;
     }
     
     public function hasReceivedMessage(string $messageType)
