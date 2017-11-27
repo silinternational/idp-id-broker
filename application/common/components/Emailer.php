@@ -14,9 +14,9 @@ use yii\web\ServerErrorHttpException;
 
 class Emailer extends Component
 {
-    const SUBJECT_INVITE_DEFAULT = 'Your New Account';
-    const SUBJECT_MFA_RATE_LIMIT_DEFAULT = 'Too Many 2-Step Verification Attempts';
-    const SUBJECT_PASSWORD_CHANGED_DEFAULT = 'Your account password has been changed';
+    const SUBJECT_INVITE_DEFAULT = 'Your new %s account';
+    const SUBJECT_MFA_RATE_LIMIT_DEFAULT = 'Too many 2-step verification attempts on your %s account';
+    const SUBJECT_PASSWORD_CHANGED_DEFAULT = 'Your %s account password has been changed';
     
     /**
      * The configuration for the email-service client.
@@ -145,6 +145,9 @@ class Emailer extends Component
     
     protected function getSubjectForMessage(string $messageType)
     {
+        if ( ! empty($this->subjects[$messageType]) && strpos($this->subjects[$messageType], '%') !== false) {
+            return sprintf($this->subjects[$messageType], $this->otherDataForEmails['idpDisplayName'] ?? '');
+        }
         return $this->subjects[$messageType] ?? null;
     }
     
