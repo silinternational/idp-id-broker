@@ -66,7 +66,7 @@ Instructions to set up 2-Step Verification:
 -------------------------------------------
 1. Go to <?=yHtml::encode($passwordProfileUrl)?>
 2. Under 2-Step Verification, set up the options that suite you best (USB Security Key, Smartphone App, and/or
-   Printable Backup Codes)
+   Printable Codes)
 3. Log out and log in again to see how it works and to have it remember your computer for 30 days. Note that
    logging out will undo the "Remember this computer" setting.
 
@@ -80,4 +80,4 @@ If you have any difficulties completing this task, please contact <?=yHtml::enco
 <?=yHtml::encode($supportEmail)?>.
 
 
-<?=$emailSignature?>
+<?=yHtml::encode($emailSignature)?>

@@ -74,7 +74,7 @@ if ( ! $isMfaEnabled) {
 <ol>
     <li>Go to <?=yHtml::a(yHtml::encode($passwordProfileUrl), $passwordProfileUrl)?></li>
     <li>Under 2-Step Verification, set up the options that suite you best (USB Security Key, Smartphone App, and/or
-        Printable Backup Codes)</li>
+        Printable Codes)</li>
     <li>Log out and log in again to see how it works and to have it remember your computer for 30 days. Note that
         logging out will undo the "Remember this computer" setting.</li>
 </ol>
@@ -89,5 +89,5 @@ if ( ! $isMfaEnabled) {
     <?=yHtml::encode($supportEmail)?>.
 </p>
 <p>
-    <?=$emailSignature?>
+    <i><?=yHtml::encode($emailSignature)?></i>
 </p>
