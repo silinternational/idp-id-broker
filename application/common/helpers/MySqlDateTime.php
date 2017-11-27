@@ -5,6 +5,7 @@ class MySqlDateTime
 {
     const MYSQL_DATETIME_FORMAT = 'Y-m-d H:i:s';
     const MYSQL_DATE_FORMAT     = 'Y-m-d';
+    const HUMAN_DATE_FORMAT     = 'F jS, Y'; // November 27th, 2017
 
     public static function now()
     {
@@ -44,5 +45,19 @@ class MySqlDateTime
     public static function relativeTime(string $difference = '+30 minutes')
     {
         return self::formatDateTime(strtotime($difference));
+    }
+
+    /**
+     * Format timestamp to human friendly date
+     * @param string|null $timestamp
+     * @return false|string
+     */
+    public static function formatDateForHumans(string $timestamp = null)
+    {
+        if ( ! is_numeric($timestamp)) {
+            $timestamp = strtotime($timestamp);
+        }
+
+        return gmdate(self::HUMAN_DATE_FORMAT, $timestamp);
     }
 }

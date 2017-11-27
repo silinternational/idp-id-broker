@@ -1,4 +1,5 @@
 <?php
+use common\helpers\MySqlDateTime;
 use yii\helpers\Html as yHtml;
 
 /**
@@ -37,8 +38,8 @@ use yii\helpers\Html as yHtml;
     in sync with any other accounts you have.
 </p>
 <p>
-    Password changed on: <?=yHtml::encode($lastChangedUtc)?><br />
-    Password expires on: <?=yHtml::encode($passwordExpiresUtc)?>
+    Password changed on: <?=yHtml::encode(MySqlDateTime::formatDateForHumans($lastChangedUtc))?><br />
+    Password expires on: <?=yHtml::encode(MySqlDateTime::formatDateForHumans($passwordExpiresUtc))?>
 </p>
 <p>
     If you have not already done so, it is highly recommended that you configure <strong>recovery methods</strong> for
