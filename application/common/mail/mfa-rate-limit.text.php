@@ -12,6 +12,16 @@ use yii\helpers\Html as yHtml;
  * @var string $locked
  * @var string $lastChangedUtc
  * @var string $lastSyncedUtc
+ * @var string $lastLoginUtc
+ * @var string $passwordExpiresUtc
+ * @var string $emailSignature
+ * @var string $helpCenterUrl
+ * @var string $idpDisplayName
+ * @var string $passwordForgotUrl
+ * @var string $passwordProfileUrl
+ * @var string $supportEmail
+ * @var string $supportName
+ * @var bool   $isMfaEnabled
  */
 ?>
 

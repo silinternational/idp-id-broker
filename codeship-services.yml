@@ -23,6 +23,8 @@ app:
         EMAIL_SERVICE_assertValidIp: "false"
         EMAIL_SERVICE_baseUrl: http://email
         EMAIL_SERVICE_validIpRanges: 192.168.0.0/16
+        EMAILER_CLASS: \Sil\SilIdBroker\Behat\Context\fakes\FakeEmailer
+        HELP_CENTER_URL: https://help-center
         IDP_NAME: Test
         MYSQL_HOST: db
         MYSQL_DATABASE: test
@@ -37,6 +39,9 @@ app:
         LDAP_USE_SSL: false
         LDAP_USE_TLS: false
         MIGRATE_PW_FROM_LDAP: true
+        PASSWORD_FORGOT_URL: https://www.example.com/forgot
+        PASSWORD_PROFILE_URL: https://password-profile
+        SUPPORT_EMAIL: support@example.com
 
 ldap:
     build:

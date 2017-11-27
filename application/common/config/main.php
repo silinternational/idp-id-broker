@@ -30,6 +30,8 @@ $mfaTotpConfig['issuer'] = $idpDisplayName;
 
 $mfaU2fConfig = Env::getArrayFromPrefix('MFA_U2F_');
 
+$emailerClass = Env::get('EMAILER_CLASS', Emailer::class);
+
 /*
  * If using Email Service, the following ENV vars should be set:
  *  - EMAIL_SERVICE_accessToken
@@ -54,16 +56,26 @@ return [
             'charset' => 'utf8',
         ],
         'emailer' => [
-            'class' => Emailer::class,
+            'class' => $emailerClass,
             'emailServiceConfig' => $emailServiceConfig,
+            
+            'otherDataForEmails' => [
+                'emailSignature' => Env::get('EMAIL_SIGNATURE', $idpDisplayName . ' Help Desk'),
+                'helpCenterUrl' => Env::get('HELP_CENTER_URL'),
+                'idpDisplayName' => $idpDisplayName,
+                'passwordForgotUrl' => Env::get('PASSWORD_FORGOT_URL'),
+                'passwordProfileUrl' => Env::get('PASSWORD_PROFILE_URL'),
+                'supportEmail' => Env::get('SUPPORT_EMAIL'),
+                'supportName' => Env::get('SUPPORT_NAME', 'support'),
+            ],
             
             'sendInviteEmails' => Env::get('SEND_INVITE_EMAILS', false),
             'sendMfaRateLimitEmails' => Env::get('SEND_MFA_RATE_LIMIT_EMAILS', true),
-            'sendWelcomeEmails' => Env::get('SEND_WELCOME_EMAILS', false),
+            'sendPasswordChangedEmails' => Env::get('SEND_PASSWORD_CHANGED_EMAILS', true),
             
             'subjectForInvite' => Env::get('SUBJECT_FOR_INVITE'),
             'subjectForMfaRateLimit' => Env::get('SUBJECT_FOR_MFA_RATE_LIMIT'),
-            'subjectForWelcome' => Env::get('SUBJECT_FOR_WELCOME'),
+            'subjectForPasswordChanged' => Env::get('SUBJECT_FOR_PASSWORD_CHANGED'),
         ],
         'ldap' => [
             'class' => Ldap::class,

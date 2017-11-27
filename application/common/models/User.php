@@ -263,19 +263,26 @@ class User extends UserBase
      */
     public function getAttributesForEmail()
     {
-        return [
+        $attrs = [
             'employeeId' => $this->employee_id,
             'firstName' => $this->first_name,
             'lastName' => $this->last_name,
-            'displayName' => $this->display_name,
+            'displayName' => $this->getDisplayName(),
             'username' => $this->username,
             'email' => $this->email,
             'active' => $this->active,
             'locked' => $this->locked,
-            'lastChangedUtc' => $this->last_changed_utc,
-            'lastSyncedUtc' => $this->last_synced_utc,
-            'lastLoginUtc' => $this->last_login_utc,
+            'lastChangedUtc' => MySqlDateTime::formatDateForHumans($this->last_changed_utc),
+            'lastSyncedUtc' => MySqlDateTime::formatDateForHumans($this->last_synced_utc),
+            'lastLoginUtc' => MySqlDateTime::formatDateForHumans($this->last_login_utc),
+            'passwordExpiresUtc' => null, // Entry needed even if null.
+            'isMfaEnabled' => count($this->mfas) > 0 ? true : false,
         ];
+        if ($this->currentPassword !== null) {
+            $attrs['passwordExpiresUtc'] = MySqlDateTime::formatDateForHumans($this->currentPassword->getExpiresOn());
+        }
+        
+        return $attrs;
     }
     
     public function hasReceivedMessage(string $messageType)
@@ -350,7 +357,7 @@ class User extends UserBase
             'first_name',
             'last_name',
             'display_name' => function ($model) {
-                return $model->display_name ?? "$model->first_name $model->last_name";
+                return $model->getDisplayName();
             },
             'username',
             'email',
@@ -371,6 +378,17 @@ class User extends UserBase
         return $fields;
     }
 
+    /**
+     * Get a display name for the user (either their display_name value, if
+     * set, or a combination of their first and last names).
+     *
+     * @return string
+     */
+    public function getDisplayName()
+    {
+        return $this->display_name ?? "$this->first_name $this->last_name";
+    }
+    
     /**
      * @return array MFA related properties
      */
@@ -414,8 +432,8 @@ class User extends UserBase
             $emailer->sendMessageTo(EmailLog::MESSAGE_TYPE_INVITE, $this);
         }
         
-        if ($emailer->shouldSendWelcomeMessageTo($this, $changedAttributes)) {
-            $emailer->sendMessageTo(EmailLog::MESSAGE_TYPE_WELCOME, $this);
+        if ($emailer->shouldSendPasswordChangedMessageTo($this, $changedAttributes)) {
+            $emailer->sendMessageTo(EmailLog::MESSAGE_TYPE_PASSWORD_CHANGED, $this);
         }
     }
 

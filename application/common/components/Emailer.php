@@ -4,17 +4,19 @@ namespace common\components;
 use common\models\EmailLog;
 use common\models\User;
 use InvalidArgumentException;
+use Psr\Log\LoggerInterface;
 use Sil\EmailService\Client\EmailServiceClient;
-use Webmozart\Assert\Assert;
+use Sil\Psr3Adapters\Psr3Yii2Logger;
 use yii\base\Component;
+use yii\helpers\ArrayHelper;
 use yii\helpers\Inflector;
 use yii\web\ServerErrorHttpException;
 
 class Emailer extends Component
 {
-    const SUBJECT_INVITE_DEFAULT = 'Your New Account';
-    const SUBJECT_MFA_RATE_LIMIT_DEFAULT = 'Too Many 2-Step Verification Attempts';
-    const SUBJECT_WELCOME_DEFAULT = 'Welcome';
+    const SUBJECT_INVITE_DEFAULT = 'Your new %s account';
+    const SUBJECT_MFA_RATE_LIMIT_DEFAULT = 'Too many 2-step verification attempts on your %s account';
+    const SUBJECT_PASSWORD_CHANGED_DEFAULT = 'Your %s account password has been changed';
     
     /**
      * The configuration for the email-service client.
@@ -26,9 +28,21 @@ class Emailer extends Component
     /** @var EmailServiceClient */
     protected $emailServiceClient = null;
     
+    /** @var LoggerInterface */
+    public $logger = null;
+    
+    /**
+     * Other values that should be made available to be inserted into emails.
+     * The keys should be camelCase and will be made available as variables
+     * (e.g. `$camelCase`) in the emailer's view files.
+     *
+     * @var array<string,mixed>
+     */
+    public $otherDataForEmails = [];
+    
     public $sendInviteEmails = false;
     public $sendMfaRateLimitEmails = true;
-    public $sendWelcomeEmails = false;
+    public $sendPasswordChangedEmails = false;
     
     /**
      * The list of subjects, keyed on message type. This is initialized during
@@ -40,7 +54,7 @@ class Emailer extends Component
     
     public $subjectForInvite;
     public $subjectForMfaRateLimit;
-    public $subjectForWelcome;
+    public $subjectForPasswordChanged;
     
     /**
      * Assert that the given configuration values are acceptable.
@@ -131,12 +145,20 @@ class Emailer extends Component
     
     protected function getSubjectForMessage(string $messageType)
     {
+        if ( ! empty($this->subjects[$messageType]) && strpos($this->subjects[$messageType], '%') !== false) {
+            return sprintf($this->subjects[$messageType], $this->otherDataForEmails['idpDisplayName'] ?? '');
+        }
         return $this->subjects[$messageType] ?? null;
     }
     
     protected function getViewForMessage(string $messageType, string $format)
     {
-        Assert::oneOf($format, ['html', 'text']);
+        if ( ! self::isValidFormat($format)) {
+            throw new \InvalidArgumentException(sprintf(
+                "The email format must be 'html' or 'text', not %s.",
+                var_export($format, true)
+            ), 1511801775);
+        }
         
         return sprintf(
             '@common/mail/%s.%s.php',
@@ -151,19 +173,36 @@ class Emailer extends Component
      */
     public function init()
     {
+        if ($this->logger === null) {
+            $this->logger = new Psr3Yii2Logger();
+        }
+        
         $this->subjectForInvite = $this->subjectForInvite ?? self::SUBJECT_INVITE_DEFAULT;
         $this->subjectForMfaRateLimit = $this->subjectForMfaRateLimit ?? self::SUBJECT_MFA_RATE_LIMIT_DEFAULT;
-        $this->subjectForWelcome = $this->subjectForWelcome ?? self::SUBJECT_WELCOME_DEFAULT;
+        $this->subjectForPasswordChanged = $this->subjectForPasswordChanged ?? self::SUBJECT_PASSWORD_CHANGED_DEFAULT;
         
         $this->subjects = [
             EmailLog::MESSAGE_TYPE_INVITE => $this->subjectForInvite,
             EmailLog::MESSAGE_TYPE_MFA_RATE_LIMIT => $this->subjectForMfaRateLimit,
-            EmailLog::MESSAGE_TYPE_WELCOME => $this->subjectForWelcome,
+            EmailLog::MESSAGE_TYPE_PASSWORD_CHANGED => $this->subjectForPasswordChanged,
         ];
         
         $this->assertConfigIsValid();
         
+        $this->verifyOtherDataForEmailIsValid();
+        
         parent::init();
+    }
+    
+    /**
+     * Determine whether the given format string is valid.
+     *
+     * @param string $format
+     * @return bool
+     */
+    protected function isValidFormat($format)
+    {
+        return in_array($format, ['html', 'text'], true);
     }
     
     /**
@@ -175,15 +214,19 @@ class Emailer extends Component
      */
     public function sendMessageTo(string $messageType, User $user)
     {
-        $userAttributesForEmail = $user->getAttributesForEmail();
+        $dataForEmail = ArrayHelper::merge(
+            $user->getAttributesForEmail(),
+            $this->otherDataForEmails
+        );
+        
         $htmlView = $this->getViewForMessage($messageType, 'html');
         $textView = $this->getViewForMessage($messageType, 'text');
         
         $this->email(
             $user->email,
             $this->getSubjectForMessage($messageType),
-            \Yii::$app->view->render($htmlView, $userAttributesForEmail),
-            \Yii::$app->view->render($textView, $userAttributesForEmail)
+            \Yii::$app->view->render($htmlView, $dataForEmail),
+            \Yii::$app->view->render($textView, $dataForEmail)
         );
         
         EmailLog::logMessage($messageType, $user->id);
@@ -205,19 +248,36 @@ class Emailer extends Component
     }
     
     /**
-     * Whether we should send a welcome message to the given User.
+     * Whether we should send a password-changed message to the given User.
      *
      * @param User $user The User in question.
-     * @param array $oldAttributeValues The old attribute values (whereas the
-     *     User object already has the new, updated values).
+     * @param array $changedAttributes The old values for any attributes that
+     *     were changed (whereas the User object already has the new, updated
+     *     values). NOTE: This will only contain entries for attributes that
+     *     were changed!
      * @return bool
      */
-    public function shouldSendWelcomeMessageTo($user, $oldAttributeValues)
+    public function shouldSendPasswordChangedMessageTo($user, $changedAttributes)
     {
-        return $this->sendWelcomeEmails
-            && array_key_exists('current_password_id', $oldAttributeValues)
-            && ($oldAttributeValues['current_password_id'] === null)
-            && !empty($user->current_password_id)
-            && !$user->hasReceivedMessage(EmailLog::MESSAGE_TYPE_WELCOME);
+        return $this->sendPasswordChangedEmails
+            && array_key_exists('current_password_id', $changedAttributes);
+    }
+    
+    /**
+     * Verify that the other data provided for use in emails is acceptable. If
+     * any data is missing, log that error but let the email be sent anyway.
+     * We'd rather they get an incomplete email than no email.
+     */
+    protected function verifyOtherDataForEmailIsValid()
+    {
+        foreach ($this->otherDataForEmails as $keyForEmail => $valueForEmail) {
+            if (empty($valueForEmail)) {
+                $this->logger->critical(sprintf(
+                    'Missing a value for %s (for use in emails)',
+                    $keyForEmail
+                ));
+                $this->otherDataForEmails[$keyForEmail] = '(MISSING)';
+            }
+        }
     }
 }
