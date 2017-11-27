@@ -10,6 +10,7 @@
  * @var string $locked
  * @var string $lastChangedUtc
  * @var string $lastSyncedUtc
+ * @var string $lastLoginUtc
  * @var string $passwordExpiresUtc
  * @var string $emailSignature
  * @var string $helpCenterUrl
