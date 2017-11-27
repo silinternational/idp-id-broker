@@ -7,7 +7,6 @@ use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use Sil\EmailService\Client\EmailServiceClient;
 use Sil\Psr3Adapters\Psr3Yii2Logger;
-use Webmozart\Assert\Assert;
 use yii\base\Component;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Inflector;
@@ -151,7 +150,12 @@ class Emailer extends Component
     
     protected function getViewForMessage(string $messageType, string $format)
     {
-        Assert::oneOf($format, ['html', 'text']);
+        if ( ! self::isValidFormat($format)) {
+            throw new \InvalidArgumentException(sprintf(
+                "The email format must be 'html' or 'text', not %s.",
+                var_export($format, true)
+            ), 1511801775);
+        }
         
         return sprintf(
             '@common/mail/%s.%s.php',
@@ -185,6 +189,17 @@ class Emailer extends Component
         $this->verifyOtherDataForEmailIsValid();
         
         parent::init();
+    }
+    
+    /**
+     * Determine whether the given format string is valid.
+     *
+     * @param string $format
+     * @return bool
+     */
+    protected function isValidFormat($format)
+    {
+        return in_array($format, ['html', 'text'], true);
     }
     
     /**
