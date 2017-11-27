@@ -275,6 +275,7 @@ class User extends UserBase
             'lastChangedUtc' => $this->last_changed_utc,
             'lastSyncedUtc' => $this->last_synced_utc,
             'lastLoginUtc' => $this->last_login_utc,
+            'passwordExpiresUtc' => null, // Entry needed even if null.
             'isMfaEnabled' => count($this->mfas) > 0 ? true : false,
         ];
         if ($this->currentPassword !== null) {
