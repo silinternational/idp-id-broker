@@ -263,7 +263,7 @@ class User extends UserBase
      */
     public function getAttributesForEmail()
     {
-        return [
+        $attrs = [
             'employeeId' => $this->employee_id,
             'firstName' => $this->first_name,
             'lastName' => $this->last_name,
@@ -275,7 +275,11 @@ class User extends UserBase
             'lastChangedUtc' => $this->last_changed_utc,
             'lastSyncedUtc' => $this->last_synced_utc,
             'lastLoginUtc' => $this->last_login_utc,
+            'isMfaEnabled' => count($this->mfas) > 0 ? true : false,
         ];
+        if ($this->currentPassword !== null) {
+            $attrs['passwordExpiresUtc'] = $this->currentPassword->getGracePeriodEndsOn();
+        }
     }
     
     public function hasReceivedMessage(string $messageType)
