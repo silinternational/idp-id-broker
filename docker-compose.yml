@@ -19,7 +19,7 @@ services:
         volumes_from:
             - data
         ports:
-            - "8080:80"
+            - "8090:80"
         depends_on:
             - db
         env_file:
@@ -31,7 +31,16 @@ services:
             LDAP_DOMAIN_CONTROLLERS: ldap
             LDAP_USE_SSL: "false"
             LDAP_USE_TLS: "false"
-            #MIGRATE_PW_FROM_LDAP: # Set this in your local.env file.
+
+    cron:
+        build: ./
+        volumes_from:
+            - data
+        depends_on:
+            - db
+        env_file:
+            - ./local.env
+        command: ["/data/run-cron.sh"]
 
     appfortests:
         build: ./
@@ -47,6 +56,7 @@ services:
             EMAIL_SERVICE_accessToken: dummy
             EMAIL_SERVICE_assertValidIp: "false"
             EMAIL_SERVICE_baseUrl: dummy
+            EMAILER_CLASS: \Sil\SilIdBroker\Behat\Context\fakes\FakeEmailer
             IDP_NAME: test
             LDAP_BASE_DN: dc=acme,dc=org
             LDAP_ADMIN_USERNAME: cn=Manager,dc=acme,dc=org
@@ -61,6 +71,8 @@ services:
             MYSQL_USER: appfortests
             MYSQL_PASSWORD: appfortests
             MIGRATE_PW_FROM_LDAP: "true"
+            PASSWORD_FORGOT_URL: https://www.example.com/forgot
+            SUPPORT_EMAIL: support@example.com
 
     appfortestsdb:
         image: silintl/mariadb:latest
@@ -123,6 +135,8 @@ services:
             EMAIL_SERVICE_accessToken: dummy
             EMAIL_SERVICE_assertValidIp: "false"
             EMAIL_SERVICE_baseUrl: dummy
+            HELP_CENTER_URL: https://www.example.com/help
+            IDP_DISPLAY_NAME: Test
             IDP_NAME: test
             LDAP_BASE_DN: dc=acme,dc=org
             LDAP_ADMIN_USERNAME: cn=Manager,dc=acme,dc=org
@@ -134,19 +148,26 @@ services:
             MYSQL_HOST: appfortestsdb
             MYSQL_PASSWORD: appfortests
             MYSQL_USER: appfortests
+            PASSWORD_FORGOT_URL: https://www.example.com/forgot
+            PASSWORD_PROFILE_URL: https://www.example.com/profile
+            SUPPORT_EMAIL: support@example.com
         command: ./run-tests.sh
         # running isolated tests
         # docker-compose run --rm test vendor/bin/behat --stop-on-failure features/user.feature
         # docker-compose run --rm test vendor/bin/behat --stop-on-failure features/user.feature:306
 
     phpmyadmin:
-        image: silintl/phpmyadmin
+        image: phpmyadmin/phpmyadmin
         ports:
-            - "8081:80"
+            - "8091:80"
         depends_on:
             - db
         env_file:
             - ./local.env
+        environment:
+            PMA_HOST: db
+            PMA_USER: user
+            PMA_PASSWORD: pass
 
 networks:
     default:

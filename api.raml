@@ -93,6 +93,30 @@ schemas:
             "type": "string",
             "enum": ["yes", "no"]
           },
+          "last_login_utc": {
+            "required": false,
+            "type": "string"
+          },
+          "mfa": {
+            "required": true,
+            "type": "object",
+            "properties": {
+              "prompt": {
+                "required": true,
+                "type": "string",
+                "enum": ["yes","no"]
+              },
+              "nag": {
+                "required": true,
+                "type": "string",
+                "enum": ["yes","no"]
+              },
+              "options": {
+                "required": true,
+                "type": "array"
+              }
+            }
+          },
           "password": {
             "required": false,
             "type": "object",
@@ -258,6 +282,41 @@ schemas:
         },
         "type": "object"
       }
+  - MfaCreation: |
+        {
+          "$schema": "http://json-schema.org/draft-03/schema",
+          "properties": {
+            "employee_id": {
+              "required": true,
+              "type": "string"
+            },
+            "type": {
+              "required": true,
+              "type": "string",
+              "enum": ["backupcode", "totp", "u2f"]
+            },
+            "label": {
+              "required": false,
+              "type": "string"
+            }
+          },
+          "type": "object"
+        }
+  - MfaCreationResponse: |
+      {
+        "$schema": "http://json-schema.org/draft-03/schema",
+        "properties": {
+          "id": {
+            "required": true,
+            "type": "integer"
+          },
+          "data": {
+            "required": true,
+            "type": "object"
+          }
+        },
+        "type": "object"
+      }
 
 /authentication:
   post:
@@ -289,6 +348,26 @@ schemas:
                 "email": "john_smith@example.com",
                 "active": "yes",
                 "locked": "no",
+                "last_login_utc": "2017-05-24 14:04:51 UTC",
+                "mfa": {
+                  "prompt": "yes",
+                  "nag": "no",
+                  "options": [
+                     {
+                       "id": 123,
+                       "type": "totp"
+                     },
+                     {
+                       "id": 234,
+                       "type": "u2f",
+                       "label": "Blue YubiKey"
+                     },
+                     {
+                       "id": 345,
+                       "type": "backupcode"
+                     },
+                   ]
+                },
                 "password": {
                   "created_utc":"2017-05-24 14:04:51 UTC",
                   "expires_on":"2018-05-24 23:59:59 UTC",
@@ -349,6 +428,25 @@ schemas:
                     "email": "john_smith@example.com",
                     "active": "yes",
                     "locked": "no",
+                    "last_login_utc": "2017-05-24 14:04:51 UTC",
+                    "mfa": {
+                      "prompt": "yes",
+                      "nag": "no",
+                      "options": [
+                         {
+                           "id": 123,
+                           "type": "totp"
+                         },
+                         {
+                           "id": 234,
+                           "type": "u2f"
+                         },
+                         {
+                           "id": 345,
+                           "type": "backupcode"
+                         },
+                       ]
+                    },
                     "password": {
                       "created_utc":"2017-05-24 14:04:51",
                       "expires_on":"2018-05-24",
@@ -364,7 +462,26 @@ schemas:
                     "username": "jane_smith",
                     "email": "jane_smith@example.com",
                     "active": "yes",
-                    "locked": "no"
+                    "locked": "no",
+                    "last_login_utc": "2017-05-24 14:04:51 UTC",
+                    "mfa": {
+                      "prompt": "yes",
+                      "nag": "no",
+                      "options": [
+                         {
+                           "id": 123,
+                           "type": "totp"
+                         },
+                         {
+                           "id": 234,
+                           "type": "u2f"
+                         },
+                         {
+                           "id": 345,
+                           "type": "backupcode"
+                         },
+                       ]
+                    }
                   }
                 ]
   post:
@@ -396,7 +513,12 @@ schemas:
                 "username": "john_smith",
                 "email": "john_smith@example.com",
                 "active": "yes",
-                "locked": "no"
+                "locked": "no",
+                "mfa": {
+                  "prompt": "no",
+                  "nag": "yes",
+                  "options": []
+                }
               }
       422:
         description: The given user data does not satisfy some validation rule.
@@ -513,7 +635,42 @@ schemas:
                   "code": 0,
                   "status": 500
                 }
-
+    /mfa:
+      get:
+        description: Get a list of configured MFA devices for user
+        responses:
+          200:
+            body:
+              application/json:
+                example: |
+                  [
+                      {
+                          "id": 7,
+                          "type": "backupcode",
+                          "label": "2SV #1",
+                          "created_utc": "2017-10-24T20:40:47+00:00",
+                          "last_used_utc": null,
+                          "data": {
+                              "count": 10
+                          }
+                      },
+                      {
+                          "id": 8,
+                          "type": "u2f",
+                          "label": "2SV #2",
+                          "created_utc": "2017-10-24T20:40:57+00:00",
+                          "last_used_utc": null,
+                          "data": []
+                      },
+                      {
+                          "id": 9,
+                          "type": "totp",
+                          "label": "2SV #3",
+                          "created_utc": "2017-10-24T20:41:05+00:00",
+                          "last_used_utc": null,
+                          "data": []
+                      }
+                  ]
     /password:
       put:
         description: Set the password for a User.
@@ -656,3 +813,75 @@ schemas:
                     }
                   ]
 # TODO: need docs for new search api, i.e., /user?username=AAA&email=AAA@example.org
+/mfa:
+  post:
+    description: Create a new mfa record.
+    body:
+      application/json:
+        schema: MfaCreation
+        example: |
+          {
+            "employee_id": "12345",
+            "type": "backupcode"
+          }
+    responses:
+      200:
+        description: The new mfa record was created.
+        body:
+          application/json:
+            schema: MfaCreationResponse
+            example: |
+              {
+                "id": 3,
+                "data": [
+                  "51231235",
+                  "74475261",
+                  "72412792",
+                  "23221473",
+                  "30936163",
+                  "09641891",
+                  "99517242",
+                  "08751652",
+                  "32842734",
+                  "25937677"
+                ]
+              }
+      400:
+        description: The given mfa data does not satisfy some validation rule.
+      500:
+        description: The server encountered an error
+  /{id}:
+    delete:
+      description: Delete an MFA configuration
+      body:
+        application/json:
+          example: |
+            {
+              "employee_id": "12345"
+            }
+      responses:
+        204:
+        404:
+        500:
+    /verify:
+      post:
+        description: Verify the value provided for this MFA device.
+        body:
+          application/json:
+            example: |
+              {
+                "employee_id": "12345",
+                "value": "01234987"
+              }
+        responses:
+          204:
+            description: Value provided passed verification
+          400:
+            description: |
+              Value provided failed verification or was unacceptable for some
+              other reason (such as an invalid `employee_id`).
+          404:
+            description: No MFA record found with that `id` and `employee_id`.
+          429:
+            description: |
+              Too many failed attempts for this MFA record recently.

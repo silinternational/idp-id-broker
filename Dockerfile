@@ -7,6 +7,8 @@ RUN apt-get update -y && \
     apt-get install -y make
 
 COPY dockerbuild/vhost.conf /etc/apache2/sites-enabled/
+COPY dockerbuild/broker-cron /etc/cron.d/
+RUN chmod 0644 /etc/cron.d/broker-cron
 
 RUN mkdir -p /data
 

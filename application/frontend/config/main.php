@@ -44,6 +44,11 @@ return [
 
                 'POST authentication' => 'authentication/create',
 
+                'GET    user/<employeeId:\w+>/mfa'  => 'mfa/list',
+                'POST   mfa'                        => 'mfa/create',
+                'POST   mfa/<id>/verify'            => 'mfa/verify',
+                'DELETE mfa/<id>'                   => 'mfa/delete',
+
                 'site/status' => 'site/status',
 
                 '<undefinedRequest>' => 'site/undefined-request',
@@ -51,9 +56,6 @@ return [
         ],
     ],
     'params' => [
-        'authorizedTokens'              => Env::getArray('API_ACCESS_KEYS'),
-        'passwordReuseLimit'            => Env::get('PASSWORD_REUSE_LIMIT', 10),
-        'passwordLifespan'              => Env::get('PASSWORD_LIFESPAN', '+1 year'),
-        'passwordExpirationGracePeriod' => Env::get('PASSWORD_EXPIRATION_GRACE_PERIOD', '+30 days'),
+
     ],
 ];

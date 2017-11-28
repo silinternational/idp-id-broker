@@ -20,8 +20,12 @@ use Yii;
  * @property string $locked
  * @property string $last_changed_utc
  * @property string $last_synced_utc
+ * @property string $require_mfa
+ * @property string $nag_for_mfa_after
+ * @property string $last_login_utc
  *
  * @property EmailLog[] $emailLogs
+ * @property Mfa[] $mfas
  * @property Password $currentPassword
  */
 class UserBase extends \yii\db\ActiveRecord
@@ -40,10 +44,10 @@ class UserBase extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['uuid', 'employee_id', 'first_name', 'last_name', 'username', 'email', 'active', 'locked', 'last_changed_utc', 'last_synced_utc'], 'required'],
+            [['uuid', 'employee_id', 'first_name', 'last_name', 'username', 'email', 'active', 'locked', 'last_changed_utc', 'last_synced_utc', 'nag_for_mfa_after'], 'required'],
             [['current_password_id'], 'integer'],
-            [['active', 'locked'], 'string'],
-            [['last_changed_utc', 'last_synced_utc'], 'safe'],
+            [['active', 'locked', 'require_mfa'], 'string'],
+            [['last_changed_utc', 'last_synced_utc', 'nag_for_mfa_after', 'last_login_utc'], 'safe'],
             [['uuid'], 'string', 'max' => 64],
             [['employee_id', 'first_name', 'last_name', 'display_name', 'username', 'email'], 'string', 'max' => 255],
             [['employee_id'], 'unique'],
@@ -72,6 +76,9 @@ class UserBase extends \yii\db\ActiveRecord
             'locked' => Yii::t('app', 'Locked'),
             'last_changed_utc' => Yii::t('app', 'Last Changed Utc'),
             'last_synced_utc' => Yii::t('app', 'Last Synced Utc'),
+            'require_mfa' => Yii::t('app', 'Require Mfa'),
+            'nag_for_mfa_after' => Yii::t('app', 'Nag For Mfa After'),
+            'last_login_utc' => Yii::t('app', 'Last Login Utc'),
         ];
     }
 
@@ -81,6 +88,14 @@ class UserBase extends \yii\db\ActiveRecord
     public function getEmailLogs()
     {
         return $this->hasMany(EmailLog::className(), ['user_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getMfas()
+    {
+        return $this->hasMany(Mfa::className(), ['user_id' => 'id']);
     }
 
     /**
