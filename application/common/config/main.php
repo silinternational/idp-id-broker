@@ -60,7 +60,7 @@ return [
             'emailServiceConfig' => $emailServiceConfig,
             
             'otherDataForEmails' => [
-                'emailSignature' => Env::get('EMAIL_SIGNATURE', $idpDisplayName . ' Help Desk'),
+                'emailSignature' => Env::get('EMAIL_SIGNATURE', ''),
                 'helpCenterUrl' => Env::get('HELP_CENTER_URL'),
                 'idpDisplayName' => $idpDisplayName,
                 'passwordForgotUrl' => Env::get('PASSWORD_FORGOT_URL'),
