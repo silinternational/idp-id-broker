@@ -25,6 +25,7 @@ services:
         env_file:
             - ./local.env
         environment:
+            EMAIL_SIGNATURE: Dummy Signature for Development
             LDAP_BASE_DN: dc=acme,dc=org
             LDAP_ADMIN_USERNAME: cn=Manager,dc=acme,dc=org
             LDAP_ADMIN_PASSWORD: admin
@@ -56,6 +57,7 @@ services:
             EMAIL_SERVICE_accessToken: dummy
             EMAIL_SERVICE_assertValidIp: "false"
             EMAIL_SERVICE_baseUrl: dummy
+            EMAIL_SIGNATURE: Dummy Signature for Tests
             EMAILER_CLASS: \Sil\SilIdBroker\Behat\Context\fakes\FakeEmailer
             IDP_NAME: test
             LDAP_BASE_DN: dc=acme,dc=org
@@ -135,6 +137,7 @@ services:
             EMAIL_SERVICE_accessToken: dummy
             EMAIL_SERVICE_assertValidIp: "false"
             EMAIL_SERVICE_baseUrl: dummy
+            EMAIL_SIGNATURE: Dummy Signature for Test
             HELP_CENTER_URL: https://www.example.com/help
             IDP_DISPLAY_NAME: Test
             IDP_NAME: test
