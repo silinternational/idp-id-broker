@@ -182,6 +182,15 @@ class Mfa extends MfaBase
         }
 
         $this->recordFailedAttempt();
+
+        \Yii::warning([
+            'action' => 'verify mfa',
+            'type' => $this->type,
+            'user' => $this->user->email,
+            'status' => 'error',
+            'error' => 'verify mfa failed'
+        ]);
+
         return false;
     }
 
