@@ -584,7 +584,7 @@ class User extends UserBase
     public function isPromptForMfa(): bool
     {
         if ($this->scenario == self::SCENARIO_AUTHENTICATE) {
-            if ($this->require_mfa == 'yes' || count($this->getVerifiedMfaOptions()) > 0) {
+            if ($this->require_mfa === 'yes' || count($this->getVerifiedMfaOptions()) > 0) {
                 return true;
             }
         }
