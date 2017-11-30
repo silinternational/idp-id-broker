@@ -29,7 +29,7 @@ Dear <?=yHtml::encode($displayName)?>,
 Congratulations! You have logged into your new <?=yHtml::encode($idpDisplayName)?> account for the first time.
 <?=yHtml::encode($idpDisplayName)?> is in the process of transitioning from logging into websites using
 an Insite account to this new "<?=yHtml::encode($idpDisplayName)?> account". Starting in January 2018 the option
-to login to websites using your Insite account will go away. This new <?=yHtml::encode($idpDisplayName)?>
+to log in to websites using your Insite account will go away. This new <?=yHtml::encode($idpDisplayName)?>
 account is not the same as your email account or computer account, it is a new corporate identity for use with
 logging into many websites used by <?=yHtml::encode($idpDisplayName)?>.
 
