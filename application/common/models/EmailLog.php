@@ -15,6 +15,7 @@ class EmailLog extends EmailLogBase
     const MESSAGE_TYPE_INVITE = 'invite';
     const MESSAGE_TYPE_MFA_RATE_LIMIT = 'mfa-rate-limit';
     const MESSAGE_TYPE_PASSWORD_CHANGED = 'password-changed';
+    const MESSAGE_TYPE_WELCOME = 'welcome';
 
     /**
      * @inheritdoc
@@ -32,6 +33,7 @@ class EmailLog extends EmailLogBase
             self::MESSAGE_TYPE_INVITE,
             self::MESSAGE_TYPE_MFA_RATE_LIMIT,
             self::MESSAGE_TYPE_PASSWORD_CHANGED,
+            self::MESSAGE_TYPE_WELCOME,
         ];
     }
     

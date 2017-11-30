@@ -435,6 +435,10 @@ class User extends UserBase
         if ($emailer->shouldSendPasswordChangedMessageTo($this, $changedAttributes)) {
             $emailer->sendMessageTo(EmailLog::MESSAGE_TYPE_PASSWORD_CHANGED, $this);
         }
+        
+        if ($emailer->shouldSendWelcomeMessageTo($this, $changedAttributes)) {
+            $emailer->sendMessageTo(EmailLog::MESSAGE_TYPE_WELCOME, $this);
+        }
     }
 
     private function updatePassword(): bool
