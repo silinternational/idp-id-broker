@@ -1,5 +1,4 @@
 <?php
-use yii\helpers\Html as yHtml;
 
 /**
  * @var string $employeeId
@@ -24,24 +23,24 @@ use yii\helpers\Html as yHtml;
  * @var bool   $isMfaEnabled
  */
 ?>
-Dear <?=yHtml::encode($displayName)?>,
+Dear <?= $displayName ?>,
 
-Congratulations! You have logged into your new <?=yHtml::encode($idpDisplayName)?> account for the first time.
-<?=yHtml::encode($idpDisplayName)?> is in the process of transitioning from logging into websites using
-an Insite account to this new "<?=yHtml::encode($idpDisplayName)?> account". Starting in January 2018 the option
-to log in to websites using your Insite account will go away. This new <?=yHtml::encode($idpDisplayName)?>
+Congratulations! You have logged into your new <?= $idpDisplayName ?> account for the first time.
+<?= $idpDisplayName ?> is in the process of transitioning from logging into websites using
+an Insite account to this new "<?= $idpDisplayName ?> account". Starting in January 2018 the option
+to log in to websites using your Insite account will go away. This new <?= $idpDisplayName ?>
 account is not the same as your email account or computer account, it is a new corporate identity for use with
-logging into many websites used by <?=yHtml::encode($idpDisplayName)?>.
+logging into many websites used by <?= $idpDisplayName ?>.
 
-Password expires on: <?=yHtml::encode($passwordExpiresUtc)?>
+Password expires on: <?= $passwordExpiresUtc ?>
 
 Please be sure to configure recovery methods for
 the potential event that you forget your password. You can reset your password using your email address,
-<?=yHtml::encode($email)?>, but you can also add other addresses and even phone numbers for SMS verification.
+<?= $email ?>, but you can also add other addresses and even phone numbers for SMS verification.
 
 Instructions to add recovery methods:
 -------------------------------------
-1. Go to <?=yHtml::encode($passwordProfileUrl)?>.
+1. Go to <?= $passwordProfileUrl ?>.
 2. Click the "Add" button next to Recovery Methods.
 3. Select the option for either an Email or Phone recovery method.
 4. Enter the email address or phone number you wish to use and click "Send Code"
@@ -59,16 +58,16 @@ step every month or so, but anyone trying to hack into your account would need b
     
 Instructions to set up 2-Step Verification:
 -------------------------------------------
-1. Go to <?=yHtml::encode($passwordProfileUrl)?>
+1. Go to <?= $passwordProfileUrl ?>
 2. Under 2-Step Verification, set up the options that suit you best (USB Security Key, Smartphone App, and/or
    Printable Codes)
 3. Log out and log in again to see how it works and to have it remember your computer for 30 days. Note that
    logging out will undo the "Remember this computer" setting.
 
-To learn more about 2-Step Verification go to <?=yHtml::encode($helpCenterUrl)?>
+To learn more about 2-Step Verification go to <?= $helpCenterUrl ?>
 
-If you have any difficulties completing this task, please contact <?=yHtml::encode($supportName)?> at
-<?=yHtml::encode($supportEmail)?>.
+If you have any difficulties completing this task, please contact <?= $supportName ?> at
+<?= $supportEmail ?>.
 
 
-<?=yHtml::encode($emailSignature)?>
+<?= $emailSignature ?>
