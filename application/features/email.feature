@@ -1,11 +1,5 @@
 Feature: Email
 
-  Scenario: Not configured to send invite emails
-    Given we are NOT configured to send invite emails
-    When I create a new user
-    Then an "invite" email should NOT have been sent to them
-      And an "invite" email to that user should NOT have been logged
-
   Scenario Outline: When to send invite emails
     Given we are configured <sendInviteEml> invite emails
       And a specific user <userExistsOrNot>
