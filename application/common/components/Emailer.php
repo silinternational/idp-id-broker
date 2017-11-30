@@ -43,7 +43,7 @@ class Emailer extends Component
     
     public $sendInviteEmails = false;
     public $sendMfaRateLimitEmails = true;
-    public $sendPasswordChangedEmails = false;
+    public $sendPasswordChangedEmails = true;
     public $sendWelcomeEmails = true;
     
     /**
