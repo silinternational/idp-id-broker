@@ -75,6 +75,17 @@ class Mfa extends MfaBase
         return $backend->delete($this->id);
     }
 
+    public function afterDelete()
+    {
+        parent::afterDelete();
+        \Yii::warning([
+            'action' => 'delete mfa',
+            'type' => $this->type,
+            'user' => $this->user->email,
+            'status' => 'success',
+        ]);
+    }
+
     /**
      * Check if given type is valid
      * @param string $type
@@ -110,8 +121,16 @@ class Mfa extends MfaBase
     public function authInit()
     {
         $backend = self::getBackendForType($this->type);
-        return $backend->authInit($this->id);
+        $authInit = $backend->authInit($this->id);
 
+        \Yii::warning([
+            'action' => 'mfa auth init',
+            'type' => $this->type,
+            'user' => $this->user->email,
+            'status' => 'success',
+        ]);
+
+        return $authInit;
     }
     
     protected function hasTooManyRecentFailures()
@@ -127,6 +146,13 @@ class Mfa extends MfaBase
     public function verify($value): bool
     {
         if ($this->hasTooManyRecentFailures()) {
+            \Yii::warning([
+                'action' => 'verify mfa',
+                'type' => $this->type,
+                'user' => $this->user->email,
+                'status' => 'error',
+                'error' => 'too many recent failures'
+            ]);
             throw new TooManyRequestsHttpException(
                 'Too many recent failed attempts for this MFA'
             );
@@ -145,10 +171,26 @@ class Mfa extends MfaBase
                 ]);
             }
             $this->clearFailedAttempts('after successful verification');
+
+            \Yii::warning([
+                'action' => 'verify mfa',
+                'type' => $this->type,
+                'user' => $this->user->email,
+                'status' => 'success',
+            ]);
             return true;
         }
 
         $this->recordFailedAttempt();
+
+        \Yii::warning([
+            'action' => 'verify mfa',
+            'type' => $this->type,
+            'user' => $this->user->email,
+            'status' => 'error',
+            'error' => 'verify mfa failed'
+        ]);
+
         return false;
     }
 
@@ -229,6 +271,13 @@ class Mfa extends MfaBase
                 throw new ServerErrorHttpException("Unable to update MFA record", 1507904194);
             }
         }
+
+        \Yii::warning([
+            'action' => 'create mfa',
+            'type' => $type,
+            'user' => $user->email,
+            'status' => 'success',
+        ]);
 
         return [
             'id' => $mfa->id,

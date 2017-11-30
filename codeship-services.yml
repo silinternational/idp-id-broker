@@ -23,6 +23,7 @@ app:
         EMAIL_SERVICE_assertValidIp: "false"
         EMAIL_SERVICE_baseUrl: http://email
         EMAIL_SERVICE_validIpRanges: 192.168.0.0/16
+        EMAIL_SIGNATURE: Dummy Signature for Automated Tests
         EMAILER_CLASS: \Sil\SilIdBroker\Behat\Context\fakes\FakeEmailer
         HELP_CENTER_URL: https://help-center
         IDP_NAME: Test

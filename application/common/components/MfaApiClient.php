@@ -4,6 +4,7 @@ namespace common\components;
 
 use GuzzleHttp\Client as GuzzleClient;
 use GuzzleHttp\Exception\ConnectException;
+use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ServerException;
 use yii\helpers\Json;
 
@@ -80,11 +81,20 @@ class MfaApiClient
      */
     public function validateTotp(string $uuid, string $code): bool
     {
-        $this->callApi('totp/' . $uuid . '/validate', 'POST', [
-            'code' => $code,
-        ]);
-
-        return true;
+        try {
+            $this->callApi('totp/' . $uuid . '/validate', 'POST', [
+                'code' => $code,
+            ]);
+            return true;
+        } catch (ClientException $e) {
+            $errorCode = $e->getCode();
+            if (($errorCode === 400) || ($errorCode === 401)) {
+                // 400 = no code provided
+                // 401 = invalid code provided
+                return false;
+            }
+            throw $e;
+        }
     }
 
     /**

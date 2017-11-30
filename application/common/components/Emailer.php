@@ -17,7 +17,8 @@ class Emailer extends Component
     const SUBJECT_INVITE_DEFAULT = 'Your new %s account';
     const SUBJECT_MFA_RATE_LIMIT_DEFAULT = 'Too many 2-step verification attempts on your %s account';
     const SUBJECT_PASSWORD_CHANGED_DEFAULT = 'Your %s account password has been changed';
-    
+    const SUBJECT_WELCOME_DEFAULT = 'Welcome to your new %s account';
+
     /**
      * The configuration for the email-service client.
      *
@@ -42,7 +43,8 @@ class Emailer extends Component
     
     public $sendInviteEmails = false;
     public $sendMfaRateLimitEmails = true;
-    public $sendPasswordChangedEmails = false;
+    public $sendPasswordChangedEmails = true;
+    public $sendWelcomeEmails = true;
     
     /**
      * The list of subjects, keyed on message type. This is initialized during
@@ -55,6 +57,7 @@ class Emailer extends Component
     public $subjectForInvite;
     public $subjectForMfaRateLimit;
     public $subjectForPasswordChanged;
+    public $subjectForWelcome;
     
     /**
      * Assert that the given configuration values are acceptable.
@@ -180,11 +183,13 @@ class Emailer extends Component
         $this->subjectForInvite = $this->subjectForInvite ?? self::SUBJECT_INVITE_DEFAULT;
         $this->subjectForMfaRateLimit = $this->subjectForMfaRateLimit ?? self::SUBJECT_MFA_RATE_LIMIT_DEFAULT;
         $this->subjectForPasswordChanged = $this->subjectForPasswordChanged ?? self::SUBJECT_PASSWORD_CHANGED_DEFAULT;
+        $this->subjectForWelcome = $this->subjectForWelcome ?? self::SUBJECT_WELCOME_DEFAULT;
         
         $this->subjects = [
             EmailLog::MESSAGE_TYPE_INVITE => $this->subjectForInvite,
             EmailLog::MESSAGE_TYPE_MFA_RATE_LIMIT => $this->subjectForMfaRateLimit,
             EmailLog::MESSAGE_TYPE_PASSWORD_CHANGED => $this->subjectForPasswordChanged,
+            EmailLog::MESSAGE_TYPE_WELCOME => $this->subjectForWelcome,
         ];
         
         $this->assertConfigIsValid();
@@ -260,7 +265,25 @@ class Emailer extends Component
     public function shouldSendPasswordChangedMessageTo($user, $changedAttributes)
     {
         return $this->sendPasswordChangedEmails
-            && array_key_exists('current_password_id', $changedAttributes);
+            && array_key_exists('current_password_id', $changedAttributes)
+            && !is_null($changedAttributes['current_password_id']);
+    }
+    
+    /**
+     * Whether we should send a welcome message to the given User.
+     *
+     * @param User $user The User in question.
+     * @param array $changedAttributes The old values for any attributes that
+     *     were changed (whereas the User object already has the new, updated
+     *     values). NOTE: This will only contain entries for attributes that
+     *     were changed!
+     * @return bool
+     */
+    public function shouldSendWelcomeMessageTo($user, $changedAttributes)
+    {
+        return $this->sendWelcomeEmails
+            && array_key_exists('current_password_id', $changedAttributes)
+            && is_null($changedAttributes['current_password_id']);
     }
     
     /**
