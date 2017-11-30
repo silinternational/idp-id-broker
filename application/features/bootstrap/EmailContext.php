@@ -63,10 +63,11 @@ class EmailContext extends YiiContext
     }
     
     /**
-     * @When I create a new user
+     * @When that user is created
      */
-    public function iCreateANewUser()
+    public function thatUserIsCreated()
     {
+        Assert::null($this->tempUser, 'The user should not have existed yet.');
         $this->tempUser = $this->createNewUser();
     }
     
@@ -129,23 +130,23 @@ class EmailContext extends YiiContext
     }
 
     /**
-     * @Given we are NOT configured to send invite emails
+     * @Given we are configured NOT to send invite emails
      */
-    public function weAreNotConfiguredToSendInviteEmails()
+    public function weAreConfiguredNotToSendInviteEmails()
     {
         $this->fakeEmailer->sendInviteEmails = false;
     }
 
     /**
-     * @Given we are NOT configured to send password-changed emails
+     * @Given we are configured NOT to send password-changed emails
      */
-    public function weAreNotConfiguredToSendPasswordChangedEmails()
+    public function weAreConfiguredNotToSendPasswordChangedEmails()
     {
         $this->fakeEmailer->sendPasswordChangedEmails = false;
     }
 
     /**
-     * @Given a user already exists
+     * @Given a (specific) user already exists
      */
     public function aUserAlreadyExists()
     {
@@ -157,17 +158,19 @@ class EmailContext extends YiiContext
      */
     public function thatUserDoesNotHaveAPassword()
     {
-        Assert::null(
-            $this->tempUser->current_password_id,
-            'The user already has a password, but this test needs a user '
-            . 'without a password.'
-        );
+        if ($this->tempUser !== null) {
+            Assert::null(
+                $this->tempUser->current_password_id,
+                'The user already has a password, but this test needs a user '
+                . 'without a password.'
+            );
+        }
     }
 
     /**
-     * @When I give that user a password
+     * @When that user gets a password
      */
-    public function iGiveThatUserAPassword()
+    public function thatUserGetsAPassword()
     {
         $this->setPasswordForUser(
             $this->tempUser,
@@ -186,9 +189,9 @@ class EmailContext extends YiiContext
     }
 
     /**
-     * @Given that user DOES have a password
+     * @Given that user has a password
      */
-    public function thatUserDoesHaveAPassword()
+    public function thatUserHasAPassword()
     {
         $this->setPasswordForUser(
             $this->tempUser,
@@ -199,9 +202,9 @@ class EmailContext extends YiiContext
     }
 
     /**
-     * @When I save changes to that user without changing the password
+     * @When that user has non-pw changes
      */
-    public function iSaveChangesToThatUserWithoutChangingThePassword()
+    public function thatUserHasNonPwChanges()
     {
         $this->tempUser->first_name .= ', changed ' . microtime();
         Assert::true(
@@ -225,5 +228,29 @@ class EmailContext extends YiiContext
     public function iChangeThatUsersPassword()
     {
         $this->iGiveThatUserAPassword();
+    }
+
+    /**
+     * @Given a specific user does NOT exist
+     */
+    public function aSpecificUserDoesNotExist()
+    {
+        $this->tempUser = null;
+    }
+
+    /**
+     * @Given we are configured to send welcome emails
+     */
+    public function weAreConfiguredToSendWelcomeEmails()
+    {
+        $this->fakeEmailer->sendWelcomeEmails = true;
+    }
+
+    /**
+     * @Given we are configured NOT to send welcome emails
+     */
+    public function weAreConfiguredNotToSendWelcomeEmails()
+    {
+        $this->fakeEmailer->sendWelcomeEmails = false;
     }
 }
