@@ -285,4 +285,20 @@ class EmailContext extends YiiContext
     {
         $this->weAreNotConfiguredToSendInviteEmails();
     }
+
+    /**
+     * @Given we are configured to send welcome emails
+     */
+    public function weAreConfiguredToSendWelcomeEmails()
+    {
+        $this->fakeEmailer->sendWelcomeEmails = true;
+    }
+
+    /**
+     * @Given we are configured NOT to send welcome emails
+     */
+    public function weAreConfiguredNotToSendWelcomeEmails()
+    {
+        $this->fakeEmailer->sendWelcomeEmails = false;
+    }
 }
