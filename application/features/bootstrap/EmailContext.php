@@ -277,4 +277,12 @@ class EmailContext extends YiiContext
     {
         $this->weAreNotConfiguredToSendPasswordChangedEmails();
     }
+
+    /**
+     * @Given we are configured NOT to send invite emails
+     */
+    public function weAreConfiguredNotToSendInviteEmails()
+    {
+        $this->weAreNotConfiguredToSendInviteEmails();
+    }
 }
