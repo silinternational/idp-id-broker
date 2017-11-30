@@ -145,7 +145,7 @@ class EmailContext extends YiiContext
     }
 
     /**
-     * @Given a user already exists
+     * @Given a (specific) user already exists
      */
     public function aUserAlreadyExists()
     {
@@ -157,11 +157,13 @@ class EmailContext extends YiiContext
      */
     public function thatUserDoesNotHaveAPassword()
     {
-        Assert::null(
-            $this->tempUser->current_password_id,
-            'The user already has a password, but this test needs a user '
-            . 'without a password.'
-        );
+        if ($this->tempUser !== null) {
+            Assert::null(
+                $this->tempUser->current_password_id,
+                'The user already has a password, but this test needs a user '
+                . 'without a password.'
+            );
+        }
     }
 
     /**
@@ -225,5 +227,54 @@ class EmailContext extends YiiContext
     public function iChangeThatUsersPassword()
     {
         $this->iGiveThatUserAPassword();
+    }
+
+    /**
+     * @Given a specific user does NOT exist
+     */
+    public function aSpecificUserDoesNotExist()
+    {
+        $this->tempUser = null;
+    }
+
+    /**
+     * @When that user is created
+     */
+    public function thatUserIsCreated()
+    {
+        Assert::null($this->tempUser, 'The user should not have existed yet.');
+        $this->iCreateANewUser();
+    }
+
+    /**
+     * @When that user gets a password
+     */
+    public function thatUserGetsAPassword()
+    {
+        $this->iGiveThatUserAPassword();
+    }
+
+    /**
+     * @When that user has non-pw changes
+     */
+    public function thatUserHasNonPwChanges()
+    {
+        $this->iSaveChangesToThatUserWithoutChangingThePassword();
+    }
+
+    /**
+     * @Given that user has a password
+     */
+    public function thatUserHasAPassword()
+    {
+        $this->thatUserDoesHaveAPassword();
+    }
+
+    /**
+     * @Given we are configured NOT to send password-changed emails
+     */
+    public function weAreConfiguredNotToSendPasswordChangedEmails()
+    {
+        $this->weAreNotConfiguredToSendPasswordChangedEmails();
     }
 }
