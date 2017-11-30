@@ -66,24 +66,6 @@ Feature: Email
         | NOT to send    | already exists  | has           | gets a password    | should NOT  |
         | NOT to send    | already exists  | has           | has non-pw changes | should NOT  |
 
-  Scenario: Not configured to send password-changed emails
-    Given we are NOT configured to send password-changed emails
-    When I create a new user
-    Then a "password-changed" email should NOT have been sent to them
-      And a "password-changed" email to that user should NOT have been logged
-
-  Scenario: Not sending a password-changed email for new users
-    Given we are configured to send password-changed emails
-    When I create a new user
-    Then a "password-changed" email should NOT have been sent to them
-      And a "password-changed" email to that user should NOT have been logged
-
-  Scenario: Sending an invite email
-    Given we are configured to send invite emails
-    When I create a new user
-    Then an "invite" email should have been sent to them
-      And an "invite" email to that user should have been logged
-
   Scenario: Sending a password-changed email for first password
     Given we are configured to send password-changed emails
       And a user already exists
