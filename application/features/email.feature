@@ -84,12 +84,6 @@ Feature: Email
     Then a "password-changed" email should NOT have been sent to them
       And a "password-changed" email to that user should NOT have been logged
 
-#  Scenario Outline: When to send an invite email
-#    @todo
-
-#  Scenario Outline: When to send a password-changed email
-#    @todo
-
   Scenario: Sending an invite email
     Given we are configured to send invite emails
     When I create a new user
