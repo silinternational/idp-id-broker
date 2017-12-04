@@ -41,21 +41,23 @@ the potential event that you forget your password. You can reset your password u
 Instructions to add recovery methods:
 -------------------------------------
 1. Go to <?= $passwordProfileUrl ?>.
-2. Click the "Add" button next to Recovery Methods.
+2. Click the "Add" button next to "Password recovery methods."
 3. Select the option for either an Email or Phone recovery method.
 4. Enter the email address or phone number you wish to use and click "Send Code"
 5. If you entered an email address, check the inbox for that email address for a new email and retrieve the code
    from that email.
 6. If you entered a phone number, watch for a text message or phone call and take note of the code you receive.
 7. Enter the verification code into the form on your screen and click "Verify".
-    
-Enable 2-Step Verification for enhanced security (recommended)
-==============================================================
-2-Step Verification can help keep bad guys out, even if they have your password. With 2-Step Verification, you'll
+
+Enable 2-Step Verification (please)
+===================================
+Using 2-Step Verification can help keep bad guys out, even if they have your password. With 2-Step Verification, you'll
 protect your account with something you know (your password) and something you have (your phone or Security Key).
 Setup is easy and with the option to remember your computer for 30 days at a time, you'll only need to use the second
-step every month or so, but anyone trying to hack into your account would need both factors.
-    
+step every month or so, but anyone trying to hack into your account would need both steps. This not only increases the
+security of your own account, it increases the privacy and protection of your colleagues by keeping intruders out of
+the systems that have sensitive information about many of us.
+
 Instructions to set up 2-Step Verification:
 -------------------------------------------
 1. Go to <?= $passwordProfileUrl ?>
