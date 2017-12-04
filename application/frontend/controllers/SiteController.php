@@ -50,7 +50,12 @@ class SiteController extends BaseRestController
         try {
             $emailer->getSiteStatus();
         } catch (Exception $e) {
-            Yii::error('Email Service problem: ' . $e->getMessage());
+            Yii::error([
+                'event' => 'email service status error',
+                'exceptionClass' => get_class($e),
+                'errorCode' => $e->getCode(),
+                'errorMessage' => $e->getMessage(),
+            ]);
             throw new Http500('Email Service problem.', $e->getCode());
         }
 
