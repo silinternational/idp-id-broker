@@ -55,8 +55,8 @@ Instructions to add recovery methods:
 if ( ! $isMfaEnabled) {
     ?>
 
-Enable 2-Step Verification for enhanced security
-================================================
+Enable 2-Step Verification (please)
+===================================
 2-Step Verification can help keep bad guys out, even if they have your password. With 2-Step Verification, you'll
 protect your account with something you know (your password) and something you have (your phone or Security Key).
 Setup is easy and with the option to remember your computer for 30 days at a time, you’ll only need to use the second

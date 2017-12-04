@@ -59,7 +59,7 @@ use yii\helpers\Html as yHtml;
 </ol>
 
 <p>
-    <strong>Enable 2-Step Verification for enhanced security</strong> (recommended)
+    <strong>Enable 2-Step Verification</strong> (please)
 </p>
 <p>
     Using 2-Step Verification can help keep bad guys out, even if they have your password. With 2-Step Verification, you'll
