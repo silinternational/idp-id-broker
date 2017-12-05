@@ -34,6 +34,8 @@ COPY application/ /data/
 RUN chown -R www-data:www-data \
     console/runtime/
 
+RUN touch /etc/default/locale
+
 EXPOSE 80
 ENTRYPOINT ["/usr/local/bin/s3-expand"]
 CMD ["/data/run.sh"]
