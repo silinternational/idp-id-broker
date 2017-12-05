@@ -380,6 +380,7 @@ class Mfa extends MfaBase
         $mfas = self::find()->where(['verified' => 0])
             ->andWhere(['<', 'created_utc', $removeOlderThan])->all();
 
+        $numDeleted = 0;
         foreach ($mfas as $mfa) {
             if ($mfa->delete() === false) {
                 \Yii::error([
@@ -388,7 +389,15 @@ class Mfa extends MfaBase
                     'error' => $mfa->getFirstErrors(),
                     'mfa_id' => $mfa->id,
                 ]);
+            } else {
+                $numDeleted += 1;
             }
         }
+        
+        \Yii::warning([
+            'action' => 'delete old unverified mfa records',
+            'status' => 'complete',
+            'count' => $numDeleted,
+        ]);
     }
 }
