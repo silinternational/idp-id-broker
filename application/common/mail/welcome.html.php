@@ -24,18 +24,6 @@ use yii\helpers\Html as yHtml;
  * @var bool   $isMfaEnabled
  */
 ?>
-<script type="application/ld+json">
-{
-  "@context": "http://schema.org",
-  "@type": "EmailMessage",
-  "description": "Setup Password Recovery Methods and 2-Step Verification",
-  "potentialAction": {
-    "@type": "ViewAction",
-    "url": "<?=yHtml::encode($passwordProfileUrl)?>",
-    "name": "Setup Password Recovery and 2-Step Verification"
-  }
-}
-</script>
 <p>
     Dear <?=yHtml::encode($displayName)?>,
 </p>
