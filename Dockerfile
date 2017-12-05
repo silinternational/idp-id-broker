@@ -20,10 +20,6 @@ COPY dockerbuild/rsyslog.conf /etc/rsyslog.conf
 RUN curl https://raw.githubusercontent.com/silinternational/s3-expand/1.5/s3-expand -o /usr/local/bin/s3-expand
 RUN chmod a+x /usr/local/bin/s3-expand
 
-# get runny
-RUN curl https://raw.githubusercontent.com/silinternational/runny/0.1/runny -o /usr/local/bin/runny
-RUN chmod a+x /usr/local/bin/runny
-
 WORKDIR /data
 
 # Install/cleanup composer dependencies
