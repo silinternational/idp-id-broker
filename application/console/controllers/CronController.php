@@ -8,6 +8,10 @@ class CronController extends Controller
 {
     public function actionRemoveOldUnverifiedRecords()
     {
+        \Yii::warning([
+            'action' => 'delete old unverified mfa records',
+            'status' => 'starting',
+        ]);
         Mfa::removeOldUnverifiedRecords();
     }
 }
