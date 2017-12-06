@@ -1,3 +1,4 @@
 # m h dom mon dow user	command
 10 */6 * * * root /data/yii cron/remove-old-unverified-records 2>&1 | /usr/bin/logger -t id-broker-cron
 #* * * * * root /data/yii cron/remove-old-unverified-records 2>&1 | /usr/bin/logger -t id-broker-cron
+* * * * * root /data/yii cron/google-analytics 2>&1 | /usr/bin/logger -t id-broker-cron
