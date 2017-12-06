@@ -111,21 +111,19 @@ return [
                     'categories' => ['application'], // stick to messages from this app, not all of Yii's built-in messaging.
                     'logVars' => [], // no need for default stuff: http://www.yiiframework.com/doc-2.0/yii-log-target.html#$logVars-detail
                     'prefix' => function () {
-                        //TODO: assumes yii\web\Request here, could be a problem if app
-                        //    develops a console portion since there's also a
-                        //    yii\console\Request
-                        /* @var Request */
                         $request = Yii::$app->request;
-
-                        // Assumes format: Bearer consumer-module-name-32randomcharacters
-                        $requesterId = substr($request->headers['Authorization'], 7, 16) ?: 'unknown';
-
                         $prefixData = [
                             'env' => YII_ENV,
-                            'id' => $requesterId,
-                            'ip' => $request->getUserIP(),
                         ];
-
+                        
+                        if ($request instanceof \yii\web\Request) {
+                            // Assumes format: Bearer consumer-module-name-32randomcharacters
+                            $prefixData['id'] = substr($request->headers['Authorization'], 7, 16) ?: 'unknown';
+                            $prefixData['ip'] = $request->getUserIP();
+                        } elseif ($request instanceof \yii\console\Request) {
+                            $prefixData['id'] = '(console)';
+                        }
+                        
                         return Json::encode($prefixData);
                     },
                 ],
