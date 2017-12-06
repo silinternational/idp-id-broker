@@ -70,7 +70,7 @@ class AnalyticsContext extends YiiContext
      */
     public function thatUserHasABackupCodeMfaRecord()
     {
-        $this->createMfa($this->tempUser, mfa::TYPE_BACKUPCODE);
+        $this->createMfa($this->tempUser, Mfa::TYPE_BACKUPCODE);
     }
 
     /**
@@ -78,7 +78,7 @@ class AnalyticsContext extends YiiContext
      */
     public function thatUserHasAVerifiedTotpMfaRecord()
     {
-        $this->createMfa($this->tempUser, mfa::TYPE_TOTP);
+        $this->createMfa($this->tempUser, Mfa::TYPE_TOTP);
     }
 
     /**
@@ -86,15 +86,15 @@ class AnalyticsContext extends YiiContext
      */
     public function thatUserHasAnUnverifiedTotpMfaRecord()
     {
-        $this->createMfa($this->tempUser, mfa::TYPE_TOTP, false);
+        $this->createMfa($this->tempUser, Mfa::TYPE_TOTP, false);
     }
 
     /**
-     * @Given that user has a verified u2f mfa record
+     * @Given that user has a(nother) verified u2f mfa record
      */
     public function thatUserHasAVerifiedU2fMfaRecord()
     {
-        $this->createMfa($this->tempUser, mfa::TYPE_U2F);
+        $this->createMfa($this->tempUser, Mfa::TYPE_U2F);
     }
 
     /**
@@ -102,7 +102,7 @@ class AnalyticsContext extends YiiContext
      */
     public function thatUserHasAnUnverifiedU2fMfaRecord()
     {
-        $this->createMfa($this->tempUser, mfa::TYPE_U2F, false);
+        $this->createMfa($this->tempUser, Mfa::TYPE_U2F, false);
     }
 
     /**

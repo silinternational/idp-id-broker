@@ -11,6 +11,7 @@ Feature: User
         And that user has a verified totp mfa record
       And I create a new user
         And that user has a verified u2f mfa record
+        And that user has another verified u2f mfa record
       And I create a new user
         And that user has an unverified totp mfa record
       And I create a new user
@@ -55,6 +56,7 @@ Feature: User
         And that user has a verified totp mfa record
       And I create a new user
         And that user has a verified u2f mfa record
+        And that user has another verified u2f mfa record
       And I create a new user
         And that user has an unverified u2f mfa record
       And I create a new user
