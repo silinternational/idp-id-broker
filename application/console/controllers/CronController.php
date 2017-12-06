@@ -19,6 +19,16 @@ class CronController extends Controller
         Mfa::removeOldUnverifiedRecords();
     }
 
+    /**
+     * Send events to Google Analytics that give the number of ...
+     *  - active users
+     *  - active users that have a verified Mfa of any type
+     *  - active users with a backup code Mfa
+     *  - active users with a verified totp Mfa
+     *  - active users with a verified u2f Mfa
+     *
+     * @throws \Exception
+     */
     public function actionGoogleAnalytics()
     {
         $trackingId = Env::get('GA_TRACKING_ID', null); // 'UA-12345678-12'
