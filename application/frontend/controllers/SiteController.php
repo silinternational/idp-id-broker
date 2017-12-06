@@ -65,6 +65,7 @@ class SiteController extends BaseRestController
                 'errorMessage' => $e->getMessage(),
                 'responseHeaders' => $responseHeaders ?? null,
                 'responseContents' => $responseContents ?? null,
+                'stackTrace' => $e->getTrace(),
             ]);
             throw new Http500('Email Service problem.', $e->getCode());
         } catch (Exception $e) {
