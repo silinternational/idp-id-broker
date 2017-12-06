@@ -30,10 +30,11 @@ use yii\helpers\Html as yHtml;
 <p>
     Congratulations! You have logged into your new <?=yHtml::encode($idpDisplayName)?> account for the first time.
     <?=yHtml::encode($idpDisplayName)?> is in the process of transitioning from logging into websites using
-    an Insite account to this new "<?=yHtml::encode($idpDisplayName)?> account". Starting in January 2018 the option
-    to log in to websites using your Insite account will go away. This new <?=yHtml::encode($idpDisplayName)?>
-    account is not the same as your email account or computer account. It is a new corporate identity for
-    logging into many websites used by <?=yHtml::encode($idpDisplayName)?>.
+    an Insite account to this new "<?=yHtml::encode($idpDisplayName)?> account". In January 2018 the option to log in
+    to some websites using your Insite account will begin to go away. It will take some time for all the Insite-login
+    associated websites to change to using the new <?=yHtml::encode($idpDisplayName)?> login. Wherever you have the
+    option to use your new <?=yHtml::encode($idpDisplayName)?> account it is recommended you do so, but keep track of
+    your Insite username and password to use where only the Insite login screen is presented.
 </p>
 <p>
     Password expires on: <?=yHtml::encode($passwordExpiresUtc)?>
