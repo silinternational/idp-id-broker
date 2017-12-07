@@ -540,6 +540,29 @@ class User extends UserBase
         return $users->all();
     }
 
+    /**
+     * @param string|null $mfaType
+     * @return ActiveQuery of active Users with a (certain type of) verified Mfa option
+     */
+    public static function getQueryOfUsersWithMfa($mfaType=null)
+    {
+        $criteria = ['verified' => 1];
+        if ($mfaType !== null) {
+            $criteria['type'] = $mfaType;
+        }
+
+        $mfas = Mfa::find()->select('user_id')
+                           ->groupBy('user_id')
+                           ->where($criteria);
+
+        $usersQuery = User::find()->where([
+            'active' => 'yes',
+            'id' => $mfas
+        ]);
+
+        return $usersQuery;
+    }
+
     public static function search($params): ActiveDataProvider
     {
         $query = User::find();
