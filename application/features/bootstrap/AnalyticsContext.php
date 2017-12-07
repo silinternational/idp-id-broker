@@ -51,7 +51,7 @@ class AnalyticsContext extends YiiContext
                 \json_encode($user->getFirstErrors(), JSON_PRETTY_PRINT)
             );
         }
-
+        $user->refresh();
         return $user;
     }
 
