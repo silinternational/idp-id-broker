@@ -540,6 +540,29 @@ class User extends UserBase
         return $users->all();
     }
 
+    /*
+     * @return integer Count of active users with a password
+     */
+    public static function countUsersWithPassword()
+    {
+        $users = User::find()->where(['active' => 'yes'])
+            ->andWhere(['not', ['current_password_id' => null]]);
+
+        return $users->count();
+    }
+
+    /*
+     * @return integer Count of active users with require_mfa = 'yes'
+     */
+    public static function countUsersWithRequireMfa()
+    {
+        $users = User::find()->where([
+            'active' => 'yes',
+            'require_mfa' => 'yes',
+        ]);
+        return $users->count();
+    }
+
     /**
      * @param string|null $mfaType
      * @return ActiveQuery of active Users with a (certain type of) verified Mfa option
@@ -561,6 +584,27 @@ class User extends UserBase
         ]);
 
         return $usersQuery;
+    }
+
+    /**
+     * If there are no active users, returns 0.
+     * Otherwise, returns the total number of verified Mfa records that are associated with an active user
+     *   divided by the total number of active users that have a verified Mfa.
+     * @return float|int
+     */
+    public static function getAverageNumberOfMfasPerUserWithMfas()
+    {
+        $userCount = self::getQueryOfUsersWithMfa()->count();
+
+        $mfaCount = Mfa::find()->joinWith('user')
+            ->where(['verified' => 1])
+            ->andWhere(['user.active' => 'yes'])->count();
+
+        if ($userCount == 0) {
+            return 0;
+        }
+
+        return $mfaCount/$userCount;
     }
 
     public static function search($params): ActiveDataProvider
