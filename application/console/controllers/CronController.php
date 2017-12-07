@@ -40,13 +40,13 @@ class CronController extends Controller
      */
     public function actionGoogleAnalytics()
     {
-        $trackingId = \Yii::$app->params('gaTrackingId'); // 'UA-12345678-12'
+        $trackingId = \Yii::$app->params['gaTrackingId']; // 'UA-12345678-12'
         if ($trackingId === null) {
             \Yii::warning(['google-analytics' => "Aborting GA cron, since the config has no gaTrackingId"]);
             return;
         }
 
-        $clientId = \Yii::$app->params('gaClientId'); // 'IDP_ID_BROKER_LOCALHOST'
+        $clientId = \Yii::$app->params['gaClientId']; // 'IDP_ID_BROKER_LOCALHOST'
         if ($clientId === null) {
             \Yii::warning(['google-analytics' => "Aborting GA cron, since the config has no gaClientId"]);
             return;
