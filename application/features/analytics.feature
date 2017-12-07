@@ -67,10 +67,11 @@ Feature: User
     Given that no mfas or users exist
       And I create a new user with a password
       And I create a new user with a password
+      And I create a new user with a password
       And I create a new user without a password
       And I create a new user without a password
     When I get the count of active users with a password
-    Then the count of active users with a password should be 2
+    Then the count of active users with a password should be 3
 
   Scenario: Get the average number of mfas per active user with a verified mfa
     Given that no mfas or users exist
@@ -95,6 +96,7 @@ Feature: User
     Given that no mfas or users exist
       And I create a new user with require mfa
       And I create a new user with require mfa
+      And I create a new user
       And I create a new user
       And I create a new user
     When I get the count of active users with require mfa
