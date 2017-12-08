@@ -1,10 +1,6 @@
 <?php
 
 
-use Sil\PhpEnv\Env;
-
-
-
 return [
     'id' => 'app-console',
     'basePath' => dirname(__DIR__),
