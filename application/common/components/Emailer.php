@@ -19,6 +19,16 @@ class Emailer extends Component
     const SUBJECT_PASSWORD_CHANGED_DEFAULT = 'Your %s account password has been changed';
     const SUBJECT_WELCOME_DEFAULT = 'Welcome to your new %s account';
 
+    const SUBJECT_GET_BACKUP_CODES_DEFAULT = 'Get printable codes for your %s account';
+    const SUBJECT_GET_NEW_BACKUP_CODES_DEFAULT = 'Get new printable codes for your %s account';
+    const SUBJECT_LOST_SECURITY_KEY_DEFAULT = 'Have you lost the security key you use with you %s account';
+    const SUBJECT_MFA_REQUIRED_DEFAULT = '2-step verification is required on your %s acccount';
+
+    const SUBJECT_MFA_OPTION_ADDED_DEFAULT = 'A 2-step verification option was added to your %s account';
+    const SUBJECT_MFA_OPTION_REMOVED_DEFAULT = 'A 2-step verification option was removed from your %s account';
+    const SUBJECT_MFA_OPTION_ENABLED_DEFAULT = 'A 2-step verification option was enabled on your %s account';
+    const SUBJECT_MFA_OPTION_DISABLED_DEFAULT = 'A 2-step verification option was disabled on your %s account';
+
     /**
      * The configuration for the email-service client.
      *
@@ -179,17 +189,35 @@ class Emailer extends Component
         if ($this->logger === null) {
             $this->logger = new Psr3Yii2Logger();
         }
-        
+
         $this->subjectForInvite = $this->subjectForInvite ?? self::SUBJECT_INVITE_DEFAULT;
         $this->subjectForMfaRateLimit = $this->subjectForMfaRateLimit ?? self::SUBJECT_MFA_RATE_LIMIT_DEFAULT;
         $this->subjectForPasswordChanged = $this->subjectForPasswordChanged ?? self::SUBJECT_PASSWORD_CHANGED_DEFAULT;
         $this->subjectForWelcome = $this->subjectForWelcome ?? self::SUBJECT_WELCOME_DEFAULT;
-        
+
+        $this->subjectGetBackupCodes = $this->subjectGetBackupCodes ?? self::SUBJECT_GET_BACKUP_CODES_DEFAULT;
+        $this->subjectGetNewBackupCodes = $this->subjectGetNewBackupCodes ?? self::SUBJECT_GET_NEW_BACKUP_CODES_DEFAULT;
+        $this->subjectLostSecurityKey = $this->subjectLostSecurityKey ?? self::SUBJECT_LOST_SECURITY_KEY_DEFAULT;
+        $this->subjectMfaRequired = $this->subjectMfaRequired ?? self::SUBJECT_MFA_REQUIRED_DEFAULT;
+
+        $this->subjectMfaOptionAdded = $this->subjectMfaOptionAdded ?? self::SUBJECT_MFA_OPTION_ADDED_DEFAULT;
+        $this->subjectMfaOptionRemoved = $this->subjectMfaOptionRemoved ?? self::SUBJECT_MFA_OPTION_REMOVED_DEFAULT;
+        $this->subjectMfaOptionEnabled = $this->subjectMfaOptionEnabled ?? self::SUBJECT_MFA_OPTION_ENABLED_DEFAULT;
+        $this->subjectMfaOptionDisabled = $this->subjectMfaOptionDisabled ?? self::SUBJECT_MFA_OPTION_DISABLED_DEFAULT;
+
         $this->subjects = [
             EmailLog::MESSAGE_TYPE_INVITE => $this->subjectForInvite,
             EmailLog::MESSAGE_TYPE_MFA_RATE_LIMIT => $this->subjectForMfaRateLimit,
             EmailLog::MESSAGE_TYPE_PASSWORD_CHANGED => $this->subjectForPasswordChanged,
             EmailLog::MESSAGE_TYPE_WELCOME => $this->subjectForWelcome,
+            EmailLog::MESSAGE_TYPE_GET_BACKUP_CODES => $this->subjectGetBackupCodes,
+            EmailLog::MESSAGE_TYPE_GET_NEW_BACKUP_CODES => $this->subjectGetNewBackupCodes,
+            EmailLog::MESSAGE_TYPE_LOST_SECURITY_KEY => $this->subjectLostSecurityKey,
+            EmailLog::MESSAGE_TYPE_MFA_REQUIRED => $this->subjectMfaRequired,
+            EmailLog::MESSAGE_TYPE_MFA_OPTION_ADDED => $this->subjectMfaOptionAdded,
+            EmailLog::MESSAGE_TYPE_MFA_OPTION_REMOVED => $this->subjectMfaOptionRemoved,
+            EmailLog::MESSAGE_TYPE_MFA_OPTION_ENABLED => $this->subjectMfaOptionEnabled,
+            EmailLog::MESSAGE_TYPE_MFA_OPTION_DISABLED => $this->subjectMfaOptionDisabled,
         ];
         
         $this->assertConfigIsValid();
