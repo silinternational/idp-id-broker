@@ -355,25 +355,56 @@ class Emailer extends Component
     }
 
     /**
+     * If a TOTP or backup code was used in the last X days but not a U2f option
+     *   and if we are configured to send this sort of email, then
+     *   send it.
+     *
      * @param User $user
      * @return bool
      */
     public function shouldSendLostSecurityKeyMessageTo($user)
     {
+        if ( ! $this->sendLostSecurityKeyEmails) {
+            return false;
+        }
 
+        $hasU2fOption = false;
         $u2fUseDate = null;
         $lastOtherUseDate = null;
         $mfaOptions = $user->getVerifiedMfaOptions();
 
+        $recentDays = self::LOST_SECURITY_KEY_EMAIL_DAYS;
+
+        // Get the dates of the last use of the MFA options
         foreach ($mfaOptions as $mfaOption) {
+
+            // If this is a U2F and it was used recently, don't send an email.
             if ($mfaOption.type === Mfa::TYPE_U2F) {
-                $u2fUseDate = $mfaOption.lastUsedDate;
+                $hasU2fOption = true;
+                if (MySqlDateTime::dateIsRecent($mfaOption->last_used_utc, $recentDays)) {
+                    return false;
+                }
+                continue;
+            }
+
+            // If one of the other MFA options has been used recently, remember it.
+            if ($lastOtherUseDate === null) {
+                $dateIsResent = MySqlDateTime::dateIsRecent($mfaOption->last_used_utc, $recentDays);
+                $lastOtherUseDate = $dateIsResent ? $mfaOption->last_used_utc : null;
             }
         }
 
+        // If they don't even have a u2f option, don't send an email
+        if ( ! $hasU2fOption) {
+            return false;
+        }
 
-        //@todo complete this method
-        return $this->sendLostSecurityKeyEmails;
+        // If a totp or backup code was used in the last X days (but not the u2f option), send an email
+        if ($lastOtherUseDate !== null) {
+            return true;
+        }
+
+        return false;
     }
 
     /**

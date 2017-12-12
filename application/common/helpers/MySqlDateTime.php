@@ -60,4 +60,21 @@ class MySqlDateTime
 
         return gmdate(self::HUMAN_DATE_FORMAT, $timestamp);
     }
+
+    /**
+     * Whether the given date falls in the last X days
+     *
+     * @param string $dbDate formated datetime from database
+     * @param int $recentDays
+     * @return bool
+     */
+    public static function dateIsRecent(string $dbDate, int $recentDays)
+    {
+        $dtInterval = '-' . $recentDays . ' days';
+        $recentDate = self::relative($dtInterval);
+
+        $dateFromDb = DateTime::CreateFromFormat(self::MYSQL_DATETIME_FORMAT, $dbDate);
+
+        return $dbDate >= $dateFromDb;
+    }
 }
