@@ -1,6 +1,7 @@
 <?php
 namespace common\components;
 
+use common\helpers\MySqlDateTime;
 use common\models\EmailLog;
 use common\models\User;
 use InvalidArgumentException;
@@ -22,12 +23,14 @@ class Emailer extends Component
     const SUBJECT_GET_BACKUP_CODES_DEFAULT = 'Get printable codes for your %s account';
     const SUBJECT_GET_NEW_BACKUP_CODES_DEFAULT = 'Get new printable codes for your %s account';
     const SUBJECT_LOST_SECURITY_KEY_DEFAULT = 'Have you lost the security key you use with you %s account';
-    const SUBJECT_MFA_REQUIRED_DEFAULT = '2-step verification is required on your %s acccount';
 
     const SUBJECT_MFA_OPTION_ADDED_DEFAULT = 'A 2-step verification option was added to your %s account';
     const SUBJECT_MFA_OPTION_REMOVED_DEFAULT = 'A 2-step verification option was removed from your %s account';
     const SUBJECT_MFA_OPTION_ENABLED_DEFAULT = 'A 2-step verification option was enabled on your %s account';
     const SUBJECT_MFA_OPTION_DISABLED_DEFAULT = 'A 2-step verification option was disabled on your %s account';
+
+    /* The number of days of not using a security key after which we email the user */
+    const LOST_SECURITY_KEY_EMAIL_DAYS = 14;
 
     /**
      * The configuration for the email-service client.
@@ -55,6 +58,15 @@ class Emailer extends Component
     public $sendMfaRateLimitEmails = true;
     public $sendPasswordChangedEmails = true;
     public $sendWelcomeEmails = true;
+
+    public $sendGetBackupCodesEmails = true;
+    public $sendGetNewBackupCodesEmails = true;
+    public $sendLostSecurityKeyEmails = true;
+
+    public $sendMfaOptionAddedEmails = true;
+    public $sendMfaOptionRemovedEmails = true;
+    public $sendMfaOptionEnabledEmails = true;
+    public $sendMfaOptionDisabledEmails = true;
     
     /**
      * The list of subjects, keyed on message type. This is initialized during
@@ -68,6 +80,15 @@ class Emailer extends Component
     public $subjectForMfaRateLimit;
     public $subjectForPasswordChanged;
     public $subjectForWelcome;
+
+    public $subjectGetBackupCodes;
+    public $subjectGetNewBackupCodes;
+    public $subjectLostSecurityKey;
+
+    public $subjectMfaOptionAdded;
+    public $subjectMfaOptionRemoved;
+    public $subjectMfaOptionEnabled;
+    public $subjectMfaOptionDisabled;
     
     /**
      * Assert that the given configuration values are acceptable.
@@ -198,7 +219,6 @@ class Emailer extends Component
         $this->subjectGetBackupCodes = $this->subjectGetBackupCodes ?? self::SUBJECT_GET_BACKUP_CODES_DEFAULT;
         $this->subjectGetNewBackupCodes = $this->subjectGetNewBackupCodes ?? self::SUBJECT_GET_NEW_BACKUP_CODES_DEFAULT;
         $this->subjectLostSecurityKey = $this->subjectLostSecurityKey ?? self::SUBJECT_LOST_SECURITY_KEY_DEFAULT;
-        $this->subjectMfaRequired = $this->subjectMfaRequired ?? self::SUBJECT_MFA_REQUIRED_DEFAULT;
 
         $this->subjectMfaOptionAdded = $this->subjectMfaOptionAdded ?? self::SUBJECT_MFA_OPTION_ADDED_DEFAULT;
         $this->subjectMfaOptionRemoved = $this->subjectMfaOptionRemoved ?? self::SUBJECT_MFA_OPTION_REMOVED_DEFAULT;
@@ -213,7 +233,6 @@ class Emailer extends Component
             EmailLog::MESSAGE_TYPE_GET_BACKUP_CODES => $this->subjectGetBackupCodes,
             EmailLog::MESSAGE_TYPE_GET_NEW_BACKUP_CODES => $this->subjectGetNewBackupCodes,
             EmailLog::MESSAGE_TYPE_LOST_SECURITY_KEY => $this->subjectLostSecurityKey,
-            EmailLog::MESSAGE_TYPE_MFA_REQUIRED => $this->subjectMfaRequired,
             EmailLog::MESSAGE_TYPE_MFA_OPTION_ADDED => $this->subjectMfaOptionAdded,
             EmailLog::MESSAGE_TYPE_MFA_OPTION_REMOVED => $this->subjectMfaOptionRemoved,
             EmailLog::MESSAGE_TYPE_MFA_OPTION_ENABLED => $this->subjectMfaOptionEnabled,
@@ -312,6 +331,89 @@ class Emailer extends Component
         return $this->sendWelcomeEmails
             && array_key_exists('current_password_id', $changedAttributes)
             && is_null($changedAttributes['current_password_id']);
+    }
+
+    /**
+     * @param User $user The User in question.
+     * @return bool
+     */
+    public function shouldSendGetBackupCodesMessageTo($user)
+    {
+        return $this->sendGetBackupCodesEmails
+            && count($user->getVerifiedMfaOptions()) == 1
+            && ! $user->hasMfaBackupCodes();
+    }
+
+    /**
+     * @param User $user
+     * @return bool
+     */
+    public function shouldSendGetNewBackupCodesMessageTo($user)
+    {
+        return $this->sendGetNewBackupCodesEmails
+            && $user->countMfaBackupCodes() <= 3;
+    }
+
+    /**
+     * @param User $user
+     * @return bool
+     */
+    public function shouldSendLostSecurityKeyMessageTo($user)
+    {
+
+        $u2fUseDate = null;
+        $lastOtherUseDate = null;
+        $mfaOptions = $user->getVerifiedMfaOptions();
+
+        foreach ($mfaOptions as $mfaOption) {
+            if ($mfaOption.type === Mfa::TYPE_U2F) {
+                $u2fUseDate = $mfaOption.lastUsedDate;
+            }
+        }
+
+
+        //@todo complete this method
+        return $this->sendLostSecurityKeyEmails;
+    }
+
+    /**
+     * @param User $user
+     * @return bool
+     */
+    public function shouldSendMfaOptionAddedMessageTo($user)
+    {
+        //@todo complete this method
+        return $this->sendMfaOptionAddedEmails;
+    }
+
+    /**
+     * @param User $user
+     * @return bool
+     */
+    public function shouldSendMfaOptionRemovedMessageTo($user)
+    {
+        //@todo complete this method
+        return $this->sendMfaOptionRemovedEmails;
+    }
+
+    /**
+     * @param User $user
+     * @return bool
+     */
+    public function shouldSendMfaOptionEnabledMessageTo($user)
+    {
+        //@todo complete this method
+        return $this->sendMfaOptionEnabledEmails;
+    }
+
+    /**
+     * @param User $user
+     * @return bool
+     */
+    public function shouldSendMfaOptionDisabledMessageTo($user)
+    {
+        //@todo complete this method
+        return $this->sendMfaOptionDisabledEmails;
     }
     
     /**
