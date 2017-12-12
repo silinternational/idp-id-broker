@@ -19,7 +19,6 @@ class EmailLog extends EmailLogBase
     const MESSAGE_TYPE_GET_BACKUP_CODES = 'get-backup-codes';
     const MESSAGE_TYPE_GET_NEW_BACKUP_CODES = 'get-new-backup-codes';
     const MESSAGE_TYPE_LOST_SECURITY_KEY = 'lost-security-key';
-    const MESSAGE_TYPE_MFA_REQUIRED = 'mfa-required';
     const MESSAGE_TYPE_MFA_OPTION_ADDED = 'mfa-option-added';
     const MESSAGE_TYPE_MFA_OPTION_REMOVED = 'mfa-option-removed';
     const MESSAGE_TYPE_MFA_OPTION_ENABLED = 'mfa-option-enabled';
@@ -45,7 +44,6 @@ class EmailLog extends EmailLogBase
             self::MESSAGE_TYPE_GET_BACKUP_CODES,
             self::MESSAGE_TYPE_GET_NEW_BACKUP_CODES,
             self::MESSAGE_TYPE_LOST_SECURITY_KEY,
-            self::MESSAGE_TYPE_MFA_REQUIRED,
             self::MESSAGE_TYPE_MFA_OPTION_ADDED,
             self::MESSAGE_TYPE_MFA_OPTION_REMOVED,
             self::MESSAGE_TYPE_MFA_OPTION_ENABLED,
