@@ -16,7 +16,13 @@ class EmailContext extends YiiContext
     protected $tempUser;
 
     /** @var bool */
-    protected $LostKeyEmailShouldBeSent;
+    protected $lostKeyEmailShouldBeSent;
+
+    /** @var bool */
+    protected $getBackupCodesEmailShouldBeSent;
+
+    /** @var bool */
+    protected $getNewBackupCodesEmailShouldBeSent;
 
     /**
      * @Then a(n) :messageType email should have been sent to them
@@ -96,7 +102,6 @@ class EmailContext extends YiiContext
         return $user;
     }
 
-
     protected function createMfa($type, $lastUsedDaysAgo=null)
     {
         $mfa = new Mfa();
@@ -109,8 +114,29 @@ class EmailContext extends YiiContext
             $mfa->last_used_utc= MySqlDateTime::relative($diffConfig);
         }
         assert::true($mfa->save(), "Could not create new mfa.");
+        $this->tempUser->refresh();
     }
 
+    protected function deleteMfaOfType($type) {
+        foreach ($this->tempUser->mfas as $mfaOption) {
+            if ($mfaOption->type === $type) {
+                assert::true($mfaOption->delete(), 'Could not delete the ' . $type . ' mfa option for the test user.');
+            }
+        }
+    }
+
+    protected function getMfa($type)
+    {
+        $mfaOptions = $this->tempUser->getVerifiedMfaOptions();
+
+        foreach ($mfaOptions as $mfa) {
+            if ($mfa->type === $type) {
+                return $mfa;
+            }
+        }
+
+        return null;
+    }
 
     /**
      * @Then a(n) :messageType email to that user should have been logged
@@ -284,20 +310,52 @@ class EmailContext extends YiiContext
     }
 
     /**
+     * @Given we are configured NOT to send lost key emails
+     */
+    public function weAreConfiguredNotToSendLostKeyEmails()
+    {
+        $this->fakeEmailer->sendLostSecurityKeyEmails = false;
+    }
+
+    /**
+     * @Given we are configured to send get backup codes emails
+     */
+    public function weAreConfiguredToSendGetBackupCodesEmails()
+    {
+        $this->fakeEmailer->sendGetBackupCodesEmails = true;
+    }
+
+    /**
+     * @Given we are configured NOT to send get backup codes emails
+     */
+    public function weAreConfiguredNotToSendGetBackupCodesEmails()
+    {
+        $this->fakeEmailer->sendGetBackupCodesEmails = false;
+    }
+
+    /**
+     * @Given we are configured to send get new backup codes emails
+     */
+    public function weAreConfiguredToSendGetNewBackupCodesEmails()
+    {
+        $this->fakeEmailer->sendGetNewBackupCodesEmails = true;
+    }
+
+    /**
+     * @Given we are configured NOT to send get new backup codes emails
+     */
+    public function weAreConfiguredNotToSendGetNewBackupCodesEmails()
+    {
+        $this->fakeEmailer->sendGetNewBackupCodesEmails = false;
+    }
+
+    /**
      * @Given no mfas exist
      */
     public function noMfasExist()
     {
         MfaBackupcode::deleteAll();
         Mfa::deleteAll();
-    }
-
-    /**
-     * @Given we are configured NOT to send lost key emails
-     */
-    public function weAreConfiguredNotToSendLostKeyEmails()
-    {
-        $this->fakeEmailer->sendLostSecurityKeyEmails = false;
     }
 
     /**
@@ -313,11 +371,7 @@ class EmailContext extends YiiContext
      */
     public function aU2fMfaOptionDoesNotExist()
     {
-        foreach ($this->tempUser->mfas as $mfaOption) {
-            if ($mfaOption.type === Mfa::TYPE_U2F) {
-                assert::true($mfaOption->delete(), 'Could not delete the u2f mfa option for the test user.');
-            }
-        }
+        $this->deleteMfaOfType(Mfa::TYPE_U2F);
     }
 
     /**
@@ -328,13 +382,20 @@ class EmailContext extends YiiContext
         $this->createMfa(Mfa::TYPE_U2F, $lastUsedDaysAgo);
     }
 
-
-        /**
-     * @Given a backup code mfa option was used :arg1 days ago
+    /**
+     * @Given a totp mfa option does exist
      */
-    public function aBackupCodeMfaOptionWasXUsedDaysAgo($lastUsedDaysAgo)
+    public function aTotpMfaOptionDoesExist()
     {
-        $this->createMfa(Mfa::TYPE_BACKUPCODE, $lastUsedDaysAgo);
+        $this->createMfa(Mfa::TYPE_TOTP);
+    }
+
+    /**
+     * @Given a totp mfa option does NOT exist
+     */
+    public function aTotpMfaOptionDoesNotExist()
+    {
+        $this->deleteMfaOfType(Mfa::TYPE_TOTP);
     }
 
     /**
@@ -346,19 +407,78 @@ class EmailContext extends YiiContext
     }
 
     /**
+     * @Given a backup code mfa option does exist
+     */
+    public function aBackupCodeMfaOptionDoesExist()
+    {
+        $this->createMfa(Mfa::TYPE_BACKUPCODE);
+    }
+
+    /**
+     * @Given a backup code mfa option does NOT exist
+     */
+    public function aBackupCodeMfaOptionDoesNotExist()
+    {
+        $this->deleteMfaOfType(Mfa::TYPE_BACKUPCODE);
+    }
+
+    /**
+     * @Given there are :arg1 backup codes
+     */
+    public function thereAreXBackupCodes($count)
+    {
+        $backupMfa = $this->getMfa(Mfa::TYPE_BACKUPCODE);
+
+        if (empty($backupMfa)) {
+            return;
+        }
+
+        MfaBackupcode::createBackupCodes($backupMfa->id, $count);
+        $backupMfa->refresh();
+    }
+
+
+    /**
+     * @Given a backup code mfa option was used :arg1 days ago
+     */
+    public function aBackupCodeMfaOptionWasXUsedDaysAgo($lastUsedDaysAgo)
+    {
+        $this->createMfa(Mfa::TYPE_BACKUPCODE, $lastUsedDaysAgo);
+    }
+
+    /**
      * @When I check if a lost security key email should be sent
      */
     public function iCheckIfALostSecurityKeyEmailShouldBeSent()
     {
-        $this->LostKeyEmailShouldBeSent = $this->fakeEmailer->shouldSendLostSecurityKeyMessageTo($this->tempUser);
+        $this->lostKeyEmailShouldBeSent = $this->fakeEmailer->shouldSendLostSecurityKeyMessageTo($this->tempUser);
     }
+
+
+    /**
+     * @When I check if a get backup codes email should be sent
+     */
+    public function iCheckIfAGetBackupCodesEmailShouldBeSent()
+    {
+        $this->getBackupCodesEmailShouldBeSent = $this->fakeEmailer->shouldSendGetBackupCodesMessageTo($this->tempUser);
+    }
+
+
+    /**
+     * @When I check if a get new backup codes email should be sent
+     */
+    public function iCheckIfAGetNewBackupCodesEmailShouldBeSent()
+    {
+        $this->getNewBackupCodesEmailShouldBeSent = $this->fakeEmailer->shouldSendGetNewBackupCodesMessageTo($this->tempUser);
+    }
+
 
     /**
      * @Then I see that a lost security key email should NOT be sent
      */
     public function iSeeThatALostSecurityKeyEmailShouldNotBeSent()
     {
-        assert::false($this->LostKeyEmailShouldBeSent);
+        assert::false($this->lostKeyEmailShouldBeSent);
     }
 
     /**
@@ -366,7 +486,39 @@ class EmailContext extends YiiContext
      */
     public function iSeeThatALostSecurityKeyEmailShouldBeSent()
     {
-        assert::true($this->LostKeyEmailShouldBeSent);
+        assert::true($this->lostKeyEmailShouldBeSent);
+    }
+
+    /**
+     * @Then I see that a get backup codes email should NOT be sent
+     */
+    public function iSeeThatAGetBackupCodesEmailShouldNotBeSent()
+    {
+        assert::false($this->getBackupCodesEmailShouldBeSent);
+    }
+
+    /**
+     * @Then I see that a get backup codes email should be sent
+     */
+    public function iSeeThatAGetBackupCodesEmailShouldBeSent()
+    {
+        assert::true($this->getBackupCodesEmailShouldBeSent);
+    }
+
+    /**
+     * @Then I see that a get new backup codes email should NOT be sent
+     */
+    public function iSeeThatAGetNewBackupCodesEmailShouldNotBeSent()
+    {
+        assert::false($this->getNewBackupCodesEmailShouldBeSent);
+    }
+
+    /**
+     * @Then I see that a get new backup codes email should be sent
+     */
+    public function iSeeThatAGetNewBackupCodesEmailShouldBeSent()
+    {
+        assert::true($this->getNewBackupCodesEmailShouldBeSent);
     }
 
 }
