@@ -417,7 +417,7 @@ class User extends UserBase
     public function hasMfaBackupCodes()
     {
         foreach ($this->getVerifiedMfaOptions() as $mfaOption) {
-            if ($mfaOption.type == Mfa::TYPE_BACKUPCODE) {
+            if ($mfaOption->type == Mfa::TYPE_BACKUPCODE) {
                 return true;
             }
         }
@@ -430,7 +430,7 @@ class User extends UserBase
     public function countMfaBackupCodes()
     {
         foreach ($this->getVerifiedMfaOptions() as $mfaOption) {
-            if ($mfaOption.type == Mfa::TYPE_BACKUPCODE) {
+            if ($mfaOption->type == Mfa::TYPE_BACKUPCODE) {
                 return count($mfaOption->mfaBackupcodes);
             }
         }
