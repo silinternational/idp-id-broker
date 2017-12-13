@@ -4,6 +4,8 @@ namespace Sil\SilIdBroker\Behat\Context;
 use Behat\Behat\Tester\Exception\PendingException;
 use common\helpers\MySqlDateTime;
 use common\models\EmailLog;
+use common\models\Mfa;
+use common\models\MfaBackupcode;
 use common\models\User;
 use Sil\SilIdBroker\Behat\Context\YiiContext;
 use Webmozart\Assert\Assert;
@@ -12,7 +14,10 @@ class EmailContext extends YiiContext
 {
     /** @var User */
     protected $tempUser;
-    
+
+    /** @var bool */
+    protected $LostKeyEmailShouldBeSent;
+
     /**
      * @Then a(n) :messageType email should have been sent to them
      */
@@ -90,6 +95,22 @@ class EmailContext extends YiiContext
         $user->refresh();
         return $user;
     }
+
+
+    protected function createMfa($type, $lastUsedDaysAgo=null)
+    {
+        $mfa = new Mfa();
+        $mfa->user_id = $this->tempUser->id;
+        $mfa->type = $type;
+        $mfa->verified = 1;
+
+        if ($lastUsedDaysAgo !== null) {
+            $diffConfig = "-" . $lastUsedDaysAgo . " days";
+            $mfa->last_used_utc= MySqlDateTime::relative($diffConfig);
+        }
+        assert::true($mfa->save(), "Could not create new mfa.");
+    }
+
 
     /**
      * @Then a(n) :messageType email to that user should have been logged
@@ -253,4 +274,99 @@ class EmailContext extends YiiContext
     {
         $this->fakeEmailer->sendWelcomeEmails = false;
     }
+
+    /**
+     * @Given we are configured to send lost key emails
+     */
+    public function weAreConfiguredToSendLostKeyEmails()
+    {
+        $this->fakeEmailer->sendLostSecurityKeyEmails = true;
+    }
+
+    /**
+     * @Given no mfas exist
+     */
+    public function noMfasExist()
+    {
+        MfaBackupcode::deleteAll();
+        Mfa::deleteAll();
+    }
+
+    /**
+     * @Given we are configured NOT to send lost key emails
+     */
+    public function weAreConfiguredNotToSendLostKeyEmails()
+    {
+        $this->fakeEmailer->sendLostSecurityKeyEmails = false;
+    }
+
+    /**
+     * @Given a u2f mfa option does Exist
+     */
+    public function aU2fMfaOptionDoesExist()
+    {
+        $this->createMfa(Mfa::TYPE_U2F);
+    }
+
+    /**
+     * @Given a u2f mfa option does NOT Exist
+     */
+    public function aU2fMfaOptionDoesNotExist()
+    {
+        foreach ($this->tempUser->mfas as $mfaOption) {
+            if ($mfaOption.type === Mfa::TYPE_U2F) {
+                assert::true($mfaOption->delete(), 'Could not delete the u2f mfa option for the test user.');
+            }
+        }
+    }
+
+    /**
+     * @Given a u2f mfa option was used :arg1 days ago
+     */
+    public function aU2fMfaOptionWasXUsedDaysAgo($lastUsedDaysAgo)
+    {
+        $this->createMfa(Mfa::TYPE_U2F, $lastUsedDaysAgo);
+    }
+
+
+        /**
+     * @Given a backup code mfa option was used :arg1 days ago
+     */
+    public function aBackupCodeMfaOptionWasXUsedDaysAgo($lastUsedDaysAgo)
+    {
+        $this->createMfa(Mfa::TYPE_BACKUPCODE, $lastUsedDaysAgo);
+    }
+
+    /**
+     * @Given a totp mfa option was used :arg1 days ago
+     */
+    public function aTotpMfaOptionWasUsedDaysAgo($lastUsedDaysAgo)
+    {
+        $this->createMfa(Mfa::TYPE_TOTP, $lastUsedDaysAgo);
+    }
+
+    /**
+     * @When I check if a lost security key email should be sent
+     */
+    public function iCheckIfALostSecurityKeyEmailShouldBeSent()
+    {
+        $this->LostKeyEmailShouldBeSent = $this->fakeEmailer->shouldSendLostSecurityKeyMessageTo($this->tempUser);
+    }
+
+    /**
+     * @Then I see that a lost security key email should NOT be sent
+     */
+    public function iSeeThatALostSecurityKeyEmailShouldNotBeSent()
+    {
+        assert::false($this->LostKeyEmailShouldBeSent);
+    }
+
+    /**
+     * @Then I see that a lost security key email should be sent
+     */
+    public function iSeeThatALostSecurityKeyEmailShouldBeSent()
+    {
+        assert::true($this->LostKeyEmailShouldBeSent);
+    }
+
 }
