@@ -369,7 +369,6 @@ class Emailer extends Component
         }
 
         $hasU2fOption = false;
-        $u2fUseDate = null;
         $lastOtherUseDate = null;
         $mfaOptions = $user->getVerifiedMfaOptions();
 
@@ -384,13 +383,11 @@ class Emailer extends Component
                 if (MySqlDateTime::dateIsRecent($mfaOption->last_used_utc, $recentDays)) {
                     return false;
                 }
-                continue;
-            }
 
             // If one of the other MFA options has been used recently, remember it.
-            if ($lastOtherUseDate === null) {
-                $dateIsResent = MySqlDateTime::dateIsRecent($mfaOption->last_used_utc, $recentDays);
-                $lastOtherUseDate = $dateIsResent ? $mfaOption->last_used_utc : null;
+            } else if ($lastOtherUseDate === null) {
+                $dateIsRecent = MySqlDateTime::dateIsRecent($mfaOption->last_used_utc, $recentDays);
+                $lastOtherUseDate = $dateIsRecent ? $mfaOption->last_used_utc : null;
             }
         }
 

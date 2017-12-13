@@ -73,8 +73,6 @@ class MySqlDateTime
         $dtInterval = '-' . $recentDays . ' days';
         $recentDate = self::relative($dtInterval);
 
-        $dateFromDb = DateTime::CreateFromFormat(self::MYSQL_DATETIME_FORMAT, $dbDate);
-
-        return $dbDate >= $dateFromDb;
+        return $dbDate >= $recentDate;
     }
 }
