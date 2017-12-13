@@ -3,6 +3,7 @@ namespace common\components;
 
 use common\helpers\MySqlDateTime;
 use common\models\EmailLog;
+use common\models\Mfa;
 use common\models\User;
 use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
@@ -378,14 +379,14 @@ class Emailer extends Component
         foreach ($mfaOptions as $mfaOption) {
 
             // If this is a U2F and it was used recently, don't send an email.
-            if ($mfaOption.type === Mfa::TYPE_U2F) {
+            if ($mfaOption->type === Mfa::TYPE_U2F) {
                 $hasU2fOption = true;
-                if (MySqlDateTime::dateIsRecent($mfaOption->last_used_utc, $recentDays)) {
+                if ( ! empty($mfaOption->last_used_utc) && MySqlDateTime::dateIsRecent($mfaOption->last_used_utc, $recentDays)) {
                     return false;
                 }
 
             // If one of the other MFA options has been used recently, remember it.
-            } else if ($lastOtherUseDate === null) {
+            } else if ($lastOtherUseDate === null && ! empty($mfaOption->last_used_utc)) {
                 $dateIsRecent = MySqlDateTime::dateIsRecent($mfaOption->last_used_utc, $recentDays);
                 $lastOtherUseDate = $dateIsRecent ? $mfaOption->last_used_utc : null;
             }
