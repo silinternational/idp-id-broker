@@ -11,12 +11,12 @@ Feature: MysqlDateTime
     When I ask if 0 days ago is recent
     Then I see that that date is recent
 
-  Scenario: Check that a barely old date is recognized as not recent
+  Scenario: Check that a barely old date is recognized as NOT recent
     Given I say that recent is in the last 3 days
     When I ask if 4 days ago is recent
-    Then I see that that date is not recent
+    Then I see that that date is NOT recent
 
-  Scenario: Check that an old date is recognized as not recent
+  Scenario: Check that an old date is recognized as NOT recent
     Given I say that recent is in the last 3 days
     When I ask if 24 days ago is recent
-    Then I see that that date is not recent
+    Then I see that that date is NOT recent
