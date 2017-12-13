@@ -33,6 +33,9 @@ class Emailer extends Component
     /* The number of days of not using a security key after which we email the user */
     const LOST_SECURITY_KEY_EMAIL_DAYS = 14;
 
+    /* The minimum number of backup codes a user can have before we nag them to get new ones */
+    const MINIMUM_BACKUP_CODES_FOR_NAG = 4;
+
     /**
      * The configuration for the email-service client.
      *
@@ -352,7 +355,8 @@ class Emailer extends Component
     public function shouldSendGetNewBackupCodesMessageTo($user)
     {
         return $this->sendGetNewBackupCodesEmails
-            && $user->countMfaBackupCodes() <= 3;
+            && $user->hasMfaBackupCodes()
+            && $user->countMfaBackupCodes() < self::MINIMUM_BACKUP_CODES_FOR_NAG;
     }
 
     /**
