@@ -27,8 +27,8 @@ class Emailer extends Component
 
     const SUBJECT_MFA_OPTION_ADDED_DEFAULT = 'A 2-step verification option was added to your %s account';
     const SUBJECT_MFA_OPTION_REMOVED_DEFAULT = 'A 2-step verification option was removed from your %s account';
-    const SUBJECT_MFA_OPTION_ENABLED_DEFAULT = 'A 2-step verification option was enabled on your %s account';
-    const SUBJECT_MFA_OPTION_DISABLED_DEFAULT = 'A 2-step verification option was disabled on your %s account';
+    const SUBJECT_MFA_ENABLED_DEFAULT = '2-step verification was enabled on your %s account';
+    const SUBJECT_MFA_DISABLED_DEFAULT = '2-step verification was disabled on your %s account';
 
     /* The number of days of not using a security key after which we email the user */
     const LOST_SECURITY_KEY_EMAIL_DAYS = 14;
@@ -69,8 +69,8 @@ class Emailer extends Component
 
     public $sendMfaOptionAddedEmails = true;
     public $sendMfaOptionRemovedEmails = true;
-    public $sendMfaOptionEnabledEmails = true;
-    public $sendMfaOptionDisabledEmails = true;
+    public $sendMfaEnabledEmails = true;
+    public $sendMfaDisabledEmails = true;
     
     /**
      * The list of subjects, keyed on message type. This is initialized during
@@ -91,8 +91,8 @@ class Emailer extends Component
 
     public $subjectMfaOptionAdded;
     public $subjectMfaOptionRemoved;
-    public $subjectMfaOptionEnabled;
-    public $subjectMfaOptionDisabled;
+    public $subjectMfaEnabled;
+    public $subjectMfaDisabled;
     
     /**
      * Assert that the given configuration values are acceptable.
@@ -226,8 +226,8 @@ class Emailer extends Component
 
         $this->subjectMfaOptionAdded = $this->subjectMfaOptionAdded ?? self::SUBJECT_MFA_OPTION_ADDED_DEFAULT;
         $this->subjectMfaOptionRemoved = $this->subjectMfaOptionRemoved ?? self::SUBJECT_MFA_OPTION_REMOVED_DEFAULT;
-        $this->subjectMfaOptionEnabled = $this->subjectMfaOptionEnabled ?? self::SUBJECT_MFA_OPTION_ENABLED_DEFAULT;
-        $this->subjectMfaOptionDisabled = $this->subjectMfaOptionDisabled ?? self::SUBJECT_MFA_OPTION_DISABLED_DEFAULT;
+        $this->subjectMfaEnabled = $this->subjectMfaEnabled ?? self::SUBJECT_MFA_ENABLED_DEFAULT;
+        $this->subjectMfaDisabled = $this->subjectMfaDisabled ?? self::SUBJECT_MFA_DISABLED_DEFAULT;
 
         $this->subjects = [
             EmailLog::MESSAGE_TYPE_INVITE => $this->subjectForInvite,
@@ -239,8 +239,8 @@ class Emailer extends Component
             EmailLog::MESSAGE_TYPE_LOST_SECURITY_KEY => $this->subjectLostSecurityKey,
             EmailLog::MESSAGE_TYPE_MFA_OPTION_ADDED => $this->subjectMfaOptionAdded,
             EmailLog::MESSAGE_TYPE_MFA_OPTION_REMOVED => $this->subjectMfaOptionRemoved,
-            EmailLog::MESSAGE_TYPE_MFA_OPTION_ENABLED => $this->subjectMfaOptionEnabled,
-            EmailLog::MESSAGE_TYPE_MFA_OPTION_DISABLED => $this->subjectMfaOptionDisabled,
+            EmailLog::MESSAGE_TYPE_MFA_ENABLED => $this->subjectMfaEnabled,
+            EmailLog::MESSAGE_TYPE_MFA_DISABLED => $this->subjectMfaDisabled,
         ];
         
         $this->assertConfigIsValid();
@@ -410,43 +410,51 @@ class Emailer extends Component
     }
 
     /**
-     * @param User $user
+     * @param User $user (assumes the user instance has already been refreshed)
+     * @param string Mfa::EVENT_TYPE_*
      * @return bool
      */
-    public function shouldSendMfaOptionAddedMessageTo($user)
+    public function shouldSendMfaOptionAddedMessageTo($user, $mfaEventType)
     {
-        //@todo complete this method
-        return $this->sendMfaOptionAddedEmails;
+        return $this->sendMfaOptionAddedEmails
+            && $mfaEventType === Mfa::EVENT_TYPE_CREATE
+            && count($user->mfas) > 1;
     }
 
     /**
-     * @param User $user
+     * @param User $user (assumes the user instance has already been refreshed)
+     * @param string Mfa::EVENT_TYPE_*
      * @return bool
      */
-    public function shouldSendMfaOptionRemovedMessageTo($user)
+    public function shouldSendMfaEnabledMessageTo($user, $mfaEventType)
     {
-        //@todo complete this method
-        return $this->sendMfaOptionRemovedEmails;
+        return $this->sendMfaEnabledEmails
+            && $mfaEventType === Mfa::EVENT_TYPE_CREATE
+            && count($user->mfas) == 1;
     }
 
     /**
-     * @param User $user
+     * @param User $user (assumes the user instance has already been refreshed)
+     * @param string Mfa::EVENT_TYPE_*
      * @return bool
      */
-    public function shouldSendMfaOptionEnabledMessageTo($user)
+    public function shouldSendMfaOptionRemovedMessageTo($user, $mfaEventType)
     {
-        //@todo complete this method
-        return $this->sendMfaOptionEnabledEmails;
+        return $this->sendMfaOptionRemovedEmails
+            && $mfaEventType === Mfa::EVENT_TYPE_DELETE
+            && count($user->mfas) > 0;
     }
 
     /**
-     * @param User $user
+     * @param User $user (assumes the user instance has already been refreshed)
+     * @param string Mfa::EVENT_TYPE_*
      * @return bool
      */
-    public function shouldSendMfaOptionDisabledMessageTo($user)
+    public function shouldSendMfaDisabledMessageTo($user, $mfaEventType)
     {
-        //@todo complete this method
-        return $this->sendMfaOptionDisabledEmails;
+        return $this->sendMfaDisabledEmails
+            && $mfaEventType === Mfa::EVENT_TYPE_DELETE
+            && count($user->mfas) < 1;
     }
     
     /**
