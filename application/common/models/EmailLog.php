@@ -21,8 +21,8 @@ class EmailLog extends EmailLogBase
     const MESSAGE_TYPE_LOST_SECURITY_KEY = 'lost-security-key';
     const MESSAGE_TYPE_MFA_OPTION_ADDED = 'mfa-option-added';
     const MESSAGE_TYPE_MFA_OPTION_REMOVED = 'mfa-option-removed';
-    const MESSAGE_TYPE_MFA_OPTION_ENABLED = 'mfa-option-enabled';
-    const MESSAGE_TYPE_MFA_OPTION_DISABLED = 'mfa-option-disabled';
+    const MESSAGE_TYPE_MFA_ENABLED = 'mfa-enabled';
+    const MESSAGE_TYPE_MFA_DISABLED = 'mfa-disabled';
 
     /**
      * @inheritdoc
@@ -46,8 +46,8 @@ class EmailLog extends EmailLogBase
             self::MESSAGE_TYPE_LOST_SECURITY_KEY,
             self::MESSAGE_TYPE_MFA_OPTION_ADDED,
             self::MESSAGE_TYPE_MFA_OPTION_REMOVED,
-            self::MESSAGE_TYPE_MFA_OPTION_ENABLED,
-            self::MESSAGE_TYPE_MFA_OPTION_DISABLED,
+            self::MESSAGE_TYPE_MFA_ENABLED,
+            self::MESSAGE_TYPE_MFA_DISABLED,
         ];
     }
     
