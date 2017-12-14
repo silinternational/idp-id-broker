@@ -138,3 +138,81 @@ Feature: Email
       | to send                  | does exist        | 3           | should      |
       | to send                  | does exist        | 4           | should NOT  |
       | NOT to send              | does exist        | 2           | should NOT  |
+
+  Scenario Outline: When to send mfa option added emails
+    Given we are configured <sendMfaOptionAddedEml> mfa option added emails
+      And no mfas exist
+      And a user already exists
+      And a u2f mfa option <u2fExistsOrNot>
+      And a totp mfa option <totpExistsOrNot>
+      And the mfa event type is set to <mfaEventType>
+    When I check if a mfa option added email should be sent
+    Then I see that a mfa option added email <shouldOrNot> be sent
+
+    Examples:
+      | sendMfaOptionAddedEml | u2fExistsOrNot | totpExistsOrNot | mfaEventType      | shouldOrNot |
+      | to send               | does exist     | does NOT exist  | create_mfa        | should NOT  |
+      | to send               | does NOT exist | does exist      | create_mfa        | should NOT  |
+      | to send               | does exist     | does exist      | create_mfa        | should      |
+      | Not to send           | does exist     | does exist      | create_mfa        | should NOT  |
+      | to send               | does exist     | does exist      | delete_mfa        | should NOT  |
+      | Not to send           | does exist     | does exist      | delete_mfa        | should NOT  |
+
+  Scenario Outline: When to send mfa enabled emails
+    Given we are configured <sendMfaEnabledEml> mfa enabled emails
+    And no mfas exist
+    And a user already exists
+    And a u2f mfa option <u2fExistsOrNot>
+    And a totp mfa option <totpExistsOrNot>
+    And the mfa event type is set to <mfaEventType>
+    When I check if a mfa enabled email should be sent
+    Then I see that a mfa enabled email <shouldOrNot> be sent
+
+    Examples:
+      | sendMfaEnabledEml     | u2fExistsOrNot | totpExistsOrNot | mfaEventType      | shouldOrNot |
+      | to send               | does exist     | does NOT exist  | create_mfa        | should      |
+      | to send               | does NOT exist | does exist      | create_mfa        | should      |
+      | to send               | does exist     | does exist      | create_mfa        | should NOT  |
+      | Not to send           | does NOT exist | does exist      | create_mfa        | should NOT  |
+      | to send               | does exist     | does NOT exist  | delete_mfa        | should NOT  |
+      | Not to send           | does exist     | does NOT exist  | delete_mfa        | should NOT  |
+
+  Scenario Outline: When to send mfa option removed emails
+    Given we are configured <sendMfaOptionRemovedEml> mfa option removed emails
+    And no mfas exist
+    And a user already exists
+    And a u2f mfa option <u2fExistsOrNot>
+    And a totp mfa option <totpExistsOrNot>
+    And the mfa event type is set to <mfaEventType>
+    When I check if a mfa option removed email should be sent
+    Then I see that a mfa option removed email <shouldOrNot> be sent
+
+    Examples:
+      | sendMfaOptionRemovedEml | u2fExistsOrNot | totpExistsOrNot | mfaEventType      | shouldOrNot |
+      | to send                 | does exist     | does NOT exist  | delete_mfa        | should      |
+      | to send                 | does NOT exist | does exist      | delete_mfa        | should      |
+      | to send                 | does exist     | does exist      | delete_mfa        | should      |
+      | to send                 | does NOT exist | does NOT exist  | delete_mfa        | should NOT  |
+      | Not to send             | does exist     | does exist      | delete_mfa        | should NOT  |
+      | to send                 | does exist     | does NOT exist  | create_mfa        | should NOT  |
+      | Not to send             | does exist     | does exist      | create_mfa        | should NOT  |
+
+  Scenario Outline: When to send mfa disabled emails
+    Given we are configured <sendMfaDisabledEml> mfa disabled emails
+    And no mfas exist
+    And a user already exists
+    And a u2f mfa option <u2fExistsOrNot>
+    And a totp mfa option <totpExistsOrNot>
+    And the mfa event type is set to <mfaEventType>
+    When I check if a mfa disabled email should be sent
+    Then I see that a mfa disabled email <shouldOrNot> be sent
+
+    Examples:
+      | sendMfaDisabledEml      | u2fExistsOrNot | totpExistsOrNot | mfaEventType      | shouldOrNot |
+      | to send                 | does exist     | does NOT exist  | delete_mfa        | should NOT  |
+      | to send                 | does NOT exist | does exist      | delete_mfa        | should NOT  |
+      | to send                 | does exist     | does exist      | delete_mfa        | should NOT  |
+      | to send                 | does NOT exist | does NOT exist  | delete_mfa        | should      |
+      | Not to send             | does NOT exist | does NOT exist  | delete_mfa        | should NOT  |
+      | to send                 | does NOT exist | does NOT exist  | create_mfa        | should NOT  |
+      | Not to send             | does NOT exist | does NOT exist  | create_mfa        | should NOT  |

@@ -24,6 +24,21 @@ class EmailContext extends YiiContext
     /** @var bool */
     protected $getNewBackupCodesEmailShouldBeSent;
 
+    /** @var bool */
+    protected $mfaOptionAddedEmailShouldBeSent;
+
+    /** @var bool */
+    protected $mfaEnabledEmailShouldBeSent;
+
+    /** @var bool */
+    protected $mfaOptionRemovedEmailShouldBeSent;
+
+    /** @var bool */
+    protected $mfaDisabledEmailShouldBeSent;
+
+    /** @var string */
+    protected $mfaEventType;
+
     /**
      * @Then a(n) :messageType email should have been sent to them
      */
@@ -286,6 +301,70 @@ class EmailContext extends YiiContext
     }
 
     /**
+     * @Given we are configured to send mfa option added emails
+     */
+    public function weAreConfiguredToSendMfaOptionAddedEmails()
+    {
+        $this->fakeEmailer->sendMfaOptionAddedEmails = true;
+    }
+
+    /**
+     * @Given we are configured NOT to send mfa option added emails
+     */
+    public function weAreConfiguredNotToSendMfaOptionAddedEmails()
+    {
+        $this->fakeEmailer->sendMfaOptionAddedEmails = false;
+    }
+
+    /**
+     * @Given we are configured to send mfa enabled emails
+     */
+    public function weAreConfiguredToSendMfaEnabledEmails()
+    {
+        $this->fakeEmailer->sendMfaEnabledEmails = true;
+    }
+
+    /**
+     * @Given we are configured NOT to send mfa enabled emails
+     */
+    public function weAreConfiguredNotToSendMfaEnabledEmails()
+    {
+        $this->fakeEmailer->sendMfaEnabledEmails = false;
+    }
+
+    /**
+     * @Given we are configured to send mfa option removed emails
+     */
+    public function weAreConfiguredToSendMfaOptionRemovedEmails()
+    {
+        $this->fakeEmailer->sendMfaOptionRemovedEmails = true;
+    }
+
+    /**
+     * @Given we are configured NOT to send mfa option removed emails
+     */
+    public function weAreConfiguredNotToSendMfaOptionRemovedEmails()
+    {
+        $this->fakeEmailer->sendMfaOptionRemovedEmails = false;
+    }
+
+    /**
+     * @Given we are configured to send mfa disabled emails
+     */
+    public function weAreConfiguredToSendMfaDisabledEmails()
+    {
+        $this->fakeEmailer->sendMfaDisabledEmails = true;
+    }
+
+    /**
+     * @Given we are configured NOT to send mfa disabled emails
+     */
+    public function weAreConfiguredNotToSendMfaDisabledEmails()
+    {
+        $this->fakeEmailer->sendMfaDisabledEmails = false;
+    }
+
+    /**
      * @Given we are configured to send welcome emails
      */
     public function weAreConfiguredToSendWelcomeEmails()
@@ -437,6 +516,13 @@ class EmailContext extends YiiContext
         $backupMfa->refresh();
     }
 
+    /**
+     * @Given the mfa event type is set to :arg1
+     */
+    public function theMfaEventTypeIsSetTo($eventType) {
+        $this->mfaEventType = $eventType;
+    }
+
 
     /**
      * @Given a backup code mfa option was used :arg1 days ago
@@ -444,6 +530,51 @@ class EmailContext extends YiiContext
     public function aBackupCodeMfaOptionWasXUsedDaysAgo($lastUsedDaysAgo)
     {
         $this->createMfa(Mfa::TYPE_BACKUPCODE, $lastUsedDaysAgo);
+    }
+
+    /**
+     * @When I check if a mfa option added email should be sent
+     */
+    public function iCheckIfAMfaOptionAddedEmailShouldBeSent()
+    {
+        $this->tempUser->refresh();
+        $this->mfaOptionAddedEmailShouldBeSent = $this->fakeEmailer->shouldSendMfaOptionAddedMessageTo(
+            $this->tempUser,
+            $this->mfaEventType
+        );
+    }
+
+    /**
+     * @When I check if a mfa enabled email should be sent
+     */
+    public function iCheckIfAMfaEnabledEmailShouldBeSent()
+    {
+        $this->mfaEnabledEmailShouldBeSent = $this->fakeEmailer->shouldSendMfaEnabledMessageTo(
+            $this->tempUser,
+            $this->mfaEventType
+        );
+    }
+
+    /**
+     * @When I check if a mfa option removed email should be sent
+     */
+    public function iCheckIfAMfaOptionRemovedEmailShouldBeSent()
+    {
+        $this->mfaOptionRemovedEmailShouldBeSent = $this->fakeEmailer->shouldSendMfaOptionRemovedMessageTo(
+            $this->tempUser,
+            $this->mfaEventType
+        );
+    }
+
+    /**
+     * @When I check if a mfa disabled email should be sent
+     */
+    public function iCheckIfAMfaDisabledEmailShouldBeSent()
+    {
+        $this->mfaDisabledEmailShouldBeSent = $this->fakeEmailer->shouldSendMfaDisabledMessageTo(
+            $this->tempUser,
+            $this->mfaEventType
+        );
     }
 
     /**
@@ -472,6 +603,69 @@ class EmailContext extends YiiContext
         $this->getNewBackupCodesEmailShouldBeSent = $this->fakeEmailer->shouldSendGetNewBackupCodesMessageTo($this->tempUser);
     }
 
+    /**
+     * @Then I see that a mfa option added email should NOT be sent
+     */
+    public function iSeeThatAMfaOptionAddedEmailShouldNotBeSent()
+    {
+        assert::false($this->mfaOptionAddedEmailShouldBeSent);
+    }
+
+    /**
+     * @Then I see that a mfa option added email should be sent
+     */
+    public function iSeeThatAMfaOptionAddedEmailShouldBeSent()
+    {
+        assert::true($this->mfaOptionAddedEmailShouldBeSent);
+    }
+
+    /**
+     * @Then I see that a mfa enabled email should NOT be sent
+     */
+    public function iSeeThatAMfaEnabledEmailShouldNotBeSent()
+    {
+        assert::false($this->mfaEnabledEmailShouldBeSent);
+    }
+
+    /**
+     * @Then I see that a mfa enabled email should be sent
+     */
+    public function iSeeThatAMfaEnabledEmailShouldBeSent()
+    {
+        assert::true($this->mfaEnabledEmailShouldBeSent);
+    }
+
+    /**
+     * @Then I see that a mfa option removed email should NOT be sent
+     */
+    public function iSeeThatAMfaOptionRemovedEmailShouldNotBeSent()
+    {
+        assert::false($this->mfaOptionRemovedEmailShouldBeSent);
+    }
+
+    /**
+     * @Then I see that a mfa option removed email should be sent
+     */
+    public function iSeeThatAMfaOptionRemovedEmailShouldBeSent()
+    {
+        assert::true($this->mfaOptionRemovedEmailShouldBeSent);
+    }
+
+    /**
+     * @Then I see that a mfa disabled email should NOT be sent
+     */
+    public function iSeeThatAMfaDisabledEmailShouldNotBeSent()
+    {
+        assert::false($this->mfaDisabledEmailShouldBeSent);
+    }
+
+    /**
+     * @Then I see that a mfa disabled email should be sent
+     */
+    public function iSeeThatAMfaDisabledEmailShouldBeSent()
+    {
+        assert::true($this->mfaDisabledEmailShouldBeSent);
+    }
 
     /**
      * @Then I see that a lost security key email should NOT be sent
@@ -520,5 +714,4 @@ class EmailContext extends YiiContext
     {
         assert::true($this->getNewBackupCodesEmailShouldBeSent);
     }
-
 }
