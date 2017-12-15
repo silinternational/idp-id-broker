@@ -22,7 +22,7 @@ class EmailContext extends YiiContext
     protected $getBackupCodesEmailShouldBeSent;
 
     /** @var bool */
-    protected $getNewBackupCodesEmailShouldBeSent;
+    protected $refreshBackupCodesEmailShouldBeSent;
 
     /** @var bool */
     protected $mfaOptionAddedEmailShouldBeSent;
@@ -413,19 +413,19 @@ class EmailContext extends YiiContext
     }
 
     /**
-     * @Given we are configured to send get new backup codes emails
+     * @Given we are configured to send refresh backup codes emails
      */
-    public function weAreConfiguredToSendGetNewBackupCodesEmails()
+    public function weAreConfiguredToSendRefreshBackupCodesEmails()
     {
-        $this->fakeEmailer->sendGetNewBackupCodesEmails = true;
+        $this->fakeEmailer->sendRefreshBackupCodesEmails = true;
     }
 
     /**
-     * @Given we are configured NOT to send get new backup codes emails
+     * @Given we are configured NOT to send refresh backup codes emails
      */
-    public function weAreConfiguredNotToSendGetNewBackupCodesEmails()
+    public function weAreConfiguredNotToSendRefreshBackupCodesEmails()
     {
-        $this->fakeEmailer->sendGetNewBackupCodesEmails = false;
+        $this->fakeEmailer->sendRefreshBackupCodesEmails = false;
     }
 
     /**
@@ -596,11 +596,11 @@ class EmailContext extends YiiContext
 
 
     /**
-     * @When I check if a get new backup codes email should be sent
+     * @When I check if a refresh backup codes email should be sent
      */
-    public function iCheckIfAGetNewBackupCodesEmailShouldBeSent()
+    public function iCheckIfARefreshBackupCodesEmailShouldBeSent()
     {
-        $this->getNewBackupCodesEmailShouldBeSent = $this->fakeEmailer->shouldSendGetNewBackupCodesMessageTo($this->tempUser);
+        $this->refreshBackupCodesEmailShouldBeSent = $this->fakeEmailer->shouldSendRefreshBackupCodesMessageTo($this->tempUser);
     }
 
     /**
@@ -700,18 +700,18 @@ class EmailContext extends YiiContext
     }
 
     /**
-     * @Then I see that a get new backup codes email should NOT be sent
+     * @Then I see that a refresh backup codes email should NOT be sent
      */
-    public function iSeeThatAGetNewBackupCodesEmailShouldNotBeSent()
+    public function iSeeThatARefreshBackupCodesEmailShouldNotBeSent()
     {
-        assert::false($this->getNewBackupCodesEmailShouldBeSent);
+        assert::false($this->refreshBackupCodesEmailShouldBeSent);
     }
 
     /**
-     * @Then I see that a get new backup codes email should be sent
+     * @Then I see that a refresh backup codes email should be sent
      */
-    public function iSeeThatAGetNewBackupCodesEmailShouldBeSent()
+    public function iSeeThatARefreshBackupCodesEmailShouldBeSent()
     {
-        assert::true($this->getNewBackupCodesEmailShouldBeSent);
+        assert::true($this->refreshBackupCodesEmailShouldBeSent);
     }
 }

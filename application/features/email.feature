@@ -122,17 +122,17 @@ Feature: Email
       | to send               | does NOT exist | does NOT exist  | does exist        | should NOT  |
       | NOT to send           | does exist     | does exist      | does NOT exist    | should NOT  |
 
-  Scenario Outline:  When to send get new backup codes emails
-    Given we are configured <sendGetNewBackupCodesEml> get new backup codes emails
+  Scenario Outline:  When to send refresh backup codes emails
+    Given we are configured <sendRefreshBackupCodesEml> refresh backup codes emails
       And no mfas exist
       And a user already exists
       And a backup code mfa option <backupExistsOrNot>
       And there are <backupCodes> backup codes
-    When I check if a get new backup codes email should be sent
-    Then I see that a get new backup codes email <shouldOrNot> be sent
+    When I check if a refresh backup codes email should be sent
+    Then I see that a refresh backup codes email <shouldOrNot> be sent
 
     Examples:
-      | sendGetNewBackupCodesEml | backupExistsOrNot | backupCodes | shouldOrNot |
+      | sendRefreshBackupCodesEml | backupExistsOrNot | backupCodes | shouldOrNot |
       | to send                  | does NOT exist    | 0           | should NOT  |
       | to send                  | does NOT exist    | 0           | should NOT  |
       | to send                  | does exist        | 3           | should      |
