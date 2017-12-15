@@ -90,7 +90,6 @@ class CronController extends Controller
         /* @var $emailer Emailer */
         $emailer = \Yii::$app->emailer;
 
-        // @todo complete this
         $users = User::findAll();
 
         foreach ($users as $user) {
@@ -98,8 +97,8 @@ class CronController extends Controller
                 $emailer->sendMessageTo(EmailLog::MESSAGE_TYPE_GET_BACKUP_CODES, $user);
             }
 
-            if ($emailer->shouldSendGetNewBackupCodesMessageTo($user)) {
-                $emailer->sendMessageTo(EmailLog::MESSAGE_TYPE_GET_NEW_BACKUP_CODES, $user);
+            if ($emailer->shouldSendRefreshBackupCodesMessageTo($user)) {
+                $emailer->sendMessageTo(EmailLog::MESSAGE_TYPE_REFRESH_BACKUP_CODES, $user);
             }
 
             if ($emailer->shouldSendLostSecurityKeyMessageTo($user)) {
