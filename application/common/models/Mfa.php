@@ -87,6 +87,9 @@ class Mfa extends MfaBase
             'user' => $this->user->email,
             'status' => 'success',
         ]);
+
+        /* @todo uncomment this line when the emails are ready */
+        // self::sendAppropriateMessages($this->user, self::EVENT_TYPE_DELETE);
     }
 
     /**
@@ -281,6 +284,10 @@ class Mfa extends MfaBase
             'user' => $user->email,
             'status' => 'success',
         ]);
+
+
+        /* @todo uncomment this line when the emails are ready */
+        // self::sendAppropriateMessages($user, self::EVENT_TYPE_CREATE);
 
         return [
             'id' => $mfa->id,
