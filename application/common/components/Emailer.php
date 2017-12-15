@@ -23,18 +23,18 @@ class Emailer extends Component
 
     const SUBJECT_GET_BACKUP_CODES_DEFAULT = 'Get printable codes for your %s account';
     const SUBJECT_REFRESH_BACKUP_CODES_DEFAULT = 'Get a new set of printable codes for your %s account';
-    const SUBJECT_LOST_SECURITY_KEY_DEFAULT = 'Have you lost the security key you use with you %s account';
+    const SUBJECT_LOST_SECURITY_KEY_DEFAULT = 'Have you lost the security key you use with your %s account';
 
-    const SUBJECT_MFA_OPTION_ADDED_DEFAULT = 'A 2-step verification option was added to your %s account';
-    const SUBJECT_MFA_OPTION_REMOVED_DEFAULT = 'A 2-step verification option was removed from your %s account';
-    const SUBJECT_MFA_ENABLED_DEFAULT = '2-step verification was enabled on your %s account';
-    const SUBJECT_MFA_DISABLED_DEFAULT = '2-step verification was disabled on your %s account';
+    const SUBJECT_MFA_OPTION_ADDED_DEFAULT = 'A 2-Step Verification option was added to your %s account';
+    const SUBJECT_MFA_OPTION_REMOVED_DEFAULT = 'A 2-Step Verification option was removed from your %s account';
+    const SUBJECT_MFA_ENABLED_DEFAULT = '2-Step Verification was enabled on your %s account';
+    const SUBJECT_MFA_DISABLED_DEFAULT = '2-Step Verification was disabled on your %s account';
 
     /* The number of days of not using a security key after which we email the user */
     const LOST_SECURITY_KEY_EMAIL_DAYS = 14;
 
     /* The minimum number of backup codes a user can have before we nag them to get new ones */
-    const MINIMUM_BACKUP_CODES_FOR_NAG = 4;
+    const MINIMUM_BACKUP_CODES_BEFORE_NAG = 4;
 
     /**
      * The configuration for the email-service client.
@@ -360,7 +360,7 @@ class Emailer extends Component
     {
         return $this->sendRefreshBackupCodesEmails
             && $user->hasMfaBackupCodes()
-            && $user->countMfaBackupCodes() < self::MINIMUM_BACKUP_CODES_FOR_NAG;
+            && $user->countMfaBackupCodes() < self::MINIMUM_BACKUP_CODES_BEFORE_NAG;
     }
 
     /**
@@ -414,6 +414,8 @@ class Emailer extends Component
     }
 
     /**
+     * Whether the user has just added an MFA option and there was already one.
+     *
      * @param User $user (assumes the user instance has already been refreshed)
      * @param string Mfa::EVENT_TYPE_*
      * @return bool
@@ -426,6 +428,8 @@ class Emailer extends Component
     }
 
     /**
+     * Whether the user has just added an MFA option and that's the only one they have.
+     *
      * @param User $user (assumes the user instance has already been refreshed)
      * @param string Mfa::EVENT_TYPE_*
      * @return bool
@@ -438,6 +442,8 @@ class Emailer extends Component
     }
 
     /**
+     * Whether the user just deleted an MFA option and there is still one or more left
+     *
      * @param User $user (assumes the user instance has already been refreshed)
      * @param string Mfa::EVENT_TYPE_*
      * @return bool
@@ -450,6 +456,8 @@ class Emailer extends Component
     }
 
     /**
+     * Whether the user has just deleted the last MFA option
+     *
      * @param User $user (assumes the user instance has already been refreshed)
      * @param string Mfa::EVENT_TYPE_*
      * @return bool
