@@ -13,9 +13,9 @@ class m171211_130001_add_several_mfa_email_log_types extends Migration
         $this->alterColumn(
             '{{email_log}}',
             'message_type',
-            "enum('invite','welcome','mfa-rate-limit','password-changed','get-backup-codes','get-new-backup-codes'," .
+            "enum('invite','welcome','mfa-rate-limit','password-changed','get-backup-codes','refresh-backup-codes'," .
                 "'lost-security-key','mfa-required','mfa-option-added','mfa-option-removed'," .
-                "'mfa-option-enabled','mfa-option-disabled') NULL"
+                "'mfa-enabled','mfa-disabled') NULL"
         );
     }
 
