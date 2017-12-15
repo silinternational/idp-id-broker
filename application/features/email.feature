@@ -133,11 +133,11 @@ Feature: Email
 
     Examples:
       | sendRefreshBackupCodesEml | backupExistsOrNot | backupCodes | shouldOrNot |
-      | to send                  | does NOT exist    | 0           | should NOT  |
-      | to send                  | does NOT exist    | 0           | should NOT  |
-      | to send                  | does exist        | 3           | should      |
-      | to send                  | does exist        | 4           | should NOT  |
-      | NOT to send              | does exist        | 2           | should NOT  |
+      | to send                   | does NOT exist    | 0           | should NOT  |
+      | to send                   | does NOT exist    | 0           | should NOT  |
+      | to send                   | does exist        | 3           | should      |
+      | to send                   | does exist        | 4           | should NOT  |
+      | NOT to send               | does exist        | 2           | should NOT  |
 
   Scenario Outline: When to send mfa option added emails
     Given we are configured <sendMfaOptionAddedEml> mfa option added emails
