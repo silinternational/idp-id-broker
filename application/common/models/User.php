@@ -414,6 +414,9 @@ class User extends UserBase
         return $mfas;
     }
 
+    /*
+     * @return bool
+     */
     public function hasMfaBackupCodes()
     {
         foreach ($this->getVerifiedMfaOptions() as $mfaOption) {
@@ -425,7 +428,7 @@ class User extends UserBase
     }
 
     /*
-     * @return int the count of a users Mfa backup codes
+     * @return int the count of a user's Mfa backup codes
      */
     public function countMfaBackupCodes()
     {
