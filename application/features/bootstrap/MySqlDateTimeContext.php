@@ -31,7 +31,7 @@ class MySqlDateTimeContext implements Context
     {
         $diffConfig = "-" . $daysAgo . " days";
         $dbDate = MySqlDateTime::relative($diffConfig);
-        echo "dbdate: " . $dbDate;
+
         $this->dateIsRecent = MySqlDateTime::dateIsRecent($dbDate, $this->recentDays);
     }
 
@@ -41,7 +41,7 @@ class MySqlDateTimeContext implements Context
      */
     public function iSeeThatThatDateIsRecent()
     {
-        Assert::True($this->dateIsRecent);
+        Assert::true($this->dateIsRecent);
     }
 
 
@@ -50,6 +50,6 @@ class MySqlDateTimeContext implements Context
      */
     public function iSeeThatThatDateIsNotRecent()
     {
-        Assert::False($this->dateIsRecent);
+        Assert::false($this->dateIsRecent);
     }
 }
