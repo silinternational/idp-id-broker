@@ -90,9 +90,10 @@ class CronController extends Controller
         /* @var $emailer Emailer */
         $emailer = \Yii::$app->emailer;
 
-        $users = User::findAll();
+        $query = (new Query)->from('user');
 
-        foreach ($users as $user) {
+        // iterate over one user at a time.
+        foreach ($query->each() as $user) {
             if ($emailer->shouldSendGetBackupCodesMessageTo($user)) {
                 $emailer->sendMessageTo(EmailLog::MESSAGE_TYPE_GET_BACKUP_CODES, $user);
             }
