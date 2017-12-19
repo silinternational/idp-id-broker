@@ -79,7 +79,7 @@ Feature: Email
   Examples:
       | sendLostKeyEml | u2fExistsOrNot | backupUsedDaysAgo | totpUsedDaysAgo | shouldOrNot |
       | to send        | does NOT exist | 2                 | 3               | should NOT  |
-      | to send        | does NOT exist | 2                 | 3               | should NOT  |
+      | to send        | does exist     | 222               | 333             | should NOT  |
       | to send        | does exist     | 2                 | 333             | should      |
       | to send        | does exist     | 222               | 3               | should      |
       | NOT to send    | does exist     | 2                 | 3               | should NOT  |
