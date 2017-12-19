@@ -1,7 +1,6 @@
 <?php
 namespace Sil\SilIdBroker\Behat\Context;
 
-use Behat\Behat\Tester\Exception\PendingException;
 use common\helpers\MySqlDateTime;
 use common\models\EmailLog;
 use common\models\Mfa;
@@ -509,7 +508,10 @@ class EmailContext extends YiiContext
         $backupMfa = $this->getMfa(Mfa::TYPE_BACKUPCODE);
 
         if (empty($backupMfa)) {
-            return;
+            if ($count == 0) {
+                return;
+            }
+            throw new InvalidArgumentException('There is no MFA Backup Code option to be able to create ' . $count . ' codes for.');
         }
 
         MfaBackupcode::createBackupCodes($backupMfa->id, $count);
