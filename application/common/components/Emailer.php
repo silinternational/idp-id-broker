@@ -30,11 +30,6 @@ class Emailer extends Component
     const SUBJECT_MFA_ENABLED_DEFAULT = '2-Step Verification was enabled on your %s account';
     const SUBJECT_MFA_DISABLED_DEFAULT = '2-Step Verification was disabled on your %s account';
 
-    /* The number of days of not using a security key after which we email the user */
-    const LOST_SECURITY_KEY_EMAIL_DAYS = 14;
-
-    /* The minimum number of backup codes a user can have before we nag them to get new ones */
-    const MINIMUM_BACKUP_CODES_BEFORE_NAG = 4;
 
     /**
      * The configuration for the email-service client.
@@ -57,6 +52,7 @@ class Emailer extends Component
      * @var array<string,mixed>
      */
     public $otherDataForEmails = [];
+
 
     /**
      * Configs to say whether we should ever send certain emails
@@ -97,6 +93,12 @@ class Emailer extends Component
     public $subjectForMfaOptionRemoved;
     public $subjectForMfaEnabled;
     public $subjectForMfaDisabled;
+
+    /* The number of days of not using a security key after which we email the user */
+    public $lostSecurityKeyEmailDays;
+
+    /* Nag the user if they have FEWER than this number of backup codes */
+    public $minimumBackupCodesBeforeNag;
 
     /**
      * Assert that the given configuration values are acceptable.
@@ -360,7 +362,7 @@ class Emailer extends Component
     {
         return $this->sendRefreshBackupCodesEmails
             && $user->hasMfaBackupCodes()
-            && $user->countMfaBackupCodes() < self::MINIMUM_BACKUP_CODES_BEFORE_NAG;
+            && $user->countMfaBackupCodes() < $this->minimumBackupCodesBeforeNag;
     }
 
     /**
@@ -381,7 +383,7 @@ class Emailer extends Component
         $lastOtherUseDate = null;
         $mfaOptions = $user->getVerifiedMfaOptions();
 
-        $recentDays = self::LOST_SECURITY_KEY_EMAIL_DAYS;
+        $recentDays = $this->lostSecurityKeyEmailDays;
 
         // Get the dates of the last use of the MFA options
         foreach ($mfaOptions as $mfaOption) {
