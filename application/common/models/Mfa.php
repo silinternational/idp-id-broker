@@ -66,6 +66,15 @@ class Mfa extends MfaBase
         ];
     }
 
+    public function afterSave($insert, $changedAttributes)
+    {
+        parent::afterSave($insert, $changedAttributes);
+
+        if ($insert) {
+            self::sendAppropriateMessages($this->user, self::EVENT_TYPE_CREATE);
+        }
+    }
+
     /**
      * Before deleting, delete backend record too
      * @return bool
@@ -284,10 +293,6 @@ class Mfa extends MfaBase
             'user' => $user->email,
             'status' => 'success',
         ]);
-
-
-        /* @todo uncomment this line when the emails are ready */
-        // self::sendAppropriateMessages($user, self::EVENT_TYPE_CREATE);
 
         return [
             'id' => $mfa->id,
