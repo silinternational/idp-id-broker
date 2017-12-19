@@ -78,10 +78,10 @@ return [
             // When they are getting low on backup codes
             'sendRefreshBackupCodesEmails' => Env::get('SEND_REFRESH_BACKUP_CODES_EMAILS', true),
             'sendLostSecurityKeyEmails' => Env::get('SEND_LOST_SECURITY_KEY_EMAILS', true),
-            'sendMfaOptionAddedEmails' => Env::get('SEND_MFA_OPTION_ADDED_EMAILS', true),
-            'sendMfaOptionRemovedEmails' => Env::get('SEND_MFA_OPTION_REMOVED_EMAILS', true),
-            'sendMfaEnabledEmails' => Env::get('SEND_MFA_ENABLED_EMAILS', true),
-            'sendMfaDisabledEmails' => Env::get('SEND_MFA_DISABLED_EMAILS', true),
+            'sendMfaOptionAddedEmails' => Env::get('SEND_MFA_OPTION_ADDED_EMAILS', false),
+            'sendMfaOptionRemovedEmails' => Env::get('SEND_MFA_OPTION_REMOVED_EMAILS', false),
+            'sendMfaEnabledEmails' => Env::get('SEND_MFA_ENABLED_EMAILS', false),
+            'sendMfaDisabledEmails' => Env::get('SEND_MFA_DISABLED_EMAILS', false),
 
             'subjectForInvite' => Env::get('SUBJECT_FOR_INVITE'),
             'subjectForMfaRateLimit' => Env::get('SUBJECT_FOR_MFA_RATE_LIMIT'),
@@ -94,6 +94,9 @@ return [
             'subjectForMfaOptionRemoved' => Env::get('SUBJECT_FOR_MFA_OPTION_REMOVED'),
             'subjectForMfaEnabled' => Env::get('SUBJECT_FOR_MFA_ENABLED'),
             'subjectForMfaDisabled' => Env::get('SUBJECT_FOR_MFA_DISABLED'),
+
+            'lostSecurityKeyEmailDays' => Env::get('LOST_SECURITY_KEY_EMAIL_DAYS', 14),
+            'minimumBackupCodesBeforeNag' => Env::get('MINIMUM_BACKUP_CODES_BEFORE_NAG', 4),
         ],
         'ldap' => [
             'class' => Ldap::class,
