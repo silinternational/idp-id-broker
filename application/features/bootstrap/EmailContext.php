@@ -15,6 +15,9 @@ class EmailContext extends YiiContext
     protected $tempUser;
 
     /** @var bool */
+    protected $getBackupCodesEmailHasBeenSent;
+
+    /** @var bool */
     protected $lostKeyEmailShouldBeSent;
 
     /** @var bool */
@@ -226,6 +229,30 @@ class EmailContext extends YiiContext
                 . 'without a password.'
             );
         }
+    }
+
+    /**
+     * @Given a :messageType email was sent :daysAgo days ago to that user
+     */
+    public function anEmailWasSentXDaysAgoToThatUser(string $messageType, int $daysAgo)
+    {
+        if ($daysAgo < 0) {
+            return;
+        }
+
+        $emailLog = new EmailLog([
+            'user_id' => $this->tempUser->id,
+            'message_type' => $messageType,
+        ]);
+
+        if ($daysAgo > 0) {
+            $diffConfig = "-" . $daysAgo . " days";
+            $dbDate = MySqlDateTime::relative($diffConfig);
+
+            $emailLog->sent_utc = $dbDate;
+        }
+        echo PHP_EOL . "Date: " . $emailLog->sent_utc;
+        $emailLog->save();
     }
 
     /**
@@ -612,13 +639,21 @@ class EmailContext extends YiiContext
     }
 
     /**
+     * @When I check if a get backup codes email has been sent recently
+     */
+    public function iCheckIfAGetBackupCodesEmailHasBeenSentRecently()
+    {
+        $messageType = EmailLog::MESSAGE_TYPE_GET_BACKUP_CODES;
+        $this->getBackupCodesEmailHasBeenSent = $this->fakeEmailer->hasReceivedMessageRecently($this->tempUser, $messageType);
+    }
+
+    /**
      * @When I check if a lost security key email should be sent
      */
     public function iCheckIfALostSecurityKeyEmailShouldBeSent()
     {
         $this->lostKeyEmailShouldBeSent = $this->fakeEmailer->shouldSendLostSecurityKeyMessageTo($this->tempUser);
     }
-
 
     /**
      * @When I check if a get backup codes email should be sent
@@ -699,6 +734,22 @@ class EmailContext extends YiiContext
     public function iSeeThatAMfaDisabledEmailShouldBeSent()
     {
         assert::true($this->mfaDisabledEmailShouldBeSent);
+    }
+
+    /**
+     * @Then I see that a get backup codes email has NOT been sent recently
+     */
+    public function iSeeThatAGetBackupCodesEmailHasNotBeSent()
+    {
+        assert::false($this->getBackupCodesEmailHasBeenSent);
+    }
+
+    /**
+     * @Then I see that a get backup codes email has been sent recently
+     */
+    public function iSeeThatAGetBackupCodesEmailHasBeenSent()
+    {
+        assert::true($this->getBackupCodesEmailHasBeenSent);
     }
 
     /**
