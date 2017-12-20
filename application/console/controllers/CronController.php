@@ -97,11 +97,6 @@ class CronController extends Controller
             if ($emailer->shouldSendGetBackupCodesMessageTo($user)) {
                 $emailer->sendMessageTo(EmailLog::MESSAGE_TYPE_GET_BACKUP_CODES, $user);
             }
-
-            if ($emailer->shouldSendRefreshBackupCodesMessageTo($user)) {
-                $emailer->sendMessageTo(EmailLog::MESSAGE_TYPE_REFRESH_BACKUP_CODES, $user);
-            }
-
             if ($emailer->shouldSendLostSecurityKeyMessageTo($user)) {
                 $emailer->sendMessageTo(EmailLog::MESSAGE_TYPE_LOST_SECURITY_KEY, $user);
             }
