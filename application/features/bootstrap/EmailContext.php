@@ -229,6 +229,28 @@ class EmailContext extends YiiContext
     }
 
     /**
+     * @Given a :messageType email has been sent to that user
+     */
+    public function anEmailHasBeenSentToThatUser(string $messageType)
+    {
+
+        $emailLog = new EmailLog([
+            'user_id' => $this->tempUser->id,
+            'message_type' => $messageType,
+        ]);
+
+        $emailLog->save();
+    }
+
+    /**
+     * @Given a :messageType email has NOT been sent to that user
+     */
+    public function anEmailHasNotBeenSentToThatUser(string $messageType)
+    {
+        return;
+    }
+
+    /**
      * @When that user gets a password
      */
     public function thatUserGetsAPassword()
@@ -519,9 +541,9 @@ class EmailContext extends YiiContext
     }
 
     /**
-     * @Given the mfa event type is set to :arg1
+     * @Given the latest mfa event type was :arg1
      */
-    public function theMfaEventTypeIsSetTo($eventType) {
+    public function theLatestMfaEventTypeWas($eventType) {
         $this->mfaEventType = $eventType;
     }
 
@@ -532,6 +554,16 @@ class EmailContext extends YiiContext
     public function aBackupCodeMfaOptionWasXUsedDaysAgo($lastUsedDaysAgo)
     {
         $this->createMfa(Mfa::TYPE_BACKUPCODE, $lastUsedDaysAgo);
+    }
+
+    /**
+     * @When a backup code is used up by that user
+     */
+    public function aBackupCodeIsUsedUpByThatUser()
+    {
+        $backupMfa = $this->getMfa(Mfa::TYPE_BACKUPCODE);
+        $backUpCode = MfaBackupcode::find()->where(['mfa_id' => $backupMfa->id])->one();
+        $backUpCode->delete();
     }
 
     /**
