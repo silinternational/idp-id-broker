@@ -97,8 +97,8 @@ class Mfa extends MfaBase
             'status' => 'success',
         ]);
 
-        /* @todo uncomment this line when the emails are ready */
-        // self::sendAppropriateMessages($this->user, self::EVENT_TYPE_DELETE);
+
+        self::sendAppropriateMessages($this->user, self::EVENT_TYPE_DELETE);
     }
 
     /**
