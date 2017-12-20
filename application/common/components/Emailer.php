@@ -100,6 +100,9 @@ class Emailer extends Component
     /* Nag the user if they have FEWER than this number of backup codes */
     public $minimumBackupCodesBeforeNag;
 
+    /* Don't resend the same type of email to the same user for X days */
+    public $emailRepeatDelayDays;
+
     /**
      * Assert that the given configuration values are acceptable.
      *
@@ -293,6 +296,26 @@ class Emailer extends Component
         
         EmailLog::logMessage($messageType, $user->id);
     }
+
+    /**
+     *
+     * Whether the user has already been sent this type of email in the last X days
+     *
+     * @param int $userId
+     * @param string $messageType
+     * @return bool
+     */
+    public function hasReceivedMessageRecently($userId, string $messageType)
+    {
+
+        $latestEmail = EmailLog::find()->where(['user_id' => $userId, 'message_type' =>$messageType])
+            ->orderBy('sent_utc DESC')->one();
+        if (empty($latestEmail)) {
+            return false;
+        }
+
+        return MySqlDateTime::dateIsRecent($latestEmail->sent_utc, $this->emailRepeatDelayDays);
+    }
     
     /**
      * Whether we should send an invite message to the given User.
@@ -351,7 +374,8 @@ class Emailer extends Component
     {
         return $this->sendGetBackupCodesEmails
             && count($user->getVerifiedMfaOptions()) == 1
-            && ! $user->hasMfaBackupCodes();
+            && ! $user->hasMfaBackupCodes()
+            && ! $this->hasReceivedMessageRecently($user->id, EmailLog::MESSAGE_TYPE_GET_BACKUP_CODES);
     }
 
     /**
@@ -376,6 +400,10 @@ class Emailer extends Component
     public function shouldSendLostSecurityKeyMessageTo($user)
     {
         if ( ! $this->sendLostSecurityKeyEmails) {
+            return false;
+        }
+
+        if ($this->hasReceivedMessageRecently($user->id, EmailLog::MESSAGE_TYPE_LOST_SECURITY_KEY)) {
             return false;
         }
 
