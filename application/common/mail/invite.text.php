@@ -25,9 +25,9 @@
 Dear <?= $displayName ?>,
 
 A new <?= $idpDisplayName ?> Identity account has been created for you and is ready for
-you to create your password. Please note this account is not the same as your <?= $idpDisplayName ?>
-email account and therefore passwords are not kept in sync. Instead this account is for use with many
-corporate websites and applications such as the corporate Wiki and personnel systems.
+you to create your password. Please note this account is not an email account. Instead
+this account is for use with many corporate websites and applications such as the
+corporate Wiki and personnel systems.
 
 After creating your password you'll also
 be given the opportunity to set up recovery methods in case you ever 
@@ -51,6 +51,10 @@ Instructions:
    the page
 7. Enter your password again to confirm it
 8. Click the "Change" button to set your new password
+
+Please note that this <?= $idpDisplayName ?> Identity account (username and password) is
+unique and its password is not synchronized with any other accounts
+you may have.
 
 Thank you,
 

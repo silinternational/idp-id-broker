@@ -28,9 +28,8 @@ use yii\helpers\Html as yHtml;
 
 <p>
     A new <?= yHtml::encode($idpDisplayName) ?> Identity account has been created for you and is ready for you to set
-    your password. Please note this account is not the same as your <?= yHtml::encode($idpDisplayName) ?> email account and therefore
-    passwords are not kept in sync. Instead this account is for use with many corporate websites and applications such
-    as the corporate Wiki and personnel systems.
+    your password. Please note this account is not an email account. Instead this account is for use with many
+    corporate websites and applications such as the corporate Wiki and personnel systems.
 </p>
 <p>
     After creating your password you'll also be given the opportunity to set up recovery methods
@@ -55,6 +54,11 @@ use yii\helpers\Html as yHtml;
   <li>Enter your password again to confirm it</li>
   <li>Click the "Change" button to set your new password</li>
 </ol>
+
+<p>
+    Please note that this <?= yHtml::encode($idpDisplayName) ?> Identity account (username and password) is
+    unique and its password is not synchronized with any other accounts you may have.
+</p>
 
 <p>Thank you,</p>
 
