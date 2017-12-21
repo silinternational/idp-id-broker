@@ -65,35 +65,51 @@ Feature: User
 #      And the only property to change should be last_synced_utc
 #      And last_synced_utc should be stored as now UTC
 
-#TODO: related to PUT now.
-#  Scenario Outline: Change the properties of an existing user
-#    Given the requester is authorized
-#      And the user store is empty
-#      And I provide the following valid data:
-#        | property     | value                 |
-#        | employee_id  | 123                   |
-#        | first_name   | Shep                  |
-#        | last_name    | Clark                 |
-#        | display_name | Shep Clark            |
-#        | username     | shep_clark            |
-#        | email        | shep_clark@example.org|
-#      And I request "/user" be created
-#      And a record exists with an employee_id of "123"
-#    When I change the <property> to <value>
-#      And I request "/user" be created again
-#    Then a record exists with a <property> of <value>
-#      And last_changed_utc and last_synced_utc are the same
-#      And last_synced_utc should be stored as now UTC
-#
-#    Examples:
-#      | property    | value           |
-#      | first_name  | FIRST           |
-#      | last_name   | LAST            |
-#      | display_name| DISPLAY         |
-#      | username    | USER            |
-#      | email       | chg@example.org |
-#      | active      | no              |
-#      | locked      | yes             |
+  Scenario Outline: Change the properties of an existing user
+    Given a record does not exist with an employee_id of "123"
+      And the requester is authorized
+      And I provide the following valid data:
+        | property     | value                 |
+        | employee_id  | 123                   |
+        | first_name   | Shep                  |
+        | last_name    | Clark                 |
+        | display_name | Shep Clark            |
+        | username     | shep_clark            |
+        | email        | shep_clark@example.org|
+      And I request "/user" be created
+      And the response status code should be 200
+      And a record exists with an employee_id of "123"
+      And the following data should be stored:
+        | property            | value                 |
+        | first_name          | Shep                  |
+        | last_name           | Clark                 |
+        | display_name        | Shep Clark            |
+        | username            | shep_clark            |
+        | email               | shep_clark@example.org|
+        | current_password_id | NULL                  |
+        | active              | yes                   |
+        | locked              | no                    |
+        | require_mfa         | no                    |
+      And I change the <property> to <value>
+    When I request "/user/123" be updated
+    Then the response status code should be 200
+      And a record exists with a <property> of <value>
+      And last_changed_utc should be stored as now UTC
+      And last_synced_utc should be stored as now UTC
+
+    Examples:
+      | property    | value           |
+      | first_name  | FIRST           |
+      | last_name   | LAST            |
+      | display_name| DISPLAY         |
+      | username    | USER            |
+      | email       | chg@example.org |
+      | active      | no              |
+      | active      | yes             |
+      | locked      | no              |
+      | locked      | yes             |
+      | require_mfa | no              |
+      | require_mfa | yes             |
 
 #TODO: consider creating a new security.feature file for all these security-related tests.
 #TODO: need to think through tests for API_ACCESS_KEYS config, i.e., need tests for ApiConsumer
