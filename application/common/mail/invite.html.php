@@ -26,7 +26,17 @@ use yii\helpers\Html as yHtml;
 ?>
 <p>Dear <?= yHtml::encode($displayName) ?>,</p>
 
-<p>A new <?= yHtml::encode($idpDisplayName) ?> account has been created for you and is ready for you to create your password. After creating your password you'll also be given the opportunity to set up recovery methods in case you ever forget your password. We highly recommended that you set up at least one or two recovery methods. You can also enhance the security of your account by enabling 2-Step Verification which will help ensure bad guys cannot get into your account even if they guess your password.</p>
+<p>
+    A new <?= yHtml::encode($idpDisplayName) ?> Identity account has been created for you and is ready for you to set
+    your password. Please note this account is not an email account. Instead this account is for use with many
+    corporate websites and applications such as the corporate Wiki and personnel systems.
+</p>
+<p>
+    After creating your password you'll also be given the opportunity to set up recovery methods
+    in case you ever forget your password. We highly recommended that you set up at least one or two recovery methods.
+    You can also enhance the security of your account by enabling 2-Step Verification which will help ensure bad guys
+    cannot get into your account even if they guess your password.
+</p>
 
 <p>
   If you have any difficulties completing this task, please contact
@@ -45,7 +55,10 @@ use yii\helpers\Html as yHtml;
   <li>Click the "Change" button to set your new password</li>
 </ol>
 
-<p>Please note that this <?= yHtml::encode($idpDisplayName) ?> account (username and password) is unique and its password is not synchronized with any other accounts you may have.</p>
+<p>
+    Please note that this <?= yHtml::encode($idpDisplayName) ?> Identity account (username and password) is
+    unique and its password is not synchronized with any other accounts you may have.
+</p>
 
 <p>Thank you,</p>
 
