@@ -14,6 +14,7 @@ Feature: User
         | display_name | Shep Clark            |
         | username     | shep_clark            |
         | email        | shep_clark@example.org|
+        | require_mfa  | yes                   |
     When I request "/user" be created
     Then the response status code should be 200
       And the following data is returned:
@@ -42,6 +43,7 @@ Feature: User
         | current_password_id | NULL                  |
         | active              | yes                   |
         | locked              | no                    |
+        | require_mfa         | yes                   |
       And last_changed_utc should be stored as now UTC
       And last_synced_utc should be stored as now UTC
 
@@ -230,6 +232,18 @@ Feature: User
       | locked      | 21                 | Locked      |
       | locked      | true               | Locked      |
       | locked      | false              | Locked      |
+      | require_mfa | YES                | Require Mfa |
+      | require_mfa | Yes                | Require Mfa |
+      | require_mfa | yessir             | Require Mfa |
+      | require_mfa | NO                 | Require Mfa |
+      | require_mfa | No                 | Require Mfa |
+      | require_mfa | nosir              | Require Mfa |
+      | require_mfa | x                  | Require Mfa |
+      | require_mfa | 1                  | Require Mfa |
+      | require_mfa | 0                  | Require Mfa |
+      | require_mfa | 21                 | Require Mfa |
+      | require_mfa | true               | Require Mfa |
+      | require_mfa | false              | Require Mfa |
 
   Scenario Outline: Attempt to create a new user while providing an invalid(too long) property
     Given the requester is authorized
