@@ -244,3 +244,17 @@ Feature: Email
       | 0           | has              |
       | 10          | has              |
       | 66          | has NOT          |
+
+  Scenario: Sending delayed mfa related emails to all appropriate users
+    Given we are configured to send lost key emails
+      And we are configured to send get backup codes emails
+      And I remove records of any emails that have been sent
+      And no mfas exist
+      And a user already exists
+      And a u2f mfa option was used 222 days ago
+      And a backup code mfa option was used 2 days ago
+      And a "lost-security-key" email has NOT been sent to that user
+      And a second user exists with a totp mfa option
+    When I send delayed mfa related emails
+    Then I see that the first user has received a lost-security-key email
+      And I see that the second user has received a get-backup-codes email

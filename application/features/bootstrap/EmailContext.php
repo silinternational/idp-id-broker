@@ -13,6 +13,7 @@ class EmailContext extends YiiContext
 {
     /** @var User */
     protected $tempUser;
+    protected $tempUser2;
 
     /** @var bool */
     protected $getBackupCodesEmailHasBeenSent;
@@ -119,10 +120,13 @@ class EmailContext extends YiiContext
         return $user;
     }
 
-    protected function createMfa($type, $lastUsedDaysAgo=null)
+    protected function createMfa($type, $lastUsedDaysAgo=null, $user=null)
     {
+        if ($user ===null) {
+            $user = $this->tempUser;
+        }
         $mfa = new Mfa();
-        $mfa->user_id = $this->tempUser->id;
+        $mfa->user_id = $user->id;
         $mfa->type = $type;
         $mfa->verified = 1;
 
@@ -130,14 +134,14 @@ class EmailContext extends YiiContext
             $diffConfig = "-" . $lastUsedDaysAgo . " days";
             $mfa->last_used_utc= MySqlDateTime::relative($diffConfig);
         }
-        assert::true($mfa->save(), "Could not create new mfa.");
-        $this->tempUser->refresh();
+        Assert::true($mfa->save(), "Could not create new mfa.");
+        $user->refresh();
     }
 
     protected function deleteMfaOfType($type) {
         foreach ($this->tempUser->mfas as $mfaOption) {
             if ($mfaOption->type === $type) {
-                assert::true($mfaOption->delete(), 'Could not delete the ' . $type . ' mfa option for the test user.');
+                Assert::true($mfaOption->delete(), 'Could not delete the ' . $type . ' mfa option for the test user.');
             }
         }
     }
@@ -210,7 +214,7 @@ class EmailContext extends YiiContext
     }
 
     /**
-     * @Given a (specific) user already exists
+     * @Given a(nother) (specific) user already exists
      */
     public function aUserAlreadyExists()
     {
@@ -229,6 +233,16 @@ class EmailContext extends YiiContext
                 . 'without a password.'
             );
         }
+    }
+
+    /**
+     * @Given a second user exists with a totp mfa option
+    */
+    public function aSecondUserExistsWithATotpMfaOption()
+    {
+        $this->tempUser2 = $this->createNewUser();
+        $this->createMfa(Mfa::TYPE_TOTP, null, $this->tempUser2);
+
     }
 
     /**
@@ -251,8 +265,8 @@ class EmailContext extends YiiContext
 
             $emailLog->sent_utc = $dbDate;
         }
-        echo PHP_EOL . "Date: " . $emailLog->sent_utc;
-        $emailLog->save();
+
+        Assert::true($emailLog->save(), 'Could not save a new EmailLog for the test');
     }
 
     /**
@@ -266,7 +280,7 @@ class EmailContext extends YiiContext
             'message_type' => $messageType,
         ]);
 
-        $emailLog->save();
+        Assert::true($emailLog->save(), 'Could not save a new EmailLog for the test');
     }
 
     /**
@@ -274,7 +288,7 @@ class EmailContext extends YiiContext
      */
     public function anEmailHasNotBeenSentToThatUser(string $messageType)
     {
-        return;
+        EmailLog::deleteAll(['user_id' => $this->tempUser->id, 'message_type' => $messageType]);
     }
 
     /**
@@ -673,11 +687,19 @@ class EmailContext extends YiiContext
     }
 
     /**
+     * @When I send delayed mfa related emails
+     */
+    public function iSendDelayedMfaRelatedEmails()
+    {
+        $this->fakeEmailer->sendDelayedMfaRelatedEmails();
+    }
+
+    /**
      * @Then I see that a mfa option added email should NOT be sent
      */
     public function iSeeThatAMfaOptionAddedEmailShouldNotBeSent()
     {
-        assert::false($this->mfaOptionAddedEmailShouldBeSent);
+        Assert::false($this->mfaOptionAddedEmailShouldBeSent);
     }
 
     /**
@@ -685,7 +707,7 @@ class EmailContext extends YiiContext
      */
     public function iSeeThatAMfaOptionAddedEmailShouldBeSent()
     {
-        assert::true($this->mfaOptionAddedEmailShouldBeSent);
+        Assert::true($this->mfaOptionAddedEmailShouldBeSent);
     }
 
     /**
@@ -693,7 +715,7 @@ class EmailContext extends YiiContext
      */
     public function iSeeThatAMfaEnabledEmailShouldNotBeSent()
     {
-        assert::false($this->mfaEnabledEmailShouldBeSent);
+        Assert::false($this->mfaEnabledEmailShouldBeSent);
     }
 
     /**
@@ -701,7 +723,7 @@ class EmailContext extends YiiContext
      */
     public function iSeeThatAMfaEnabledEmailShouldBeSent()
     {
-        assert::true($this->mfaEnabledEmailShouldBeSent);
+        Assert::true($this->mfaEnabledEmailShouldBeSent);
     }
 
     /**
@@ -709,7 +731,7 @@ class EmailContext extends YiiContext
      */
     public function iSeeThatAMfaOptionRemovedEmailShouldNotBeSent()
     {
-        assert::false($this->mfaOptionRemovedEmailShouldBeSent);
+        Assert::false($this->mfaOptionRemovedEmailShouldBeSent);
     }
 
     /**
@@ -717,7 +739,7 @@ class EmailContext extends YiiContext
      */
     public function iSeeThatAMfaOptionRemovedEmailShouldBeSent()
     {
-        assert::true($this->mfaOptionRemovedEmailShouldBeSent);
+        Assert::true($this->mfaOptionRemovedEmailShouldBeSent);
     }
 
     /**
@@ -725,7 +747,7 @@ class EmailContext extends YiiContext
      */
     public function iSeeThatAMfaDisabledEmailShouldNotBeSent()
     {
-        assert::false($this->mfaDisabledEmailShouldBeSent);
+        Assert::false($this->mfaDisabledEmailShouldBeSent);
     }
 
     /**
@@ -733,7 +755,7 @@ class EmailContext extends YiiContext
      */
     public function iSeeThatAMfaDisabledEmailShouldBeSent()
     {
-        assert::true($this->mfaDisabledEmailShouldBeSent);
+        Assert::true($this->mfaDisabledEmailShouldBeSent);
     }
 
     /**
@@ -741,7 +763,7 @@ class EmailContext extends YiiContext
      */
     public function iSeeThatAGetBackupCodesEmailHasNotBeSent()
     {
-        assert::false($this->getBackupCodesEmailHasBeenSent);
+        Assert::false($this->getBackupCodesEmailHasBeenSent);
     }
 
     /**
@@ -749,7 +771,7 @@ class EmailContext extends YiiContext
      */
     public function iSeeThatAGetBackupCodesEmailHasBeenSent()
     {
-        assert::true($this->getBackupCodesEmailHasBeenSent);
+        Assert::true($this->getBackupCodesEmailHasBeenSent);
     }
 
     /**
@@ -757,7 +779,7 @@ class EmailContext extends YiiContext
      */
     public function iSeeThatALostSecurityKeyEmailShouldNotBeSent()
     {
-        assert::false($this->lostKeyEmailShouldBeSent);
+        Assert::false($this->lostKeyEmailShouldBeSent);
     }
 
     /**
@@ -765,7 +787,7 @@ class EmailContext extends YiiContext
      */
     public function iSeeThatALostSecurityKeyEmailShouldBeSent()
     {
-        assert::true($this->lostKeyEmailShouldBeSent);
+        Assert::true($this->lostKeyEmailShouldBeSent);
     }
 
     /**
@@ -773,7 +795,7 @@ class EmailContext extends YiiContext
      */
     public function iSeeThatAGetBackupCodesEmailShouldNotBeSent()
     {
-        assert::false($this->getBackupCodesEmailShouldBeSent);
+        Assert::false($this->getBackupCodesEmailShouldBeSent);
     }
 
     /**
@@ -781,7 +803,7 @@ class EmailContext extends YiiContext
      */
     public function iSeeThatAGetBackupCodesEmailShouldBeSent()
     {
-        assert::true($this->getBackupCodesEmailShouldBeSent);
+        Assert::true($this->getBackupCodesEmailShouldBeSent);
     }
 
     /**
@@ -789,7 +811,7 @@ class EmailContext extends YiiContext
      */
     public function iSeeThatARefreshBackupCodesEmailShouldNotBeSent()
     {
-        assert::false($this->refreshBackupCodesEmailShouldBeSent);
+        Assert::false($this->refreshBackupCodesEmailShouldBeSent);
     }
 
     /**
@@ -797,6 +819,22 @@ class EmailContext extends YiiContext
      */
     public function iSeeThatARefreshBackupCodesEmailShouldBeSent()
     {
-        assert::true($this->refreshBackupCodesEmailShouldBeSent);
+        Assert::true($this->refreshBackupCodesEmailShouldBeSent);
+    }
+
+    /**
+     * @Then I see that the first user has received a lost-security-key email
+     */
+    public function iSeeThatTheFirstUserHasReceivedALostSecurityKeyEmail()
+    {
+        Assert::true($this->fakeEmailer->hasReceivedMessageRecently($this->tempUser->id, EmailLog::MESSAGE_TYPE_LOST_SECURITY_KEY));
+    }
+
+    /**
+     * @Then I see that the second user has received a get-backup-codes email
+     */
+    public function iSeeThatTheSecondUserHasReceivedAGetBackupCodesEmail()
+    {
+        Assert::true($this->fakeEmailer->hasReceivedMessageRecently($this->tempUser2->id, EmailLog::MESSAGE_TYPE_GET_BACKUP_CODES));
     }
 }
