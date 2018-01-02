@@ -417,7 +417,7 @@ class Mfa extends MfaBase
     }
 
 
-    protected function sendAppropriateMessages($user, $eventType)
+    protected static function sendAppropriateMessages($user, $eventType)
     {
         /* @var $emailer Emailer */
         $emailer = \Yii::$app->emailer;
