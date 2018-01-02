@@ -207,7 +207,11 @@ class FeatureContext extends YiiContext
     {
         $this->userFromDb = User::findOne([$lookupKey => $lookupValue]);
 
-        Assert::notNull($this->userFromDb);
+        Assert::notNull($this->userFromDb, sprintf(
+            'Failed to find a user with a %s of %s.',
+            $lookupKey,
+            var_export($lookupValue, true)
+        ));
     }
 
     /**

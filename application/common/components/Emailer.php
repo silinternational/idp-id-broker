@@ -16,10 +16,10 @@ use yii\web\ServerErrorHttpException;
 
 class Emailer extends Component
 {
-    const SUBJECT_INVITE_DEFAULT = 'Your new %s account';
-    const SUBJECT_MFA_RATE_LIMIT_DEFAULT = 'Too many 2-step verification attempts on your %s account';
-    const SUBJECT_PASSWORD_CHANGED_DEFAULT = 'Your %s account password has been changed';
-    const SUBJECT_WELCOME_DEFAULT = 'Welcome to your new %s account';
+    const SUBJECT_INVITE_DEFAULT = 'Your new %s Identity account';
+    const SUBJECT_MFA_RATE_LIMIT_DEFAULT = 'Too many 2-Step Verification attempts on your %s Identity account';
+    const SUBJECT_PASSWORD_CHANGED_DEFAULT = 'Your %s Identity account password has been changed';
+    const SUBJECT_WELCOME_DEFAULT = 'Welcome to your new %s Identity account';
 
     const SUBJECT_GET_BACKUP_CODES_DEFAULT = 'Get printable codes for your %s account';
     const SUBJECT_REFRESH_BACKUP_CODES_DEFAULT = 'Get a new set of printable codes for your %s account';

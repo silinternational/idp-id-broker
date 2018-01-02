@@ -79,6 +79,7 @@ class User extends UserBase
             'email',
             'active',
             'locked',
+            'require_mfa',
             'nag_for_mfa_after',
         ];
 
@@ -90,6 +91,7 @@ class User extends UserBase
             'email',
             'active',
             'locked',
+            'require_mfa',
         ];
 
         $scenarios[self::SCENARIO_UPDATE_PASSWORD] = ['password'];
@@ -118,7 +120,7 @@ class User extends UserBase
                 'nag_for_mfa_after', 'default', 'value' => MySqlDateTime::today(),
             ],
             [
-                ['active', 'locked'], 'in', 'range' => ['yes', 'no'],
+                ['active', 'locked', 'require_mfa'], 'in', 'range' => ['yes', 'no'],
             ],
             [
                 'email', 'email',
