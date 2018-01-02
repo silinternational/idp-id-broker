@@ -89,17 +89,6 @@ class CronController extends Controller
     {
         /* @var $emailer Emailer */
         $emailer = \Yii::$app->emailer;
-
-        $query = (new Query)->from('user');
-
-        // iterate over one user at a time.
-        foreach ($query->each() as $user) {
-            if ($emailer->shouldSendGetBackupCodesMessageTo($user)) {
-                $emailer->sendMessageTo(EmailLog::MESSAGE_TYPE_GET_BACKUP_CODES, $user);
-            }
-            if ($emailer->shouldSendLostSecurityKeyMessageTo($user)) {
-                $emailer->sendMessageTo(EmailLog::MESSAGE_TYPE_LOST_SECURITY_KEY, $user);
-            }
-        }
+        $emailer->sendDelayedMfaRelatedEmails();
     }
 }

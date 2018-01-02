@@ -13,6 +13,7 @@ use yii\base\Component;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Inflector;
 use yii\web\ServerErrorHttpException;
+use yii\db\Query;
 
 class Emailer extends Component
 {
@@ -296,6 +297,27 @@ class Emailer extends Component
         
         EmailLog::logMessage($messageType, $user->id);
     }
+
+    /**
+     * Iterates over all users and sends get-backup-code and/or lost-security-key emails as is appropriate
+     */
+    public function sendDelayedMfaRelatedEmails()
+    {
+        $query = (new Query)->from('user');
+
+        // iterate over one user at a time.
+        foreach ($query->each() as $userData) {
+            $user = User::findOne($userData['id']);
+
+            if ($this->shouldSendGetBackupCodesMessageTo($user)) {
+                $this->sendMessageTo(EmailLog::MESSAGE_TYPE_GET_BACKUP_CODES, $user);
+            }
+            if ($this->shouldSendLostSecurityKeyMessageTo($user)) {
+                $this->sendMessageTo(EmailLog::MESSAGE_TYPE_LOST_SECURITY_KEY, $user);
+            }
+        }
+    }
+
 
     /**
      *
