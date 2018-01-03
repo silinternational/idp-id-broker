@@ -21,13 +21,13 @@ class MfaController extends BaseRestController
     public function actionCreate()
     {
         $req = \Yii::$app->request;
-        $type = $req->getBodyParam('type','invalid');
-        if ( ! Mfa::isValidType($type)) {
+        $type = $req->getBodyParam('type', 'invalid');
+        if (! Mfa::isValidType($type)) {
             throw new BadRequestHttpException('The provided type is not a supported MFA type', 1506695647);
         }
 
         $employeeId = $req->getBodyParam('employee_id');
-        if ( is_null($employeeId)) {
+        if (is_null($employeeId)) {
             throw new BadRequestHttpException('employee_id is required', 1506695722);
         }
 
@@ -80,7 +80,7 @@ class MfaController extends BaseRestController
             $value = str_replace(' ', '', $value);
         }
 
-        if ( ! $mfa->verify($value)){
+        if (! $mfa->verify($value)) {
             throw new BadRequestHttpException();
         }
 
