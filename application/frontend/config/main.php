@@ -45,6 +45,7 @@ return [
                 'POST authentication' => 'authentication/create',
 
                 'GET    user/<employeeId:\w+>/mfa'  => 'mfa/list',
+                'GET    mfa/<id:\w+>'               => 'mfa/view',
                 'POST   mfa'                        => 'mfa/create',
                 'POST   mfa/<id>/verify'            => 'mfa/verify',
                 'DELETE mfa/<id>'                   => 'mfa/delete',
