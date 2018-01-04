@@ -148,4 +148,39 @@ class MfaController extends BaseRestController
         \Yii::$app->response->statusCode = 204;
         return null;
     }
+
+    /**
+     * Get a specific MFA record for a user.
+     *
+     * @param string $id The MFA's ID.
+     * @return Mfa
+     * @throws BadRequestHttpException
+     * @throws NotFoundHttpException
+     */
+    public function actionView(string $id): array
+    {
+        /* @var $request \yii\web\Request */
+        $request = \Yii::$app->request;
+        
+        $employeeId = $request->getBodyParam('employee_id');
+        if (empty($employeeId)) {
+            throw new BadRequestHttpException('employee_id is required');
+        }
+
+        $user = User::findOne(['employee_id' => $employeeId]);
+        if ($user === null) {
+            throw new BadRequestHttpException('Invalid employee_id');
+        }
+
+        $mfa = Mfa::findOne(['id' => $id, 'user_id' => $user->id]);
+        if ($mfa === null) {
+            throw new NotFoundHttpException(sprintf(
+                'MFA record for id %s and employee_id %s not found',
+                var_export($id, true),
+                var_export($employeeId, true)
+            ), 1515012460);
+        }
+
+        return $mfa;
+    }
 }
