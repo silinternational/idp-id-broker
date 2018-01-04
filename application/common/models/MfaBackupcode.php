@@ -2,6 +2,7 @@
 namespace common\models;
 
 use common\helpers\MySqlDateTime;
+use common\components\Emailer;
 use yii\helpers\ArrayHelper;
 use yii\web\ServerErrorHttpException;
 
@@ -119,5 +120,19 @@ class MfaBackupcode extends MfaBackupcodeBase
             }
         }
         return true;
+    }
+
+
+    public function afterDelete()
+    {
+        parent::afterDelete();
+
+        $user = $this->mfa->user;
+
+        /* @var $emailer Emailer */
+        $emailer = \Yii::$app->emailer;
+        if ($emailer->shouldSendRefreshBackupCodesMessageTo($user)) {
+            $emailer->sendMessageTo(EmailLog::MESSAGE_TYPE_REFRESH_BACKUP_CODES, $user);
+        }
     }
 }

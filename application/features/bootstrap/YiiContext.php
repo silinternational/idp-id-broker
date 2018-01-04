@@ -38,6 +38,9 @@ class YiiContext implements Context
                 'logger' => new Psr3ConsoleLogger(),
             ]
         ));
+        $this->fakeEmailer->emailRepeatDelayDays = 31;
+        $this->fakeEmailer->minimumBackupCodesBeforeNag = 4;
+
         Yii::$app->set('emailer', $this->fakeEmailer);
         
         $this->addFakeLogTarget();
