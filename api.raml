@@ -851,46 +851,6 @@ schemas:
       500:
         description: The server encountered an error
   /{id}:
-    get:
-      description: Get an MFA configuration
-      body:
-        application/json:
-          schema:  |
-            {
-              "$schema": "http://json-schema.org/draft-03/schema",
-              "properties": {
-                "employee_id": {
-                  "required": true,
-                  "type": "string"
-                }
-              },
-              "type": "object"
-            }
-          example: |
-            {
-              "employee_id": "12345"
-            }
-      responses:
-        200:
-          body:
-            application/json:
-              example: |
-                {
-                  "id": 7,
-                  "type": "backupcode",
-                  "label": "2SV #1",
-                  "created_utc": "2017-10-24T20:40:47+00:00",
-                  "last_used_utc": null,
-                  "data": {
-                    "count": 10
-                  }
-                }
-        400:
-          description: |
-            The request was invalid for some reason (such as if it lacked an
-            `employee_id`).
-        404:
-        500:
     delete:
       description: Delete an MFA configuration
       body:
