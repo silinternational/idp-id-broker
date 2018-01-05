@@ -3,6 +3,9 @@
 use Behat\Gherkin\Node\TableNode;
 use common\helpers\MySqlDateTime;
 use common\models\Password;
+use common\models\Mfa;
+use common\models\MfaBackupcode;
+use common\models\MfaFailedAttempt;
 use common\models\User;
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Response;
@@ -42,9 +45,14 @@ class FeatureContext extends YiiContext
      */
     public function theUserStoreIsEmpty()
     {
-        foreach (User::find()->all() as $user) {
-            Assert::notSame($user->delete(), false);
-        }
+        // To avoid calls to try to remove TOTP/U2F entries from their
+        // respective backend services, we are simply deleting all relevant
+        // records here via deleteAll() to prevent their before/afterDelete()
+        // functions from being called.
+        MfaBackupcode::deleteAll();
+        MfaFailedAttempt::deleteAll();
+        Mfa::deleteAll();
+        User::deleteAll();
     }
 
     /**
