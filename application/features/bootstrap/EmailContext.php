@@ -622,7 +622,8 @@ class EmailContext extends YiiContext
         $backupMfa = $this->getMfa(Mfa::TYPE_BACKUPCODE);
         $backUpCode = array_shift($this->tempBackupCodes);
 
-        MfaBackupcode::validateAndRemove($backupMfa->id, $backUpCode);
+        Assert::true(MfaBackupcode::validateAndRemove($backupMfa->id, $backUpCode),
+            'Could not remove a backup code.');
     }
 
     /**
@@ -701,7 +702,7 @@ class EmailContext extends YiiContext
      */
     public function iCheckIfARefreshBackupCodesEmailShouldBeSent()
     {
-        $this->refreshBackupCodesEmailShouldBeSent = $this->fakeEmailer->shouldSendRefreshBackupCodesMessageTo($this->tempUser);
+        $this->refreshBackupCodesEmailShouldBeSent = $this->fakeEmailer->shouldSendRefreshBackupCodesMessage(count($this->tempBackupCodes));
     }
 
     /**

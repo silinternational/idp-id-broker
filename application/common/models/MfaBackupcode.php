@@ -49,7 +49,7 @@ class MfaBackupcode extends MfaBackupcodeBase
                 if ($sendEmail) {
                     /* @var $emailer Emailer */
                     $emailer = \Yii::$app->emailer;
-                    if ($emailer->shouldSendRefreshBackupCodesMessageTo($startCount - 1)) {
+                    if ($emailer->shouldSendRefreshBackupCodesMessage($startCount - 1)) {
                         $mfa = Mfa::findOne($mfaId);
                         $user = $mfa->user;
                         $emailer->sendMessageTo(EmailLog::MESSAGE_TYPE_REFRESH_BACKUP_CODES, $user);
