@@ -15,6 +15,9 @@ class EmailContext extends YiiContext
     protected $tempUser;
     protected $tempUser2;
 
+    /** @var  array of strings */
+    protected $tempBackupCodes;
+
     /** @var bool */
     protected $getBackupCodesEmailHasBeenSent;
 
@@ -552,7 +555,10 @@ class EmailContext extends YiiContext
      */
     public function aBackupCodeMfaOptionDoesExist()
     {
-        $this->createMfa(Mfa::TYPE_BACKUPCODE);
+        $results = Mfa::create($this->tempUser->id, Mfa::TYPE_BACKUPCODE);
+        $this->tempBackupCodes = $results['data'];
+
+        $this->tempUser->refresh();
     }
 
     /**
@@ -566,19 +572,30 @@ class EmailContext extends YiiContext
     /**
      * @Given there are :arg1 backup codes
      */
-    public function thereAreXBackupCodes($count)
+    public function thereAreXBackupCodes($desiredCount)
     {
         $backupMfa = $this->getMfa(Mfa::TYPE_BACKUPCODE);
 
         if (empty($backupMfa)) {
-            if ($count == 0) {
+            if ($desiredCount == 0) {
                 return;
             }
-            throw new InvalidArgumentException('There is no MFA Backup Code option to be able to create ' . $count . ' codes for.');
+            throw new InvalidArgumentException('There is no MFA Backup Code option available for the test.');
         }
 
-        MfaBackupcode::createBackupCodes($backupMfa->id, $count);
-        $backupMfa->refresh();
+        $codeCount = count($this->tempBackupCodes);
+
+        Assert::greaterThanEq($codeCount, $desiredCount, 'There are not enough backup codes to run the test.');
+
+        $countDiff = $codeCount - $desiredCount;
+
+        for ($i = 0; $i < $countDiff; $i++) {
+            $nextCode = array_shift($this->tempBackupCodes);
+            MfaBackupcode::validateAndRemove($backupMfa->id, $nextCode, False);
+        }
+
+        $remainingCodes = MfaBackupcode::findAll(['mfa_id' => $backupMfa->id]);
+        Assert::eq(count($remainingCodes), $desiredCount, 'Could not ensure the desired count of backup codes.');
     }
 
     /**
@@ -603,8 +620,9 @@ class EmailContext extends YiiContext
     public function aBackupCodeIsUsedUpByThatUser()
     {
         $backupMfa = $this->getMfa(Mfa::TYPE_BACKUPCODE);
-        $backUpCode = MfaBackupcode::find()->where(['mfa_id' => $backupMfa->id])->one();
-        $backUpCode->delete();
+        $backUpCode = array_shift($this->tempBackupCodes);
+
+        MfaBackupcode::validateAndRemove($backupMfa->id, $backUpCode);
     }
 
     /**

@@ -402,13 +402,13 @@ class Emailer extends Component
 
     /**
      * @param User $user
+     * @param int $backupCodeCount - the number of backup codes left for the user (after a deletion)
      * @return bool
      */
-    public function shouldSendRefreshBackupCodesMessageTo($user)
+    public function shouldSendRefreshBackupCodesMessageTo($backupCodeCount)
     {
         return $this->sendRefreshBackupCodesEmails
-            && $user->hasMfaBackupCodes()
-            && $user->countMfaBackupCodes() < $this->minimumBackupCodesBeforeNag;
+            && $backupCodeCount < $this->minimumBackupCodesBeforeNag;
     }
 
     /**

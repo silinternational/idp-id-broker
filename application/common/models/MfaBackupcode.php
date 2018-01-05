@@ -26,12 +26,14 @@ class MfaBackupcode extends MfaBackupcodeBase
      * Check if given value exists, if so delete and return true, else false
      * @param int $mfaId
      * @param int $code
+     * @param bool $sendEmail optional (default=True) Whether to send an email (False is used by tests)
      * @return bool
      * @throws ServerErrorHttpException
      */
-    public static function validateAndRemove(int $mfaId, int $code): bool
+    public static function validateAndRemove(int $mfaId, int $code, $sendEmail=True): bool
     {
         $backupCodes = MfaBackupcode::findAll(['mfa_id' => $mfaId]);
+        $startCount = count($backupCodes);
         foreach ($backupCodes as $backupCode) {
             if (password_verify($code, $backupCode->value)) {
                 if ($backupCode->delete() === false) {
@@ -43,6 +45,17 @@ class MfaBackupcode extends MfaBackupcodeBase
                     ]);
                     throw new ServerErrorHttpException("Unable to delete code after use", 1506692863);
                 }
+
+                if ($sendEmail) {
+                    /* @var $emailer Emailer */
+                    $emailer = \Yii::$app->emailer;
+                    if ($emailer->shouldSendRefreshBackupCodesMessageTo($startCount - 1)) {
+                        $mfa = Mfa::findOne($mfaId);
+                        $user = $mfa->user;
+                        $emailer->sendMessageTo(EmailLog::MESSAGE_TYPE_REFRESH_BACKUP_CODES, $user);
+                    }
+                }
+
                 return true;
             }
         }
@@ -122,17 +135,4 @@ class MfaBackupcode extends MfaBackupcodeBase
         return true;
     }
 
-
-    public function afterDelete()
-    {
-        parent::afterDelete();
-
-        $user = $this->mfa->user;
-
-        /* @var $emailer Emailer */
-        $emailer = \Yii::$app->emailer;
-        if ($emailer->shouldSendRefreshBackupCodesMessageTo($user)) {
-            $emailer->sendMessageTo(EmailLog::MESSAGE_TYPE_REFRESH_BACKUP_CODES, $user);
-        }
-    }
 }
