@@ -416,6 +416,32 @@ class User extends UserBase
         return $mfas;
     }
 
+    /*
+     * @return bool
+     */
+    public function hasMfaBackupCodes()
+    {
+        foreach ($this->getVerifiedMfaOptions() as $mfaOption) {
+            if ($mfaOption->type == Mfa::TYPE_BACKUPCODE) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /*
+     * @return int the count of a user's Mfa backup codes
+     */
+    public function countMfaBackupCodes()
+    {
+        foreach ($this->getVerifiedMfaOptions() as $mfaOption) {
+            if ($mfaOption->type == Mfa::TYPE_BACKUPCODE) {
+                return count($mfaOption->mfaBackupcodes);
+            }
+        }
+        return 0;
+    }
+
     public function save($runValidation = true, $attributeNames = null)
     {
         if ($this->scenario === self::SCENARIO_UPDATE_PASSWORD) {
@@ -441,6 +467,7 @@ class User extends UserBase
         if ($emailer->shouldSendWelcomeMessageTo($this, $changedAttributes)) {
             $emailer->sendMessageTo(EmailLog::MESSAGE_TYPE_WELCOME, $this);
         }
+
     }
 
     private function updatePassword(): bool

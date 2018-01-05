@@ -3,6 +3,7 @@ namespace console\controllers;
 
 use common\models\Mfa;
 use common\models\User;
+use common\components\Emailer;
 use yii\console\Controller;
 
 use TheIconic\Tracking\GoogleAnalytics\Analytics;
@@ -81,5 +82,13 @@ class CronController extends Controller
         $gaEvents['action'] = 'completed posting to Google Analytics';
 
         \Yii::warning($gaEvents);
+    }
+
+
+    public function actionSendDelayedMfaRelatedEmails()
+    {
+        /* @var $emailer Emailer */
+        $emailer = \Yii::$app->emailer;
+        $emailer->sendDelayedMfaRelatedEmails();
     }
 }

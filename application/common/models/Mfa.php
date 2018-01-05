@@ -19,6 +19,9 @@ class Mfa extends MfaBase
     const TYPE_U2F = 'u2f';
     const TYPE_BACKUPCODE = 'backupcode';
 
+    const EVENT_TYPE_CREATE = 'create_mfa';
+    const EVENT_TYPE_DELETE = 'delete_mfa';
+
     public function rules(): array
     {
         return ArrayHelper::merge([
@@ -63,6 +66,15 @@ class Mfa extends MfaBase
         ];
     }
 
+    public function afterSave($insert, $changedAttributes)
+    {
+        parent::afterSave($insert, $changedAttributes);
+
+        if ($insert) {
+            self::sendAppropriateMessages($this->user, self::EVENT_TYPE_CREATE);
+        }
+    }
+
     /**
      * Before deleting, delete backend record too
      * @return bool
@@ -84,6 +96,9 @@ class Mfa extends MfaBase
             'user' => $this->user->email,
             'status' => 'success',
         ]);
+
+
+        self::sendAppropriateMessages($this->user, self::EVENT_TYPE_DELETE);
     }
 
     /**
@@ -399,5 +414,26 @@ class Mfa extends MfaBase
             'status' => 'complete',
             'count' => $numDeleted,
         ]);
+    }
+
+
+    protected static function sendAppropriateMessages($user, $eventType)
+    {
+        /* @var $emailer Emailer */
+        $emailer = \Yii::$app->emailer;
+        $user->refresh();
+
+        if ($emailer->shouldSendMfaOptionAddedMessageTo($user, $eventType)) {
+            $emailer->sendMessageTo(EmailLog::MESSAGE_TYPE_MFA_OPTION_ADDED, $user);
+
+        } else if ($emailer->shouldSendMfaEnabledMessageTo($user, $eventType)) {
+            $emailer->sendMessageTo(EmailLog::MESSAGE_TYPE_MFA_ENABLED, $user);
+
+        } else if ($emailer->shouldSendMfaOptionRemovedMessageTo($user, $eventType)) {
+            $emailer->sendMessageTo(EmailLog::MESSAGE_TYPE_MFA_OPTION_REMOVED, $user);
+
+        } else if ($emailer->shouldSendMfaDisabledMessageTo($user, $eventType)) {
+            $emailer->sendMessageTo(EmailLog::MESSAGE_TYPE_MFA_DISABLED, $user);
+        }
     }
 }
