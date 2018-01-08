@@ -32,6 +32,7 @@ class MfaBackupcode extends MfaBackupcodeBase
     public static function validateAndRemove(int $mfaId, int $code): bool
     {
         $backupCodes = MfaBackupcode::findAll(['mfa_id' => $mfaId]);
+        $startCount = count($backupCodes);
         foreach ($backupCodes as $backupCode) {
             if (password_verify($code, $backupCode->value)) {
                 if ($backupCode->delete() === false) {
@@ -43,6 +44,15 @@ class MfaBackupcode extends MfaBackupcodeBase
                     ]);
                     throw new ServerErrorHttpException("Unable to delete code after use", 1506692863);
                 }
+
+                /* @var $emailer Emailer */
+                $emailer = \Yii::$app->emailer;
+                if ($emailer->shouldSendRefreshBackupCodesMessage($startCount - 1)) {
+                    $mfa = Mfa::findOne($mfaId);
+                    $user = $mfa->user;
+                    $emailer->sendMessageTo(EmailLog::MESSAGE_TYPE_REFRESH_BACKUP_CODES, $user);
+                }
+
                 return true;
             }
         }
@@ -122,17 +132,4 @@ class MfaBackupcode extends MfaBackupcodeBase
         return true;
     }
 
-
-    public function afterDelete()
-    {
-        parent::afterDelete();
-
-        $user = $this->mfa->user;
-
-        /* @var $emailer Emailer */
-        $emailer = \Yii::$app->emailer;
-        if ($emailer->shouldSendRefreshBackupCodesMessageTo($user)) {
-            $emailer->sendMessageTo(EmailLog::MESSAGE_TYPE_REFRESH_BACKUP_CODES, $user);
-        }
-    }
 }
