@@ -36,8 +36,7 @@ Instructions to set up 2-Step Verification:
    1. Go to <?= $passwordProfileUrl ?>
    2. Under 2-Step Verification, set up the options that suit you best (Security Key, Smartphone App, and/or
 Printable Codes)
-   3. Log out and log in again to see how it works and to have it remember your computer for 30 days. Note that
-logging out will undo the "Remember this computer" setting.
+   3. Log out and log in again to see how it works and to have it remember your browser for 30 days.
 
 To learn more about 2-Step Verification go to <?= $helpCenterUrl ?>
 
