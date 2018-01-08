@@ -386,7 +386,7 @@ class Mfa extends MfaBase
     }
 
     /**
-     * Returns a human f
+     * Returns a human friendly version of the Mfa's type
      *
      * @return string
      */
