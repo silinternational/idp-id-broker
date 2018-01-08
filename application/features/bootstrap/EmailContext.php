@@ -591,7 +591,7 @@ class EmailContext extends YiiContext
 
         for ($i = 0; $i < $countDiff; $i++) {
             $nextCode = array_shift($this->tempBackupCodes);
-            MfaBackupcode::validateAndRemove($backupMfa->id, $nextCode, False);
+            MfaBackupcode::validateAndRemove($backupMfa->id, $nextCode);
         }
 
         $remainingCodes = MfaBackupcode::findAll(['mfa_id' => $backupMfa->id]);
