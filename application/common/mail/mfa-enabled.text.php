@@ -26,10 +26,10 @@
 Dear <?= $displayName?>,
 
 Congratulations! You have enabled 2-Step Verification on your <?= $idpDisplayName ?> Identity account. This is a great
-way to protect access your account as well keep bad guys out of our corporate systems.
+way to protect access to your account as well keep bad guys out of our corporate systems.
 
 The next time you log in to a site using your <?= $idpDisplayName ?> Identity account you will be prompted for
-2-Step Verification. On that screen you’ll see a checkbox already checked to remember your computer for 30 days.
+2-Step Verification. On that screen you'll see a checkbox already checked to remember your browser for 30 days.
 If you leave it checked you will only be prompted for 2-Step Verification once a month or so.
 
 If you have not already done so, we recommend configuring at least two options for 2-Step Verification in case one of
