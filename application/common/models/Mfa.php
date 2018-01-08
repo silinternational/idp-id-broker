@@ -386,15 +386,15 @@ class Mfa extends MfaBase
     }
 
     /**
-     * Returns a human friendly form of the MFA type
+     * Returns a human f
      *
      * @return string
      */
     public function getReadableType() {
         $types = [
-            self::TYPE_BACKUPCODE => "Printable Codes",
-            self::TYPE_TOTP => "Smartphone App",
-            self::TYPE_U2F => "Security Key",
+            self::TYPE_BACKUPCODE => 'Printable Codes',
+            self::TYPE_TOTP => 'Smartphone App',
+            self::TYPE_U2F => 'Security Key',
         ];
         return $types[$this->type];
     }
