@@ -28,7 +28,7 @@ use yii\helpers\Html as yHtml;
 <p>Dear <?= yHtml::encode($displayName) ?>,</p>
 
 <p>
-    You only have <?= $numRemainingCodes ?> Printable Codes remaining for use with 2-Step Verification on your
+    You only have <?= $numRemainingCodes ?> Printable Code(s) remaining for use with 2-Step Verification on your
     <?= yHtml::encode($idpDisplayName) ?> Identity account. Now may be a good time to generate new codes to ensure you do not run out.
 </p>
 
@@ -38,7 +38,7 @@ use yii\helpers\Html as yHtml;
 <ol>
     <li>Go to <?= yHtml::encode($passwordProfileUrl) ?></li>
     <li>Login if needed</li>
-    <li>Under 2-Step Verification, click on CREATE NEW next to the Printable Coes option.</li>
+    <li>Under 2-Step Verification, click on CREATE NEW next to the Printable Codes option.</li>
     <li>Either print the codes out, download them to a safe place, or copy and paste them into a safe place.</li>
 </ol>
 
