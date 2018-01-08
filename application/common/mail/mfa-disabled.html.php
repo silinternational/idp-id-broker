@@ -26,4 +26,28 @@ use yii\helpers\Html as yHtml;
 ?>
 <p>Dear <?= yHtml::encode($displayName) ?>,</p>
 
-<h2>TODO: Compose contents of this email message</h2>
+<p>
+    2-Step Verification has been disabled on your <?= yHtml::encode($idpDisplayName) ?> Identity account. If this was not intentional
+    follow the instructions below to setup 2-Step Verification on your account.
+</p>
+<p>
+    If you did not do this it could be a sign someone else has compromised your account.
+    Please contact <?= yHtml::encode($supportName) ?> at <?= yHtml::encode($supportEmail) ?> as soon as possible to report the incident.
+</p>
+
+<p><b>Instructions to set up 2-Step Verification:</b></p>
+<ol>
+    <li>Go to <?= yHtml::encode($passwordProfileUrl) ?></li>
+    <li>Under 2-Step Verification, set up the options that suit you best (Security Key, Smartphone App, and/or
+    Printable Codes)</li>
+    <li>Log out and log in again to see how it works and to have it remember your browser for 30 days.</li>
+</ol>
+<p>
+    To learn more about 2-Step Verification go to <?= yHtml::encode($helpCenterUrl) ?>
+</p>
+<p>
+    If you have any difficulties completing this task, please contact <?= yHtml::encode($supportName) ?> at
+<?= yHtml::encode($supportEmail) ?>.
+</p>
+
+<p><i><?= yHtml::encode($emailSignature) ?></i></p>

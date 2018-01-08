@@ -20,9 +20,26 @@
  * @var string $passwordProfileUrl
  * @var string $supportEmail
  * @var string $supportName
+ * @var string $mfaTypeDisabled
  * @var bool   $isMfaEnabled
+ * @var array  $mfaOptions
  */
 ?>
 Dear <?= $displayName ?>,
 
-TODO: Compose contents of this email message.
+You have disabled the ability to use a <?= $mfaTypeDisabled ?> for 2-Step Verification when logging in using
+your <?= $idpDisplayName ?> Identity account. If this was not intentional, go to <?= $passwordProfileUrl ?>,
+log in if needed, and add it back to your account.
+
+You can continue to use 2-Step Verification using the following option(s):
+<?php
+foreach ($mfaOptions as $mfa) {
+    echo ' - ' . $mfa->getReadableType() . PHP_EOL;
+}
+?>
+
+If you did not do this it could be a sign someone else has compromised your account. Please contact <?= $supportName ?>
+at <?= $supportEmail ?> as soon as possible to report the incident.
+
+<?= $emailSignature ?>
+
