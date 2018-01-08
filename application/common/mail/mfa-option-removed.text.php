@@ -34,7 +34,7 @@ log in if needed, and add it back to your account.
 You can continue to use 2-Step Verification using the following option(s):
 <?php
 foreach ($mfaOptions as $mfa) {
-    echo ' - ' . $mfa->getReadableType();
+    echo ' - ' . $mfa->getReadableType() . PHP_EOL;
 }
 ?>
 
