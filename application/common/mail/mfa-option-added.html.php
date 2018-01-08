@@ -38,7 +38,7 @@ use yii\helpers\Html as yHtml;
 <ol>
     <?php
         foreach ($mfaOptions as $mfa) {
-            echo '<li>' . yHtml::encode($mfa->label) . '</li>';
+            echo '<li>' . yHtml::encode($mfa->getReadableType()) . '</li>';
         }
     ?>
 </ol>

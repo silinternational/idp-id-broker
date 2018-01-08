@@ -33,7 +33,7 @@ method of 2-Step Verification if you do not have access to the primary method.
 You now have the following 2-Step Verification options enabled:
 <?php
     foreach ($mfaOptions as $mfa) {
-       echo ' - ' . yHtml::encode($mfa->label);
+       echo ' - ' . $mfa->getReadableType();
     }
 ?>
 

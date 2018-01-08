@@ -71,7 +71,7 @@ class Mfa extends MfaBase
         parent::afterSave($insert, $changedAttributes);
 
         if ($insert) {
-            self::sendAppropriateMessages($this->user, self::EVENT_TYPE_CREATE);
+            $this->sendAppropriateMessages($this->user, self::EVENT_TYPE_CREATE);
         }
     }
 
@@ -98,7 +98,7 @@ class Mfa extends MfaBase
         ]);
 
 
-        self::sendAppropriateMessages($this->user, self::EVENT_TYPE_DELETE);
+        $this->sendAppropriateMessages($this->user, self::EVENT_TYPE_DELETE);
     }
 
     /**
@@ -431,7 +431,7 @@ class Mfa extends MfaBase
     }
 
 
-    protected static function sendAppropriateMessages($user, $eventType)
+    protected function sendAppropriateMessages($user, $eventType)
     {
         /* @var $emailer Emailer */
         $emailer = \Yii::$app->emailer;
@@ -444,6 +444,7 @@ class Mfa extends MfaBase
             $emailer->sendMessageTo(EmailLog::MESSAGE_TYPE_MFA_ENABLED, $user);
 
         } else if ($emailer->shouldSendMfaOptionRemovedMessageTo($user, $eventType)) {
+            $emailer->otherDataForEmails['mfaTypeDisabled'] = $this->getReadableType();
             $emailer->sendMessageTo(EmailLog::MESSAGE_TYPE_MFA_OPTION_REMOVED, $user);
 
         } else if ($emailer->shouldSendMfaDisabledMessageTo($user, $eventType)) {
