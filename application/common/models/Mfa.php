@@ -386,6 +386,20 @@ class Mfa extends MfaBase
     }
 
     /**
+     * Returns a human friendly form of the MFA type
+     *
+     * @return string
+     */
+    public function getReadableType() {
+        $types = [
+            self::TYPE_BACKUPCODE => "Printable Codes",
+            self::TYPE_TOTP => "Smartphone App",
+            self::TYPE_U2F => "Security Key",
+        ];
+        return $types[$this->type];
+    }
+
+    /**
      * Remove records that were not verified within the given time frame
      * @param int $maxAgeHours
      */
