@@ -24,4 +24,22 @@
 ?>
 Dear <?= $displayName ?>,
 
-TODO: Compose contents of this email message.
+You currently only have one method of 2-Step Verification configured for your <?= $idpDisplayName ?> Identity account and
+have not generated Printable Codes as a backup. You are not required to have Printable Codes but we do recommend them as
+a backup in case you lose your other option. If you do not want Printable Codes you can delete and ignore this email.
+
+Instructions to generate Printable Codes:
+-----------------------------------------
+   1. Go to <?= $passwordProfileUrl ?>
+   2. Log in if needed
+   3. In the 2-Step Verification section, click the Create button next to Printable Codes
+   4. Either print the codes out, download them to a safe place, or copy and paste them into a safe place.
+
+Treat these codes as you would your password and keep them safe. Also note that these codes are one-time use only.
+If you ever lose, misplace, or use them up you can come back to this site to generate new codes (which also invalidates
+any remaining previous codes).
+
+If you have any difficulties completing this task, please contact <?= $supportName ?> at
+<?= $supportEmail ?>.
+
+<?= $emailSignature ?>
