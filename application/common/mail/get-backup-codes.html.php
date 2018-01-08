@@ -27,7 +27,7 @@ use yii\helpers\Html as yHtml;
 <p>Dear <?= yHtml::encode($displayName) ?>,</p>
 
 <p>
-    You currently only have one method of 2-Step Verification configured for your <?= $yHtml::encode(idpDisplayName) ?>
+    You currently only have one method of 2-Step Verification configured for your <?= yHtml::encode($idpDisplayName) ?>
     Identity account and have not generated Printable Codes as a backup. You are not required to have Printable Codes
     but we do recommend them as a backup in case you lose your other option. If you do not want Printable Codes you can
     delete and ignore this email.
