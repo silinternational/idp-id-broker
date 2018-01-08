@@ -25,7 +25,7 @@ class MfaBackupcode extends MfaBackupcodeBase
     /**
      * Check if given value exists, if so delete and return true, else false
      * @param int $mfaId
-     * @param int $code
+     * @param string $code
      * @return bool
      * @throws ServerErrorHttpException
      */
@@ -86,7 +86,7 @@ class MfaBackupcode extends MfaBackupcodeBase
 
     /**
      * @param int $mfaId
-     * @param int $value
+     * @param string $value
      * @throws ServerErrorHttpException
      */
     public static function insertBackupCode(int $mfaId, $value)
