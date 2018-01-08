@@ -280,6 +280,7 @@ class User extends UserBase
             'passwordExpiresUtc' => null, // Entry needed even if null.
             'isMfaEnabled' => count($this->mfas) > 0 ? true : false,
             'mfaOptions' => $this->getVerifiedMfaOptions(),
+            'numRemainingCodes' => $this->countMfaBackupCodes(),
         ];
         if ($this->currentPassword !== null) {
             $attrs['passwordExpiresUtc'] = MySqlDateTime::formatDateForHumans($this->currentPassword->getExpiresOn());
