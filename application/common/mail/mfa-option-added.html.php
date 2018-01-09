@@ -22,8 +22,30 @@ use yii\helpers\Html as yHtml;
  * @var string $supportEmail
  * @var string $supportName
  * @var bool   $isMfaEnabled
+ * @var array  $mfaOptions
  */
 ?>
 <p>Dear <?= yHtml::encode($displayName) ?>,</p>
 
-<h2>TODO: Compose contents of this email message</h2>
+<p>
+    You have added a new option for 2-Step Verification to your <?= yHtml::encode($idpDisplayName) ?> Identity account.
+    When you are prompted for 2-Step Verification in the future, you will now have the option to choose a different
+    method of 2-Step Verification if you do not have access to the primary method.
+</p>
+<p>
+    You now have the following 2-Step Verification options enabled:
+</p>
+<ol>
+    <?php
+        foreach ($mfaOptions as $mfa) {
+            echo '<li>' . yHtml::encode($mfa->getReadableType()) . '</li>';
+        }
+    ?>
+</ol>
+
+<p>
+    If you have any questions or concerns about this, please contact <?= yHtml::encode($supportName) ?> at
+    <?= yHtml::encode($supportEmail) ?>.
+</p>
+
+<p><i><?= yHtml::encode($emailSignature) ?></i></p>

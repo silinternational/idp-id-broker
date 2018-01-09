@@ -212,11 +212,11 @@ Feature: Email
 
   Scenario Outline: When to send refresh backup codes emails
     Given we are configured <sendRefreshBackupCodesEml> refresh backup codes emails
-      And I remove records of any emails that have been sent
       And no mfas exist
       And a user already exists
       And a backup code mfa option does exist
       And there are <backupCodes> backup codes
+      And I remove records of any emails that have been sent
     When a backup code is used up by that user
     Then a "refresh-backup-codes" email <shouldOrNot> have been sent to them
       And a "refresh-backup-codes" email to that user <shouldOrNot> have been logged
