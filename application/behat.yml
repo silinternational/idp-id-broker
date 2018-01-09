@@ -19,9 +19,9 @@ default:
                 - %paths.base%/features/ldap.feature
             contexts: [ Sil\SilIdBroker\Behat\Context\LdapContext ]
         mfa_features:
-             paths:
+            paths:
                 - %paths.base%/features/mfa.feature
-             contexts: [ Sil\SilIdBroker\Behat\Context\MfaContext ]
+            contexts: [ Sil\SilIdBroker\Behat\Context\MfaContext ]
         mfa_rate_limit_features:
             paths:
                 - %paths.base%/features/mfa-rate-limit.feature
