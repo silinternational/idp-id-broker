@@ -3,11 +3,8 @@ namespace Sil\SilIdBroker\Behat\Context;
 
 use common\models\Mfa;
 use common\models\MfaBackupcode;
-use common\models\MfaFailedAttemptBase;
 use common\models\User;
-use Sil\SilIdBroker\Behat\Context\fakes\FakeOfflineLdap;
 use Webmozart\Assert\Assert;
-use Yii;
 
 class MfaUnitTestsContext extends YiiContext
 {
