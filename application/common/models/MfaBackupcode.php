@@ -31,10 +31,26 @@ class MfaBackupcode extends MfaBackupcodeBase
      */
     public static function validateAndRemove(int $mfaId, $code): bool
     {
+        $intCode = intval($code);
+        $codeStartsWithZero = (! empty($code) && $code[0] === '0');
+
         $backupCodes = MfaBackupcode::findAll(['mfa_id' => $mfaId]);
         $startCount = count($backupCodes);
         foreach ($backupCodes as $backupCode) {
-            if (password_verify($code, $backupCode->value)) {
+            $foundMatch = false;
+
+            /*
+             *   For backwards compatability, check if the integer version
+             * of the code matches (i.e. without leading zeros) what is
+             * in the database.
+             *   In earlier versions, codes were being cast to integers,
+             * and some shortened values may still be in the database.
+             */
+            if ($codeStartsWithZero) {
+                $foundMatch = password_verify($intCode, $backupCode->value);
+            }
+
+            if ($foundMatch || password_verify($code, $backupCode->value)) {
                 if ($backupCode->delete() === false) {
                     \Yii::error([
                         'action' => 'mfa-validate-and-remove',
