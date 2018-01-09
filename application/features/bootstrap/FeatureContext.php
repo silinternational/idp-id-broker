@@ -3,6 +3,9 @@
 use Behat\Gherkin\Node\TableNode;
 use common\helpers\MySqlDateTime;
 use common\models\Password;
+use common\models\Mfa;
+use common\models\MfaBackupcode;
+use common\models\MfaFailedAttempt;
 use common\models\User;
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Response;
@@ -42,9 +45,14 @@ class FeatureContext extends YiiContext
      */
     public function theUserStoreIsEmpty()
     {
-        foreach (User::find()->all() as $user) {
-            Assert::notSame($user->delete(), false);
-        }
+        // To avoid calls to try to remove TOTP/U2F entries from their
+        // respective backend services, we are simply deleting all relevant
+        // records here via deleteAll() to prevent their before/afterDelete()
+        // functions from being called.
+        MfaBackupcode::deleteAll();
+        MfaFailedAttempt::deleteAll();
+        Mfa::deleteAll();
+        User::deleteAll();
     }
 
     /**
@@ -59,7 +67,6 @@ class FeatureContext extends YiiContext
         $this->now = MySqlDateTime::now();
 
         $this->resBody = $this->extractBody($this->response);
-
     }
 
     private function buildClient(): Client
@@ -77,12 +84,18 @@ class FeatureContext extends YiiContext
     private function sendRequest(Client $client, string $action, string $resource): ResponseInterface
     {
         switch ($action) {
-            case 'created'  : return $client->post  ($resource);
-            case 'updated'  : return $client->put   ($resource);
-            case 'deleted'  : return $client->delete($resource);
-            case 'retrieved': return $client->get   ($resource);
-            case 'headed'   : return $client->head  ($resource);
-            case 'patched'  : return $client->patch ($resource);
+            case 'created':
+                return $client->post($resource);
+            case 'updated':
+                return $client->put($resource);
+            case 'deleted':
+                return $client->delete($resource);
+            case 'retrieved':
+                return $client->get($resource);
+            case 'headed':
+                return $client->head($resource);
+            case 'patched':
+                return $client->patch($resource);
 
             default: throw new InvalidArgumentException("$action is not a recognized HTTP verb.");
         }
@@ -100,8 +113,11 @@ class FeatureContext extends YiiContext
      */
     public function theResponseStatusCodeShouldBe($statusCode)
     {
-        Assert::eq($this->response->getStatusCode(), $statusCode,
-                   sprintf("Unexpected response: %s", var_export($this->resBody, true)));
+        Assert::eq(
+            $this->response->getStatusCode(),
+            $statusCode,
+            sprintf("Unexpected response: %s", var_export($this->resBody, true))
+        );
     }
 
     /**
@@ -230,7 +246,7 @@ class FeatureContext extends YiiContext
     //TODO: remove once https://github.com/Behat/Behat/issues/777 is resolved for tables.
     private function transformNULLs($value)
     {
-        return ($value === "NULL") ? NULL : $value;
+        return ($value === "NULL") ? null : $value;
     }
 
     /**
