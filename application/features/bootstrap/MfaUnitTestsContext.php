@@ -100,7 +100,10 @@ class MfaUnitTestsContext extends YiiContext
      */
     public function aMatchingBackupCodeIsProvidedForValidation()
     {
-        $this->backupCodeWasValid = MfaBackupcode::validateAndRemove($this->mfaId, $this->inputBackupCode);
+        $this->backupCodeWasValid = MfaBackupcode::validateAndRemove(
+            $this->mfaId,
+            $this->inputBackupCode
+        );
     }
 
     /**
@@ -108,7 +111,10 @@ class MfaUnitTestsContext extends YiiContext
      */
     public function aNOTMatchingBackupCodeIsProvidedForValidation()
     {
-        $this->backupCodeWasValid = MfaBackupcode::validateAndRemove($this->mfaId, '76543210');
+        $this->backupCodeWasValid = MfaBackupcode::validateAndRemove(
+            $this->mfaId,
+            '76543210'
+        );
     }
 
     /**
