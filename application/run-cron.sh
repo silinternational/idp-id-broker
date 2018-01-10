@@ -17,5 +17,8 @@ chown -R www-data:www-data \
 # Run database migrations
 runny /data/yii migrate --interactive=0
 
+# Dump env to a file
+env >> /etc/environment
+
 # Start cron daemon
 cron -f

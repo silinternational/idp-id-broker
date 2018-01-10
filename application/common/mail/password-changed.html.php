@@ -28,19 +28,20 @@ use yii\helpers\Html as yHtml;
     Dear <?=yHtml::encode($displayName)?>,
 </p>
 <p>
-    Congratulations! You have logged into your new <?=yHtml::encode($idpDisplayName)?> account for the first time.
-    <?=yHtml::encode($idpDisplayName)?> is in the process of transitioning from logging into websites using
-    an Insite account to this new "<?=yHtml::encode($idpDisplayName)?> account". In January 2018 the option to log in
-    to some websites using your Insite account will begin to go away. It will take some time for all the Insite-login
-    associated websites to change to using the new <?=yHtml::encode($idpDisplayName)?> login. Wherever you have the
-    option to use your new <?=yHtml::encode($idpDisplayName)?> account it is recommended you do so, but keep track of
-    your Insite username and password to use where only the Insite login screen is presented.
+    The password for your <?=yHtml::encode($idpDisplayName)?> account has been changed. If you did not make this change
+    please contact <?=yHtml::encode($supportName)?> at <?=yHtml::encode($supportEmail)?> immediately to let us know.
 </p>
 <p>
+    Please remember that this account will be your primary means for logging into many corporate
+    applications. It is also important to note that this account (username and password) is unique and will not be kept
+    in sync with any other accounts you have.
+</p>
+<p>
+    Password changed on: <?=yHtml::encode($lastChangedUtc)?><br />
     Password expires on: <?=yHtml::encode($passwordExpiresUtc)?>
 </p>
 <p>
-    Please be sure to configure <strong>recovery methods</strong> for
+    If you have not already done so, it is highly recommended that you configure <strong>recovery methods</strong> for
     the potential event that you forget your password. You can reset your password using your email address,
     <?=yHtml::encode($email)?>, but you can also add other addresses and even phone numbers for SMS verification.
 </p>
@@ -59,6 +60,9 @@ use yii\helpers\Html as yHtml;
 
 </ol>
 
+<?php
+if ( ! $isMfaEnabled) {
+?>
 <p>
     <strong>Enable 2-Step Verification</strong> (please)
 </p>
@@ -81,7 +85,9 @@ use yii\helpers\Html as yHtml;
 <p>
     To learn more about 2-Step Verification go to <?=yHtml::a(yHtml::encode($helpCenterUrl), $helpCenterUrl)?>
 </p>
-
+<?php
+}
+?>
 <p>
     If you have any difficulties completing this task, please contact <?=yHtml::encode($supportName)?> at
     <?=yHtml::encode($supportEmail)?>.

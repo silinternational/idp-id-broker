@@ -25,17 +25,17 @@
 ?>
 Dear <?= $displayName ?>,
 
-Congratulations! You have logged into your new <?=$idpDisplayName?> account for the first time.
-<?=$idpDisplayName?> is in the process of transitioning from logging into websites using
-an Insite account to this new "<?=$idpDisplayName?> account". In January 2018 the option to log in
-to some websites using your Insite account will begin to go away. It will take some time for all the Insite-login
-associated websites to change to using the new <?=$idpDisplayName?> login. Wherever you have the
-option to use your new <?=$idpDisplayName?> account it is recommended you do so, but keep track of
-your Insite username and password to use where only the Insite login screen is presented.
+The password for your <?= $idpDisplayName ?> account has been changed. If you did not make this change
+please contact <?= $supportName ?> at <?= $supportEmail ?> immediately to let us know.
 
+Please remember that this account will be your primary means for logging into many corporate
+applications. It is also important to note that this account (username and password) is unique and will not be kept
+in sync with any other accounts you have.
+
+Password changed on: <?= $lastChangedUtc ?>
 Password expires on: <?= $passwordExpiresUtc ?>
 
-Please be sure to configure recovery methods for
+If you have not already done so, it is highly recommended that you configure recovery methods for
 the potential event that you forget your password. You can reset your password using your email address,
 <?= $email ?>, but you can also add other addresses and even phone numbers for SMS verification.
 
@@ -50,11 +50,15 @@ Instructions to add recovery methods:
 6. If you entered a phone number, watch for a text message or phone call and take note of the code you receive.
 7. Enter the verification code into the form on your screen and click "Verify".
 
+<?php
+if ( ! $isMfaEnabled) {
+    ?>
+
 Enable 2-Step Verification (please)
 ===================================
-Using 2-Step Verification can help keep bad guys out, even if they have your password. With 2-Step Verification, you'll
+2-Step Verification can help keep bad guys out, even if they have your password. With 2-Step Verification, you'll
 protect your account with something you know (your password) and something you have (your phone or Security Key).
-Setup is easy and with the option to remember your computer for 30 days at a time, you'll only need to use the second
+Setup is easy and with the option to remember your computer for 30 days at a time, you’ll only need to use the second
 step every month or so, but anyone trying to hack into your account would need both steps. This not only increases the
 security of your own account, it increases the privacy and protection of your colleagues by keeping intruders out of
 the systems that have sensitive information about many of us.
@@ -68,6 +72,10 @@ Instructions to set up 2-Step Verification:
    logging out will undo the "Remember this computer" setting.
 
 To learn more about 2-Step Verification go to <?= $helpCenterUrl ?>
+
+    <?php
+}
+?>
 
 If you have any difficulties completing this task, please contact <?= $supportName ?> at
 <?= $supportEmail ?>.

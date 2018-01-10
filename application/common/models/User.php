@@ -121,6 +121,7 @@ class User extends UserBase
             'email',
             'active',
             'locked',
+            'require_mfa',
             'nag_for_mfa_after',
         ];
 
@@ -132,6 +133,7 @@ class User extends UserBase
             'email',
             'active',
             'locked',
+            'require_mfa',
         ];
 
         $scenarios[self::SCENARIO_UPDATE_PASSWORD] = ['password'];
@@ -160,7 +162,7 @@ class User extends UserBase
                 'nag_for_mfa_after', 'default', 'value' => MySqlDateTime::today(),
             ],
             [
-                ['active', 'locked'], 'in', 'range' => ['yes', 'no'],
+                ['active', 'locked', 'require_mfa'], 'in', 'range' => ['yes', 'no'],
             ],
             [
                 'email', 'email',
@@ -305,19 +307,28 @@ class User extends UserBase
      */
     public function getAttributesForEmail()
     {
-        return [
+        $attrs = [
             'employeeId' => $this->employee_id,
             'firstName' => $this->first_name,
             'lastName' => $this->last_name,
-            'displayName' => $this->display_name,
+            'displayName' => $this->getDisplayName(),
             'username' => $this->username,
             'email' => $this->email,
             'active' => $this->active,
             'locked' => $this->locked,
-            'lastChangedUtc' => $this->last_changed_utc,
-            'lastSyncedUtc' => $this->last_synced_utc,
-            'lastLoginUtc' => $this->last_login_utc,
+            'lastChangedUtc' => MySqlDateTime::formatDateForHumans($this->last_changed_utc),
+            'lastSyncedUtc' => MySqlDateTime::formatDateForHumans($this->last_synced_utc),
+            'lastLoginUtc' => MySqlDateTime::formatDateForHumans($this->last_login_utc),
+            'passwordExpiresUtc' => null, // Entry needed even if null.
+            'isMfaEnabled' => count($this->mfas) > 0 ? true : false,
+            'mfaOptions' => $this->getVerifiedMfaOptions(),
+            'numRemainingCodes' => $this->countMfaBackupCodes(),
         ];
+        if ($this->currentPassword !== null) {
+            $attrs['passwordExpiresUtc'] = MySqlDateTime::formatDateForHumans($this->currentPassword->getExpiresOn());
+        }
+        
+        return $attrs;
     }
     
     public function hasReceivedMessage(string $messageType)
@@ -392,7 +403,7 @@ class User extends UserBase
             'first_name',
             'last_name',
             'display_name' => function ($model) {
-                return $model->display_name ?? "$model->first_name $model->last_name";
+                return $model->getDisplayName();
             },
             'username',
             'email',
@@ -413,6 +424,17 @@ class User extends UserBase
         return $fields;
     }
 
+    /**
+     * Get a display name for the user (either their display_name value, if
+     * set, or a combination of their first and last names).
+     *
+     * @return string
+     */
+    public function getDisplayName()
+    {
+        return $this->display_name ?? "$this->first_name $this->last_name";
+    }
+    
     /**
      * @return array MFA related properties
      */
@@ -438,6 +460,32 @@ class User extends UserBase
         return $mfas;
     }
 
+    /*
+     * @return bool
+     */
+    public function hasMfaBackupCodes()
+    {
+        foreach ($this->getVerifiedMfaOptions() as $mfaOption) {
+            if ($mfaOption->type == Mfa::TYPE_BACKUPCODE) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /*
+     * @return int the count of a user's Mfa backup codes
+     */
+    public function countMfaBackupCodes()
+    {
+        foreach ($this->getVerifiedMfaOptions() as $mfaOption) {
+            if ($mfaOption->type == Mfa::TYPE_BACKUPCODE) {
+                return count($mfaOption->mfaBackupcodes);
+            }
+        }
+        return 0;
+    }
+
     public function save($runValidation = true, $attributeNames = null)
     {
         if ($this->scenario === self::SCENARIO_UPDATE_PASSWORD) {
@@ -456,9 +504,14 @@ class User extends UserBase
             $emailer->sendMessageTo(EmailLog::MESSAGE_TYPE_INVITE, $this);
         }
         
+        if ($emailer->shouldSendPasswordChangedMessageTo($this, $changedAttributes)) {
+            $emailer->sendMessageTo(EmailLog::MESSAGE_TYPE_PASSWORD_CHANGED, $this);
+        }
+        
         if ($emailer->shouldSendWelcomeMessageTo($this, $changedAttributes)) {
             $emailer->sendMessageTo(EmailLog::MESSAGE_TYPE_WELCOME, $this);
         }
+
     }
 
     private function updatePassword(): bool
@@ -560,6 +613,73 @@ class User extends UserBase
         return $users->all();
     }
 
+    /*
+     * @return integer Count of active users with a password
+     */
+    public static function countUsersWithPassword()
+    {
+        $users = User::find()->where(['active' => 'yes'])
+            ->andWhere(['not', ['current_password_id' => null]]);
+
+        return $users->count();
+    }
+
+    /*
+     * @return integer Count of active users with require_mfa = 'yes'
+     */
+    public static function countUsersWithRequireMfa()
+    {
+        $users = User::find()->where([
+            'active' => 'yes',
+            'require_mfa' => 'yes',
+        ]);
+        return $users->count();
+    }
+
+    /**
+     * @param string|null $mfaType
+     * @return ActiveQuery of active Users with a (certain type of) verified Mfa option
+     */
+    public static function getQueryOfUsersWithMfa($mfaType=null)
+    {
+        $criteria = ['verified' => 1];
+        if ($mfaType !== null) {
+            $criteria['type'] = $mfaType;
+        }
+
+        $mfas = Mfa::find()->select('user_id')
+                           ->groupBy('user_id')
+                           ->where($criteria);
+
+        $usersQuery = User::find()->where([
+            'active' => 'yes',
+            'id' => $mfas
+        ]);
+
+        return $usersQuery;
+    }
+
+    /**
+     * If there are no active users, returns 0.
+     * Otherwise, returns the total number of verified Mfa records that are associated with an active user
+     *   divided by the total number of active users that have a verified Mfa.
+     * @return float|int
+     */
+    public static function getAverageNumberOfMfasPerUserWithMfas()
+    {
+        $userCount = self::getQueryOfUsersWithMfa()->count();
+
+        $mfaCount = Mfa::find()->joinWith('user')
+            ->where(['verified' => 1])
+            ->andWhere(['user.active' => 'yes'])->count();
+
+        if ($userCount == 0) {
+            return 0;
+        }
+
+        return $mfaCount/$userCount;
+    }
+
     public static function search($params): ActiveDataProvider
     {
         $query = User::find();
@@ -604,7 +724,7 @@ class User extends UserBase
     public function isPromptForMfa(): bool
     {
         if ($this->scenario == self::SCENARIO_AUTHENTICATE) {
-            if (strtolower($this->require_mfa == 'yes') || count($this->mfas) > 0) {
+            if ($this->require_mfa === 'yes' || count($this->getVerifiedMfaOptions()) > 0) {
                 return true;
             }
         }

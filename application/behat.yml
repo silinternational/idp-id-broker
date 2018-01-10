@@ -6,6 +6,10 @@ default:
                 - %paths.base%/features/password.feature
                 - %paths.base%/features/user.feature
             contexts: [ FeatureContext ]
+        analytics_features:
+            paths:
+                - %paths.base%/features/analytics.feature
+            contexts: [ Sil\SilIdBroker\Behat\Context\AnalyticsContext ]
         email_features:
             paths:
                 - %paths.base%/features/email.feature
@@ -14,7 +18,19 @@ default:
             paths:
                 - %paths.base%/features/ldap.feature
             contexts: [ Sil\SilIdBroker\Behat\Context\LdapContext ]
+        mfa_features:
+            paths:
+                - %paths.base%/features/mfa.feature
+            contexts: [ Sil\SilIdBroker\Behat\Context\MfaContext ]
         mfa_rate_limit_features:
             paths:
                 - %paths.base%/features/mfa-rate-limit.feature
             contexts: [ Sil\SilIdBroker\Behat\Context\MfaRateLimitContext ]
+        mfa_unit_tests_features:
+            paths:
+                - %paths.base%/features/mfa-unit-tests.feature
+            contexts: [ Sil\SilIdBroker\Behat\Context\MfaUnitTestsContext ]
+        mysql_date_time_features:
+            paths:
+                - %paths.base%/features/mysql-date-time.feature
+            contexts: [ Sil\SilIdBroker\Behat\Context\MySqlDateTimeContext ]

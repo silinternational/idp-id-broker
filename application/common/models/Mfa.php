@@ -19,6 +19,9 @@ class Mfa extends MfaBase
     const TYPE_U2F = 'u2f';
     const TYPE_BACKUPCODE = 'backupcode';
 
+    const EVENT_TYPE_CREATE = 'create_mfa';
+    const EVENT_TYPE_DELETE = 'delete_mfa';
+
     public function rules(): array
     {
         return ArrayHelper::merge([
@@ -63,6 +66,15 @@ class Mfa extends MfaBase
         ];
     }
 
+    public function afterSave($insert, $changedAttributes)
+    {
+        parent::afterSave($insert, $changedAttributes);
+
+        if ($insert) {
+            $this->sendAppropriateMessages($this->user, self::EVENT_TYPE_CREATE);
+        }
+    }
+
     /**
      * Before deleting, delete backend record too
      * @return bool
@@ -73,6 +85,20 @@ class Mfa extends MfaBase
         
         $backend = self::getBackendForType($this->type);
         return $backend->delete($this->id);
+    }
+
+    public function afterDelete()
+    {
+        parent::afterDelete();
+        \Yii::warning([
+            'action' => 'delete mfa',
+            'type' => $this->type,
+            'user' => $this->user->email,
+            'status' => 'success',
+        ]);
+
+
+        $this->sendAppropriateMessages($this->user, self::EVENT_TYPE_DELETE);
     }
 
     /**
@@ -110,8 +136,16 @@ class Mfa extends MfaBase
     public function authInit()
     {
         $backend = self::getBackendForType($this->type);
-        return $backend->authInit($this->id);
+        $authInit = $backend->authInit($this->id);
 
+        \Yii::warning([
+            'action' => 'mfa auth init',
+            'type' => $this->type,
+            'user' => $this->user->email,
+            'status' => 'success',
+        ]);
+
+        return $authInit;
     }
     
     protected function hasTooManyRecentFailures()
@@ -127,6 +161,13 @@ class Mfa extends MfaBase
     public function verify($value): bool
     {
         if ($this->hasTooManyRecentFailures()) {
+            \Yii::warning([
+                'action' => 'verify mfa',
+                'type' => $this->type,
+                'user' => $this->user->email,
+                'status' => 'error',
+                'error' => 'too many recent failures'
+            ]);
             throw new TooManyRequestsHttpException(
                 'Too many recent failed attempts for this MFA'
             );
@@ -145,10 +186,26 @@ class Mfa extends MfaBase
                 ]);
             }
             $this->clearFailedAttempts('after successful verification');
+
+            \Yii::warning([
+                'action' => 'verify mfa',
+                'type' => $this->type,
+                'user' => $this->user->email,
+                'status' => 'success',
+            ]);
             return true;
         }
 
         $this->recordFailedAttempt();
+
+        \Yii::warning([
+            'action' => 'verify mfa',
+            'type' => $this->type,
+            'user' => $this->user->email,
+            'status' => 'error',
+            'error' => 'verify mfa failed'
+        ]);
+
         return false;
     }
 
@@ -229,6 +286,13 @@ class Mfa extends MfaBase
                 throw new ServerErrorHttpException("Unable to update MFA record", 1507904194);
             }
         }
+
+        \Yii::warning([
+            'action' => 'create mfa',
+            'type' => $type,
+            'user' => $user->email,
+            'status' => 'success',
+        ]);
 
         return [
             'id' => $mfa->id,
@@ -322,6 +386,20 @@ class Mfa extends MfaBase
     }
 
     /**
+     * Returns a human friendly version of the Mfa's type
+     *
+     * @return string
+     */
+    public function getReadableType() {
+        $types = [
+            self::TYPE_BACKUPCODE => 'Printable Codes',
+            self::TYPE_TOTP => 'Smartphone App',
+            self::TYPE_U2F => 'Security Key',
+        ];
+        return $types[$this->type];
+    }
+
+    /**
      * Remove records that were not verified within the given time frame
      * @param int $maxAgeHours
      */
@@ -331,6 +409,7 @@ class Mfa extends MfaBase
         $mfas = self::find()->where(['verified' => 0])
             ->andWhere(['<', 'created_utc', $removeOlderThan])->all();
 
+        $numDeleted = 0;
         foreach ($mfas as $mfa) {
             if ($mfa->delete() === false) {
                 \Yii::error([
@@ -339,7 +418,37 @@ class Mfa extends MfaBase
                     'error' => $mfa->getFirstErrors(),
                     'mfa_id' => $mfa->id,
                 ]);
+            } else {
+                $numDeleted += 1;
             }
+        }
+        
+        \Yii::warning([
+            'action' => 'delete old unverified mfa records',
+            'status' => 'complete',
+            'count' => $numDeleted,
+        ]);
+    }
+
+
+    protected function sendAppropriateMessages($user, $eventType)
+    {
+        /* @var $emailer Emailer */
+        $emailer = \Yii::$app->emailer;
+        $user->refresh();
+
+        if ($emailer->shouldSendMfaOptionAddedMessageTo($user, $eventType)) {
+            $emailer->sendMessageTo(EmailLog::MESSAGE_TYPE_MFA_OPTION_ADDED, $user);
+
+        } else if ($emailer->shouldSendMfaEnabledMessageTo($user, $eventType)) {
+            $emailer->sendMessageTo(EmailLog::MESSAGE_TYPE_MFA_ENABLED, $user);
+
+        } else if ($emailer->shouldSendMfaOptionRemovedMessageTo($user, $eventType)) {
+            $emailer->otherDataForEmails['mfaTypeDisabled'] = $this->getReadableType();
+            $emailer->sendMessageTo(EmailLog::MESSAGE_TYPE_MFA_OPTION_REMOVED, $user);
+
+        } else if ($emailer->shouldSendMfaDisabledMessageTo($user, $eventType)) {
+            $emailer->sendMessageTo(EmailLog::MESSAGE_TYPE_MFA_DISABLED, $user);
         }
     }
 }

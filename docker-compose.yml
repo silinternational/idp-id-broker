@@ -25,6 +25,7 @@ services:
         env_file:
             - ./local.env
         environment:
+            EMAIL_SIGNATURE: Dummy Signature for Development
             LDAP_BASE_DN: dc=acme,dc=org
             LDAP_ADMIN_USERNAME: cn=Manager,dc=acme,dc=org
             LDAP_ADMIN_PASSWORD: admin
@@ -56,6 +57,8 @@ services:
             EMAIL_SERVICE_accessToken: dummy
             EMAIL_SERVICE_assertValidIp: "false"
             EMAIL_SERVICE_baseUrl: dummy
+            EMAIL_SIGNATURE: Dummy Signature for Tests
+            EMAILER_CLASS: \Sil\SilIdBroker\Behat\Context\fakes\FakeEmailer
             IDP_NAME: test
             LDAP_BASE_DN: dc=acme,dc=org
             LDAP_ADMIN_USERNAME: cn=Manager,dc=acme,dc=org
@@ -70,6 +73,8 @@ services:
             MYSQL_USER: appfortests
             MYSQL_PASSWORD: appfortests
             MIGRATE_PW_FROM_LDAP: "true"
+            PASSWORD_FORGOT_URL: https://www.example.com/forgot
+            SUPPORT_EMAIL: support@example.com
 
     appfortestsdb:
         image: silintl/mariadb:latest
@@ -132,6 +137,9 @@ services:
             EMAIL_SERVICE_accessToken: dummy
             EMAIL_SERVICE_assertValidIp: "false"
             EMAIL_SERVICE_baseUrl: dummy
+            EMAIL_SIGNATURE: Dummy Signature for Test
+            HELP_CENTER_URL: https://www.example.com/help
+            IDP_DISPLAY_NAME: Test
             IDP_NAME: test
             LDAP_BASE_DN: dc=acme,dc=org
             LDAP_ADMIN_USERNAME: cn=Manager,dc=acme,dc=org
@@ -143,6 +151,9 @@ services:
             MYSQL_HOST: appfortestsdb
             MYSQL_PASSWORD: appfortests
             MYSQL_USER: appfortests
+            PASSWORD_FORGOT_URL: https://www.example.com/forgot
+            PASSWORD_PROFILE_URL: https://www.example.com/profile
+            SUPPORT_EMAIL: support@example.com
         command: ./run-tests.sh
         # running isolated tests
         # docker-compose run --rm test vendor/bin/behat --stop-on-failure features/user.feature

@@ -30,6 +30,8 @@ $mfaTotpConfig['issuer'] = $idpDisplayName;
 
 $mfaU2fConfig = Env::getArrayFromPrefix('MFA_U2F_');
 
+$emailerClass = Env::get('EMAILER_CLASS', Emailer::class);
+
 /*
  * If using Email Service, the following ENV vars should be set:
  *  - EMAIL_SERVICE_accessToken
@@ -54,16 +56,49 @@ return [
             'charset' => 'utf8',
         ],
         'emailer' => [
-            'class' => Emailer::class,
+            'class' => $emailerClass,
             'emailServiceConfig' => $emailServiceConfig,
+            
+            'otherDataForEmails' => [
+                'emailSignature' => Env::get('EMAIL_SIGNATURE', ''),
+                'helpCenterUrl' => Env::get('HELP_CENTER_URL'),
+                'idpDisplayName' => $idpDisplayName,
+                'passwordForgotUrl' => Env::get('PASSWORD_FORGOT_URL'),
+                'passwordProfileUrl' => Env::get('PASSWORD_PROFILE_URL'),
+                'supportEmail' => Env::get('SUPPORT_EMAIL'),
+                'supportName' => Env::get('SUPPORT_NAME', 'support'),
+            ],
             
             'sendInviteEmails' => Env::get('SEND_INVITE_EMAILS', false),
             'sendMfaRateLimitEmails' => Env::get('SEND_MFA_RATE_LIMIT_EMAILS', true),
-            'sendWelcomeEmails' => Env::get('SEND_WELCOME_EMAILS', false),
-            
+            'sendPasswordChangedEmails' => Env::get('SEND_PASSWORD_CHANGED_EMAILS', true),
+            'sendWelcomeEmails' => Env::get('SEND_WELCOME_EMAILS', true),
+            // When they have no backup codes yet
+            'sendGetBackupCodesEmails' => Env::get('SEND_GET_BACKUP_CODES_EMAILS', true),
+            // When they are getting low on backup codes
+            'sendRefreshBackupCodesEmails' => Env::get('SEND_REFRESH_BACKUP_CODES_EMAILS', true),
+            'sendLostSecurityKeyEmails' => Env::get('SEND_LOST_SECURITY_KEY_EMAILS', true),
+            'sendMfaOptionAddedEmails' => Env::get('SEND_MFA_OPTION_ADDED_EMAILS', true),
+            'sendMfaOptionRemovedEmails' => Env::get('SEND_MFA_OPTION_REMOVED_EMAILS', true),
+            'sendMfaEnabledEmails' => Env::get('SEND_MFA_ENABLED_EMAILS', true),
+            'sendMfaDisabledEmails' => Env::get('SEND_MFA_DISABLED_EMAILS', true),
+
             'subjectForInvite' => Env::get('SUBJECT_FOR_INVITE'),
             'subjectForMfaRateLimit' => Env::get('SUBJECT_FOR_MFA_RATE_LIMIT'),
+            'subjectForPasswordChanged' => Env::get('SUBJECT_FOR_PASSWORD_CHANGED'),
             'subjectForWelcome' => Env::get('SUBJECT_FOR_WELCOME'),
+            'subjectForGetBackupCodes' => Env::get('SUBJECT_FOR_GET_BACKUP_CODES'),
+            'subjectForRefreshBackupCodes' => Env::get('SUBJECT_FOR_REFRESH_BACKUP_CODES'),
+            'subjectForLostSecurityKey' => Env::get('SUBJECT_FOR_LOST_SECURITY_KEY'),
+            'subjectForMfaOptionAdded' => Env::get('SUBJECT_FOR_MFA_OPTION_ADDED'),
+            'subjectForMfaOptionRemoved' => Env::get('SUBJECT_FOR_MFA_OPTION_REMOVED'),
+            'subjectForMfaEnabled' => Env::get('SUBJECT_FOR_MFA_ENABLED'),
+            'subjectForMfaDisabled' => Env::get('SUBJECT_FOR_MFA_DISABLED'),
+
+            'lostSecurityKeyEmailDays' => Env::get('LOST_SECURITY_KEY_EMAIL_DAYS', 62),
+            'minimumBackupCodesBeforeNag' => Env::get('MINIMUM_BACKUP_CODES_BEFORE_NAG', 4),
+
+            'emailRepeatDelayDays' => Env::get('EMAIL_REPEAT_DELAY_DAYS', 31),
         ],
         'ldap' => [
             'class' => Ldap::class,
@@ -97,21 +132,19 @@ return [
                     'categories' => ['application'], // stick to messages from this app, not all of Yii's built-in messaging.
                     'logVars' => [], // no need for default stuff: http://www.yiiframework.com/doc-2.0/yii-log-target.html#$logVars-detail
                     'prefix' => function () {
-                        //TODO: assumes yii\web\Request here, could be a problem if app
-                        //    develops a console portion since there's also a
-                        //    yii\console\Request
-                        /* @var Request */
                         $request = Yii::$app->request;
-
-                        // Assumes format: Bearer consumer-module-name-32randomcharacters
-                        $requesterId = substr($request->headers['Authorization'], 7, 16) ?: 'unknown';
-
                         $prefixData = [
                             'env' => YII_ENV,
-                            'id' => $requesterId,
-                            'ip' => $request->getUserIP(),
                         ];
-
+                        
+                        if ($request instanceof \yii\web\Request) {
+                            // Assumes format: Bearer consumer-module-name-32randomcharacters
+                            $prefixData['id'] = substr($request->headers['Authorization'], 7, 16) ?: 'unknown';
+                            $prefixData['ip'] = $request->getUserIP();
+                        } elseif ($request instanceof \yii\console\Request) {
+                            $prefixData['id'] = '(console)';
+                        }
+                        
                         return Json::encode($prefixData);
                     },
                 ],
@@ -165,5 +198,9 @@ return [
         'passwordLifespan'              => Env::get('PASSWORD_LIFESPAN', '+1 year'),
         'passwordMfaLifespanExtension'  => Env::get('PASSWORD_MFA_LIFESPAN_EXTENSION', '+1 year'),
         'passwordExpirationGracePeriod' => Env::get('PASSWORD_EXPIRATION_GRACE_PERIOD', '+30 days'),
+        'googleAnalytics'               => [
+            'trackingId' => Env::get('GA_TRACKING_ID'),
+            'clientId'   => Env::get('GA_CLIENT_ID'),
+        ]
     ],
 ];

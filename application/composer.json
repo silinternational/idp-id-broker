@@ -13,6 +13,7 @@
     "silinternational/psr3-adapters": "^1.1",
     "silinternational/yii2-json-log-targets": "^1.0",
     "silinternational/yii2-email-log-target": "^1.0",
+    "theiconic/php-ga-measurement-protocol": "^2.0",
     "yiisoft/yii2-swiftmailer": "^2.0",
     "ramsey/uuid": "^3.6"
   },

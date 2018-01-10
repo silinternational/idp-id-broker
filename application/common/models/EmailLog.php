@@ -14,7 +14,15 @@ class EmailLog extends EmailLogBase
      */
     const MESSAGE_TYPE_INVITE = 'invite';
     const MESSAGE_TYPE_MFA_RATE_LIMIT = 'mfa-rate-limit';
+    const MESSAGE_TYPE_PASSWORD_CHANGED = 'password-changed';
     const MESSAGE_TYPE_WELCOME = 'welcome';
+    const MESSAGE_TYPE_GET_BACKUP_CODES = 'get-backup-codes';
+    const MESSAGE_TYPE_REFRESH_BACKUP_CODES = 'refresh-backup-codes';
+    const MESSAGE_TYPE_LOST_SECURITY_KEY = 'lost-security-key';
+    const MESSAGE_TYPE_MFA_OPTION_ADDED = 'mfa-option-added';
+    const MESSAGE_TYPE_MFA_OPTION_REMOVED = 'mfa-option-removed';
+    const MESSAGE_TYPE_MFA_ENABLED = 'mfa-enabled';
+    const MESSAGE_TYPE_MFA_DISABLED = 'mfa-disabled';
 
     /**
      * @inheritdoc
@@ -31,7 +39,15 @@ class EmailLog extends EmailLogBase
         return [
             self::MESSAGE_TYPE_INVITE,
             self::MESSAGE_TYPE_MFA_RATE_LIMIT,
+            self::MESSAGE_TYPE_PASSWORD_CHANGED,
             self::MESSAGE_TYPE_WELCOME,
+            self::MESSAGE_TYPE_GET_BACKUP_CODES,
+            self::MESSAGE_TYPE_REFRESH_BACKUP_CODES,
+            self::MESSAGE_TYPE_LOST_SECURITY_KEY,
+            self::MESSAGE_TYPE_MFA_OPTION_ADDED,
+            self::MESSAGE_TYPE_MFA_OPTION_REMOVED,
+            self::MESSAGE_TYPE_MFA_ENABLED,
+            self::MESSAGE_TYPE_MFA_DISABLED,
         ];
     }
     
