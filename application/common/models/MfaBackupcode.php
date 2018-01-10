@@ -32,7 +32,7 @@ class MfaBackupcode extends MfaBackupcodeBase
     public static function validateAndRemove(int $mfaId, $code): bool
     {
         $intCode = intval($code);
-        $codeStartsWithZero = (! empty($code) && $code[0] === '0');
+        $codeStartsWithZero = (substr($code, 0, 1) === '0');
 
         $backupCodes = MfaBackupcode::findAll(['mfa_id' => $mfaId]);
         $startCount = count($backupCodes);
