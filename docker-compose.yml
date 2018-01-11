@@ -25,6 +25,7 @@ services:
         env_file:
             - ./local.env
         environment:
+            EMAILER_CLASS: \Sil\SilIdBroker\Behat\Context\fakes\FakeEmailer
             EMAIL_SIGNATURE: Dummy Signature for Development
             LDAP_BASE_DN: dc=acme,dc=org
             LDAP_ADMIN_USERNAME: cn=Manager,dc=acme,dc=org
