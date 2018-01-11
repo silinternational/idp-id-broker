@@ -144,10 +144,10 @@ Feature: Email
 
     Examples:
       | sendMfaOptionAddedEml | u2fExistsOrNot | totpExistsOrNot | mfaEventType      | shouldOrNot |
-      | to send               | does exist     | does NOT exist  | create_mfa        | should NOT  |
-      | to send               | does NOT exist | does exist      | create_mfa        | should NOT  |
-      | to send               | does exist     | does exist      | create_mfa        | should      |
-      | Not to send           | does exist     | does exist      | create_mfa        | should NOT  |
+      | to send               | does exist     | does NOT exist  | verify_mfa        | should NOT  |
+      | to send               | does NOT exist | does exist      | verify_mfa        | should NOT  |
+      | to send               | does exist     | does exist      | verify_mfa        | should      |
+      | Not to send           | does exist     | does exist      | verify_mfa        | should NOT  |
       | to send               | does exist     | does exist      | delete_mfa        | should NOT  |
       | Not to send           | does exist     | does exist      | delete_mfa        | should NOT  |
 
@@ -163,10 +163,10 @@ Feature: Email
 
     Examples:
       | sendMfaEnabledEml     | u2fExistsOrNot | totpExistsOrNot | mfaEventType      | shouldOrNot |
-      | to send               | does exist     | does NOT exist  | create_mfa        | should      |
-      | to send               | does NOT exist | does exist      | create_mfa        | should      |
-      | to send               | does exist     | does exist      | create_mfa        | should NOT  |
-      | NOT to send           | does NOT exist | does exist      | create_mfa        | should NOT  |
+      | to send               | does exist     | does NOT exist  | verify_mfa        | should      |
+      | to send               | does NOT exist | does exist      | verify_mfa        | should      |
+      | to send               | does exist     | does exist      | verify_mfa        | should NOT  |
+      | NOT to send           | does NOT exist | does exist      | verify_mfa        | should NOT  |
       | to send               | does exist     | does NOT exist  | delete_mfa        | should NOT  |
       | NOT to send           | does exist     | does NOT exist  | delete_mfa        | should NOT  |
 
@@ -187,28 +187,28 @@ Feature: Email
       | to send                 | does exist     | does exist      | delete_mfa        | should      |
       | to send                 | does NOT exist | does NOT exist  | delete_mfa        | should NOT  |
       | NOT to send             | does exist     | does exist      | delete_mfa        | should NOT  |
-      | to send                 | does exist     | does NOT exist  | create_mfa        | should NOT  |
-      | NOT to send             | does exist     | does exist      | create_mfa        | should NOT  |
+      | to send                 | does exist     | does NOT exist  | verify_mfa        | should NOT  |
+      | NOT to send             | does exist     | does exist      | verify_mfa        | should NOT  |
 
   Scenario Outline: When to send mfa disabled emails (after one has been added or deleted)
     Given we are configured <sendMfaDisabledEml> mfa disabled emails
-      And no mfas exist
-      And a user already exists
-      And a u2f mfa option <u2fExistsOrNot>
-      And a totp mfa option <totpExistsOrNot>
-      And the latest mfa event type was <mfaEventType>
+    And no mfas exist
+    And a user already exists
+    And a u2f mfa option <u2fExistsOrNot>
+    And a totp mfa option <totpExistsOrNot>
+    And the latest mfa event type was <mfaEventType>
     When I check if a mfa disabled email should be sent
     Then I see that a mfa disabled email <shouldOrNot> be sent
 
     Examples:
-      | sendMfaDisabledEml      | u2fExistsOrNot | totpExistsOrNot | mfaEventType      | shouldOrNot |
-      | to send                 | does exist     | does NOT exist  | delete_mfa        | should NOT  |
-      | to send                 | does NOT exist | does exist      | delete_mfa        | should NOT  |
-      | to send                 | does exist     | does exist      | delete_mfa        | should NOT  |
-      | to send                 | does NOT exist | does NOT exist  | delete_mfa        | should      |
-      | NOT to send             | does NOT exist | does NOT exist  | delete_mfa        | should NOT  |
-      | to send                 | does NOT exist | does NOT exist  | create_mfa        | should NOT  |
-      | NOT to send             | does NOT exist | does NOT exist  | create_mfa        | should NOT  |
+      | sendMfaDisabledEml | u2fExistsOrNot | totpExistsOrNot | mfaEventType | shouldOrNot |
+      | to send            | does exist     | does NOT exist  | delete_mfa   | should NOT  |
+      | to send            | does NOT exist | does exist      | delete_mfa   | should NOT  |
+      | to send            | does exist     | does exist      | delete_mfa   | should NOT  |
+      | to send            | does NOT exist | does NOT exist  | delete_mfa   | should      |
+      | NOT to send        | does NOT exist | does NOT exist  | delete_mfa   | should NOT  |
+      | to send            | does NOT exist | does NOT exist  | verify_mfa   | should NOT  |
+      | NOT to send        | does NOT exist | does NOT exist  | verify_mfa   | should NOT  |
 
   Scenario Outline: When to send refresh backup codes emails
     Given we are configured <sendRefreshBackupCodesEml> refresh backup codes emails

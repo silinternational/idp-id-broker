@@ -474,7 +474,7 @@ class Emailer extends Component
     public function shouldSendMfaOptionAddedMessageTo($user, $mfaEventType)
     {
         return $this->sendMfaOptionAddedEmails
-            && $mfaEventType === Mfa::EVENT_TYPE_CREATE
+            && $mfaEventType === Mfa::EVENT_TYPE_VERIFY
             && count($user->mfas) > 1;
     }
 
@@ -488,7 +488,7 @@ class Emailer extends Component
     public function shouldSendMfaEnabledMessageTo($user, $mfaEventType)
     {
         return $this->sendMfaEnabledEmails
-            && $mfaEventType === Mfa::EVENT_TYPE_CREATE
+            && $mfaEventType === Mfa::EVENT_TYPE_VERIFY
             && count($user->mfas) == 1;
     }
 
