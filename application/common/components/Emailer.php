@@ -475,7 +475,7 @@ class Emailer extends Component
     {
         return $this->sendMfaOptionAddedEmails
             && $mfaEventType === Mfa::EVENT_TYPE_VERIFY
-            && count($user->mfas) > 1;
+            && count($user->getVerifiedMfaOptions()) > 1;
     }
 
     /**
@@ -489,7 +489,7 @@ class Emailer extends Component
     {
         return $this->sendMfaEnabledEmails
             && $mfaEventType === Mfa::EVENT_TYPE_VERIFY
-            && count($user->mfas) == 1;
+            && count($user->getVerifiedMfaOptions()) == 1;
     }
 
     /**
@@ -503,7 +503,7 @@ class Emailer extends Component
     {
         return $this->sendMfaOptionRemovedEmails
             && $mfaEventType === Mfa::EVENT_TYPE_DELETE
-            && count($user->mfas) > 0;
+            && count($user->getVerifiedMfaOptions()) > 0;
     }
 
     /**
@@ -517,7 +517,7 @@ class Emailer extends Component
     {
         return $this->sendMfaDisabledEmails
             && $mfaEventType === Mfa::EVENT_TYPE_DELETE
-            && count($user->mfas) < 1;
+            && count($user->getVerifiedMfaOptions()) < 1;
     }
     
     /**
