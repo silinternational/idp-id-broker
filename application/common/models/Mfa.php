@@ -72,6 +72,7 @@ class Mfa extends MfaBase
      *  -- OR --
      * Whether the Mfa option both had its verified value changed and is now verified
      *
+     * @param bool $insert Whether the mfa is being inserted
      * @param array $changedAttributes
      * @return bool
      */
