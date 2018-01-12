@@ -70,7 +70,7 @@ class MfaUnitTestsContext extends YiiContext
         Assert::true($mfa->save(), "Could not create new mfa.");
         $user->refresh();
         $this->mfaId = $mfa['id'];
-        $this->mfa = Mfa::findOne(['id' => $mfa['id']]);
+        $this->mfa = $mfa; 
     }
 
     /**
@@ -88,7 +88,7 @@ class MfaUnitTestsContext extends YiiContext
      */
     public function iHaveAUserWithAnUnverifiedTotpMfaOption()
     {
-        Mfa::deleteAll([]);
+        Mfa::deleteAll();
         $this->tempUser = $this->createNewUserInDatabase('mfa_tester');
         $this->createMfa(Mfa::TYPE_TOTP, 0);
         Assert::isEmpty(
