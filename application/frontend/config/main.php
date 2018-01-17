@@ -33,6 +33,7 @@ return [
             'enablePrettyUrl' => true, // turns /index.php?r=post%2Fview&id=100 into /index.php/post/100
             'showScriptName' => false, // turns /index.php/post/100 into /post/100
             // http://www.yiiframework.com/doc-2.0/guide-rest-routing.html
+            // http://www.yiiframework.com/doc-2.0/guide-runtime-routing.html#named-parameters
             'rules' => [
                 'GET  user'                           => 'user/index',
                 'GET  user/expiring'                  => 'user/expiring',
@@ -46,8 +47,8 @@ return [
 
                 'GET    user/<employeeId:\w+>/mfa'  => 'mfa/list',
                 'POST   mfa'                        => 'mfa/create',
-                'POST   mfa/<id>/verify'            => 'mfa/verify',
-                'DELETE mfa/<id>'                   => 'mfa/delete',
+                'POST   mfa/<id:\d+>/verify'            => 'mfa/verify',
+                'DELETE mfa/<id:\d+>'                   => 'mfa/delete',
 
                 'site/status' => 'site/status',
 

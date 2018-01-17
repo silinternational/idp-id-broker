@@ -73,11 +73,32 @@ return [
             'sendMfaRateLimitEmails' => Env::get('SEND_MFA_RATE_LIMIT_EMAILS', true),
             'sendPasswordChangedEmails' => Env::get('SEND_PASSWORD_CHANGED_EMAILS', true),
             'sendWelcomeEmails' => Env::get('SEND_WELCOME_EMAILS', true),
-            
+            // When they have no backup codes yet
+            'sendGetBackupCodesEmails' => Env::get('SEND_GET_BACKUP_CODES_EMAILS', true),
+            // When they are getting low on backup codes
+            'sendRefreshBackupCodesEmails' => Env::get('SEND_REFRESH_BACKUP_CODES_EMAILS', true),
+            'sendLostSecurityKeyEmails' => Env::get('SEND_LOST_SECURITY_KEY_EMAILS', true),
+            'sendMfaOptionAddedEmails' => Env::get('SEND_MFA_OPTION_ADDED_EMAILS', true),
+            'sendMfaOptionRemovedEmails' => Env::get('SEND_MFA_OPTION_REMOVED_EMAILS', true),
+            'sendMfaEnabledEmails' => Env::get('SEND_MFA_ENABLED_EMAILS', true),
+            'sendMfaDisabledEmails' => Env::get('SEND_MFA_DISABLED_EMAILS', true),
+
             'subjectForInvite' => Env::get('SUBJECT_FOR_INVITE'),
             'subjectForMfaRateLimit' => Env::get('SUBJECT_FOR_MFA_RATE_LIMIT'),
             'subjectForPasswordChanged' => Env::get('SUBJECT_FOR_PASSWORD_CHANGED'),
             'subjectForWelcome' => Env::get('SUBJECT_FOR_WELCOME'),
+            'subjectForGetBackupCodes' => Env::get('SUBJECT_FOR_GET_BACKUP_CODES'),
+            'subjectForRefreshBackupCodes' => Env::get('SUBJECT_FOR_REFRESH_BACKUP_CODES'),
+            'subjectForLostSecurityKey' => Env::get('SUBJECT_FOR_LOST_SECURITY_KEY'),
+            'subjectForMfaOptionAdded' => Env::get('SUBJECT_FOR_MFA_OPTION_ADDED'),
+            'subjectForMfaOptionRemoved' => Env::get('SUBJECT_FOR_MFA_OPTION_REMOVED'),
+            'subjectForMfaEnabled' => Env::get('SUBJECT_FOR_MFA_ENABLED'),
+            'subjectForMfaDisabled' => Env::get('SUBJECT_FOR_MFA_DISABLED'),
+
+            'lostSecurityKeyEmailDays' => Env::get('LOST_SECURITY_KEY_EMAIL_DAYS', 62),
+            'minimumBackupCodesBeforeNag' => Env::get('MINIMUM_BACKUP_CODES_BEFORE_NAG', 4),
+
+            'emailRepeatDelayDays' => Env::get('EMAIL_REPEAT_DELAY_DAYS', 31),
         ],
         'ldap' => [
             'class' => Ldap::class,

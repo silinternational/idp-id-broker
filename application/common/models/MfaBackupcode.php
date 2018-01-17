@@ -2,6 +2,7 @@
 namespace common\models;
 
 use common\helpers\MySqlDateTime;
+use common\components\Emailer;
 use yii\helpers\ArrayHelper;
 use yii\web\ServerErrorHttpException;
 
@@ -24,15 +25,32 @@ class MfaBackupcode extends MfaBackupcodeBase
     /**
      * Check if given value exists, if so delete and return true, else false
      * @param int $mfaId
-     * @param int $code
+     * @param string $code
      * @return bool
      * @throws ServerErrorHttpException
      */
-    public static function validateAndRemove(int $mfaId, int $code): bool
+    public static function validateAndRemove(int $mfaId, $code): bool
     {
+        $intCode = intval($code);
+        $codeStartsWithZero = (substr($code, 0, 1) === '0');
+
         $backupCodes = MfaBackupcode::findAll(['mfa_id' => $mfaId]);
+        $startCount = count($backupCodes);
         foreach ($backupCodes as $backupCode) {
-            if (password_verify($code, $backupCode->value)) {
+            $foundMatch = false;
+
+            /*
+             *   For backwards compatability, check if the integer version
+             * of the code matches (i.e. without leading zeros) what is
+             * in the database.
+             *   In earlier versions, codes were being cast to integers,
+             * and some shortened values may still be in the database.
+             */
+            if ($codeStartsWithZero) {
+                $foundMatch = password_verify($intCode, $backupCode->value);
+            }
+
+            if ($foundMatch || password_verify($code, $backupCode->value)) {
                 if ($backupCode->delete() === false) {
                     \Yii::error([
                         'action' => 'mfa-validate-and-remove',
@@ -42,6 +60,15 @@ class MfaBackupcode extends MfaBackupcodeBase
                     ]);
                     throw new ServerErrorHttpException("Unable to delete code after use", 1506692863);
                 }
+
+                /* @var $emailer Emailer */
+                $emailer = \Yii::$app->emailer;
+                if ($emailer->shouldSendRefreshBackupCodesMessage($startCount - 1)) {
+                    $mfa = Mfa::findOne($mfaId);
+                    $user = $mfa->user;
+                    $emailer->sendMessageTo(EmailLog::MESSAGE_TYPE_REFRESH_BACKUP_CODES, $user);
+                }
+
                 return true;
             }
         }
@@ -75,10 +102,10 @@ class MfaBackupcode extends MfaBackupcodeBase
 
     /**
      * @param int $mfaId
-     * @param int $value
+     * @param string $value
      * @throws ServerErrorHttpException
      */
-    public static function insertBackupCode(int $mfaId, int $value)
+    public static function insertBackupCode(int $mfaId, $value)
     {
         $code = new MfaBackupcode();
         $code->mfa_id = $mfaId;
@@ -120,4 +147,5 @@ class MfaBackupcode extends MfaBackupcodeBase
         }
         return true;
     }
+
 }
