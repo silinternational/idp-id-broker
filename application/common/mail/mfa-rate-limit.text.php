@@ -1,5 +1,4 @@
 <?php
-use yii\helpers\Html as yHtml;
 
 /**
  * @var string $employeeId
