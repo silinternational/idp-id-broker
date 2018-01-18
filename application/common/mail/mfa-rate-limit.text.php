@@ -1,5 +1,4 @@
 <?php
-use yii\helpers\Html as yHtml;
 
 /**
  * @var string $employeeId
@@ -24,8 +23,18 @@ use yii\helpers\Html as yHtml;
  * @var bool   $isMfaEnabled
  */
 ?>
+Dear <?= $displayName ?>,
 
-<?php /** @todo Write the content for the mfa-rate-limit (text) email. */ ?>
+There have been too many failed 2-Step Verification attempts on your 
+<?= $idpDisplayName ?> Identity account. You will need to wait at least 
+5 minutes and try again.
 
-Thanks!
- - <?php /** @todo Add a signature/name to the mfa-rate-limit (text) email. */ ?>
+If you are not currently trying to log into your <?= $idpDisplayName ?> Identity 
+account, it could be a sign someone else is trying to access your account. 
+Please contact <?= $supportName ?> at <?= $supportEmail ?> as soon as possible 
+to report the incident.
+
+If you continue to have problems accessing your account, please contact 
+<?= $supportName ?> at <?= $supportEmail ?>.
+
+<?= $emailSignature ?>
