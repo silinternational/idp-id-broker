@@ -29,7 +29,7 @@ use yii\helpers\Html as yHtml;
 <p>Dear <?= yHtml::encode($displayName) ?>,</p>
 
 <p>
-    You have disabled the ability to use a <?= yHtml::encode($mfaTypeDisabled) ?> for 2-Step Verification when logging in using
+    You have disabled the ability to use your <?= yHtml::encode($mfaTypeDisabled) ?> for 2-Step Verification when logging in using
     your <?= yHtml::encode($idpDisplayName) ?> Identity account. If this was not intentional, go to
     <?= yHtml::encode($passwordProfileUrl) ?>, log in if needed, and add it back to your account.
 </p>
