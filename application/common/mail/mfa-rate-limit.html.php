@@ -24,10 +24,22 @@ use yii\helpers\Html as yHtml;
  * @var bool   $isMfaEnabled
  */
 ?>
+<p>Dear <?= yHtml::encode($displayName) ?>,</p>
 <p>
-    <?php /** @todo Write the content for the mfa-rate-limit (HTML) email. */ ?>
+    There have been too many failed 2-Step Verification attempts on your 
+    <?= yHtml::encode($idpDisplayName) ?> Identity account. You will need to wait at least 
+    5 minutes and try again.
 </p>
 <p>
-    Thanks!
-    - <i><?php /** @todo Add a signature/name to the mfa-rate-limit (HTML) email. */ ?></i>
+    If you are not currently trying to log into your <?= yHtml::encode($idpDisplayName) ?> Identity 
+    account, it could be a sign someone else is trying to access your account. 
+    Please contact <?= yHtml::encode($supportName) ?> at <?= yHtml::encode($supportEmail) ?> as soon as possible 
+    to report the incident.
+</p>
+<p>
+    If you continue to have problems accessing your account, please contact 
+    <?= yHtml::encode($supportName) ?> at <?= yHtml::encode($supportEmail) ?>.
+</p>
+<p>
+    <i><?= yHtml::encode($emailSignature) ?></i>
 </p>
