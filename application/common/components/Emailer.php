@@ -497,6 +497,7 @@ class Emailer extends Component
      *
      * @param User $user (assumes the user instance has already been refreshed)
      * @param string Mfa::EVENT_TYPE_*
+     * @param Mfa $mfa
      * @return bool
      */
     public function shouldSendMfaOptionRemovedMessageTo($user, $mfaEventType, $mfa)
@@ -512,6 +513,7 @@ class Emailer extends Component
      *
      * @param User $user (assumes the user instance has already been refreshed)
      * @param string Mfa::EVENT_TYPE_*
+     * @param Mfa $mfa
      * @return bool
      */
     public function shouldSendMfaDisabledMessageTo($user, $mfaEventType, $mfa)
