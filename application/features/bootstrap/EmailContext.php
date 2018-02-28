@@ -130,8 +130,7 @@ class EmailContext extends YiiContext
         $type,
         $lastUsedDaysAgo=null,
         $user=null,
-        $verified=1,
-        $saveAsTestMfa=True // In case a previously create mfa needs to stay in focus
+        $verified=1
     )
     {
         if ($user ===null) {
@@ -142,9 +141,7 @@ class EmailContext extends YiiContext
         $mfa->type = $type;
         $mfa->verified = $verified;
 
-        if ($saveAsTestMfa) {
-            $this->testMfaOption = $mfa;
-        }
+        $this->testMfaOption = $mfa;
 
         if ($lastUsedDaysAgo !== null) {
             $diffConfig = "-" . $lastUsedDaysAgo . " days";
@@ -152,6 +149,16 @@ class EmailContext extends YiiContext
         }
         Assert::true($mfa->save(), "Could not create new mfa.");
         $user->refresh();
+    }
+
+    protected function createTempMfa($type, $verified) {
+        $user = $this->tempUser;
+        $mfa = new Mfa();
+        $mfa->user_id = $user->id;
+        $mfa->type = $type;
+        $mfa->verified = $verified;
+
+        return $mfa;
     }
 
     protected function deleteMfaOfType($type) {
@@ -523,26 +530,23 @@ class EmailContext extends YiiContext
         $this->createMfa(Mfa::TYPE_U2F);
     }
 
+
     /**
-     * @Given a verified u2f mfa option does exist but not as the test mfa
+     * @Given a verified u2f mfa option was just deleted
      */
-    public function aVerifiedU2fMfaOptionDoesExistButNotAsTheTestMfa()
+    public function aVerifiedU2fMfaOptionWasJustDeleted()
     {
-        $this->createMfa(Mfa::TYPE_U2F, null, null, 1, False);
+        $this->testMfaOption = $this->createTempMfa(Mfa::TYPE_U2F, 1);
+        $this->mfaEventType = 'delete_mfa';
     }
 
     /**
-     * @Given a verified u2f mfa option used to exist
+     * @Given an unverified u2f mfa option was just deleted
      */
-    public function aVerifiedU2fMfaOptionUsedToExist()
+    public function anUnverifiedU2fMfaOptionWasJustDeleted()
     {
-        $user = $this->tempUser;
-        $mfa = new Mfa();
-        $mfa->user_id = $user->id;
-        $mfa->type = Mfa::TYPE_U2F;
-        $mfa->verified = 1;
-
-        $this->testMfaOption = $mfa;
+        $this->testMfaOption = $this->createTempMfa(Mfa::TYPE_U2F, 0);
+        $this->mfaEventType = 'delete_mfa';
     }
 
     /**
