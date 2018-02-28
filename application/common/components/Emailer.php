@@ -493,30 +493,32 @@ class Emailer extends Component
     }
 
     /**
-     * Whether the user just deleted an MFA option and there is still one or more left
+     * Whether the user just deleted a verified MFA option and there is still one or more left
      *
      * @param User $user (assumes the user instance has already been refreshed)
      * @param string Mfa::EVENT_TYPE_*
      * @return bool
      */
-    public function shouldSendMfaOptionRemovedMessageTo($user, $mfaEventType)
+    public function shouldSendMfaOptionRemovedMessageTo($user, $mfaEventType, $mfa)
     {
         return $this->sendMfaOptionRemovedEmails
             && $mfaEventType === Mfa::EVENT_TYPE_DELETE
+            && $mfa->verified
             && count($user->getVerifiedMfaOptions()) > 0;
     }
 
     /**
-     * Whether the user has just deleted the last MFA option
+     * Whether the user has just deleted the last verified MFA option
      *
      * @param User $user (assumes the user instance has already been refreshed)
      * @param string Mfa::EVENT_TYPE_*
      * @return bool
      */
-    public function shouldSendMfaDisabledMessageTo($user, $mfaEventType)
+    public function shouldSendMfaDisabledMessageTo($user, $mfaEventType, $mfa)
     {
         return $this->sendMfaDisabledEmails
             && $mfaEventType === Mfa::EVENT_TYPE_DELETE
+            && $mfa->verified
             && count($user->getVerifiedMfaOptions()) < 1;
     }
     
