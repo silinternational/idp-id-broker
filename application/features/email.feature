@@ -214,8 +214,7 @@ Feature: Email
       And we are configured to send mfa option removed emails
       And no mfas exist
       And a user already exists
-      And a verified u2f mfa option used to exist
-      And the latest mfa event type was delete_mfa
+      And a verified u2f mfa option was just deleted
     When I check if a mfa <optionRemovedOrDisabled> email should be sent
     Then I see that a mfa <optionRemovedOrDisabled> email <shouldOrNot> be sent
 
@@ -225,13 +224,11 @@ Feature: Email
       | disabled                | should      |
 
   Scenario: When to send an email after an unverified u2f mfa option has been deleted.
-    Given we are configured to send mfa disabled emails
-      And we are configured to send mfa option removed emails
+    Given we are configured to send mfa option removed emails
       And no mfas exist
       And a user already exists
-      And an unverified u2f mfa option does exist
-      And a verified u2f mfa option does exist but not as the test mfa
-      And the latest mfa event type was delete_mfa
+      And a verified u2f mfa option does exist
+      And an unverified u2f mfa option was just deleted
     When I check if a mfa option removed email should be sent
     Then I see that a mfa option removed email should not be sent
 
