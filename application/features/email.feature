@@ -209,7 +209,7 @@ Feature: Email
       | NOT to send        | does NOT exist | does NOT exist  | verify_mfa   | should NOT  |
 
 
-  Scenario Outline: When to send an email after a verified u2f mfa option has been deleted.
+  Scenario Outline: What kind of email to send after the last verified mfa option has been deleted.
     Given we are configured to send mfa disabled emails
       And we are configured to send mfa option removed emails
       And no mfas exist
