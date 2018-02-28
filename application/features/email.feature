@@ -223,7 +223,7 @@ Feature: Email
       | option removed          | should NOT  |
       | disabled                | should      |
 
-  Scenario: When to send an email after an unverified u2f mfa option has been deleted.
+  Scenario: When to send a mfa option removed email after an unverified u2f mfa option has been deleted.
     Given we are configured to send mfa option removed emails
       And no mfas exist
       And a user already exists
@@ -231,6 +231,14 @@ Feature: Email
       And an unverified u2f mfa option was just deleted
     When I check if a mfa option removed email should be sent
     Then I see that a mfa option removed email should not be sent
+
+  Scenario: When to send a mfa disabled email after an unverified u2f mfa option has been deleted.
+    Given we are configured to send mfa disabled emails
+    And no mfas exist
+    And a user already exists
+    And an unverified u2f mfa option was just deleted
+    When I check if a mfa disabled email should be sent
+    Then I see that a mfa disabled email should not be sent
 
 
   Scenario Outline: When to send refresh backup codes emails
