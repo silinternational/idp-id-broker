@@ -45,6 +45,9 @@ class EmailContext extends YiiContext
     /** @var string */
     protected $mfaEventType;
 
+    /** @var Mfa */
+    protected $testMfaOption;
+
     /**
      * @Then a(n) :messageType email should have been sent to them
      */
@@ -123,7 +126,12 @@ class EmailContext extends YiiContext
         return $user;
     }
 
-    protected function createMfa($type, $lastUsedDaysAgo=null, $user=null)
+    protected function createMfa(
+        $type,
+        $lastUsedDaysAgo=null,
+        $user=null,
+        $verified=1
+    )
     {
         if ($user ===null) {
             $user = $this->tempUser;
@@ -131,7 +139,9 @@ class EmailContext extends YiiContext
         $mfa = new Mfa();
         $mfa->user_id = $user->id;
         $mfa->type = $type;
-        $mfa->verified = 1;
+        $mfa->verified = $verified;
+
+        $this->testMfaOption = $mfa;
 
         if ($lastUsedDaysAgo !== null) {
             $diffConfig = "-" . $lastUsedDaysAgo . " days";
@@ -139,6 +149,16 @@ class EmailContext extends YiiContext
         }
         Assert::true($mfa->save(), "Could not create new mfa.");
         $user->refresh();
+    }
+
+    protected function createTempMfa($type, $verified) {
+        $user = $this->tempUser;
+        $mfa = new Mfa();
+        $mfa->user_id = $user->id;
+        $mfa->type = $type;
+        $mfa->verified = $verified;
+
+        return $mfa;
     }
 
     protected function deleteMfaOfType($type) {
@@ -503,15 +523,42 @@ class EmailContext extends YiiContext
     }
 
     /**
-     * @Given a u2f mfa option does Exist
+     * @Given a verified u2f mfa option does exist
      */
-    public function aU2fMfaOptionDoesExist()
+    public function aVerifiedU2fMfaOptionDoesExist()
     {
         $this->createMfa(Mfa::TYPE_U2F);
     }
 
+
     /**
-     * @Given a u2f mfa option does NOT Exist
+     * @Given a verified u2f mfa option was just deleted
+     */
+    public function aVerifiedU2fMfaOptionWasJustDeleted()
+    {
+        $this->testMfaOption = $this->createTempMfa(Mfa::TYPE_U2F, 1);
+        $this->mfaEventType = 'delete_mfa';
+    }
+
+    /**
+     * @Given an unverified u2f mfa option was just deleted
+     */
+    public function anUnverifiedU2fMfaOptionWasJustDeleted()
+    {
+        $this->testMfaOption = $this->createTempMfa(Mfa::TYPE_U2F, 0);
+        $this->mfaEventType = 'delete_mfa';
+    }
+
+    /**
+     * @Given an unverified u2f mfa option does exist
+     */
+    public function anUnverifiedU2fMfaOptionDoesExist()
+    {
+        $this->createMfa(Mfa::TYPE_U2F, null, null, 0);
+    }
+
+    /**
+     * @Given a (verified) u2f mfa option does NOT Exist
      */
     public function aU2fMfaOptionDoesNotExist()
     {
@@ -656,7 +703,8 @@ class EmailContext extends YiiContext
     {
         $this->mfaOptionRemovedEmailShouldBeSent = $this->fakeEmailer->shouldSendMfaOptionRemovedMessageTo(
             $this->tempUser,
-            $this->mfaEventType
+            $this->mfaEventType,
+            $this->testMfaOption
         );
     }
 
@@ -667,7 +715,8 @@ class EmailContext extends YiiContext
     {
         $this->mfaDisabledEmailShouldBeSent = $this->fakeEmailer->shouldSendMfaDisabledMessageTo(
             $this->tempUser,
-            $this->mfaEventType
+            $this->mfaEventType,
+            $this->testMfaOption
         );
     }
 
