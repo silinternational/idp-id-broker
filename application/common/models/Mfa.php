@@ -97,9 +97,10 @@ class Mfa extends MfaBase
          */
         if ($this->isNewlyVerified($insert, $changedAttributes)) {
 
-            $this->sendAppropriateMessages(
+            self::sendAppropriateMessages(
                 $this->user,
-                self::EVENT_TYPE_VERIFY
+                self::EVENT_TYPE_VERIFY,
+                $this
             );
         }
     }
@@ -126,8 +127,11 @@ class Mfa extends MfaBase
             'status' => 'success',
         ]);
 
-
-        $this->sendAppropriateMessages($this->user, self::EVENT_TYPE_DELETE);
+        self::sendAppropriateMessages(
+            $this->user,
+            self::EVENT_TYPE_DELETE,
+            $this
+        );
     }
 
     /**
@@ -460,7 +464,7 @@ class Mfa extends MfaBase
     }
 
 
-    protected function sendAppropriateMessages($user, $eventType)
+    protected static function sendAppropriateMessages($user, $eventType, $mfa)
     {
         /* @var $emailer Emailer */
         $emailer = \Yii::$app->emailer;
@@ -472,11 +476,11 @@ class Mfa extends MfaBase
         } else if ($emailer->shouldSendMfaEnabledMessageTo($user, $eventType)) {
             $emailer->sendMessageTo(EmailLog::MESSAGE_TYPE_MFA_ENABLED, $user);
 
-        } else if ($emailer->shouldSendMfaOptionRemovedMessageTo($user, $eventType)) {
-            $emailer->otherDataForEmails['mfaTypeDisabled'] = $this->getReadableType();
+        } else if ($emailer->shouldSendMfaOptionRemovedMessageTo($user, $eventType, $mfa)) {
+            $emailer->otherDataForEmails['mfaTypeDisabled'] = $mfa->getReadableType();
             $emailer->sendMessageTo(EmailLog::MESSAGE_TYPE_MFA_OPTION_REMOVED, $user);
 
-        } else if ($emailer->shouldSendMfaDisabledMessageTo($user, $eventType)) {
+        } else if ($emailer->shouldSendMfaDisabledMessageTo($user, $eventType, $mfa)) {
             $emailer->sendMessageTo(EmailLog::MESSAGE_TYPE_MFA_DISABLED, $user);
         }
     }
