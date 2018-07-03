@@ -157,6 +157,9 @@ class User extends UserBase
                 'on' => self::SCENARIO_AUTHENTICATE,
             ],
             [
+                ['manager_email', 'spouse_email'], 'email',
+            ],
+            [
                 ['last_synced_utc', 'last_changed_utc'],
                 'default', 'value' => MySqlDateTime::now(),
             ],

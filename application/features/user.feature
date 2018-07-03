@@ -292,6 +292,32 @@ Feature: User
       | username     | Username     |
       | email        | Email        |
 
+  Scenario Outline: Attempt to create a new user while providing an invalid property for an optional property
+    Given the requester is authorized
+    And the user store is empty
+    And I provide the following valid data:
+      | property     | value                 |
+      | employee_id  | 123                   |
+      | first_name   | Shep                  |
+      | last_name    | Clark                 |
+      | display_name | Shep Clark            |
+      | username     | shep_clark            |
+      | email        | shep_clark@example.org|
+    But I provide an invalid <property> of <value>
+    When I request "/user" be created
+    Then the response status code should be 422
+    And the property message should contain "<contents>"
+    And the user store is still empty
+
+    Examples:
+      | property      | value           | contents      |
+      | spouse_email  | true            | Spouse Email  |
+      | spouse_email  | 123             | Spouse Email  |
+      | spouse_email  | invalid.address | Spouse Email  |
+      | manager_email | true            | Manager Email |
+      | manager_email | 123             | Manager Email |
+      | manager_email | invalid.address | Manager Email |
+
   Scenario: Attempt to create a new user with a username that already exists
     Given the requester is authorized
       And the user store is empty
