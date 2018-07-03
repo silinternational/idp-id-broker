@@ -79,8 +79,10 @@ class User extends UserBase
             'email',
             'active',
             'locked',
+            'manager_email',
             'require_mfa',
             'nag_for_mfa_after',
+            'spouse_email',
         ];
 
         $scenarios[self::SCENARIO_UPDATE_USER] = [
@@ -91,7 +93,9 @@ class User extends UserBase
             'email',
             'active',
             'locked',
+            'manager_email',
             'require_mfa',
+            'spouse_email',
         ];
 
         $scenarios[self::SCENARIO_UPDATE_PASSWORD] = ['password'];
