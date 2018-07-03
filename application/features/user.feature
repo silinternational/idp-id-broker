@@ -297,12 +297,12 @@ Feature: User
     And the user store is empty
     And I provide the following valid data:
       | property     | value                 |
-      | employee_id  | 123                   |
-      | first_name   | Shep                  |
-      | last_name    | Clark                 |
-      | display_name | Shep Clark            |
-      | username     | shep_clark            |
-      | email        | shep_clark@example.org|
+      | employee_id  | 456                   |
+      | first_name   | John                  |
+      | last_name    | Smith                 |
+      | display_name | John Smith            |
+      | username     | john_smith            |
+      | email        | john_smith@example.org|
     But I provide an invalid <property> of <value>
     When I request "/user" be created
     Then the response status code should be 422
