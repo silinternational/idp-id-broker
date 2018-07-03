@@ -375,9 +375,11 @@ class User extends UserBase
             'active',
             'locked',
             'last_login_utc',
+            'manager_email',
             'mfa' => function ($model) {
                 return $model->getMfaFields();
             },
+            'spouse_email',
         ];
 
         if ($this->current_password_id !== null) {
