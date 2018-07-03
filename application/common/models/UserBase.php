@@ -23,6 +23,8 @@ use Yii;
  * @property string $require_mfa
  * @property string $nag_for_mfa_after
  * @property string $last_login_utc
+ * @property string $manager_email
+ * @property string $spouse_email
  *
  * @property EmailLog[] $emailLogs
  * @property Mfa[] $mfas
@@ -49,7 +51,7 @@ class UserBase extends \yii\db\ActiveRecord
             [['active', 'locked', 'require_mfa'], 'string'],
             [['last_changed_utc', 'last_synced_utc', 'nag_for_mfa_after', 'last_login_utc'], 'safe'],
             [['uuid'], 'string', 'max' => 64],
-            [['employee_id', 'first_name', 'last_name', 'display_name', 'username', 'email'], 'string', 'max' => 255],
+            [['employee_id', 'first_name', 'last_name', 'display_name', 'username', 'email', 'manager_email', 'spouse_email'], 'string', 'max' => 255],
             [['employee_id'], 'unique'],
             [['username'], 'unique'],
             [['email'], 'unique'],
@@ -79,6 +81,8 @@ class UserBase extends \yii\db\ActiveRecord
             'require_mfa' => Yii::t('app', 'Require Mfa'),
             'nag_for_mfa_after' => Yii::t('app', 'Nag For Mfa After'),
             'last_login_utc' => Yii::t('app', 'Last Login Utc'),
+            'manager_email' => Yii::t('app', 'Manager Email'),
+            'spouse_email' => Yii::t('app', 'Spouse Email'),
         ];
     }
 
