@@ -79,8 +79,10 @@ class User extends UserBase
             'email',
             'active',
             'locked',
+            'manager_email',
             'require_mfa',
             'nag_for_mfa_after',
+            'spouse_email',
         ];
 
         $scenarios[self::SCENARIO_UPDATE_USER] = [
@@ -91,7 +93,9 @@ class User extends UserBase
             'email',
             'active',
             'locked',
+            'manager_email',
             'require_mfa',
+            'spouse_email',
         ];
 
         $scenarios[self::SCENARIO_UPDATE_PASSWORD] = ['password'];
@@ -151,6 +155,9 @@ class User extends UserBase
             [
                 'locked', 'compare', 'compareValue' => 'no',
                 'on' => self::SCENARIO_AUTHENTICATE,
+            ],
+            [
+                ['manager_email', 'spouse_email'], 'email',
             ],
             [
                 ['last_synced_utc', 'last_changed_utc'],
@@ -368,9 +375,11 @@ class User extends UserBase
             'active',
             'locked',
             'last_login_utc',
+            'manager_email',
             'mfa' => function ($model) {
                 return $model->getMfaFields();
             },
+            'spouse_email',
         ];
 
         if ($this->current_password_id !== null) {
