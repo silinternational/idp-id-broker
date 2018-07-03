@@ -292,7 +292,7 @@ Feature: User
       | username     | Username     |
       | email        | Email        |
 
-  Scenario Outline: Attempt to create a new user while providing an invalid property for an optional property
+  Scenario Outline: Attempt to create a new user while providing an invalid value for an optional property
     Given the requester is authorized
     And the user store is empty
     And I provide the following valid data:
