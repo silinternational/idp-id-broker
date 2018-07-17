@@ -7,27 +7,29 @@ Feature: User
     Given a record does not exist with an employee_id of "123"
       And the requester is authorized
       And I provide the following valid data:
-        | property     | value                 |
-        | employee_id  | 123                   |
-        | first_name   | Shep                  |
-        | last_name    | Clark                 |
-        | display_name | Shep Clark            |
-        | username     | shep_clark            |
-        | email        | shep_clark@example.org|
-        | require_mfa  | yes                   |
+        | property      | value                 |
+        | employee_id   | 123                   |
+        | first_name    | Shep                  |
+        | last_name     | Clark                 |
+        | display_name  | Shep Clark            |
+        | username      | shep_clark            |
+        | email         | shep_clark@example.org|
+        | manager_email | boss_man@example.org  |
+        | require_mfa   | yes                   |
     When I request "/user" be created
     Then the response status code should be 200
       And the following data is returned:
-        | property     | value                 |
+        | property      | value                 |
 #TODO:need to ensure uuid came back but not sure about value...
-        | employee_id  | 123                   |
-        | first_name   | Shep                  |
-        | last_name    | Clark                 |
-        | display_name | Shep Clark            |
-        | username     | shep_clark            |
-        | email        | shep_clark@example.org|
-        | active       | yes                   |
-        | locked       | no                    |
+        | employee_id   | 123                   |
+        | first_name    | Shep                  |
+        | last_name     | Clark                 |
+        | display_name  | Shep Clark            |
+        | username      | shep_clark            |
+        | email         | shep_clark@example.org|
+        | active        | yes                   |
+        | locked        | no                    |
+        | manager_email | boss_man@example.org  |
       And the following data is not returned:
         | property                |
         | current_password_id     |
@@ -43,7 +45,9 @@ Feature: User
         | current_password_id | NULL                  |
         | active              | yes                   |
         | locked              | no                    |
+        | manager_email       | boss_man@example.org  |
         | require_mfa         | yes                   |
+        | spouse_email        | NULL                  |
       And last_changed_utc should be stored as now UTC
       And last_synced_utc should be stored as now UTC
 
@@ -98,18 +102,19 @@ Feature: User
       And last_synced_utc should be stored as now UTC
 
     Examples:
-      | property    | value           |
-      | first_name  | FIRST           |
-      | last_name   | LAST            |
-      | display_name| DISPLAY         |
-      | username    | USER            |
-      | email       | chg@example.org |
-      | active      | no              |
-      | active      | yes             |
-      | locked      | no              |
-      | locked      | yes             |
-      | require_mfa | no              |
-      | require_mfa | yes             |
+      | property     | value              |
+      | first_name   | FIRST              |
+      | last_name    | LAST               |
+      | display_name | DISPLAY            |
+      | username     | USER               |
+      | email        | chg@example.org    |
+      | active       | no                 |
+      | active       | yes                |
+      | locked       | no                 |
+      | locked       | yes                |
+      | spouse_email | spouse@example.org |
+      | require_mfa  | no                 |
+      | require_mfa  | yes                |
 
 #TODO: consider creating a new security.feature file for all these security-related tests.
 #TODO: need to think through tests for API_ACCESS_KEYS config, i.e., need tests for ApiConsumer
@@ -286,6 +291,32 @@ Feature: User
       | display_name | Display Name |
       | username     | Username     |
       | email        | Email        |
+
+  Scenario Outline: Attempt to create a new user while providing an invalid value for an optional property
+    Given the requester is authorized
+    And the user store is empty
+    And I provide the following valid data:
+      | property     | value                 |
+      | employee_id  | 456                   |
+      | first_name   | John                  |
+      | last_name    | Smith                 |
+      | display_name | John Smith            |
+      | username     | john_smith            |
+      | email        | john_smith@example.org|
+    But I provide an invalid <property> of <value>
+    When I request "/user" be created
+    Then the response status code should be 422
+    And the property message should contain "<contents>"
+    And the user store is still empty
+
+    Examples:
+      | property      | value           | contents      |
+      | spouse_email  | true            | Spouse Email  |
+      | spouse_email  | 123             | Spouse Email  |
+      | spouse_email  | invalid.address | Spouse Email  |
+      | manager_email | true            | Manager Email |
+      | manager_email | 123             | Manager Email |
+      | manager_email | invalid.address | Manager Email |
 
   Scenario: Attempt to create a new user with a username that already exists
     Given the requester is authorized
