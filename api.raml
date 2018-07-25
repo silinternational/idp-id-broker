@@ -97,6 +97,10 @@ schemas:
             "required": false,
             "type": "string"
           },
+          "manager_email": {
+            "required": false,
+            "type": "string"
+          },
           "mfa": {
             "required": true,
             "type": "object",
@@ -134,6 +138,10 @@ schemas:
                 "type": "string"
               }
             }
+          },
+          "spouse_email": {
+            "required": false,
+            "type": "string"
           }
         },
         "type": "object"
@@ -175,6 +183,14 @@ schemas:
             "required": false,
             "type": "string",
             "enum": ["yes", "no"]
+          },
+          "manager_email": {
+            "required": false,
+            "type": "string"
+          },
+          "spouse_email": {
+            "required": false,
+            "type": "string"
           }
         },
         "type": "object"
@@ -222,6 +238,10 @@ schemas:
               "type": "string",
               "enum": ["yes", "no"]
             },
+            "manager_email": {
+              "required": false,
+              "type": "string"
+            },
             "password": {
               "required": false,
               "type": "object",
@@ -239,6 +259,10 @@ schemas:
                   "type": "string"
                 }
               }
+            },
+            "spouse_email": {
+              "required": false,
+              "type": "string"
             }
           },
           "type": "object"
@@ -278,6 +302,14 @@ schemas:
             "required": false,
             "type": "string",
             "enum": ["yes", "no"]
+          },
+          "manager_email": {
+            "required": false,
+            "type": "string"
+          },
+          "spouse_email": {
+            "required": false,
+            "type": "string"
           }
         },
         "type": "object"
