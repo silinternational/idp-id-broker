@@ -443,6 +443,16 @@ schemas:
         type: string
         default: "fields=uuid,employee_id,first_name,last_name,display_name,username,email,active,locked,password"
         example: "fields=employee_id,active"
+      username:
+        description: Search user by username.
+        required: false
+        type: string
+        example: "username=john_smith"
+      email:
+        description: Search user by email.
+        required: false
+        type: string
+        example: "email=john_smith@example.com"
     responses:
       200:
           body:
@@ -844,7 +854,6 @@ schemas:
                       }
                     }
                   ]
-# TODO: need docs for new search api, i.e., /user?username=AAA&email=AAA@example.org
 /mfa:
   post:
     description: Create a new mfa record.
