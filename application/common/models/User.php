@@ -380,6 +380,8 @@ class User extends UserBase
                 return $model->getMfaFields();
             },
             'spouse_email',
+            'mfa_review_after' => 'nag_for_mfa_after',
+            'method_review_after' => 'nag_for_method_after',
         ];
 
         if ($this->current_password_id !== null) {
@@ -698,4 +700,22 @@ class User extends UserBase
         return false;
     }
 
+    /**
+     * Update the first nag_for_*_after date that has passed
+     */
+    public function updateNagDates()
+    {
+        // save current time to avoid race condition
+        $now = time();
+
+        if (strtotime($this->nag_for_mfa_after) < $now) {
+            $this->nag_for_mfa_after = MySqlDateTime::relative(\Yii::$app->params['mfaNagInterval']);
+            return;
+        }
+
+        if (strtotime($this->nag_for_method_after) < $now) {
+            $this->nag_for_method_after = MySqlDateTime::relative(\Yii::$app->params['methodNagInterval']);
+            return;
+        }
+    }
 }
