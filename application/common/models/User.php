@@ -82,6 +82,7 @@ class User extends UserBase
             'manager_email',
             'require_mfa',
             'nag_for_mfa_after',
+            'nag_for_method_after',
             'spouse_email',
         ];
 
@@ -122,6 +123,9 @@ class User extends UserBase
             ],
             [
                 'nag_for_mfa_after', 'default', 'value' => MySqlDateTime::today(),
+            ],
+            [
+                'nag_for_method_after', 'default', 'value' => MySqlDateTime::today(),
             ],
             [
                 ['active', 'locked', 'require_mfa'], 'in', 'range' => ['yes', 'no'],
