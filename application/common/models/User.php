@@ -82,6 +82,7 @@ class User extends UserBase
             'manager_email',
             'require_mfa',
             'nag_for_mfa_after',
+            'nag_for_method_after',
             'spouse_email',
         ];
 
@@ -122,6 +123,9 @@ class User extends UserBase
             ],
             [
                 'nag_for_mfa_after', 'default', 'value' => MySqlDateTime::today(),
+            ],
+            [
+                'nag_for_method_after', 'default', 'value' => MySqlDateTime::today(),
             ],
             [
                 ['active', 'locked', 'require_mfa'], 'in', 'range' => ['yes', 'no'],
@@ -380,6 +384,9 @@ class User extends UserBase
                 return $model->getMfaFields();
             },
             'spouse_email',
+            'method' => function ($model) {
+                return $model->getMethodFields();
+            },
         ];
 
         if ($this->current_password_id !== null) {
@@ -401,16 +408,25 @@ class User extends UserBase
     {
         return $this->display_name ?? "$this->first_name $this->last_name";
     }
-    
+
+    /**
+     * Is it time to nag the user to add an MFA?
+     *
+     * @return bool
+     */
+    public function isTimeToNagForMfa()
+    {
+        return strtotime($this->nag_for_mfa_after) < time();
+    }
+
     /**
      * @return array MFA related properties
      */
     public function getMfaFields()
     {
-        $promptForMfa = $this->isPromptForMfa() ? 'yes' : 'no';
         return [
-            'prompt'  => $promptForMfa,
-            'nag'     => ($promptForMfa == 'no' && strtotime($this->nag_for_mfa_after) < time()) ? 'yes' : 'no',
+            'prompt'  => $this->isPromptForMfa() ? 'yes' : 'no',
+            'nag'     => (! $this->isPromptForMfa() && $this->isTimeToNagForMfa()) ? 'yes' : 'no',
             'options' => $this->getVerifiedMfaOptions(),
         ];
     }
@@ -425,6 +441,28 @@ class User extends UserBase
             }
         }
         return $mfas;
+    }
+
+    /**
+     * Is it time to nag the user to add a recovery method?
+     *
+     * @return bool
+     */
+    public function isTimeToNagForMethod()
+    {
+        return strtotime($this->nag_for_method_after) < time();
+    }
+
+    /**
+     * Return method-related properties to include in /user responses
+     *
+     * @return array method-related properties
+     */
+    public function getMethodFields()
+    {
+        return [
+            'nag' => ( ! $this->isTimeToNagForMfa() && $this->isTimeToNagForMethod()) ? 'yes' : 'no',
+        ];
     }
 
     /*
@@ -698,4 +736,22 @@ class User extends UserBase
         return false;
     }
 
+    /**
+     * Update the first nag_for_*_after date that has passed
+     */
+    public function updateNagDates()
+    {
+        // save current time to avoid race condition
+        $now = time();
+
+        if (strtotime($this->nag_for_mfa_after) < $now) {
+            $this->nag_for_mfa_after = MySqlDateTime::relative(\Yii::$app->params['mfaNagInterval']);
+            return;
+        }
+
+        if (strtotime($this->nag_for_method_after) < $now) {
+            $this->nag_for_method_after = MySqlDateTime::relative(\Yii::$app->params['methodNagInterval']);
+            return;
+        }
+    }
 }

@@ -43,17 +43,13 @@ class Authentication
 
             $this->authenticatedUser = clone $user;
 
-            /*
-             * Update last_login_utc and nag_for_mfa_after if unable to save log
-             * error and proceed without stopping user
-             */
             $user->last_login_utc = MySqlDateTime::now();
-            if (strtotime($user->nag_for_mfa_after) < time()) {
-                $user->nag_for_mfa_after = MySqlDateTime::relative(\Yii::$app->params['mfaNagInterval']);
-            }
+
+            $user->updateNagDates();
+
             if ( ! $user->save() ){
                 \Yii::error([
-                    'action' => 'save last_login_utc and nag_for_mfa_after for user after authentication',
+                    'action' => 'save last_login_utc and nag dates for user after authentication',
                     'status' => 'error',
                     'message' => $user->getFirstErrors(),
                 ]);

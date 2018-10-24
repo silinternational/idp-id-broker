@@ -12,5 +12,10 @@ else
     sleep 10
 fi
 
+if [[ $APP_ENV == "dev" ]]; then
+    export XDEBUG_CONFIG="remote_enable=1 remote_host="$REMOTE_DEBUG_IP
+    apt-get -y -q install php-xdebug
+fi
+
 # Run apache in foreground
 apache2ctl -D FOREGROUND
