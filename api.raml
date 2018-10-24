@@ -121,6 +121,17 @@ schemas:
               }
             }
           },
+          "method": {
+            "required": true,
+            "type": "object",
+            "properties": {
+              "nag": {
+                "required": true,
+                "type": "string",
+                "enum": ["yes","no"]
+              }
+            }
+          },
           "password": {
             "required": false,
             "type": "object",
