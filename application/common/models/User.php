@@ -384,8 +384,9 @@ class User extends UserBase
                 return $model->getMfaFields();
             },
             'spouse_email',
-            'mfa_review_after' => 'nag_for_mfa_after',
-            'method_review_after' => 'nag_for_method_after',
+            'method' => function ($model) {
+                return $model->getMethodFields();
+            },
         ];
 
         if ($this->current_password_id !== null) {
