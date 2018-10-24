@@ -407,16 +407,25 @@ class User extends UserBase
     {
         return $this->display_name ?? "$this->first_name $this->last_name";
     }
-    
+
+    /**
+     * Is it time to nag the user to add an MFA?
+     *
+     * @return bool
+     */
+    public function isTimeToNagForMfa()
+    {
+        return strtotime($this->nag_for_mfa_after) < time();
+    }
+
     /**
      * @return array MFA related properties
      */
     public function getMfaFields()
     {
-        $promptForMfa = $this->isPromptForMfa() ? 'yes' : 'no';
         return [
-            'prompt'  => $promptForMfa,
-            'nag'     => ($promptForMfa == 'no' && strtotime($this->nag_for_mfa_after) < time()) ? 'yes' : 'no',
+            'prompt'  => $this->isPromptForMfa() ? 'yes' : 'no',
+            'nag'     => (! $this->isPromptForMfa() && $this->isTimeToNagForMfa()) ? 'yes' : 'no',
             'options' => $this->getVerifiedMfaOptions(),
         ];
     }
