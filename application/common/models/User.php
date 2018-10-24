@@ -442,6 +442,28 @@ class User extends UserBase
         return $mfas;
     }
 
+    /**
+     * Is it time to nag the user to add a recovery method?
+     *
+     * @return bool
+     */
+    public function isTimeToNagForMethod()
+    {
+        return strtotime($this->nag_for_method_after) < time();
+    }
+
+    /**
+     * Return method-related properties to include in /user responses
+     *
+     * @return array method-related properties
+     */
+    public function getMethodFields()
+    {
+        return [
+            'nag' => ( ! $this->isTimeToNagForMfa() && $this->isTimeToNagForMethod()) ? 'yes' : 'no',
+        ];
+    }
+
     /*
      * @return bool
      */
