@@ -193,7 +193,7 @@ return [
         'idpName'                       => $idpName,
         'idpDisplayName'                => $idpDisplayName,
         'mfaNagInterval'                => Env::get('MFA_NAG_INTERVAL', '+30 days'),
-        'methodNagInterval'             => Env::get('METHOD_NAG_INTERVAL', '+30 days'),
+        'methodNagInterval'             => Env::get('METHOD_NAG_INTERVAL', '+6 months'),
         'migratePasswordsFromLdap'      => Env::get('MIGRATE_PW_FROM_LDAP', false),
         'passwordReuseLimit'            => Env::get('PASSWORD_REUSE_LIMIT', 10),
         'passwordLifespan'              => Env::get('PASSWORD_LIFESPAN', '+1 year'),
