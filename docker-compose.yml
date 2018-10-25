@@ -155,6 +155,10 @@ services:
             PASSWORD_FORGOT_URL: https://www.example.com/forgot
             PASSWORD_PROFILE_URL: https://www.example.com/profile
             SUPPORT_EMAIL: support@example.com
+            RESET_lifetimeSeconds: 3600
+            RESET_disableDuration: 900
+            RESET_codeLength: 6
+            RESET_maxAttempts: 10
         command: ./run-tests.sh
         # running isolated tests
         # docker-compose run --rm test vendor/bin/behat --stop-on-failure features/user.feature
