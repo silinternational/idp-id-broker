@@ -714,6 +714,20 @@ schemas:
                           "data": []
                       }
                   ]
+    /method:
+      get:
+        description: Get a list of verified recovery methods for user
+        responses:
+          200:
+            body:
+              application/json:
+                example: |
+                  [
+                      {
+                          "uid": "0YrSiNp2P6sfkleepNNvFYMQWuLfssve",
+                          "value": email@example.org
+                      },
+                  ]
     /password:
       put:
         description: Set the password for a User.
