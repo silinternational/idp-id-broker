@@ -45,10 +45,12 @@ return [
 
                 'POST authentication' => 'authentication/create',
 
-                'GET    user/<employeeId:\w+>/mfa'  => 'mfa/list',
-                'POST   mfa'                        => 'mfa/create',
-                'POST   mfa/<id:\d+>/verify'            => 'mfa/verify',
-                'DELETE mfa/<id:\d+>'                   => 'mfa/delete',
+                'GET    user/<employeeId:\w+>/mfa'    => 'mfa/list',
+                'POST   mfa'                          => 'mfa/create',
+                'POST   mfa/<id:\d+>/verify'          => 'mfa/verify',
+                'DELETE mfa/<id:\d+>'                 => 'mfa/delete',
+
+                'GET    user/<employeeId:\w+>/method' => 'method/list',
 
                 'site/status' => 'site/status',
 
