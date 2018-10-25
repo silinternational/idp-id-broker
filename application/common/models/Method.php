@@ -2,7 +2,9 @@
 
 namespace common\models;
 
-use Yii;
+use yii\helpers\ArrayHelper;
+use common\helpers\MySqlDateTime;
+use common\helpers\Utils;
 
 /**
  * Class Method
@@ -30,7 +32,7 @@ class Method extends MethodBase
 
                 [
                     'verification_expires', 'default', 'when' => function() { return $this->getIsNewRecord(); },
-                    'value' => Utils::getDatetime(time() + \Yii::$app->params['reset']['lifetimeSeconds']),
+                    'value' => MySqlDateTime::formatDate(time() + \Yii::$app->params['reset']['lifetimeSeconds']),
                 ],
 
                 [
@@ -38,7 +40,7 @@ class Method extends MethodBase
                 ],
 
                 [
-                    ['created'], 'default', 'value' => Utils::getDatetime(),
+                    ['created'], 'default', 'value' => MySqlDateTime::now(),
                 ],
 
             ],
