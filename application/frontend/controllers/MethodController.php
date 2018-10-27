@@ -49,7 +49,8 @@ class MethodController extends BaseRestController
             throw new NotFoundHttpException(
                 'method ' . var_export($uid, true)
                 . ' for employee ' . var_export($employeeId, true)
-                . ' not found', 1540665086 );
+                . ' not found', 1540665086 
+            );
         }
 
         return $method;
