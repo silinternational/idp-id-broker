@@ -4,6 +4,7 @@ namespace frontend\controllers;
 use common\models\Method;
 use common\models\User;
 use frontend\components\BaseRestController;
+use yii\web\BadRequestHttpException;
 use yii\web\NotFoundHttpException;
 
 /**
@@ -16,13 +17,13 @@ class MethodController extends BaseRestController
      * Get list of Recovery Methods for given user
      * @param string $employeeId
      * @return Method[]
-     * @throws NotFoundHttpException
+     * @throws BadRequestHttpException
      */
     public function actionList(string $employeeId): array
     {
         $user = User::findOne(['employee_id' => $employeeId]);
         if ($user === null) {
-            throw new NotFoundHttpException(
+            throw new BadRequestHttpException(
                 'User not found for employeeId ' . var_export($employeeId, true),
                 1540491109
             );
@@ -52,6 +53,24 @@ class MethodController extends BaseRestController
         }
 
         return $method;
+    }
+
+    /**
+     * Delete method
+     *
+     * @param string $uid
+     * @return array
+     * @throws ServerErrorHttpException
+     */
+    public function actionDelete($uid)
+    {
+        $method = $this->actionView($uid);
+
+        if ( ! $method->delete()) {
+            throw new ServerErrorHttpException('Unable to delete method', 1540673326);
+        }
+
+        return [];
     }
 
 }
