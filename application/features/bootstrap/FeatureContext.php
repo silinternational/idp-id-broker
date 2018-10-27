@@ -3,6 +3,7 @@
 use Behat\Gherkin\Node\TableNode;
 use common\helpers\MySqlDateTime;
 use common\models\Password;
+use common\models\Method;
 use common\models\Mfa;
 use common\models\MfaBackupcode;
 use common\models\MfaFailedAttempt;
@@ -33,6 +34,8 @@ class FeatureContext extends YiiContext
     const ACCEPTABLE_DELTA_IN_SECONDS = 1;
 
     protected $tempEmployeeId = null;
+
+    protected $tempUid = null;
 
     /**
      * @Given I add a user with a(n) :property of :value
@@ -90,6 +93,7 @@ class FeatureContext extends YiiContext
         MfaBackupcode::deleteAll();
         MfaFailedAttempt::deleteAll();
         Mfa::deleteAll();
+        Method::deleteAll();
         User::deleteAll();
     }
 
@@ -137,6 +141,23 @@ class FeatureContext extends YiiContext
 
             default: throw new InvalidArgumentException("$action is not a recognized HTTP verb.");
         }
+    }
+
+    /**
+     * @When I send a :verb to :resource with a valid uid
+     */
+    public function iSendAToWithAValidUid($verb, $resource)
+    {
+        $client = $this->buildClient();
+
+        $this->response = call_user_func(
+            [$client, strtolower($verb)],
+            str_replace('{uid}', $this->tempUid, $resource)
+        );
+
+        $this->now = MySqlDateTime::now();
+
+        $this->resBody = $this->extractBody($this->response);
     }
 
     private function extractBody(Response $response): array

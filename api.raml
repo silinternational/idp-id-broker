@@ -360,6 +360,39 @@ schemas:
         },
         "type": "object"
       }
+  - MethodResponse: |
+    {
+        "$schema": "http://json-schema.org/draft-03/schema",
+        "properties": {
+          "uid": {
+            "required": true,
+            "type": "string"
+          },
+          "value": {
+            "required": true,
+            "type": "string"
+          }
+        },
+        "type": "object"
+    }
+  - MethodListResponse: |
+    {
+        "$schema": "http://json-schema.org/draft-03/schema",
+        "items": {
+          "properties": {
+            "uid": {
+              "required": true,
+              "type": "string"
+            },
+            "value": {
+              "required": true,
+              "type": "string"
+            }
+          },
+          "type": "object"
+        }
+        "type": "array"
+    }
 
 /authentication:
   post:
@@ -721,6 +754,7 @@ schemas:
           200:
             body:
               application/json:
+                schema: MethodListResponse
                 example: |
                   [
                       {
@@ -942,3 +976,27 @@ schemas:
           429:
             description: |
               Too many failed attempts for this MFA record recently.
+/method:
+  /{uid}:
+    get:
+      description: Retrieve a specific recovery method.
+      body:
+        application/json:
+          example: |
+            {
+              "employee_id": "12345"
+            }
+      responses:
+        200:
+          description: Recovery method found
+            body:
+              application/json:
+                schema: MethodResponse
+                example: |
+                  {
+                    "uid": "12345678901234567890123456789012",
+                    "value": "email@example.org"
+                  }
+        404:
+        500:
+
