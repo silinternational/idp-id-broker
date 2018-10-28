@@ -5,6 +5,7 @@ use common\models\Method;
 use common\models\User;
 use frontend\components\BaseRestController;
 use yii\web\BadRequestHttpException;
+use yii\web\ConflictHttpException;
 use yii\web\NotFoundHttpException;
 
 /**
@@ -49,7 +50,8 @@ class MethodController extends BaseRestController
             throw new NotFoundHttpException(
                 'method ' . var_export($uid, true)
                 . ' for employee ' . var_export($employeeId, true)
-                . ' not found', 1540665086 
+                . ' not found',
+                1540665086
             );
         }
 
@@ -74,4 +76,37 @@ class MethodController extends BaseRestController
         return [];
     }
 
+    /**
+     * Create new unverified method. Also sends verification message.
+     * @return Method
+     * @throws BadRequestHttpException
+     * @throws ConflictHttpException
+     * @throws \Exception
+     */
+    public function actionCreate()
+    {
+        // ensure we don't use expired methods
+        $this->deleteExpiredUnverifiedMethods();
+
+        $value = mb_strtolower(\Yii::$app->request->post('value'));
+        $userId = User::findOne(['employee_id' => $employeeId])->id ?? null;
+        $method = Method::findOne(['value' => $value, 'user_id' => $userId]);
+
+        if ($method === null) {
+            $method = new Method;
+            $method->user_id = $userId;
+            $method->value = mb_strtolower($value);
+        }
+
+        $method->sendVerification();
+
+        if ( ! $method->save()) {
+            throw new ServerErrorHttpException(
+                sprintf('Unable to save method after sending verification message'),
+                1461441851
+            );
+        }
+
+        return $method;
+    }
 }
