@@ -28,7 +28,7 @@ use yii\helpers\Html as yHtml;
     Dear <?=yHtml::encode($displayName)?>,
 </p>
 <p>
-    Congratulations! You have logged into your new <?=yHtml::encode($idpDisplayName)?> account for the first time.
+    Congratulations! You have logged into your new <?=yHtml::encode($idpDisplayName)?> Identity account for the first time.
     <?=yHtml::encode($idpDisplayName)?> is in the process of transitioning from logging into websites using
     an Insite account to this new "<?=yHtml::encode($idpDisplayName)?> account". In January 2018 the option to log in
     to some websites using your Insite account will begin to go away. It will take some time for all the Insite-login
@@ -64,7 +64,7 @@ use yii\helpers\Html as yHtml;
 </p>
 <p>
     Using 2-Step Verification can help keep bad guys out, even if they have your password. With 2-Step Verification, you'll
-    protect your account with something you know (your password) and something you have (your phone or Security Key).
+    protect your account with something you know (your password) and something you have (your Smartphone, a Security Key, or Printable Codes).
     Setup is easy and with the option to remember your computer for 30 days at a time, you'll only need to use the second
     step every month or so, but anyone trying to hack into your account would need both steps. This not only increases the
     security of your own account, it increases the privacy and protection of your colleagues by keeping intruders out of
@@ -73,10 +73,10 @@ use yii\helpers\Html as yHtml;
 <strong>Instructions to set up 2-Step Verification:</strong>
 <ol>
     <li>Go to <?=yHtml::a(yHtml::encode($passwordProfileUrl), $passwordProfileUrl)?></li>
-    <li>Under 2-Step Verification, set up the options that suit you best (USB Security Key, Smartphone App, and/or
+    <li>Under 2-Step Verification, set up the options that suit you best (Security Key, Smartphone App, and/or
         Printable Codes)</li>
-    <li>Log out and log in again to see how it works and to have it remember your computer for 30 days. Note that
-        logging out will undo the "Remember this computer" setting.</li>
+    <li>Log out and log in again to see how it works and to have it remember your browser for 30 days. Clearing cookies will
+        cause 2-Step Verification to be required again on that browser the next time you log in.</li>
 </ol>
 <p>
     To learn more about 2-Step Verification go to <?=yHtml::a(yHtml::encode($helpCenterUrl), $helpCenterUrl)?>
