@@ -60,14 +60,14 @@ class MethodController extends BaseRestController
 
         return $method;
     }
-    
+
     /**
      * View single Recovery Method
      * @param string $uid
      * @return Method
      * @throws NotFoundHttpException
      */
-    public function getView($uid)
+    public function actionView($uid)
     {
         return $this->getRequestedMethod($uid);
     }
