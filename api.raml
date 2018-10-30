@@ -978,6 +978,30 @@ schemas:
             description: |
               Too many failed attempts for this MFA record recently.
 /method:
+  post:
+    description: Create a new recovery method and send verification email.
+    body:
+      application/json:
+        example: |
+          {
+            "employee_id": "12345",
+            "value": "987654"
+          }
+    responses:
+      200:
+        description: Recovery method created and email sent.
+        body:
+          application/json:
+            schema: MethodResponse
+            example: |
+              {
+                "uid": "12345678901234567890123456789012",
+                "value": "email@example.org"
+              }
+      409:
+        description: New method matches an already existing verified method
+      500:
+        description: Database or other system error
   /{uid}:
     get:
       description: Retrieve a specific recovery method.
@@ -990,14 +1014,14 @@ schemas:
       responses:
         200:
           description: Recovery method found
-            body:
-              application/json:
-                schema: MethodResponse
-                example: |
-                  {
-                    "uid": "12345678901234567890123456789012",
-                    "value": "email@example.org"
-                  }
+          body:
+            application/json:
+              schema: MethodResponse
+              example: |
+                {
+                  "uid": "12345678901234567890123456789012",
+                  "value": "email@example.org"
+                }
         404:
           description: User not found or method not found
     delete:
@@ -1011,6 +1035,31 @@ schemas:
       responses:
         200:
           description: Recovery method found
+          body:
+            application/json:
+              schema: MethodResponse
+              example: |
+                {
+                  "uid": "12345678901234567890123456789012",
+                  "value": "email@example.org"
+                }
+        404:
+          description: User not found or method not found
+        500:
+          description: Delete failed
+    /verify:
+      put:
+        description: Verify the recovery method by a matching code.
+        body:
+          application/json:
+            example: |
+              {
+                "employee_id": "12345",
+                "code": "987654"
+              }
+        responses:
+          200:
+            description: Provided code matches original code
             body:
               application/json:
                 schema: MethodResponse
@@ -1019,8 +1068,26 @@ schemas:
                     "uid": "12345678901234567890123456789012",
                     "value": "email@example.org"
                   }
-        404:
-          description: User not found or method not found
-        500:
-          description: Delete failed
+          400:
+            description: Missing or invalid code
+          404:
+            description: User not found or method not found
+          500:
+            description: Database or other system error
+    /resend:
+      put:
+        description: Resend the recovery email
+        body:
+          application/json:
+            example: |
+              {
+                "employee_id": "12345"
+              }
+        responses:
+          200:
+            description: Method found and email sent
+          400:
+            description: Method already verified
+          404:
+            description: User not found or method not found
 
