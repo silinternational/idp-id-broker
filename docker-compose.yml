@@ -49,7 +49,7 @@ services:
         volumes_from:
             - data
         ports:
-            - "8082:80"
+            - "80"
         depends_on:
             - appfortestsdb
         environment:
@@ -76,6 +76,10 @@ services:
             MIGRATE_PW_FROM_LDAP: "true"
             PASSWORD_FORGOT_URL: https://www.example.com/forgot
             SUPPORT_EMAIL: support@example.com
+            RESET_lifetimeSeconds: 3600
+            RESET_disableDuration: 900
+            RESET_codeLength: 6
+            RESET_maxAttempts: 10
 
     appfortestsdb:
         image: silintl/mariadb:latest

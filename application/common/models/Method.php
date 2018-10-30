@@ -2,9 +2,11 @@
 
 namespace common\models;
 
-use yii\helpers\ArrayHelper;
 use common\helpers\MySqlDateTime;
 use common\helpers\Utils;
+use yii\helpers\ArrayHelper;
+use yii\web\ConflictHttpException;
+use yii\web\ServerErrorHttpException;
 
 /**
  * Class Method
@@ -80,6 +82,11 @@ class Method extends MethodBase
         }
     }
 
+    public function isVerified()
+    {
+        return $this->verified === 1 ? true : false;
+    }
+
     /**
      * Send verification message
      * @throws ConflictHttpException
@@ -87,7 +94,7 @@ class Method extends MethodBase
      */
     public function sendVerification()
     {
-        if ($method->isVerified()) {
+        if ($this->isVerified()) {
             throw new ConflictHttpException('Method already verified', 1540689804);
         }
 
@@ -96,7 +103,7 @@ class Method extends MethodBase
             throw new ServerErrorHttpException('Save error after incrementing attempts', 1461441850);
         }
 
-        $this->sendVerificationEmail();
+//        $this->sendVerificationEmail();
     }
 
     /**

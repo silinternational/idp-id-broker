@@ -31,26 +31,27 @@ Feature: Recovery Method
       | property      | value                 |
       | value         | verified@example.com  |
 
-#  Scenario: Create a new Method record
-#    When I provide the following valid data:
-#      | property     | value                 |
-#      | employee_id  | 123                   |
-#      | value        | user123@example.org   |
-#    And I request "/method/create" be created
-#    Then the response status code should be 200
-#    And the following data is returned:
-#      | property      | value                 |
-#      | value         | user123@example.org   |
-#    And the following data should be stored:
-#      | property              | value                 |
-#      | value                 | user123@example.org   |
-#      | verified              | 0                     |
-#      | verification_attempts | 0                     |
+  Scenario: Create a new Method record
+    When I provide the following valid data:
+      | property     | value                 |
+      | employee_id  | 123                   |
+      | value        | user123@example.org   |
+    And I request "/method/create" be created
+    Then the response status code should be 200
+    And the following data is returned:
+      | property      | value                 |
+      | value         | user123@example.org   |
+    And a method record exists with a value of "user123@example.org"
+    And the following method data should be stored:
+      | property              | value                 |
+      | value                 | user123@example.org   |
+      | verified              | 0                     |
+      | verification_attempts | 1                     |
 #    And verification_code should be stored as ?
 #    And verification_expires should be stored as ? UTC
 #    And created should be stored as now UTC
 #    And an email is sent to "user123@example.org"
-#
+
 ### TODO: Try to create a method using the primary (or spouse/supervisor) address
 #
 #  Scenario: Resend a method verification

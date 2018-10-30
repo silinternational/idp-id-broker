@@ -86,9 +86,10 @@ class MethodController extends BaseRestController
     public function actionCreate()
     {
         // ensure we don't use expired methods
-        $this->deleteExpiredUnverifiedMethods();
+        Method::deleteExpiredUnverifiedMethods();
 
         $value = mb_strtolower(\Yii::$app->request->post('value'));
+        $employeeId = \Yii::$app->request->getBodyParam('employee_id');
         $userId = User::findOne(['employee_id' => $employeeId])->id ?? null;
         $method = Method::findOne(['value' => $value, 'user_id' => $userId]);
 
