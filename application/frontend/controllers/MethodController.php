@@ -1,12 +1,15 @@
 <?php
 namespace frontend\controllers;
 
+use common\exceptions\InvalidCodeException;
 use common\models\Method;
 use common\models\User;
 use frontend\components\BaseRestController;
 use yii\web\BadRequestHttpException;
 use yii\web\ConflictHttpException;
 use yii\web\NotFoundHttpException;
+use yii\web\ServerErrorHttpException;
+use yii\web\TooManyRequestsHttpException;
 
 /**
  * Class MethodController
@@ -34,12 +37,12 @@ class MethodController extends BaseRestController
     }
 
     /**
-     * View single Recovery Method
+     * Retrieve the Method record referenced by the uid and employee_id
      * @param string $uid
      * @return Method
      * @throws NotFoundHttpException
      */
-    public function actionView($uid)
+    protected function getRequestedMethod($uid)
     {
         $employeeId = \Yii::$app->request->getBodyParam('employee_id');
 
@@ -57,23 +60,16 @@ class MethodController extends BaseRestController
 
         return $method;
     }
-
+    
     /**
-     * Delete method
-     *
+     * View single Recovery Method
      * @param string $uid
-     * @return array
-     * @throws ServerErrorHttpException
+     * @return Method
+     * @throws NotFoundHttpException
      */
-    public function actionDelete($uid)
+    public function getView($uid)
     {
-        $method = $this->actionView($uid);
-
-        if ( ! $method->delete()) {
-            throw new ServerErrorHttpException('Unable to delete method', 1540673326);
-        }
-
-        return [];
+        return $this->getRequestedMethod($uid);
     }
 
     /**
@@ -110,4 +106,90 @@ class MethodController extends BaseRestController
 
         return $method;
     }
+
+    /**
+     * Validates user submitted code and marks method as verified if valid
+     * @param string $uid
+     * @return Method
+     * @throws BadRequestHttpException
+     * @throws NotFoundHttpException
+     * @throws TooManyRequestsHttpException
+     * @throws \Exception
+     */
+    public function actionUpdate($uid)
+    {
+        Method::deleteExpiredUnverifiedMethods();
+
+        /** @var Method $method */
+        $method = $this->getRequestedMethod($uid);
+
+        if ($method->isVerified()) {
+            return $method;
+        }
+
+        if ($method->verification_attempts >= \Yii::$app->params['reset']['maxAttempts']) {
+            throw new TooManyRequestsHttpException();
+        }
+
+        $code = \Yii::$app->request->getBodyParam('code');
+        if ($code === null) {
+            throw new BadRequestHttpException(\Yii::t('app', 'Code is required'));
+        }
+
+        try {
+            $method->validateAndSetAsVerified($code);
+        } catch (InvalidCodeException $e) {
+            throw new BadRequestHttpException(\Yii::t('app', 'Invalid verification code'), 1470315942);
+        } catch (\Exception $e) {
+            throw new ServerErrorHttpException(
+                'Unable to set method as verified: ' . $e->getMessage(),
+                1470315941,
+                $e
+            );
+        }
+
+        return $method;
+    }
+
+    /**
+     * Delete method
+     *
+     * @param string $uid
+     * @return array
+     * @throws ServerErrorHttpException
+     */
+    public function actionDelete($uid)
+    {
+        $method = $this->getRequestedMethod($uid);
+
+        if ( ! $method->delete()) {
+            throw new ServerErrorHttpException('Unable to delete method', 1540673326);
+        }
+
+        return [];
+    }
+
+    /**
+     * @param string $uid
+     * @return \stdClass
+     * @throws NotFoundHttpException
+     * @throws BadRequestHttpException
+     * @throws \Exception
+     */
+    public function actionResend($uid)
+    {
+        $method = $this->getRequestedMethod($uid);
+
+        if ($method->isVerified()) {
+            throw new BadRequestHttpException(\Yii::t('app', 'Method already verified'));
+        }
+
+        $method->sendVerification();
+
+        /*
+         * Return empty object
+         */
+        return new \stdClass();
+    }
 }
+

@@ -2,6 +2,7 @@
 
 namespace common\models;
 
+use common\exceptions\InvalidCodeException;
 use common\helpers\MySqlDateTime;
 use common\helpers\Utils;
 use yii\helpers\ArrayHelper;
@@ -59,27 +60,12 @@ class Method extends MethodBase
     }
 
     /**
-     * Delete all method records that are not verified and verification_expires date is in the past
+     * @return string
+     * @throws \Exception
      */
-    public static function deleteExpiredUnverifiedMethods()
+    public function getMaskedValue()
     {
-        $methods = self::find()
-            ->where(['verified' => 0])
-            ->andWhere(['<', 'verification_expires', MySqlDateTime::now()])
-            ->all();
-
-        foreach ($methods as $method) {
-            try {
-                $method->delete();
-            } catch (\Exception $e) {
-                \Yii::error([
-                    'action' => 'delete expired unverified methods',
-                    'status' => 'failed',
-                    'error' => $e->getMessage(),
-                    'method_uid' => $method->uid,
-                ]);
-            }
-        }
+        return Utils::maskEmail($this->value);
     }
 
     public function isVerified()
@@ -127,11 +113,67 @@ class Method extends MethodBase
     }
 
     /**
-     * @return string
+     * Validate user submitted code and update record to be verified if valid
+     * @param string $userSubmitted
      * @throws \Exception
      */
-    public function getMaskedValue()
+    public function validateAndSetAsVerified($userSubmitted)
     {
-        return Utils::maskEmail($this->value);
+        /*
+         * Increase attempts count before verifying code in case verification fails
+         * for some reason
+         */
+        $this->verification_attempts++;
+        if ( ! $this->save()) {
+            throw new \Exception('Unable to increment verification attempts', 1462903086);
+        }
+
+        /*
+         * Verify user provided code
+         */
+        if ( $this->verification_code !== $userSubmitted) {
+            throw new InvalidCodeException('Invalid verification code', 1461442988);
+        }
+
+        /*
+         * Update attributes to be verified
+         */
+        $this->verification_code = null;
+        $this->verification_expires = null;
+        $this->verification_attempts = null;
+        $this->verified = 1;
+
+        if ( ! $this->save()) {
+            \Yii::error([
+                'action' => 'validate and set method as verified',
+                'status' => 'error',
+                'error' => $this->getFirstErrors(),
+            ]);
+            throw new \Exception('Unable to set method as verified', 1461442990);
+        }
+    }
+
+    /**
+     * Delete all method records that are not verified and verification_expires date is in the past
+     */
+    public static function deleteExpiredUnverifiedMethods()
+    {
+        $methods = self::find()
+            ->where(['verified' => 0])
+            ->andWhere(['<', 'verification_expires', MySqlDateTime::now()])
+            ->all();
+
+        foreach ($methods as $method) {
+            try {
+                $method->delete();
+            } catch (\Exception $e) {
+                \Yii::error([
+                    'action' => 'delete expired unverified methods',
+                    'status' => 'failed',
+                    'error' => $e->getMessage(),
+                    'method_uid' => $method->uid,
+                ]);
+            }
+        }
     }
 }
