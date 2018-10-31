@@ -35,7 +35,7 @@ class Method extends MethodBase
 
                 [
                     'verification_expires', 'default', 'when' => function() { return $this->getIsNewRecord(); },
-                    'value' => MySqlDateTime::formatDate(time() + \Yii::$app->params['reset']['lifetimeSeconds']),
+                    'value' => MySqlDateTime::formatDateTime(time() + \Yii::$app->params['reset']['lifetimeSeconds']),
                 ],
 
                 [

@@ -116,7 +116,7 @@ class MethodController extends BaseRestController
      * @throws TooManyRequestsHttpException
      * @throws \Exception
      */
-    public function actionUpdate($uid)
+    public function actionVerify($uid)
     {
         Method::deleteExpiredUnverifiedMethods();
 
@@ -192,4 +192,3 @@ class MethodController extends BaseRestController
         return new \stdClass();
     }
 }
-

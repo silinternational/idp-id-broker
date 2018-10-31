@@ -303,9 +303,9 @@ class FeatureContext extends YiiContext
     }
 
     //TODO: remove once https://github.com/Behat/Behat/issues/777 is resolved for tables.
-    private function transformNULLs($value)
+    protected function transformNULLs($value)
     {
-        return ($value === "NULL") ? null : $value;
+        return ($value === "NULL" || $value === "null") ? null : $value;
     }
 
     /**

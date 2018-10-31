@@ -53,32 +53,31 @@ Feature: Recovery Method
 #    And an email is sent to "user123@example.org"
 
 ### TODO: Try to create a method using the primary (or spouse/supervisor) address
-#
-#  Scenario: Resend a method verification
-#    Given user with employee id 123 has an verified Method
-#    When I send a "POST" to "/method/{uid}/resend" with a valid uid
-#    Then the response status code should be 200
-#    And the following data is returned:
-#      | property      | value                  |
-#      | value         | verified@example.org   |
-#    And the following data should be stored:
-#      | property              | value             |
-#      | verified              | 0                 |
-#    And an email is sent to "verified@example.org"
-#
-#  Scenario: Verify a Method
-#    Given user with employee id 123 has an unverified Method
-#    When I send a "POST" to "/method/{uid}/verify" with a valid uid
-#    Then the response status code should be 200
-#    And the following data is returned:
-#      | property      | value                    |
-#      | value         | unverified@example.org   |
-#    And the following data should be stored:
-#      | property              | value                 |
-#      | verified              | 1                     |
-#      | verification_code     | NULL                  |
-#      | verification_attempts | NULL                  |
-#      | verification_expires  | NULL                  |
+
+ Scenario: Resend a method verification
+   Given user with employee id 123 has an unverified Method
+   When I send a "PUT" to "/method/{uid}/resend" with a valid uid
+   Then the response status code should be 200
+   And a method record exists with a value of "unverified@example.com"
+   And the following method data should be stored:
+     | property              | value                 |
+     | verified              | 0                     |
+#   And an email is sent to "unverified@example.com"
+
+ Scenario: Verify a Method
+   Given user with employee id 123 has an unverified Method
+   When I send a "PUT" to "/method/{uid}/verify" with a valid uid
+   Then the response status code should be 200
+   And the following data is returned:
+     | property      | value                    |
+     | value         | unverified@example.com   |
+   And a method record exists with a value of "unverified@example.com"
+   And the following method data should be stored:
+     | property              | value                 |
+     | verified              | 1                     |
+     | verification_code     | null                  |
+     | verification_attempts | null                  |
+     | verification_expires  | null                  |
 
   Scenario: Delete a Method
     Given user with employee id 123 has an unverified Method

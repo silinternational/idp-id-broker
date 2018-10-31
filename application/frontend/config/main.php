@@ -69,10 +69,8 @@ return [
                 'POST    method'                                  => 'method/create',
                 'PUT     method/' . UID_ROUTE_PATTERN             => 'method/update',
                 'PUT     method/' . UID_ROUTE_PATTERN . '/resend' => 'method/resend',
+                'PUT     method/' . UID_ROUTE_PATTERN . '/verify' => 'method/verify',
                 'DELETE  method/' . UID_ROUTE_PATTERN             => 'method/delete',
-                'OPTIONS method'                                  => 'method/options',
-                'OPTIONS method/' . UID_ROUTE_PATTERN             => 'method/options',
-                'OPTIONS method/' . UID_ROUTE_PATTERN . '/resend' => 'method/options',
 
 
                 'site/status' => 'site/status',

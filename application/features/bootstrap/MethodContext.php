@@ -10,7 +10,6 @@ use Webmozart\Assert\Assert;
 class MethodContext extends \FeatureContext
 {
     protected $methodFromDb;
-    protected $tempMethodVerificationCode;
 
     /**
      * @Given /^user with employee id (.*) has (?:a|an) (verified|unverified) Method$/
@@ -27,7 +26,7 @@ class MethodContext extends \FeatureContext
         Assert::true($method->save(), 'Failed to add that Method record to the database.');
 
         $this->tempUid = $method->uid;
-        $this->tempMethodVerificationCode = $method->verification_code;
+        $this->iChangeThe('code', $method->verification_code);
     }
 
     /**
@@ -53,8 +52,7 @@ class MethodContext extends \FeatureContext
             $property = $row['property'];
             $expectedValue = $row['value'];
 
-            Assert::eq($this->methodFromDb->$property, $expectedValue);
+            Assert::eq($this->methodFromDb->$property, $this->transformNULLs($expectedValue));
         }
     }
-
 }
