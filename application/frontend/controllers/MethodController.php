@@ -84,8 +84,22 @@ class MethodController extends BaseRestController
         // ensure we don't use expired methods
         Method::deleteExpiredUnverifiedMethods();
 
-        $value = mb_strtolower(\Yii::$app->request->post('value'));
+        $value = \Yii::$app->request->post('value');
+        if ($value === null) {
+            throw new BadRequestHttpException(
+                'value is required',
+                1540665086
+            );
+        }
+
         $employeeId = \Yii::$app->request->getBodyParam('employee_id');
+        if ($employeeId === null) {
+            throw new BadRequestHttpException(
+                'employee_id is required',
+                1540990164
+            );
+        }
+
         $userId = User::findOne(['employee_id' => $employeeId])->id ?? null;
         $method = Method::findOne(['value' => $value, 'user_id' => $userId]);
 
