@@ -180,7 +180,8 @@ class MethodController extends BaseRestController
             throw new ServerErrorHttpException('Unable to delete method', 1540673326);
         }
 
-        return [];
+        \Yii::$app->response->statusCode = 204;
+        return null;
     }
 
     /**
