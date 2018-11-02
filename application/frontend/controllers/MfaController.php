@@ -47,7 +47,7 @@ class MfaController extends BaseRestController
      * @throws BadRequestHttpException
      * @throws NotFoundHttpException
      * @throws TooManyRequestsHttpException
-     * @return User
+     * @return null
      */
     public function actionVerify(int $id)
     {
