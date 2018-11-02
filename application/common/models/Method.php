@@ -54,7 +54,7 @@ class Method extends MethodBase
     public function fields()
     {
         return [
-            'uid',
+            'id' => function() { return $this->uid; },
             'value',
         ];
     }
