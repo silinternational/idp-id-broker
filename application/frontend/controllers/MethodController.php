@@ -109,14 +109,14 @@ class MethodController extends BaseRestController
             $method->value = mb_strtolower($value);
         }
 
-        $method->sendVerification();
-
         if ( ! $method->save()) {
             throw new ServerErrorHttpException(
-                sprintf('Unable to save method after sending verification message'),
+                sprintf('Unable to save new method'),
                 1461441851
             );
         }
+
+        $method->sendVerification();
 
         return $method;
     }
