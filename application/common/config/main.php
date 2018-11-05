@@ -203,6 +203,6 @@ return [
             'trackingId' => Env::get('GA_TRACKING_ID'),
             'clientId'   => Env::get('GA_CLIENT_ID'),
         ],
-        'reset' => ENV::getArrayFromPrefix('RESET_'),
+        'reset' => Env::getArrayFromPrefix('RESET_'),
     ],
 ];
