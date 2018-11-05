@@ -82,4 +82,4 @@ Feature: Recovery Method
   Scenario: Delete a Method
     Given user with employee id 123 has an unverified Method
     When I send a "DELETE" to "/method/{uid}" with a valid uid
-    Then the response status code should be 200
+    Then the response status code should be 204
