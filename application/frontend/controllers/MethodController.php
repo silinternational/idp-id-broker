@@ -39,16 +39,21 @@ class MethodController extends BaseRestController
     /**
      * Retrieve the Method record referenced by the uid and employee_id
      * @param string $uid
+     * @param bool $verifiedOnly Limit query to verified methods only
      * @return Method
      * @throws NotFoundHttpException
      */
-    protected function getRequestedMethod($uid)
+    protected function getRequestedMethod($uid, $verifiedOnly = false)
     {
         $employeeId = \Yii::$app->request->getBodyParam('employee_id');
 
         $user = User::findOne(['employee_id' => $employeeId]);
 
-        $method = Method::findOne(['uid' => $uid, 'user_id' => ($user->id ?? null)]);
+        $query = ['uid' => $uid, 'user_id' => ($user->id ?? null)];
+        if ($verifiedOnly) {
+            $query['verified'] = 1;
+        }
+        $method = Method::findOne($query);
         if ($method === null) {
             throw new NotFoundHttpException(
                 'method ' . var_export($uid, true)
@@ -69,7 +74,7 @@ class MethodController extends BaseRestController
      */
     public function actionView($uid)
     {
-        return $this->getRequestedMethod($uid);
+        return $this->getRequestedMethod($uid, true);
     }
 
     /**
