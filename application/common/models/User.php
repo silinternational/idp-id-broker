@@ -54,7 +54,20 @@ class User extends UserBase
                 return false;
             }
         }
-        
+
+        foreach ($this->methods as $method) {
+            if (! $mfa->delete()) {
+                \Yii::error([
+                    'action' => 'delete method record before deleting user',
+                    'status' => 'error',
+                    'error' => $method->getFirstErrors(),
+                    'mfa_id' => $method->id,
+                    'user_id' => $this->id,
+                ]);
+                return false;
+            }
+        }
+
         return true;
     }
     
