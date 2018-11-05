@@ -10,7 +10,7 @@ class m181025_155801_create_method_table extends Migration
     /**
      * @inheritdoc
      */
-    public function up()
+    public function safeUp()
     {
         $this->createTable(
             '{{method}}',
@@ -36,7 +36,7 @@ class m181025_155801_create_method_table extends Migration
     /**
      * @inheritdoc
      */
-    public function down()
+    public function safeDown()
     {
         $this->dropTable('{{method}}');
     }
