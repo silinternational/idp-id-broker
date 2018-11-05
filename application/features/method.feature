@@ -46,7 +46,7 @@ Feature: Recovery Method
       | property              | value                 |
       | value                 | user123@example.org   |
       | verified              | 0                     |
-      | verification_attempts | 1                     |
+      | verification_attempts | 0                     |
 #    And verification_code should be stored as ?
 #    And verification_expires should be stored as ? UTC
 #    And created should be stored as now UTC
