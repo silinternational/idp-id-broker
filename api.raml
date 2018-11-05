@@ -979,13 +979,15 @@ schemas:
               Too many failed attempts for this MFA record recently.
 /method:
   post:
-    description: Create a new recovery method and send verification email.
+    description: >
+      Create a new recovery method and send verification email. At this point,
+      all methods are email, so 'value' is always an email address.
     body:
       application/json:
         example: |
           {
             "employee_id": "12345",
-            "value": "987654"
+            "value": "email@example.org"
           }
     responses:
       200:
@@ -1035,16 +1037,8 @@ schemas:
               "employee_id": "12345"
             }
       responses:
-        200:
-          description: Recovery method found
-          body:
-            application/json:
-              schema: MethodResponse
-              example: |
-                {
-                  "uid": "12345678901234567890123456789012",
-                  "value": "email@example.org"
-                }
+        204:
+          description: Recovery method found and deleted
         404:
           description: User not found or method not found
         500:
@@ -1074,6 +1068,8 @@ schemas:
             description: Missing or invalid code
           404:
             description: User not found or method not found
+          429:
+            description: Too many verification attempts
           500:
             description: Database or other system error
     /resend:
@@ -1092,4 +1088,3 @@ schemas:
             description: Method already verified
           404:
             description: User not found or method not found
-
