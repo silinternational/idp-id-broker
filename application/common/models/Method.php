@@ -84,6 +84,11 @@ class Method extends MethodBase
             throw new ConflictHttpException('Method already verified', 1540689804);
         }
 
+        $this->verification_attempts++;
+        if ( ! $this->save()) {
+            throw new ServerErrorHttpException('Save error after incrementing attempts', 1461441850);
+        }
+
 //        $this->sendVerificationEmail();
     }
 
