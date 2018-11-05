@@ -66,7 +66,7 @@ Feature: Recovery Method
 
  Scenario: Verify a Method
    Given user with employee id 123 has an unverified Method
-   When I send a "PUT" to "/method/{uid}/verify" with a valid uid
+   When I send the correct code to verify that Method
    Then the response status code should be 200
    And the following data is returned:
      | property      | value                    |

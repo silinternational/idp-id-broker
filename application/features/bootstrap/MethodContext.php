@@ -26,7 +26,6 @@ class MethodContext extends \FeatureContext
         Assert::true($method->save(), 'Failed to add that Method record to the database.');
 
         $this->tempUid = $method->uid;
-        $this->iChangeThe('code', $method->verification_code);
     }
 
     /**
@@ -46,7 +45,7 @@ class MethodContext extends \FeatureContext
     /**
      * @Then the following method data should be stored:
      */
-    public function theFollowingMethtodDataIsStored(TableNode $data)
+    public function theFollowingMethodDataIsStored(TableNode $data)
     {
         foreach ($data as $row) {
             $property = $row['property'];
@@ -54,5 +53,15 @@ class MethodContext extends \FeatureContext
 
             Assert::eq($this->methodFromDb->$property, $this->transformNULLs($expectedValue));
         }
+    }
+
+    /**
+     * @When I send the correct code to verify that Method
+     */
+    public function iSendTheCorrectCodeToVerifyThatMethod()
+    {
+        $method = Method::findOne(['uid' => $this->tempUid]);
+        $this->iChangeThe('code', $method->verification_code);
+        $this->iSendAToWithAValidUid('PUT', '/method/{uid}/verify');
     }
 }
