@@ -3,6 +3,7 @@
 use Behat\Gherkin\Node\TableNode;
 use common\helpers\MySqlDateTime;
 use common\models\Password;
+use common\models\Method;
 use common\models\Mfa;
 use common\models\MfaBackupcode;
 use common\models\MfaFailedAttempt;
@@ -32,6 +33,46 @@ class FeatureContext extends YiiContext
     private $now;
     const ACCEPTABLE_DELTA_IN_SECONDS = 1;
 
+    protected $tempEmployeeId = null;
+
+    protected $tempUid = null;
+
+    /**
+     * @Given I add a user with a(n) :property of :value
+     */
+    public function iAddAUserWithAnOf($property, $value)
+    {
+        $sampleUserData = [
+            'employee_id' => '10000',
+            'first_name' => 'John',
+            'last_name' => 'Smith',
+            'display_name' => 'John Smith',
+            'username' => 'john_smith',
+            'email' => 'john_smith@example.org',
+        ];
+        $sampleUserData[$property] = $value;
+
+        $this->tempEmployeeId = $sampleUserData['employee_id'];
+
+        $dataForTableNode = [
+            ['property', 'value'],
+        ];
+        foreach ($sampleUserData as $sampleProperty => $sampleValue) {
+            $dataForTableNode[] = [$sampleProperty, $sampleValue];
+        }
+        $this->iProvideTheFollowingValidData(new TableNode($dataForTableNode));
+        $this->iRequestTheResourceBe('/user', 'created');
+        $this->theResponseStatusCodeShouldBe(200);
+    }
+
+    /**
+     * @Then I should receive :numRecords record(s)
+     */
+    public function iShouldReceiveRecords($numRecords)
+    {
+        $this->iShouldReceiveUsers($numRecords);
+    }
+
     /**
      * @Given the requester is not authorized
      */
@@ -52,6 +93,7 @@ class FeatureContext extends YiiContext
         MfaBackupcode::deleteAll();
         MfaFailedAttempt::deleteAll();
         Mfa::deleteAll();
+        Method::deleteAll();
         User::deleteAll();
     }
 
@@ -99,6 +141,23 @@ class FeatureContext extends YiiContext
 
             default: throw new InvalidArgumentException("$action is not a recognized HTTP verb.");
         }
+    }
+
+    /**
+     * @When I send a :verb to :resource with a valid uid
+     */
+    public function iSendAToWithAValidUid($verb, $resource)
+    {
+        $client = $this->buildClient();
+
+        $this->response = call_user_func(
+            [$client, strtolower($verb)],
+            str_replace('{uid}', $this->tempUid, $resource)
+        );
+
+        $this->now = MySqlDateTime::now();
+
+        $this->resBody = $this->extractBody($this->response);
     }
 
     private function extractBody(Response $response): array
@@ -244,9 +303,9 @@ class FeatureContext extends YiiContext
     }
 
     //TODO: remove once https://github.com/Behat/Behat/issues/777 is resolved for tables.
-    private function transformNULLs($value)
+    protected function transformNULLs($value)
     {
-        return ($value === "NULL") ? null : $value;
+        return ($value === "NULL" || $value === "null") ? null : $value;
     }
 
     /**

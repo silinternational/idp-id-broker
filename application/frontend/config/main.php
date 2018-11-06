@@ -5,6 +5,8 @@ use Sil\PhpEnv\Env;
 use yii\web\JsonParser;
 use yii\web\Response;
 
+const UID_ROUTE_PATTERN = '<uid:([a-zA-Z0-9_\-]{32})>';
+
 return [
     'id' => 'app-frontend',
     'basePath' => dirname(__DIR__),
@@ -35,6 +37,9 @@ return [
             // http://www.yiiframework.com/doc-2.0/guide-rest-routing.html
             // http://www.yiiframework.com/doc-2.0/guide-runtime-routing.html#named-parameters
             'rules' => [
+                /*
+                 * User routes
+                 */
                 'GET  user'                           => 'user/index',
                 'GET  user/expiring'                  => 'user/expiring',
                 'GET  user/first-password'            => 'user/first-password',
@@ -43,12 +48,30 @@ return [
                 'PUT  user/<employeeId:\w+>'          => 'user/update',
                 'PUT  user/<employeeId:\w+>/password' => 'user/update-password',
 
+                /*
+                 * Authentication routes
+                 */
                 'POST authentication' => 'authentication/create',
 
-                'GET    user/<employeeId:\w+>/mfa'  => 'mfa/list',
-                'POST   mfa'                        => 'mfa/create',
-                'POST   mfa/<id:\d+>/verify'            => 'mfa/verify',
-                'DELETE mfa/<id:\d+>'                   => 'mfa/delete',
+                /*
+                 * MFA routes
+                 */
+                'GET    user/<employeeId:\w+>/mfa'    => 'mfa/list',
+                'POST   mfa'                          => 'mfa/create',
+                'POST   mfa/<id:\d+>/verify'          => 'mfa/verify',
+                'DELETE mfa/<id:\d+>'                 => 'mfa/delete',
+
+                /*
+                 * Method routes
+                 */
+                'GET     user/<employeeId:\w+>/method'            => 'method/list',
+                'GET     method/' . UID_ROUTE_PATTERN             => 'method/view',
+                'POST    method'                                  => 'method/create',
+                'PUT     method/' . UID_ROUTE_PATTERN             => 'method/update',
+                'PUT     method/' . UID_ROUTE_PATTERN . '/resend' => 'method/resend',
+                'PUT     method/' . UID_ROUTE_PATTERN . '/verify' => 'method/verify',
+                'DELETE  method/' . UID_ROUTE_PATTERN             => 'method/delete',
+
 
                 'site/status' => 'site/status',
 

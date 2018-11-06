@@ -28,6 +28,7 @@ use Yii;
  * @property string $nag_for_method_after
  *
  * @property EmailLog[] $emailLogs
+ * @property Method[] $methods
  * @property Mfa[] $mfas
  * @property Password $currentPassword
  */
@@ -94,6 +95,14 @@ class UserBase extends \yii\db\ActiveRecord
     public function getEmailLogs()
     {
         return $this->hasMany(EmailLog::className(), ['user_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getMethods()
+    {
+        return $this->hasMany(Method::className(), ['user_id' => 'id']);
     }
 
     /**

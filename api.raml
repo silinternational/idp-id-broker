@@ -360,6 +360,39 @@ schemas:
         },
         "type": "object"
       }
+  - MethodResponse: |
+    {
+        "$schema": "http://json-schema.org/draft-03/schema",
+        "properties": {
+          "uid": {
+            "required": true,
+            "type": "string"
+          },
+          "value": {
+            "required": true,
+            "type": "string"
+          }
+        },
+        "type": "object"
+    }
+  - MethodListResponse: |
+    {
+        "$schema": "http://json-schema.org/draft-03/schema",
+        "items": {
+          "properties": {
+            "uid": {
+              "required": true,
+              "type": "string"
+            },
+            "value": {
+              "required": true,
+              "type": "string"
+            }
+          },
+          "type": "object"
+        }
+        "type": "array"
+    }
 
 /authentication:
   post:
@@ -724,6 +757,22 @@ schemas:
                           "data": []
                       }
                   ]
+    /method:
+      get:
+        description: Get a list of verified recovery methods for user
+        responses:
+          400:
+          200:
+            body:
+              application/json:
+                schema: MethodListResponse
+                example: |
+                  [
+                      {
+                          "uid": "0YrSiNp2P6sfkleepNNvFYMQWuLfssve",
+                          "value": email@example.org
+                      },
+                  ]
     /password:
       put:
         description: Set the password for a User.
@@ -937,3 +986,114 @@ schemas:
           429:
             description: |
               Too many failed attempts for this MFA record recently.
+/method:
+  post:
+    description: >
+      Create a new recovery method and send verification email. At this point,
+      all methods are email, so 'value' is always an email address.
+    body:
+      application/json:
+        example: |
+          {
+            "employee_id": "12345",
+            "value": "email@example.org"
+          }
+    responses:
+      200:
+        description: Recovery method created and email sent.
+        body:
+          application/json:
+            schema: MethodResponse
+            example: |
+              {
+                "uid": "12345678901234567890123456789012",
+                "value": "email@example.org"
+              }
+      400:
+        description: Missing parameter
+      409:
+        description: New method matches an already existing verified method
+      500:
+        description: Database or other system error
+  /{uid}:
+    get:
+      description: Retrieve a specific, verified recovery method.
+      body:
+        application/json:
+          example: |
+            {
+              "employee_id": "12345"
+            }
+      responses:
+        200:
+          description: Recovery method found
+          body:
+            application/json:
+              schema: MethodResponse
+              example: |
+                {
+                  "uid": "12345678901234567890123456789012",
+                  "value": "email@example.org"
+                }
+        404:
+          description: User not found or method not found
+    delete:
+      description: Delete a specific recovery method.
+      body:
+        application/json:
+          example: |
+            {
+              "employee_id": "12345"
+            }
+      responses:
+        204:
+          description: Recovery method found and deleted
+        404:
+          description: User not found or method not found
+        500:
+          description: Delete failed
+    /verify:
+      put:
+        description: Verify the recovery method by a matching code.
+        body:
+          application/json:
+            example: |
+              {
+                "employee_id": "12345",
+                "code": "987654"
+              }
+        responses:
+          200:
+            description: Provided code matches original code
+            body:
+              application/json:
+                schema: MethodResponse
+                example: |
+                  {
+                    "uid": "12345678901234567890123456789012",
+                    "value": "email@example.org"
+                  }
+          400:
+            description: Missing or invalid code
+          404:
+            description: User not found or method not found
+          429:
+            description: Too many verification attempts
+          500:
+            description: Database or other system error
+    /resend:
+      put:
+        description: Resend the method verification email
+        body:
+          application/json:
+            example: |
+              {
+                "employee_id": "12345"
+              }
+        responses:
+          200:
+            description: Method found and email sent
+          400:
+            description: Method already verified
+          404:
+            description: User not found or method not found

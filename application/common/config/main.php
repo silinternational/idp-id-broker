@@ -202,6 +202,7 @@ return [
         'googleAnalytics'               => [
             'trackingId' => Env::get('GA_TRACKING_ID'),
             'clientId'   => Env::get('GA_CLIENT_ID'),
-        ]
+        ],
+        'reset' => Env::getArrayFromPrefix('RESET_'),
     ],
 ];

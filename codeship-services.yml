@@ -11,7 +11,7 @@ app:
         image: silintl/idp-id-broker
         dockerfile_path: ./Dockerfile
         cached: true
-    links:
+    depends_on:
         - db
         - ldap
         - ldapload
@@ -43,6 +43,10 @@ app:
         PASSWORD_FORGOT_URL: https://www.example.com/forgot
         PASSWORD_PROFILE_URL: https://password-profile
         SUPPORT_EMAIL: support@example.com
+        RESET_lifetimeSeconds: 3600
+        RESET_disableDuration: 900
+        RESET_codeLength: 6
+        RESET_maxAttempts: 10
 
 ldap:
     build:
@@ -55,7 +59,7 @@ ldapload:
         context: ./development/ldap
         dockerfile: Dockerfile
     working_dir: /data
-    links:
+    depends_on:
         - ldap
     volumes:
         - ./development/ldap/fakepeople.ldif:/root/fakepeople.ldif
