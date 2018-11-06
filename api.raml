@@ -1008,7 +1008,7 @@ schemas:
         description: Database or other system error
   /{uid}:
     get:
-      description: Retrieve a specific, validated recovery method.
+      description: Retrieve a specific, verified recovery method.
       body:
         application/json:
           example: |
@@ -1074,7 +1074,7 @@ schemas:
             description: Database or other system error
     /resend:
       put:
-        description: Resend the recovery email
+        description: Resend the method verification email
         body:
           application/json:
             example: |
