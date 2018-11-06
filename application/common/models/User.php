@@ -56,7 +56,7 @@ class User extends UserBase
         }
 
         foreach ($this->methods as $method) {
-            if (! $mfa->delete()) {
+            if (! $method->delete()) {
                 \Yii::error([
                     'action' => 'delete method record before deleting user',
                     'status' => 'error',
