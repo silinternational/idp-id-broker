@@ -26,12 +26,6 @@
 Dear <?= $displayName ?>,
 
 Congratulations! You have logged into your new <?=$idpDisplayName?> Identity account for the first time.
-<?=$idpDisplayName?> is in the process of transitioning from logging into websites using
-an Insite account to this new "<?=$idpDisplayName?> account". In January 2018 the option to log in
-to some websites using your Insite account will begin to go away. It will take some time for all the Insite-login
-associated websites to change to using the new <?=$idpDisplayName?> login. Wherever you have the
-option to use your new <?=$idpDisplayName?> account it is recommended you do so, but keep track of
-your Insite username and password to use where only the Insite login screen is presented.
 
 Password expires on: <?= $passwordExpiresUtc ?>
 
