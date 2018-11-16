@@ -819,6 +819,17 @@ schemas:
                   }
           204:
             description: No user record was found with that `employee_id`.
+          409:
+            description: A recently-used password was given.
+              application/json:
+                schema: Error
+                example: |
+                  {
+                    "name": "Conflict",
+                    "message": "May not be reused yet.",
+                    "code": 1542395933,
+                    "status": 409
+                  }
           422:
             description: |
               The given password does not meet some requirement (such as if an
