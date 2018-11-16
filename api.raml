@@ -387,6 +387,10 @@ schemas:
             "value": {
               "required": true,
               "type": "string"
+            },
+            "verified": {
+              "required": true,
+              "type": "boolean"
             }
           },
           "type": "object"
@@ -759,7 +763,7 @@ schemas:
                   ]
     /method:
       get:
-        description: Get a list of verified recovery methods for user
+        description: Get a list of verified and unverified recovery methods for user
         responses:
           400:
           200:
@@ -770,7 +774,8 @@ schemas:
                   [
                       {
                           "uid": "0YrSiNp2P6sfkleepNNvFYMQWuLfssve",
-                          "value": email@example.org
+                          "value": email@example.org,
+                          "verified": true
                       },
                   ]
     /password:
