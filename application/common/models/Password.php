@@ -8,6 +8,7 @@ use Yii;
 use yii\behaviors\AttributeBehavior;
 use yii\db\ActiveRecord;
 use yii\helpers\ArrayHelper;
+use yii\web\ConflictHttpException;
 
 /**
  * Class Password
@@ -47,9 +48,6 @@ class Password extends PasswordBase
             [
                 'hash', $this->isHashable(),
             ],
-            [
-                'hash', $this->isReusable(),
-            ],
         ], parent::rules());
     }
 
@@ -58,15 +56,6 @@ class Password extends PasswordBase
         return function ($attributeName) {
             if ($this->hash === false) {
                 $this->addError($attributeName, 'Unable to hash password.');
-            }
-        };
-    }
-
-    private function isReusable(): Closure
-    {
-        return function ($attributeName) {
-            if ($this->hasAlreadyBeenUsedTooRecently()) {
-                $this->addError($attributeName, 'May not be reused yet.');
             }
         };
     }
@@ -198,5 +187,20 @@ class Password extends PasswordBase
     public function getUser()
     {
         return $this->hasOne(User::className(), ['id' => 'user_id']);
+    }
+
+    /**
+     * @param bool $runValidation
+     * @param null $attributeNames
+     * @return bool
+     * @throws ConflictHttpException
+     */
+    public function save($runValidation = true, $attributeNames = null)
+    {
+        if ($this->hasAlreadyBeenUsedTooRecently()) {
+            throw new ConflictHttpException('May not be reused yet.', 1542395933);
+        }
+
+        return parent::save($runValidation, $attributeNames);
     }
 }
