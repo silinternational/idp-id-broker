@@ -56,6 +56,7 @@ class Method extends MethodBase
         return [
             'id' => function() { return $this->uid; },
             'value',
+            'verified' => function() { return $this->verified == 1; }
         ];
     }
 
