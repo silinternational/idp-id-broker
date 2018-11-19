@@ -1,9 +1,10 @@
-#%RAML 0.8
+#%RAML 1.0
 title: ID Broker API
+version: 4
 protocols: [ HTTPS ]
 mediaType: application/json
 securitySchemes:
-  - AuthzBearerToken:
+  AuthzBearerToken:
       type: x-{other}
       describedBy:
         headers:
@@ -12,8 +13,8 @@ securitySchemes:
             example: Bearer abc123
 securedBy: [ AuthzBearerToken ]
 
-schemas:
-  - Authentication: |
+types:
+  Authentication: |
       {
         "$schema": "http://json-schema.org/draft-03/schema",
         "properties": {
@@ -28,7 +29,7 @@ schemas:
         },
         "type": "object"
       }
-  - Error: |
+  Error: |
       {
         "$schema": "http://json-schema.org/draft-03/schema",
         "properties": {
@@ -51,7 +52,7 @@ schemas:
         },
         "type": "object"
       }
-  - ReturnedUser: |
+  ReturnedUser: |
       {
         "$schema": "http://json-schema.org/draft-03/schema",
         "properties": {
@@ -157,7 +158,7 @@ schemas:
         },
         "type": "object"
       }
-  - UserCreation: |
+  UserCreation: |
       {
         "$schema": "http://json-schema.org/draft-03/schema",
         "properties": {
@@ -206,7 +207,7 @@ schemas:
         },
         "type": "object"
       }
-  - UserList: |
+  UserList: |
       {
         "$schema": "http://json-schema.org/draft-03/schema",
         "items": {
@@ -280,7 +281,7 @@ schemas:
         },
         "type": "array"
       }
-  - UserUpdate: |
+  UserUpdate: |
       {
         "$schema": "http://json-schema.org/draft-03/schema",
         "properties": {
@@ -325,7 +326,7 @@ schemas:
         },
         "type": "object"
       }
-  - MfaCreation: |
+  MfaCreation: |
         {
           "$schema": "http://json-schema.org/draft-03/schema",
           "properties": {
@@ -345,7 +346,7 @@ schemas:
           },
           "type": "object"
         }
-  - MfaCreationResponse: |
+  MfaCreationResponse: |
       {
         "$schema": "http://json-schema.org/draft-03/schema",
         "properties": {
@@ -355,12 +356,12 @@ schemas:
           },
           "data": {
             "required": true,
-            "type": "object"
+            "type": "array"
           }
         },
         "type": "object"
       }
-  - MethodResponse: |
+  MethodResponse: |
       {
         "$schema": "http://json-schema.org/draft-03/schema",
         "properties": {
@@ -375,7 +376,7 @@ schemas:
         },
         "type": "object"
       }
-  - MethodListResponse: |
+  MethodListResponse: |
       {
         "$schema": "http://json-schema.org/draft-03/schema",
         "items": {
@@ -445,8 +446,8 @@ schemas:
                      {
                        "id": 345,
                        "type": "backupcode"
-                     },
-                   ]
+                     }
+                  ]
                 },
                 "password": {
                   "created_utc":"2017-05-24 14:04:51 UTC",
