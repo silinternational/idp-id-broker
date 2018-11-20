@@ -57,7 +57,7 @@ Feature: Recovery Method
  Scenario: Resend a method verification
    Given user with employee id 123 has an unverified Method
    When I send a "PUT" to "/method/{uid}/resend" with a valid uid
-   Then the response status code should be 200
+   Then the response status code should be 204
    And a method record exists with a value of "unverified@example.com"
    And the following method data should be stored:
      | property              | value                 |
