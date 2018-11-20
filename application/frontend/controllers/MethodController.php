@@ -174,8 +174,10 @@ class MethodController extends BaseRestController
      * Delete method
      *
      * @param string $uid
-     * @return array
+     * @return \stdClass
+     * @throws NotFoundHttpException
      * @throws ServerErrorHttpException
+     * @throws \Throwable
      */
     public function actionDelete($uid)
     {
@@ -186,7 +188,7 @@ class MethodController extends BaseRestController
         }
 
         \Yii::$app->response->statusCode = 204;
-        return null;
+        return new \stdClass();
     }
 
     /**
@@ -209,6 +211,7 @@ class MethodController extends BaseRestController
         /*
          * Return empty object
          */
+        \Yii::$app->response->statusCode = 204;
         return new \stdClass();
     }
 }

@@ -767,6 +767,7 @@ types:
         description: Get a list of verified and unverified recovery methods for user
         responses:
           400:
+            description: User not found for given `employee_id`
           200:
             body:
               application/json:
@@ -1108,7 +1109,7 @@ types:
                 "employee_id": "12345"
               }
         responses:
-          200:
+          204:
             description: Method found and email sent
           400:
             description: Method already verified
