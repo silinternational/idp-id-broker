@@ -16,12 +16,12 @@ Feature: Recovery Method
     Then the response status code should be 200
     And I should receive 1 record
 
-  Scenario: Retrieve a Method for a User with 1 verified and 1 unverified Method
+  Scenario: Retrieve Method records for a User with 1 verified and 1 unverified Method
     Given user with employee id 123 has a verified Method
     And user with employee id 123 has an unverified Method
     When I request "/user/123/method" be retrieved
     Then the response status code should be 200
-    And I should receive 1 record
+    And I should receive 2 records
 
   Scenario: Retrieve a specific Method record
     Given user with employee id 123 has a verified Method

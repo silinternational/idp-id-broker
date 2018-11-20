@@ -33,7 +33,7 @@ class MethodController extends BaseRestController
             );
         }
 
-        return Method::findAll(['user_id' => $user->id, 'verified' => 1]);
+        return Method::findAll(['user_id' => $user->id]);
     }
 
     /**
