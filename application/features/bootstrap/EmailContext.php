@@ -3,6 +3,7 @@ namespace Sil\SilIdBroker\Behat\Context;
 
 use common\helpers\MySqlDateTime;
 use common\models\EmailLog;
+use common\models\Method;
 use common\models\Mfa;
 use common\models\MfaBackupcode;
 use common\models\User;
@@ -47,6 +48,11 @@ class EmailContext extends YiiContext
 
     /** @var Mfa */
     protected $testMfaOption;
+
+    /** @var Method */
+    protected $testMethod;
+
+    const METHOD_EMAIL_ADDRESS = 'method@example.com';
 
     /**
      * @Then a(n) :messageType email should have been sent to them
@@ -904,5 +910,66 @@ class EmailContext extends YiiContext
     public function iSeeThatTheSecondUserHasReceivedAGetBackupCodesEmail()
     {
         Assert::true($this->fakeEmailer->hasReceivedMessageRecently($this->tempUser2->id, EmailLog::MESSAGE_TYPE_GET_BACKUP_CODES));
+    }
+
+    /**
+     * @Given no methods exist
+     */
+    public function noMethodsExist()
+    {
+        Method::deleteAll();
+    }
+
+    /**
+     * @param string $value
+     */
+    protected function createMethod($value)
+    {
+        $user = $this->tempUser;
+        $method = Method::create($user->id, $value);
+
+        $this->testMethod = $method;
+
+        Assert::true($method->save(), "Could not create new method.");
+    }
+
+    /**
+     * @When I create a new recovery method
+     */
+    public function iCreateANewRecoveryMethod()
+    {
+        $this->createMethod(self::METHOD_EMAIL_ADDRESS);
+    }
+
+    /**
+     * @Then a Method Verify email is sent to that method
+     */
+    public function aMethodVerifyEmailIsSentToThatMethod()
+    {
+        $matchingFakeEmails = $this->fakeEmailer->getFakeEmailsOfTypeSentToAddress(
+            EmailLog::MESSAGE_TYPE_METHOD_VERIFY,
+            self::METHOD_EMAIL_ADDRESS
+        );
+
+        Assert::greaterThan(count($matchingFakeEmails), 0, sprintf(
+            'Did not find any %s emails sent to that address.',
+            EmailLog::MESSAGE_TYPE_METHOD_VERIFY
+        ));
+    }
+
+    /**
+     * @Given an unverified method exists
+     */
+    public function anUnverifiedMethodExists()
+    {
+        $this->createMethod(self::METHOD_EMAIL_ADDRESS);
+    }
+
+    /**
+     * @When I request that the verify email is resent
+     */
+    public function iRequestThatTheVerifyEmailIsResent()
+    {
+        $this->testMethod->sendVerification();
     }
 }

@@ -1,4 +1,7 @@
-Feature: Recovery Method
+Feature: Recovery Method API
+  Messages are exchanged with a RESTful API for the
+  purpose of creating and verifying password recovery
+  methods.
 
   Background:
     Given the requester is authorized
@@ -50,7 +53,6 @@ Feature: Recovery Method
 #    And verification_code should be stored as ?
 #    And verification_expires should be stored as ? UTC
 #    And created should be stored as now UTC
-#    And an email is sent to "user123@example.org"
 
 ### TODO: Try to create a method using the primary (or spouse/supervisor) address
 
@@ -62,7 +64,6 @@ Feature: Recovery Method
    And the following method data should be stored:
      | property              | value                 |
      | verified              | 0                     |
-#   And an email is sent to "unverified@example.com"
 
  Scenario: Verify a Method
    Given user with employee id 123 has an unverified Method
@@ -83,3 +84,4 @@ Feature: Recovery Method
     Given user with employee id 123 has an unverified Method
     When I send a "DELETE" to "/method/{uid}" with a valid uid
     Then the response status code should be 204
+

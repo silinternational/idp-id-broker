@@ -59,7 +59,35 @@ class FakeEmailer extends Emailer
             }
         );
     }
-    
+
+    /**
+     * Get the actual email data (from this FakeEmailer) of any emails sent to
+     * the given address and of the specified type.
+     *
+     * @param string $messageType The type of message.
+     * @param User $address The address in question.
+     * @return array
+     */
+    public function getFakeEmailsOfTypeSentToAddress(
+        string $messageType,
+        string $address
+    ) {
+        $fakeEmailer = $this;
+        $fakeEmailsSent = $fakeEmailer->getFakeEmailsSent();
+
+        return array_filter(
+            $fakeEmailsSent,
+            function ($fakeEmail) use ($fakeEmailer, $messageType, $address) {
+
+                $subject = $fakeEmail['subject'] ?? '';
+                $toAddress = $fakeEmail['to_address'] ?? '';
+
+                return $fakeEmailer->isSubjectForMessageType($subject, $messageType)
+                    && ($toAddress === $address);
+            }
+        );
+    }
+
     public function getFakeEmailsSent()
     {
         return $this->getEmailServiceClient()->emailsSent;
