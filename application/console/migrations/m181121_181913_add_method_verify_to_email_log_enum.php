@@ -34,19 +34,4 @@ class m181121_181913_add_method_verify_to_email_log_enum extends Migration
             "'mfa-enabled','mfa-disabled') NULL"
         );
     }
-
-    /*
-    // Use up()/down() to run migration code without a transaction.
-    public function up()
-    {
-
-    }
-
-    public function down()
-    {
-        echo "m181121_181913_add_method_verify_to_email_log_enum cannot be reverted.\n";
-
-        return false;
-    }
-    */
 }
