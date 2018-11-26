@@ -38,52 +38,28 @@ class FakeEmailer extends Emailer
      *
      * @param string $messageType The type of message.
      * @param User $user The User in question.
+     * @param string $address Email address to find. If provided, overrides $user->email.
      * @return array[]
      */
     public function getFakeEmailsOfTypeSentToUser(
         string $messageType,
-        User $user
+        User $user,
+        string $address = null
     ) {
         $fakeEmailer = $this;
         $fakeEmailsSent = $fakeEmailer->getFakeEmailsSent();
-        
+
+        $checkAddress = $address ?? $user->email;
+
         return array_filter(
             $fakeEmailsSent,
-            function ($fakeEmail) use ($fakeEmailer, $messageType, $user) {
+            function ($fakeEmail) use ($fakeEmailer, $messageType, $checkAddress) {
                 
                 $subject = $fakeEmail['subject'] ?? '';
                 $toAddress = $fakeEmail['to_address'] ?? '';
                 
                 return $fakeEmailer->isSubjectForMessageType($subject, $messageType)
-                    && ($toAddress === $user->email);
-            }
-        );
-    }
-
-    /**
-     * Get the actual email data (from this FakeEmailer) of any emails sent to
-     * the given address and of the specified type.
-     *
-     * @param string $messageType The type of message.
-     * @param User $address The address in question.
-     * @return array
-     */
-    public function getFakeEmailsOfTypeSentToAddress(
-        string $messageType,
-        string $address
-    ) {
-        $fakeEmailer = $this;
-        $fakeEmailsSent = $fakeEmailer->getFakeEmailsSent();
-
-        return array_filter(
-            $fakeEmailsSent,
-            function ($fakeEmail) use ($fakeEmailer, $messageType, $address) {
-
-                $subject = $fakeEmail['subject'] ?? '';
-                $toAddress = $fakeEmail['to_address'] ?? '';
-
-                return $fakeEmailer->isSubjectForMessageType($subject, $messageType)
-                    && ($toAddress === $address);
+                    && ($toAddress === $checkAddress);
             }
         );
     }

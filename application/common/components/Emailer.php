@@ -291,53 +291,28 @@ class Emailer extends Component
      * @param string $messageType The message type. Must be one of the
      *     EmailLog::MESSAGE_TYPE_* values.
      * @param User $user The intended recipient.
+     * @param string[] $data  Data fields for email template. Include key 'toAddress' to override
+     *     sending to primary address in User object.
      */
-    public function sendMessageTo(string $messageType, User $user)
-    {
-        $dataForEmail = ArrayHelper::merge(
-            $user->getAttributesForEmail(),
-            $this->otherDataForEmails
-        );
-        
-        $htmlView = $this->getViewForMessage($messageType, 'html');
-        $textView = $this->getViewForMessage($messageType, 'text');
-        
-        $this->email(
-            $user->email,
-            $this->getSubjectForMessage($messageType),
-            \Yii::$app->view->render($htmlView, $dataForEmail),
-            \Yii::$app->view->render($textView, $dataForEmail)
-        );
-        
-        EmailLog::logMessage($messageType, $user->id);
-    }
-
-    /**
-     * Send a verification message to the given email address.
-     *
-     * @param string[] $data  Data fields for email template. Must contain keys 'toAddress' and 'code'.
-     * @param User     $user  User record associated with the verification message. Used
-     *                        for template data and email logging.
-     */
-    public function sendVerificationMessage(array $data, User $user)
+    public function sendMessageTo(string $messageType, User $user, array $data = [])
     {
         $dataForEmail = ArrayHelper::merge(
             $user->getAttributesForEmail(),
             $this->otherDataForEmails,
             $data
         );
-
-        $htmlView = $this->getViewForMessage(EmailLog::MESSAGE_TYPE_METHOD_VERIFY, 'html');
-        $textView = $this->getViewForMessage(EmailLog::MESSAGE_TYPE_METHOD_VERIFY, 'text');
-
+        
+        $htmlView = $this->getViewForMessage($messageType, 'html');
+        $textView = $this->getViewForMessage($messageType, 'text');
+        
         $this->email(
-            $data['toAddress'],
-            $this->getSubjectForMessage(EmailLog::MESSAGE_TYPE_METHOD_VERIFY),
+            $data['toAddress'] ?? $user->email,
+            $this->getSubjectForMessage($messageType),
             \Yii::$app->view->render($htmlView, $dataForEmail),
             \Yii::$app->view->render($textView, $dataForEmail)
         );
-
-        EmailLog::logMessage(EmailLog::MESSAGE_TYPE_METHOD_VERIFY, $user->id);
+        
+        EmailLog::logMessage($messageType, $user->id);
     }
 
     /**

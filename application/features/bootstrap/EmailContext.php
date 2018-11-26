@@ -946,8 +946,9 @@ class EmailContext extends YiiContext
      */
     public function aMethodVerifyEmailIsSentToThatMethod()
     {
-        $matchingFakeEmails = $this->fakeEmailer->getFakeEmailsOfTypeSentToAddress(
+        $matchingFakeEmails = $this->fakeEmailer->getFakeEmailsOfTypeSentToUser(
             EmailLog::MESSAGE_TYPE_METHOD_VERIFY,
+            $this->tempUser,
             self::METHOD_EMAIL_ADDRESS
         );
 

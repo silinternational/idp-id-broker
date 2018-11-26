@@ -107,7 +107,7 @@ class Method extends MethodBase
             'code' => $this->verification_code,
         ];
 
-        $emailer->sendVerificationMessage($data, $this->user);
+        $emailer->sendMessageTo(EmailLog::MESSAGE_TYPE_METHOD_VERIFY, $this->user, $data);
     }
 
     /**
