@@ -926,7 +926,7 @@ class EmailContext extends YiiContext
     protected function createMethod($value)
     {
         $user = $this->tempUser;
-        $method = Method::create($user->id, $value);
+        $method = Method::findOrCreate($user->id, $value);
 
         $this->testMethod = $method;
 

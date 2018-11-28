@@ -107,7 +107,7 @@ class MethodController extends BaseRestController
 
         $userId = User::findOne(['employee_id' => $employeeId])->id ?? null;
 
-        return Method::create($userId, $value);
+        return Method::findOrCreate($userId, $value);
     }
 
     /**

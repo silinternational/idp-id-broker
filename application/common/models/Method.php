@@ -182,7 +182,7 @@ class Method extends MethodBase
      * @throws ConflictHttpException
      * @throws ServerErrorHttpException
      */
-    public static function create($userId, $value)
+    public static function findOrCreate($userId, $value)
     {
         $method = Method::findOne(['value' => $value, 'user_id' => $userId]);
 
