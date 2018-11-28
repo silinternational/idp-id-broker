@@ -187,7 +187,7 @@ class Method extends MethodBase
         $method = Method::findOne(['value' => $value, 'user_id' => $userId]);
 
         if ($method === null) {
-            $method = new Method;
+            $method = new Method();
             $method->user_id = $userId;
             $method->value = mb_strtolower($value);
         }
