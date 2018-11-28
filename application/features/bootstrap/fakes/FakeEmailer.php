@@ -37,29 +37,23 @@ class FakeEmailer extends Emailer
      * the given user and of the specified type.
      *
      * @param string $messageType The type of message.
-     * @param User $user The User in question.
-     * @param string $address Email address to find. If provided, overrides $user->email.
+     * @param string $emailAddress Email address to find.
      * @return array[]
      */
-    public function getFakeEmailsOfTypeSentToUser(
-        string $messageType,
-        User $user,
-        string $address = null
-    ) {
+    public function getFakeEmailsOfTypeSentToUser(string $messageType, string $emailAddress)
+    {
         $fakeEmailer = $this;
         $fakeEmailsSent = $fakeEmailer->getFakeEmailsSent();
 
-        $checkAddress = $address ?? $user->email;
-
         return array_filter(
             $fakeEmailsSent,
-            function ($fakeEmail) use ($fakeEmailer, $messageType, $checkAddress) {
+            function ($fakeEmail) use ($fakeEmailer, $messageType, $emailAddress) {
                 
                 $subject = $fakeEmail['subject'] ?? '';
                 $toAddress = $fakeEmail['to_address'] ?? '';
                 
                 return $fakeEmailer->isSubjectForMessageType($subject, $messageType)
-                    && ($toAddress === $checkAddress);
+                    && ($toAddress === $emailAddress);
             }
         );
     }
