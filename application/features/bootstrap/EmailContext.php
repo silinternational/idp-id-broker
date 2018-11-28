@@ -947,7 +947,9 @@ class EmailContext extends YiiContext
     public function aMethodVerifyEmailIsSentToThatMethod()
     {
         $matchingFakeEmails = $this->fakeEmailer->getFakeEmailsOfTypeSentToUser(
-            EmailLog::MESSAGE_TYPE_METHOD_VERIFY, self::METHOD_EMAIL_ADDRESS);
+            EmailLog::MESSAGE_TYPE_METHOD_VERIFY,
+            self::METHOD_EMAIL_ADDRESS
+        );
 
         Assert::greaterThan(count($matchingFakeEmails), 0, sprintf(
             'Did not find any %s emails sent to that address.',
