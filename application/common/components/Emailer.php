@@ -206,8 +206,10 @@ class Emailer extends Component
     }
 
     /**
-     * @param string $messageType
-     * @param string $format
+     * Retrieve the view text for the given message type and format. The view is read from a
+     * file in common/mail: e.g. mfa-disabled.html.php
+     * @param string $messageType Message type -- should be defined in EmailLog getMessageTypes().
+     * @param string $format Message format -- must be either 'text' or 'html'
      * @return string
      */
     protected function getViewForMessage(string $messageType, string $format): string
