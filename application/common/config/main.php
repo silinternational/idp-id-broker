@@ -94,6 +94,7 @@ return [
             'subjectForMfaOptionRemoved' => Env::get('SUBJECT_FOR_MFA_OPTION_REMOVED'),
             'subjectForMfaEnabled' => Env::get('SUBJECT_FOR_MFA_ENABLED'),
             'subjectForMfaDisabled' => Env::get('SUBJECT_FOR_MFA_DISABLED'),
+            'subjectForMethodVerify' => Env::get('SUBJECT_FOR_METHOD_VERIFY'),
 
             'lostSecurityKeyEmailDays' => Env::get('LOST_SECURITY_KEY_EMAIL_DAYS', 62),
             'minimumBackupCodesBeforeNag' => Env::get('MINIMUM_BACKUP_CODES_BEFORE_NAG', 4),

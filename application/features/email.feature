@@ -289,3 +289,17 @@ Feature: Email
     When I send delayed mfa related emails
     Then I see that the first user has received a lost-security-key email
       And I see that the second user has received a get-backup-codes email
+
+  Scenario: Send a recovery method verify email upon creation of the object
+    Given a user already exists
+      And no methods exist
+      And I remove records of any emails that have been sent
+    When I create a new recovery method
+    Then a Method Verify email is sent to that method
+
+  Scenario: Resend a recovery method verify email for an existing object
+    Given a user already exists
+    And an unverified method exists
+    And I remove records of any emails that have been sent
+    When I request that the verify email is resent
+    Then a Method Verify email is sent to that method

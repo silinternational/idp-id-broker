@@ -2,6 +2,7 @@
 
 namespace common\models;
 
+use common\components\Emailer;
 use common\exceptions\InvalidCodeException;
 use common\helpers\MySqlDateTime;
 use common\helpers\Utils;
@@ -90,7 +91,7 @@ class Method extends MethodBase
             throw new ServerErrorHttpException('Save error after incrementing attempts', 1461441850);
         }
 
-//        $this->sendVerificationEmail();
+        $this->sendVerificationEmail();
     }
 
     /**
@@ -98,19 +99,15 @@ class Method extends MethodBase
      */
     public function sendVerificationEmail()
     {
-        Verification::sendEmail(
-            $this->value,
-            'Verification required - New account recovery method added',
-            '@common/mail/method/verify',
-            $this->verification_code,
-            Utils::getFriendlyDate($this->verification_expires),
-            $this->user,
-            null,
-            $this->user->getId(),
-            'New email method',
-            'A new email method has been added and verification sent to ' . $this->getMaskedValue(),
-            []
-        );
+        /* @var $emailer Emailer */
+        $emailer = \Yii::$app->emailer;
+
+        $data = [
+            'toAddress' => $this->value,
+            'code' => $this->verification_code,
+        ];
+
+        $emailer->sendMessageTo(EmailLog::MESSAGE_TYPE_METHOD_VERIFY, $this->user, $data);
     }
 
     /**
@@ -176,5 +173,34 @@ class Method extends MethodBase
                 ]);
             }
         }
+    }
+
+    /**
+     * @param integer $userId
+     * @param string $value
+     * @return Method
+     * @throws ConflictHttpException
+     * @throws ServerErrorHttpException
+     */
+    public static function findOrCreate($userId, $value)
+    {
+        $method = Method::findOne(['value' => $value, 'user_id' => $userId]);
+
+        if ($method === null) {
+            $method = new Method();
+            $method->user_id = $userId;
+            $method->value = mb_strtolower($value);
+        }
+
+        if ( ! $method->save()) {
+            throw new ServerErrorHttpException(
+                sprintf('Unable to save new method'),
+                1461441851
+            );
+        }
+
+        $method->sendVerification();
+
+        return $method;
     }
 }

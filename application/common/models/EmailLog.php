@@ -23,6 +23,7 @@ class EmailLog extends EmailLogBase
     const MESSAGE_TYPE_MFA_OPTION_REMOVED = 'mfa-option-removed';
     const MESSAGE_TYPE_MFA_ENABLED = 'mfa-enabled';
     const MESSAGE_TYPE_MFA_DISABLED = 'mfa-disabled';
+    const MESSAGE_TYPE_METHOD_VERIFY = 'method-verify';
 
     /**
      * @inheritdoc
@@ -48,6 +49,7 @@ class EmailLog extends EmailLogBase
             self::MESSAGE_TYPE_MFA_OPTION_REMOVED,
             self::MESSAGE_TYPE_MFA_ENABLED,
             self::MESSAGE_TYPE_MFA_DISABLED,
+            self::MESSAGE_TYPE_METHOD_VERIFY,
         ];
     }
     

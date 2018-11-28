@@ -30,7 +30,7 @@ class Emailer extends Component
     const SUBJECT_MFA_OPTION_REMOVED_DEFAULT = 'A 2-Step Verification option was removed from your %s account';
     const SUBJECT_MFA_ENABLED_DEFAULT = '2-Step Verification was enabled on your %s account';
     const SUBJECT_MFA_DISABLED_DEFAULT = '2-Step Verification was disabled on your %s account';
-
+    const SUBJECT_METHOD_VERIFY_DEFAULT = 'Please verify your new password recovery method';
 
     /**
      * The configuration for the email-service client.
@@ -94,6 +94,8 @@ class Emailer extends Component
     public $subjectForMfaOptionRemoved;
     public $subjectForMfaEnabled;
     public $subjectForMfaDisabled;
+
+    public $subjectForMethodVerify;
 
     /* The number of days of not using a security key after which we email the user */
     public $lostSecurityKeyEmailDays;
@@ -190,7 +192,11 @@ class Emailer extends Component
     {
         return $this->getEmailServiceClient()->getSiteStatus();
     }
-    
+
+    /**
+     * @param string $messageType
+     * @return null|string
+     */
     protected function getSubjectForMessage(string $messageType)
     {
         if ( ! empty($this->subjects[$messageType]) && strpos($this->subjects[$messageType], '%') !== false) {
@@ -198,8 +204,15 @@ class Emailer extends Component
         }
         return $this->subjects[$messageType] ?? null;
     }
-    
-    protected function getViewForMessage(string $messageType, string $format)
+
+    /**
+     * Retrieve the view identifier for the given message type and format. The view is read from a
+     * file in common/mail: e.g. mfa-disabled.html.php
+     * @param string $messageType Message type -- should be defined in EmailLog getMessageTypes().
+     * @param string $format Message format -- must be either 'text' or 'html'
+     * @return string
+     */
+    protected function getViewForMessage(string $messageType, string $format): string
     {
         if ( ! self::isValidFormat($format)) {
             throw new \InvalidArgumentException(sprintf(
@@ -239,6 +252,8 @@ class Emailer extends Component
         $this->subjectForMfaEnabled = $this->subjectForMfaEnabled ?? self::SUBJECT_MFA_ENABLED_DEFAULT;
         $this->subjectForMfaDisabled = $this->subjectForMfaDisabled ?? self::SUBJECT_MFA_DISABLED_DEFAULT;
 
+        $this->subjectForMethodVerify = $this->subjectForMethodVerify ?? self::SUBJECT_METHOD_VERIFY_DEFAULT;
+
         $this->subjects = [
             EmailLog::MESSAGE_TYPE_INVITE => $this->subjectForInvite,
             EmailLog::MESSAGE_TYPE_MFA_RATE_LIMIT => $this->subjectForMfaRateLimit,
@@ -251,6 +266,7 @@ class Emailer extends Component
             EmailLog::MESSAGE_TYPE_MFA_OPTION_REMOVED => $this->subjectForMfaOptionRemoved,
             EmailLog::MESSAGE_TYPE_MFA_ENABLED => $this->subjectForMfaEnabled,
             EmailLog::MESSAGE_TYPE_MFA_DISABLED => $this->subjectForMfaDisabled,
+            EmailLog::MESSAGE_TYPE_METHOD_VERIFY => $this->subjectForMethodVerify,
         ];
         
         $this->assertConfigIsValid();
@@ -277,19 +293,22 @@ class Emailer extends Component
      * @param string $messageType The message type. Must be one of the
      *     EmailLog::MESSAGE_TYPE_* values.
      * @param User $user The intended recipient.
+     * @param string[] $data  Data fields for email template. Include key 'toAddress' to override
+     *     sending to primary address in User object.
      */
-    public function sendMessageTo(string $messageType, User $user)
+    public function sendMessageTo(string $messageType, User $user, array $data = [])
     {
         $dataForEmail = ArrayHelper::merge(
             $user->getAttributesForEmail(),
-            $this->otherDataForEmails
+            $this->otherDataForEmails,
+            $data
         );
         
         $htmlView = $this->getViewForMessage($messageType, 'html');
         $textView = $this->getViewForMessage($messageType, 'text');
         
         $this->email(
-            $user->email,
+            $data['toAddress'] ?? $user->email,
             $this->getSubjectForMessage($messageType),
             \Yii::$app->view->render($htmlView, $dataForEmail),
             \Yii::$app->view->render($textView, $dataForEmail)

@@ -106,24 +106,8 @@ class MethodController extends BaseRestController
         }
 
         $userId = User::findOne(['employee_id' => $employeeId])->id ?? null;
-        $method = Method::findOne(['value' => $value, 'user_id' => $userId]);
 
-        if ($method === null) {
-            $method = new Method;
-            $method->user_id = $userId;
-            $method->value = mb_strtolower($value);
-        }
-
-        if ( ! $method->save()) {
-            throw new ServerErrorHttpException(
-                sprintf('Unable to save new method'),
-                1461441851
-            );
-        }
-
-        $method->sendVerification();
-
-        return $method;
+        return Method::findOrCreate($userId, $value);
     }
 
     /**
