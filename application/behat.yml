@@ -2,39 +2,39 @@ default:
     suites:
         common_features:
             paths:
-                - %paths.base%/features/authentication.feature
-                - %paths.base%/features/password.feature
-                - %paths.base%/features/user.feature
+                - "%paths.base%/features/authentication.feature"
+                - "%paths.base%/features/password.feature"
+                - "%paths.base%/features/user.feature"
             contexts: [ FeatureContext ]
         analytics_features:
             paths:
-                - %paths.base%/features/analytics.feature
+                - "%paths.base%/features/analytics.feature"
             contexts: [ Sil\SilIdBroker\Behat\Context\AnalyticsContext ]
         email_features:
             paths:
-                - %paths.base%/features/email.feature
+                - "%paths.base%/features/email.feature"
             contexts: [ Sil\SilIdBroker\Behat\Context\EmailContext ]
         ldap_features:
             paths:
-                - %paths.base%/features/ldap.feature
+                - "%paths.base%/features/ldap.feature"
             contexts: [ Sil\SilIdBroker\Behat\Context\LdapContext ]
         method_features:
             paths:
-                - %paths.base%/features/method.feature
+                - "%paths.base%/features/method.feature"
             contexts: [ Sil\SilIdBroker\Behat\Context\MethodContext ]
         mfa_features:
             paths:
-                - %paths.base%/features/mfa.feature
+                - "%paths.base%/features/mfa.feature"
             contexts: [ Sil\SilIdBroker\Behat\Context\MfaContext ]
         mfa_rate_limit_features:
             paths:
-                - %paths.base%/features/mfa-rate-limit.feature
+                - "%paths.base%/features/mfa-rate-limit.feature"
             contexts: [ Sil\SilIdBroker\Behat\Context\MfaRateLimitContext ]
         mfa_unit_tests_features:
             paths:
-                - %paths.base%/features/mfa-unit-tests.feature
+                - "%paths.base%/features/mfa-unit-tests.feature"
             contexts: [ Sil\SilIdBroker\Behat\Context\MfaUnitTestsContext ]
         mysql_date_time_features:
             paths:
-                - %paths.base%/features/mysql-date-time.feature
+                - "%paths.base%/features/mysql-date-time.feature"
             contexts: [ Sil\SilIdBroker\Behat\Context\MySqlDateTimeContext ]
