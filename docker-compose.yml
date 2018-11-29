@@ -92,7 +92,7 @@ services:
             MYSQL_PASSWORD: appfortests
 
     cli:
-        image: silintl/php7:latest
+        image: silintl/php7:7.2
         volumes_from:
             - data
         working_dir: /data
@@ -129,7 +129,7 @@ services:
         command: bash -c "sleep 10 && /data/load_ldap.sh"
 
     test:
-        image: silintl/php7:latest
+        image: silintl/php7:7.2
         volumes_from:
             - data
         working_dir: /data
