@@ -36,6 +36,11 @@ class UserController extends BaseRestController
 
         $this->save($user);
 
+        /*
+         * Refresh user model to retrieve database default values
+         */
+        $user->refresh();
+
         return $user;
     }
 
