@@ -6,7 +6,8 @@ use yii\helpers\ArrayHelper;
 require(__DIR__ . '/../../vendor/autoload.php');
 
 define('YII_ENV', Env::get('APP_ENV', 'prod'));
-define('YII_DEBUG', YII_ENV !== 'prod');
+//define('YII_DEBUG', YII_ENV !== 'prod');
+define('YII_DEBUG', true);
 
 require(__DIR__ . '/../../vendor/yiisoft/yii2/Yii.php');
 
