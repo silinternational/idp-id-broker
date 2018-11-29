@@ -7,16 +7,16 @@ Feature: User
     Given a record does not exist with an employee_id of "123"
       And the requester is authorized
       And I provide the following valid data:
-        | property      | value                 |
-        | employee_id   | 123                   |
-        | first_name    | Shep                  |
-        | last_name     | Clark                 |
-        | display_name  | Shep Clark            |
-        | username      | shep_clark            |
-        | email         | shep_clark@example.org|
-        | manager_email | boss_man@example.org  |
-        | require_mfa   | yes                   |
-        | do_not_disclose | true                |
+        | property        | value                 |
+        | employee_id     | 123                   |
+        | first_name      | Shep                  |
+        | last_name       | Clark                 |
+        | display_name    | Shep Clark            |
+        | username        | shep_clark            |
+        | email           | shep_clark@example.org|
+        | manager_email   | boss_man@example.org  |
+        | require_mfa     | yes                   |
+        | do_not_disclose | 1                     |
     When I request "/user" be created
     Then the response status code should be 200
       And the following data is returned:
@@ -50,7 +50,7 @@ Feature: User
         | manager_email       | boss_man@example.org  |
         | require_mfa         | yes                   |
         | spouse_email        | NULL                  |
-        | do_not_disclose     | true                  |
+        | do_not_disclose     | 1                     |
       And last_changed_utc should be stored as now UTC
       And last_synced_utc should be stored as now UTC
 
@@ -83,7 +83,7 @@ Feature: User
         | display_name    | Shep Clark            |
         | username        | shep_clark            |
         | email           | shep_clark@example.org|
-        | do_not_disclose | true                  |
+        | do_not_disclose | 1                     |
       And I request "/user" be created
       And the response status code should be 200
       And a record exists with an employee_id of "123"
