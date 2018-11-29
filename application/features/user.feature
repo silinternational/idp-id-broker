@@ -98,7 +98,7 @@ Feature: User
         | active              | yes                   |
         | locked              | no                    |
         | require_mfa         | no                    |
-        | do_not_disclose     | true                  |
+        | do_not_disclose     | 1                     |
       And I change the <property> to <value>
     When I request "/user/123" be updated
     Then the response status code should be 200
