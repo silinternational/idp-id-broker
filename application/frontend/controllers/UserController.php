@@ -53,6 +53,11 @@ class UserController extends BaseRestController
 
         $user->attributes = Yii::$app->request->getBodyParams();
 
+        /*
+         * Received as boolean, stored as tinyint(1)
+         */
+        $user->do_not_disclose = (int)$user->do_not_disclose;
+
         $this->save($user);
 
         return $user;
