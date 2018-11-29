@@ -7,7 +7,7 @@ use Yii;
 /**
  * This is the model class for table "user".
  *
- * @property integer $id
+ * @property int $id
  * @property string $uuid
  * @property string $employee_id
  * @property string $first_name
@@ -15,7 +15,7 @@ use Yii;
  * @property string $display_name
  * @property string $username
  * @property string $email
- * @property integer $current_password_id
+ * @property int $current_password_id
  * @property string $active
  * @property string $locked
  * @property string $last_changed_utc
@@ -26,6 +26,7 @@ use Yii;
  * @property string $manager_email
  * @property string $spouse_email
  * @property string $nag_for_method_after
+ * @property int $do_not_disclose
  *
  * @property EmailLog[] $emailLogs
  * @property Method[] $methods
@@ -35,7 +36,7 @@ use Yii;
 class UserBase extends \yii\db\ActiveRecord
 {
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public static function tableName()
     {
@@ -43,13 +44,13 @@ class UserBase extends \yii\db\ActiveRecord
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function rules()
     {
         return [
             [['uuid', 'employee_id', 'first_name', 'last_name', 'username', 'email', 'active', 'locked', 'last_changed_utc', 'last_synced_utc', 'nag_for_mfa_after', 'nag_for_method_after'], 'required'],
-            [['current_password_id'], 'integer'],
+            [['current_password_id', 'do_not_disclose'], 'integer'],
             [['active', 'locked', 'require_mfa'], 'string'],
             [['last_changed_utc', 'last_synced_utc', 'nag_for_mfa_after', 'last_login_utc', 'nag_for_method_after'], 'safe'],
             [['uuid'], 'string', 'max' => 64],
@@ -62,7 +63,7 @@ class UserBase extends \yii\db\ActiveRecord
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function attributeLabels()
     {
@@ -86,6 +87,7 @@ class UserBase extends \yii\db\ActiveRecord
             'manager_email' => Yii::t('app', 'Manager Email'),
             'spouse_email' => Yii::t('app', 'Spouse Email'),
             'nag_for_method_after' => Yii::t('app', 'Nag For Method After'),
+            'do_not_disclose' => Yii::t('app', 'Do Not Disclose'),
         ];
     }
 

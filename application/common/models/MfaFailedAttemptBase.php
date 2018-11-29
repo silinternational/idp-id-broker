@@ -7,8 +7,8 @@ use Yii;
 /**
  * This is the model class for table "mfa_failed_attempt".
  *
- * @property integer $id
- * @property integer $mfa_id
+ * @property int $id
+ * @property int $mfa_id
  * @property string $at_utc
  *
  * @property Mfa $mfa
@@ -16,7 +16,7 @@ use Yii;
 class MfaFailedAttemptBase extends \yii\db\ActiveRecord
 {
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public static function tableName()
     {
@@ -24,7 +24,7 @@ class MfaFailedAttemptBase extends \yii\db\ActiveRecord
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function rules()
     {
@@ -37,7 +37,7 @@ class MfaFailedAttemptBase extends \yii\db\ActiveRecord
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function attributeLabels()
     {
