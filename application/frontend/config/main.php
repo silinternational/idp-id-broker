@@ -7,6 +7,8 @@ use yii\web\Response;
 
 const UID_ROUTE_PATTERN = '<uid:([a-zA-Z0-9_\-]{32})>';
 
+$cookieValidationKey = Env::get('COOKIE_VALIDATION_KEY');
+
 return [
     'id' => 'app-frontend',
     'basePath' => dirname(__DIR__),
@@ -20,6 +22,8 @@ return [
         ],
         // http://www.yiiframework.com/doc-2.0/guide-runtime-requests.html
         'request' => [
+            'cookieValidationKey' => $cookieValidationKey,
+            'enableCookieValidation' => !empty($cookieValidationKey),
             // restrict input to JSON only http://www.yiiframework.com/doc-2.0/guide-rest-quick-start.html#enabling-json-input
             'parsers' => [
                 'application/json' => JsonParser::class,

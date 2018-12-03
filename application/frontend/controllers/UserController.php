@@ -36,6 +36,11 @@ class UserController extends BaseRestController
 
         $this->save($user);
 
+        /*
+         * Refresh user model to retrieve database default values
+         */
+        $user->refresh();
+
         return $user;
     }
 
@@ -52,6 +57,11 @@ class UserController extends BaseRestController
         $user->scenario = User::SCENARIO_UPDATE_USER;
 
         $user->attributes = Yii::$app->request->getBodyParams();
+
+        /*
+         * Received as boolean, stored as tinyint(1)
+         */
+        $user->do_not_disclose = (int)$user->do_not_disclose;
 
         $this->save($user);
 

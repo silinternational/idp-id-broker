@@ -7,29 +7,31 @@ Feature: User
     Given a record does not exist with an employee_id of "123"
       And the requester is authorized
       And I provide the following valid data:
-        | property      | value                 |
-        | employee_id   | 123                   |
-        | first_name    | Shep                  |
-        | last_name     | Clark                 |
-        | display_name  | Shep Clark            |
-        | username      | shep_clark            |
-        | email         | shep_clark@example.org|
-        | manager_email | boss_man@example.org  |
-        | require_mfa   | yes                   |
+        | property        | value                 |
+        | employee_id     | 123                   |
+        | first_name      | Shep                  |
+        | last_name       | Clark                 |
+        | display_name    | Shep Clark            |
+        | username        | shep_clark            |
+        | email           | shep_clark@example.org|
+        | manager_email   | boss_man@example.org  |
+        | require_mfa     | yes                   |
+        | do_not_disclose | 1                     |
     When I request "/user" be created
     Then the response status code should be 200
       And the following data is returned:
         | property      | value                 |
 #TODO:need to ensure uuid came back but not sure about value...
-        | employee_id   | 123                   |
-        | first_name    | Shep                  |
-        | last_name     | Clark                 |
-        | display_name  | Shep Clark            |
-        | username      | shep_clark            |
-        | email         | shep_clark@example.org|
-        | active        | yes                   |
-        | locked        | no                    |
-        | manager_email | boss_man@example.org  |
+        | employee_id     | 123                   |
+        | first_name      | Shep                  |
+        | last_name       | Clark                 |
+        | display_name    | Shep Clark            |
+        | username        | shep_clark            |
+        | email           | shep_clark@example.org|
+        | active          | yes                   |
+        | locked          | no                    |
+        | manager_email   | boss_man@example.org  |
+        | do_not_disclose | true                  |
       And the following data is not returned:
         | property                |
         | current_password_id     |
@@ -48,6 +50,7 @@ Feature: User
         | manager_email       | boss_man@example.org  |
         | require_mfa         | yes                   |
         | spouse_email        | NULL                  |
+        | do_not_disclose     | 1                     |
       And last_changed_utc should be stored as now UTC
       And last_synced_utc should be stored as now UTC
 
@@ -73,13 +76,14 @@ Feature: User
     Given a record does not exist with an employee_id of "123"
       And the requester is authorized
       And I provide the following valid data:
-        | property     | value                 |
-        | employee_id  | 123                   |
-        | first_name   | Shep                  |
-        | last_name    | Clark                 |
-        | display_name | Shep Clark            |
-        | username     | shep_clark            |
-        | email        | shep_clark@example.org|
+        | property        | value                 |
+        | employee_id     | 123                   |
+        | first_name      | Shep                  |
+        | last_name       | Clark                 |
+        | display_name    | Shep Clark            |
+        | username        | shep_clark            |
+        | email           | shep_clark@example.org|
+        | do_not_disclose | 1                     |
       And I request "/user" be created
       And the response status code should be 200
       And a record exists with an employee_id of "123"
@@ -94,6 +98,7 @@ Feature: User
         | active              | yes                   |
         | locked              | no                    |
         | require_mfa         | no                    |
+        | do_not_disclose     | 1                     |
       And I change the <property> to <value>
     When I request "/user/123" be updated
     Then the response status code should be 200
@@ -102,19 +107,21 @@ Feature: User
       And last_synced_utc should be stored as now UTC
 
     Examples:
-      | property     | value              |
-      | first_name   | FIRST              |
-      | last_name    | LAST               |
-      | display_name | DISPLAY            |
-      | username     | USER               |
-      | email        | chg@example.org    |
-      | active       | no                 |
-      | active       | yes                |
-      | locked       | no                 |
-      | locked       | yes                |
-      | spouse_email | spouse@example.org |
-      | require_mfa  | no                 |
-      | require_mfa  | yes                |
+      | property        | value              |
+      | first_name      | FIRST              |
+      | last_name       | LAST               |
+      | display_name    | DISPLAY            |
+      | username        | USER               |
+      | email           | chg@example.org    |
+      | active          | no                 |
+      | active          | yes                |
+      | locked          | no                 |
+      | locked          | yes                |
+      | spouse_email    | spouse@example.org |
+      | require_mfa     | no                 |
+      | require_mfa     | yes                |
+      | do_not_disclose | false              |
+      | do_not_disclose | true               |
 
 #TODO: consider creating a new security.feature file for all these security-related tests.
 #TODO: need to think through tests for API_ACCESS_KEYS config, i.e., need tests for ApiConsumer
