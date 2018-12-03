@@ -130,7 +130,7 @@ class MethodController extends BaseRestController
             return $method;
         }
 
-        if ($method->verification_attempts >= \Yii::$app->params['reset']['maxAttempts']) {
+        if ($method->verification_attempts >= \Yii::$app->params['method']['maxAttempts']) {
             throw new TooManyRequestsHttpException();
         }
 

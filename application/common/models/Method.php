@@ -31,12 +31,12 @@ class Method extends MethodBase
 
                 [
                     'verification_code', 'default', 'when' => function() { return $this->getIsNewRecord(); },
-                    'value' => Utils::getRandomDigits(\Yii::$app->params['reset']['codeLength']),
+                    'value' => Utils::getRandomDigits(\Yii::$app->params['method']['codeLength']),
                 ],
 
                 [
                     'verification_expires', 'default', 'when' => function() { return $this->getIsNewRecord(); },
-                    'value' => MySqlDateTime::formatDateTime(time() + \Yii::$app->params['reset']['lifetimeSeconds']),
+                    'value' => MySqlDateTime::formatDateTime(time() + \Yii::$app->params['method']['lifetimeSeconds']),
                 ],
 
                 [
