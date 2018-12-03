@@ -467,6 +467,17 @@ types:
         body:
           type: Error
   /{id}:
+    put:
+      description: Update an MFA label
+      body:
+        properties:
+          employee_id: string
+          label: string
+        example: |
+          {
+            "employee_id": "12345",
+            "label": "My blue USB key"
+          }
     delete:
       description: Delete an MFA configuration
       body:

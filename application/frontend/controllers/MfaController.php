@@ -108,14 +108,14 @@ class MfaController extends BaseRestController
     }
 
     /**
-     * Delete MFA record
+     * Find an MFA by id and employee_id
+     *
      * @param int $id
-     * @return false|int
+     * @return Mfa|null
      * @throws BadRequestHttpException
      * @throws NotFoundHttpException
-     * @throws ServerErrorHttpException
      */
-    public function actionDelete(int $id)
+    protected function getRequestedMfa($id)
     {
         $employeeId = \Yii::$app->request->getBodyParam('employee_id');
         if ($employeeId == null) {
@@ -124,6 +124,7 @@ class MfaController extends BaseRestController
 
         $user = User::findOne(['employee_id' => $employeeId]);
         if ($user == null) {
+            \Yii::error(['status' => 'error'], __METHOD__);
             throw new BadRequestHttpException("Invalid employee_id");
         }
 
@@ -134,6 +135,22 @@ class MfaController extends BaseRestController
                 1506697614
             );
         }
+
+        return $mfa;
+    }
+
+    /**
+     * Delete MFA record
+     * @param int $id
+     * @return null
+     * @throws \Throwable
+     * @throws BadRequestHttpException
+     * @throws NotFoundHttpException
+     * @throws ServerErrorHttpException
+     */
+    public function actionDelete(int $id)
+    {
+        $mfa = $this->getRequestedMfa($id);
 
         if ($mfa->delete() === false) {
             \Yii::error([
@@ -147,5 +164,38 @@ class MfaController extends BaseRestController
 
         \Yii::$app->response->statusCode = 204;
         return null;
+    }
+
+    /**
+     * @param int $id
+     * @return Mfa|null
+     * @throws BadRequestHttpException
+     * @throws NotFoundHttpException
+     * @throws ServerErrorHttpException
+     * @throws \Throwable
+     * @throws \yii\db\StaleObjectException
+     */
+    public function actionUpdate(int $id)
+    {
+        $mfa = $this->getRequestedMfa($id);
+
+        $label = \Yii::$app->request->getBodyParam('label');
+        if ($label === null) {
+            return $mfa;
+        }
+
+        $mfa->label = $label;
+
+        if ($mfa->update() === false) {
+            \Yii::error([
+                'action' => 'update mfa',
+                'status' => 'error',
+                'error' => $mfa->getFirstErrors(),
+                'mfa_id' => $mfa->id,
+            ]);
+            throw new ServerErrorHttpException("Unable to update MFA option", 1543873675);
+        }
+
+        return $mfa;
     }
 }

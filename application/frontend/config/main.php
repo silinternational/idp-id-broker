@@ -62,6 +62,7 @@ return [
                  */
                 'GET    user/<employeeId:\w+>/mfa'    => 'mfa/list',
                 'POST   mfa'                          => 'mfa/create',
+                'PUT    mfa/<id:\d+>'                 => 'mfa/update',
                 'POST   mfa/<id:\d+>/verify'          => 'mfa/verify',
                 'DELETE mfa/<id:\d+>'                 => 'mfa/delete',
 
