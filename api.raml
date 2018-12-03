@@ -368,12 +368,18 @@ types:
           200:
             body:
               type: MfaResponse[]
+          400:
+            description: User not found for given `employee_id`
+            body:
+              type: Error
     /method:
       get:
         description: Get a list of verified and unverified recovery methods for user
         responses:
           400:
             description: User not found for given `employee_id`
+            body:
+              type: Error
           200:
             body:
               type: MethodResponse[]
@@ -454,8 +460,12 @@ types:
           type: MfaCreationResponse
       400:
         description: The given mfa data does not satisfy some validation rule.
+        body:
+          type: Error
       500:
         description: The server encountered an error
+        body:
+          type: Error
   /{id}:
     delete:
       description: Delete an MFA configuration
@@ -468,8 +478,20 @@ types:
           }
       responses:
         204:
+          description: Successful deletion of record
+        400:
+          description: >
+            `employee_id` was not provided or it did not match an employee record
+          body:
+            type: Error
         404:
+          description: The MFA record was not found
+          body:
+            type: Error
         500:
+          description: Unable to delete the MFA record
+          body:
+            type: Error
     /verify:
       post:
         description: Verify the value provided for this MFA device.
@@ -489,11 +511,17 @@ types:
             description: >
               Value provided failed verification or was unacceptable for some
               other reason (such as an invalid `employee_id`).
+            body:
+              type: Error
           404:
             description: No MFA record found with that `id` and `employee_id`.
+            body:
+              type: Error
           429:
             description: >
               Too many failed attempts for this MFA record recently.
+            body:
+              type: Error
 /method:
   post:
     description: >
@@ -508,10 +536,16 @@ types:
           type: MethodResponse
       400:
         description: Missing parameter
+        body:
+          type: Error
       409:
         description: New method matches an already existing verified method
+        body:
+          type: Error
       500:
         description: Database or other system error
+        body:
+          type: Error
   /{uid}:
     get:
       description: Retrieve a specific, verified recovery method.
@@ -529,6 +563,8 @@ types:
             type: MethodResponse
         404:
           description: User not found or method not found
+          body:
+            type: Error
     delete:
       description: Delete a specific recovery method.
       body:
@@ -543,8 +579,12 @@ types:
           description: Recovery method found and deleted
         404:
           description: User not found or method not found
+          body:
+            type: Error
         500:
           description: Delete failed
+          body:
+            type: Error
     /verify:
       put:
         description: Verify the recovery method by a matching code.
@@ -566,10 +606,16 @@ types:
             description: Missing or invalid code
           404:
             description: User not found or method not found
+            body:
+              type: Error
           429:
             description: Too many verification attempts
+            body:
+              type: Error
           500:
             description: Database or other system error
+            body:
+              type: Error
     /resend:
       put:
         description: Resend the method verification email
@@ -585,5 +631,9 @@ types:
             description: Method found and email sent
           400:
             description: Method already verified
+            body:
+              type: Error
           404:
             description: User not found or method not found
+            body:
+              type: Error
