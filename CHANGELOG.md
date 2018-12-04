@@ -10,6 +10,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   `/authentication` and `/user` endpoints
 - Added recovery methods, as previously defined in idp-pw-api.
 - Added "Do Not Disclose" feature for users with increased privacy concerns
+- Added `PUT /mfa/{mfaId}` endpoint to update MFA labels.
+
 ### Changed
 - Changed password reuse error HTTP status code from 422 to 409
 - Unverified recovery methods are now included in listing from `GET /user/{id}/method`
