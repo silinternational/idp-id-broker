@@ -66,7 +66,7 @@ types:
             enum: [ yes, no ]
           nag:
             enum: [ yes, no ]
-          options: Mfa[]
+          options: MfaResponse[]
       method:
         type: object
         properties:
@@ -95,19 +95,36 @@ types:
           "prompt": "yes",
           "nag": "no",
           "options": [
-             {
-               "id": 123,
-               "type": "totp"
-             },
-             {
-               "id": 234,
-               "type": "u2f",
-               "label": "Blue YubiKey"
-             },
-             {
-               "id": 345,
-               "type": "backupcode"
-             }
+            {
+              "id": 123,
+              "type": "totp",
+              "label": "Google Authenticator",
+              "created_utc": "2017-10-24T20:40:47+00:00",
+              "last_used_utc": null,
+              "data": {
+                "count": 10
+              }
+            },
+            {
+              "id": 234,
+              "type": "u2f",
+              "label": "Blue YubiKey",
+              "created_utc": "2017-10-24T20:40:47+00:00",
+              "last_used_utc": null,
+              "data": {
+                "count": 10
+            }
+            },
+            {
+              "id": 345,
+              "type": "backupcode",
+              "label": "2SV #1",
+              "created_utc": "2017-10-24T20:40:47+00:00",
+              "last_used_utc": null,
+              "data": {
+                  "count": 10
+              }
+            }
           ]
         },
         "password": {
@@ -163,13 +180,6 @@ types:
       {
         "active": "no"
       }
-  Mfa:
-    type: object
-    properties:
-      id: integer
-      type:
-        enum: [ backupcode, totp, u2f ]
-      label?: string
   MfaCreation:
     type: object
     properties:
