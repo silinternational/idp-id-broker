@@ -124,8 +124,14 @@ class MfaController extends BaseRestController
 
         $user = User::findOne(['employee_id' => $employeeId]);
         if ($user == null) {
-            \Yii::error(['status' => 'error'], __METHOD__);
-            throw new BadRequestHttpException("Invalid employee_id");
+            \Yii::error([
+                'action' => 'find user for mfa',
+                'status' => 'error',
+                'employee_id' => $employeeId,
+                'mfaId' => $id,
+                'request' => \Yii::$app->request->url()
+            ]);
+            throw new BadRequestHttpException("Invalid employee_id", 1543934333);
         }
 
         $mfa = Mfa::findOne(['id' => $id, 'user_id' => $user->id]);
