@@ -38,7 +38,7 @@ types:
         "code": 0,
         "status": 400
       }
-  ReturnedUser:
+  UserResponse:
     description: >
       Information on user record. Password is not included if a password
       has not been assigned to the user.
@@ -278,7 +278,7 @@ types:
           authentication succeeded). The body of the response will have the
           attributes of the authenticated User.
         body:
-          type: ReturnedUser
+          type: UserResponse
       400:
         description: >
           The given credentials were NOT acceptable/valid (i.e. - the
@@ -310,7 +310,7 @@ types:
     responses:
       200:
         body:
-          type: ReturnedUser[]
+          type: UserResponse[]
   post:
     description: Create a new user record.
     body:
@@ -319,7 +319,7 @@ types:
       200:
         description: The new user record was created.
         body:
-          type: ReturnedUser
+          type: UserResponse
       422:
         description: The given user data does not satisfy some validation rule.
         body:
@@ -337,7 +337,7 @@ types:
             The corresponding user record (matching on the `employee_id` URL
             parameter).
           body:
-            type: ReturnedUser
+            type: UserResponse
         204:
           description: No user record was found with that `employee_id`.
     put:
@@ -350,7 +350,7 @@ types:
             The corresponding user record (matching on the `employee_id` URL
             parameter) was updated to match the given data.
           body:
-            type: ReturnedUser
+            type: UserResponse
         204:
           description: No user record was found with that `employee_id`.
         422:
@@ -398,7 +398,7 @@ types:
             description: >
               The password for the user with that `employee_id` was successfully updated.
             body:
-              type: ReturnedUser
+              type: UserResponse
           204:
             description: No user record was found with that `employee_id`.
           409:
@@ -435,7 +435,7 @@ types:
       responses:
         200:
           body:
-            type: ReturnedUser[]
+            type: UserResponse[]
   /first-password:
     get:
       description: Get a list of the active users whose first password was created on a given date.
@@ -447,7 +447,7 @@ types:
       responses:
         200:
           body:
-            type: ReturnedUser[]
+            type: UserResponse[]
 /mfa:
   post:
     description: Create a new mfa record.
