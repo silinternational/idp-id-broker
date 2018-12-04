@@ -478,6 +478,22 @@ types:
             "employee_id": "12345",
             "label": "My blue USB key"
           }
+      responses:
+        200:
+          body:
+            type: MfaResponse
+        400:
+          description: Missing or invalid employee_id
+          body:
+            type: Error
+        404:
+          description: MFA record not found or mismatched employee_id
+          body:
+            type: Error
+        500:
+          description: The server encountered an error
+          body:
+            type: Error
     delete:
       description: Delete an MFA configuration
       body:
