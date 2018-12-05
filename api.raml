@@ -66,11 +66,15 @@ types:
             enum: [ yes, no ]
           nag:
             enum: [ yes, no ]
+          review:
+            enum: [ yes, no ]
           options: MfaResponse[]
       method:
         type: object
         properties:
           nag:
+            enum: [ yes, no ]
+          review:
             enum: [ yes, no ]
       password?:
         type: object
@@ -94,6 +98,7 @@ types:
         "mfa": {
           "prompt": "yes",
           "nag": "no",
+          "review": "no",
           "options": [
             {
               "id": 123,
@@ -133,7 +138,8 @@ types:
           "grace_period_ends_on":"2018-06-23 23:59:59 UTC"
         },
         "method": {
-          "nag": "no"
+          "nag": "no",
+          "review": "no"
         }
       }
   UserCreation:
