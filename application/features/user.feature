@@ -3,6 +3,9 @@ Feature: User
   As an authorized requester
   I need to be able to manage user information
 
+  Background:
+    Given the user store is empty
+
   Scenario: Create a new user
     Given a record does not exist with an employee_id of "123"
       And the requester is authorized
