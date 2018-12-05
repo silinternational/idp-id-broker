@@ -26,7 +26,7 @@ use Yii;
  * @property string $manager_email
  * @property string $spouse_email
  * @property string $nag_for_method_after
- * @property int $do_not_disclose
+ * @property string $do_not_disclose
  *
  * @property EmailLog[] $emailLogs
  * @property Method[] $methods
@@ -50,8 +50,8 @@ class UserBase extends \yii\db\ActiveRecord
     {
         return [
             [['uuid', 'employee_id', 'first_name', 'last_name', 'username', 'email', 'active', 'locked', 'last_changed_utc', 'last_synced_utc', 'nag_for_mfa_after', 'nag_for_method_after'], 'required'],
-            [['current_password_id', 'do_not_disclose'], 'integer'],
-            [['active', 'locked', 'require_mfa'], 'string'],
+            [['current_password_id'], 'integer'],
+            [['active', 'locked', 'require_mfa', 'do_not_disclose'], 'string'],
             [['last_changed_utc', 'last_synced_utc', 'nag_for_mfa_after', 'last_login_utc', 'nag_for_method_after'], 'safe'],
             [['uuid'], 'string', 'max' => 64],
             [['employee_id', 'first_name', 'last_name', 'display_name', 'username', 'email', 'manager_email', 'spouse_email'], 'string', 'max' => 255],

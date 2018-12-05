@@ -396,9 +396,7 @@ class User extends UserBase
             'last_login_utc',
             'manager_email',
             'spouse_email',
-            'do_not_disclose' => function ($model): bool {
-                return $model->do_not_disclose;
-            },
+            'do_not_disclose',
             'mfa' => function ($model) {
                 return $model->getMfaFields();
             },
