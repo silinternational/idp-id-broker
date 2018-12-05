@@ -21,10 +21,19 @@ class User extends UserBase
     const SCENARIO_UPDATE_PASSWORD = 'update_password';
     const SCENARIO_AUTHENTICATE    = 'authenticate';
 
+    const NAG_NONE          = 'none';
+    const NAG_ADD_MFA       = 'add_mfa';
+    const NAG_REVIEW_MFA    = 'review_mfa';
+    const NAG_ADD_METHOD    = 'add_method';
+    const NAG_REVIEW_METHOD = 'review_method';
+
     public $password;
 
     /** @var Ldap */
     private $ldap;
+
+    /** @var string */
+    private $nagState;
 
     /**
      * {@inheritdoc}
@@ -428,13 +437,42 @@ class User extends UserBase
     }
 
     /**
-     * Is it time to nag the user to add an MFA?
-     *
-     * @return bool
+     * Based on current time and presence of MFA and Method options,
+     * determine which "nag" to present to the user.
      */
-    public function isTimeToNagForMfa()
+    public function getNagState()
     {
-        return strtotime($this->nag_for_mfa_after) < time();
+        /*
+         * Don't recalculate in case the date has changed since the last calculation.
+         */
+        if ($this->nagState !== null) return $this->nagState;
+
+        $now = time();
+
+        if (strtotime($this->nag_for_mfa_after) < $now) {
+            if (count($this->mfas) === 0) {
+                $this->nagState = self::NAG_ADD_MFA;
+            } else {
+                $this->nagState = self::NAG_REVIEW_MFA;
+            }
+        }
+
+        if (strtotime($this->nag_for_method_after) < $now) {
+            if (count($this->methods) === 0) {
+                /*
+                 * NAG_ADD_METHOD overrides NAG_REVIEW_MFA
+                 */
+                if ($this->nagState === self::NAG_REVIEW_MFA) $this->nagState = self::NAG_ADD_METHOD;
+
+                $this->nagState = $this->nagState ?? self::NAG_ADD_METHOD;
+            } else {
+                $this->nagState = $this->nagState ?? self::NAG_REVIEW_METHOD;
+            }
+        }
+
+        $this->nagState = $this->nagState ?? self::NAG_NONE;
+
+        return $this->nagState;
     }
 
     /**
@@ -444,7 +482,8 @@ class User extends UserBase
     {
         return [
             'prompt'  => $this->isPromptForMfa() ? 'yes' : 'no',
-            'nag'     => (! $this->isPromptForMfa() && $this->isTimeToNagForMfa()) ? 'yes' : 'no',
+            'nag'     => (! $this->isPromptForMfa() && $this->getNagState() == self::NAG_ADD_MFA) ? 'yes' : 'no',
+            'review'  => $this->getNagState() == self::NAG_REVIEW_MFA ? 'yes' : 'no',
             'options' => $this->getVerifiedMfaOptions(),
         ];
     }
@@ -462,24 +501,16 @@ class User extends UserBase
     }
 
     /**
-     * Is it time to nag the user to add a recovery method?
-     *
-     * @return bool
-     */
-    public function isTimeToNagForMethod()
-    {
-        return strtotime($this->nag_for_method_after) < time();
-    }
-
-    /**
      * Return method-related properties to include in /user responses
      *
      * @return array method-related properties
+     * @throws \Exception
      */
     public function getMethodFields()
     {
         return [
-            'nag' => ( ! $this->isTimeToNagForMfa() && $this->isTimeToNagForMethod()) ? 'yes' : 'no',
+            'nag' => $this->getNagState() == self::NAG_ADD_METHOD ? 'yes' : 'no',
+            'review' => $this->getNagState() == self::NAG_REVIEW_METHOD ? 'yes' : 'no',
         ];
     }
 
@@ -755,19 +786,16 @@ class User extends UserBase
     }
 
     /**
-     * Update the first nag_for_*_after date that has passed
+     * Update the nag_for_*_after date that corresponds to the current nag state
      */
     public function updateNagDates()
     {
-        // save current time to avoid race condition
-        $now = time();
-
-        if (strtotime($this->nag_for_mfa_after) < $now) {
+        if ($this->getNagState() === self::NAG_ADD_MFA || $this->getNagState() === self::NAG_REVIEW_MFA) {
             $this->nag_for_mfa_after = MySqlDateTime::relative(\Yii::$app->params['mfaNagInterval']);
             return;
         }
 
-        if (strtotime($this->nag_for_method_after) < $now) {
+        if ($this->getNagState() === self::NAG_ADD_METHOD || $this->getNagState() === self::NAG_REVIEW_METHOD) {
             $this->nag_for_method_after = MySqlDateTime::relative(\Yii::$app->params['methodNagInterval']);
             return;
         }
