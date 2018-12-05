@@ -270,8 +270,26 @@ class FeatureContext extends YiiContext
     public function theFollowingDataReturned($isOrIsNot, TableNode $data)
     {
         foreach ($data as $row) {
-            $isOrIsNot === 'is' ? Assert::eq($this->resBody[$row['property']], $row['value'])
-                                : Assert::keyNotExists($this->resBody, $row['property']);
+            if (strpos($row['property'], '.') !== false) {
+                $name = explode('.', $row['property'], 2);
+                if ($isOrIsNot === 'is') {
+                    Assert::eq(
+                        $this->resBody[$name[0]][$name[1]],
+                        $row['value'],
+                        sprintf(
+                            '"%s" not equal to "%s", "%s" found',
+                            $row['property'],
+                            $row['value'],
+                            $this->resBody[$name[0]][$name[1]]
+                        )
+                    );
+                } else {
+                    Assert::true(false, "invalid test condition");
+                }
+            } else {
+                $isOrIsNot === 'is' ? Assert::eq($this->resBody[$row['property']], $row['value'])
+                    : Assert::keyNotExists($this->resBody, $row['property']);
+            }
         }
     }
 
