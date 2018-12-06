@@ -3,6 +3,9 @@ Feature: User
   In order to report about mfa usage
   I need to be able to count active users with diffent kinds of verified mfa records
 
+  Background:
+    Given the user store is empty
+
   Scenario: Get a count of active users with a verified mfa
     Given that no mfas or users exist
       And I create a new user

@@ -9,7 +9,7 @@ default:
         analytics_features:
             paths:
                 - "%paths.base%/features/analytics.feature"
-            contexts: [ Sil\SilIdBroker\Behat\Context\AnalyticsContext ]
+            contexts: [ FeatureContext, Sil\SilIdBroker\Behat\Context\AnalyticsContext ]
         email_features:
             paths:
                 - "%paths.base%/features/email.feature"
