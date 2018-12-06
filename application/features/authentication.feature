@@ -177,10 +177,6 @@ Feature: Authentication
     When I request "/authentication" be created
     Then the response status code should be 200
 
-#    TODO: attempt to authenticate a user who doesn't have a password yet, expect 400 (ensure timing attack protection is enforced)
-# TODO: need test for check that a user's password is good all the way until midnight of the expiration/grace period dates
-# TODO: need test to allow username or email address to be used for authentication
-
   Scenario: Check "nag" flags on user resource in response to authenticate call
     Given I provide the following valid data:
       | property  | value       |
@@ -211,113 +207,7 @@ Feature: Authentication
       | mfa.nag       | no                    |
       | mfa.review    | no                    |
 
-  Scenario: Check "nag" flags on user resource when user has at least one MFA
-    Given I provide the following valid data:
-      | property    | value |
-      | employee_id | 123   |
-      | type        | totp  |
-    And I request "/mfa" be created
-    And I provide the following valid data:
-      | property  | value       |
-      | username  | shep_clark  |
-      | password  | govols!!!   |
-    And I request "/authentication" be created
-    Then the following data is returned:
-      | property      | value                 |
-      | employee_id   | 123                   |
-      | method.nag    | yes                   |
-      | method.review | no                    |
-      | mfa.nag       | no                    |
-      | mfa.review    | no                    |
-    When I request "/authentication" be created
-    Then the following data is returned:
-      | property      | value                 |
-      | employee_id   | 123                   |
-      | method.nag    | no                    |
-      | method.review | no                    |
-      | mfa.nag       | no                    |
-      | mfa.review    | yes                   |
-    When I request "/authentication" be created
-    Then the following data is returned:
-      | property      | value                 |
-      | employee_id   | 123                   |
-      | method.nag    | no                    |
-      | method.review | no                    |
-      | mfa.nag       | no                    |
-      | mfa.review    | no                    |
-
-  Scenario: Check "nag" flags on user resource when user has at least one Method
-    Given I provide the following valid data:
-      | property    | value                 |
-      | employee_id | 123                   |
-      | value       | alternate@example.org |
-    And I request "/method" be created
-    And I provide the following valid data:
-      | property  | value       |
-      | username  | shep_clark  |
-      | password  | govols!!!   |
-    And I request "/authentication" be created
-    Then the following data is returned:
-      | property      | value                 |
-      | employee_id   | 123                   |
-      | method.nag    | no                    |
-      | method.review | no                    |
-      | mfa.nag       | yes                   |
-      | mfa.review    | no                    |
-    When I request "/authentication" be created
-    Then the following data is returned:
-      | property      | value                 |
-      | employee_id   | 123                   |
-      | method.nag    | no                    |
-      | method.review | yes                   |
-      | mfa.nag       | no                    |
-      | mfa.review    | no                    |
-    When I request "/authentication" be created
-    Then the following data is returned:
-      | property      | value                 |
-      | employee_id   | 123                   |
-      | method.nag    | no                    |
-      | method.review | no                    |
-      | mfa.nag       | no                    |
-      | mfa.review    | no                    |
-
-  Scenario: Check "nag" flags on user resource when user has both Methods and MFAs
-    Given I provide the following valid data:
-      | property    | value                 |
-      | employee_id | 123                   |
-      | value       | alternate@example.org |
-    And I request "/method" be created
-    And I provide the following valid data:
-      | property    | value                 |
-      | employee_id | 123                   |
-      | type        | u2f                   |
-    And I request "/mfa" be created
-    And I provide the following valid data:
-      | property  | value       |
-      | username  | shep_clark  |
-      | password  | govols!!!   |
-    And I request "/authentication" be created
-    Then the following data is returned:
-      | property      | value                 |
-      | employee_id   | 123                   |
-      | method.nag    | no                    |
-      | method.review | no                    |
-      | mfa.nag       | no                    |
-      | mfa.review    | yes                   |
-    When I request "/authentication" be created
-    Then the following data is returned:
-      | property      | value                 |
-      | employee_id   | 123                   |
-      | method.nag    | no                    |
-      | method.review | yes                   |
-      | mfa.nag       | no                    |
-      | mfa.review    | no                    |
-    When I request "/authentication" be created
-    Then the following data is returned:
-      | property      | value                 |
-      | employee_id   | 123                   |
-      | method.nag    | no                    |
-      | method.review | no                    |
-      | mfa.nag       | no                    |
-      | mfa.review    | no                    |
+# TODO: attempt to authenticate a user who doesn't have a password yet, expect 400 (ensure timing attack protection is enforced)
+# TODO: need test for check that a user's password is good all the way until midnight of the expiration/grace period dates
+# TODO: need test to allow username or email address to be used for authentication
 
