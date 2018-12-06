@@ -65,18 +65,22 @@ types:
         properties:
           prompt:
             enum: [ yes, no ]
-          nag:
+          add:
             enum: [ yes, no ]
+            description: Flag to indicate whether to remind the user to add an MFA option
           review:
             enum: [ yes, no ]
+            description: Flag to indicate whether to remind the user to review their MFA options
           options: MfaResponse[]
       method:
         type: object
         properties:
-          nag:
+          add:
             enum: [ yes, no ]
+            description: Flag to indicate whether to remind the user to add a recovery method
           review:
             enum: [ yes, no ]
+            description: Flag to indicate whether to remind the user to review their recovery methods
       password?:
         type: object
         properties:
@@ -98,7 +102,7 @@ types:
         "hide": "no",
         "mfa": {
           "prompt": "yes",
-          "nag": "no",
+          "add": "no",
           "review": "no",
           "options": [
             {
@@ -139,7 +143,7 @@ types:
           "grace_period_ends_on":"2018-06-23 23:59:59 UTC"
         },
         "method": {
-          "nag": "no",
+          "add": "no",
           "review": "no"
         }
       }

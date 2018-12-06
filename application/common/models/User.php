@@ -480,12 +480,15 @@ class User extends UserBase
     {
         return [
             'prompt'  => $this->isPromptForMfa() ? 'yes' : 'no',
-            'nag'     => (! $this->isPromptForMfa() && $this->getNagState() == self::NAG_ADD_MFA) ? 'yes' : 'no',
+            'add'     => $this->getNagState() == self::NAG_ADD_MFA ? 'yes' : 'no',
             'review'  => $this->getNagState() == self::NAG_REVIEW_MFA ? 'yes' : 'no',
             'options' => $this->getVerifiedMfaOptions(),
         ];
     }
 
+    /**
+     * @return Mfa[]
+     */
     public function getVerifiedMfaOptions()
     {
         $mfas = [];
@@ -498,6 +501,9 @@ class User extends UserBase
         return $mfas;
     }
 
+    /**
+     * @return Method[]
+     */
     public function getVerifiedMethodOptions()
     {
         return array_filter($this->methods, function ($method) {
@@ -514,7 +520,7 @@ class User extends UserBase
     public function getMethodFields()
     {
         return [
-            'nag' => $this->getNagState() == self::NAG_ADD_METHOD ? 'yes' : 'no',
+            'add' => $this->getNagState() == self::NAG_ADD_METHOD ? 'yes' : 'no',
             'review' => $this->getNagState() == self::NAG_REVIEW_METHOD ? 'yes' : 'no',
         ];
     }

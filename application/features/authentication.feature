@@ -186,25 +186,25 @@ Feature: Authentication
     Then the following data is returned:
       | property      | value                 |
       | employee_id   | 123                   |
-      | method.nag    | no                    |
+      | method.add    | no                    |
       | method.review | no                    |
-      | mfa.nag       | yes                   |
+      | mfa.add       | yes                   |
       | mfa.review    | no                    |
     When I request "/authentication" be created
     Then the following data is returned:
       | property      | value                 |
       | employee_id   | 123                   |
-      | method.nag    | yes                   |
+      | method.add    | yes                   |
       | method.review | no                    |
-      | mfa.nag       | no                    |
+      | mfa.add       | no                    |
       | mfa.review    | no                    |
     When I request "/authentication" be created
     Then the following data is returned:
       | property      | value                 |
       | employee_id   | 123                   |
-      | method.nag    | no                    |
+      | method.add    | no                    |
       | method.review | no                    |
-      | mfa.nag       | no                    |
+      | mfa.add       | no                    |
       | mfa.review    | no                    |
 
 # TODO: attempt to authenticate a user who doesn't have a password yet, expect 400 (ensure timing attack protection is enforced)
