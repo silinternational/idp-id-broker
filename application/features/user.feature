@@ -409,44 +409,8 @@ Feature: User
     When I request a list of verified methods
     Then I see a list containing 1 method
 
-  Scenario: Check "nag" state when user has no Methods or Mfas
-    Given A user with 0 verified methods, 0 unverified method, 0 verified mfas, and 0 unverified mfas
-    And the nag dates are in the past
-    When I request the nag state
-    Then I see that the nag state is "add_mfa"
-    And I update the nag dates
-    When I request the nag state
-    Then I see that the nag state is "add_method"
-    And I update the nag dates
-    When I request the nag state
-    Then I see that the nag state is "none"
-
-  Scenario: Check "nag" state when user has at least one verified Method
-    Given A user with 1 verified methods, 1 unverified method, 0 verified mfas, and 0 unverified mfas
-     And the nag dates are in the past
-    When I request the nag state
-    Then I see that the nag state is "add_mfa"
-     And I update the nag dates
-    When I request the nag state
-    Then I see that the nag state is "review_method"
-     And I update the nag dates
-    When I request the nag state
-    Then I see that the nag state is "none"
-
-  Scenario: Check "nag" state when user has at least one verified Mfa
-    Given A user with 0 verified methods, 0 unverified method, 1 verified mfas, and 1 unverified mfas
-    And the nag dates are in the past
-    When I request the nag state
-    Then I see that the nag state is "add_method"
-    And I update the nag dates
-    When I request the nag state
-    Then I see that the nag state is "review_mfa"
-    And I update the nag dates
-    When I request the nag state
-    Then I see that the nag state is "none"
-
   Scenario Outline: Check "nag" state when user has or doesn't have methods and mfas
-    Given A user with <verifiedMethods> verified methods, <unverifiedMethods> unverified method, <verifiedMfas> verified mfas, and <unverifiedMfas> unverified mfas
+    Given A user with <verifiedMethods> verified methods, <unverifiedMethods> unverified methods, <verifiedMfas> verified mfas, and <unverifiedMfas> unverified mfas
     And the nag dates are in the past
     When I request the nag state
     Then I see that the nag state is <state1>
