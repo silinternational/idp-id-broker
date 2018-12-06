@@ -4,7 +4,6 @@ namespace Sil\SilIdBroker\Behat\Context;
 use common\helpers\MySqlDateTime;
 use common\models\Method;
 use common\models\Mfa;
-use common\models\MfaBackupcode;
 use common\models\User;
 use Webmozart\Assert\Assert;
 
@@ -64,9 +63,8 @@ class UnitTestsContext extends YiiContext
 
     protected function createMfa($type, $verified = 1, $user = null)
     {
-        if ($user === null) {
-            $user = $this->tempUser;
-        }
+        $user = $user ?? $this->tempUser;
+
         $mfa = new Mfa();
         $mfa->user_id = $user->id;
         $mfa->type = $type;
@@ -80,9 +78,8 @@ class UnitTestsContext extends YiiContext
 
     protected function createMethod($value, $verified = 1, $user = null)
     {
-        if ($user === null) {
-            $user = $this->tempUser;
-        }
+        $user = $user ?? $this->tempUser;
+
         $method = new Method();
         $method->user_id = $user->id;
         $method->value = $value;
@@ -90,8 +87,6 @@ class UnitTestsContext extends YiiContext
 
         Assert::true($method->save(), "Could not create new method.");
         $user->refresh();
-        $this->methodId = $method['id'];
-        $this->method = $method;
     }
 
     /**
@@ -166,6 +161,10 @@ class UnitTestsContext extends YiiContext
     public function iUpdateTheNagDates()
     {
         $this->tempUser->updateNagDates();
+
+        /*
+         * Force an update the next time getNagState() is called
+         */
         $this->tempUser->nagState = null;
     }
 }
