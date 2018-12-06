@@ -129,7 +129,7 @@ class MfaController extends BaseRestController
                 'status' => 'error',
                 'employee_id' => $employeeId,
                 'mfaId' => $id,
-                'request' => \Yii::$app->request->url()
+                'request' => \Yii::$app->request->url
             ]);
             throw new BadRequestHttpException("Invalid employee_id", 1543934333);
         }

@@ -97,7 +97,7 @@ class User extends UserBase
             'nag_for_mfa_after',
             'nag_for_method_after',
             'spouse_email',
-            'do_not_disclose',
+            'hide',
         ];
 
         $scenarios[self::SCENARIO_UPDATE_USER] = [
@@ -111,7 +111,7 @@ class User extends UserBase
             'manager_email',
             'require_mfa',
             'spouse_email',
-            'do_not_disclose',
+            'hide',
         ];
 
         $scenarios[self::SCENARIO_UPDATE_PASSWORD] = ['password'];
@@ -396,9 +396,7 @@ class User extends UserBase
             'last_login_utc',
             'manager_email',
             'spouse_email',
-            'do_not_disclose' => function ($model): bool {
-                return $model->do_not_disclose;
-            },
+            'hide',
             'mfa' => function ($model) {
                 return $model->getMfaFields();
             },

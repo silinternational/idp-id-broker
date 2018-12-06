@@ -58,7 +58,8 @@ types:
       last_login_utc?: string
       manager_email?: string
       spouse_email?: string
-      do_not_disclose: boolean
+      hide:
+        enum: [ yes, no ]
       mfa:
         type: object
         properties:
@@ -90,7 +91,7 @@ types:
         "active": "yes",
         "locked": "no",
         "last_login_utc": "2017-05-24 14:04:51 UTC",
-        "do_not_disclose": false,
+        "hide": "no",
         "mfa": {
           "prompt": "yes",
           "nag": "no",
@@ -151,7 +152,8 @@ types:
         enum: [ yes, no ]
       manager_email?: string
       spouse_email?: string
-      do_not_disclose: boolean
+      hide:
+        enum: [ yes, no ]
     example: |
       {
         "employee_id": "12345",
@@ -159,7 +161,7 @@ types:
         "last_name": "Smith",
         "username": "john_smith",
         "email": "john_smith@example.com",
-        "do_not_disclose": false
+        "hide": "no"
       }
   UserUpdate:
     type: object
@@ -175,7 +177,8 @@ types:
         enum: [ yes, no ]
       manager_email?: string
       spouse_email?: string
-      do_not_disclose?: boolean
+      hide?:
+        enum: [ yes, no ]
     example: |
       {
         "active": "no"
