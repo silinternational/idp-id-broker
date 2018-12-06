@@ -5,7 +5,7 @@ default:
                 - "%paths.base%/features/authentication.feature"
                 - "%paths.base%/features/password.feature"
                 - "%paths.base%/features/user.feature"
-            contexts: [ FeatureContext ]
+            contexts: [ FeatureContext, Sil\SilIdBroker\Behat\Context\UnitTestsContext ]
         analytics_features:
             paths:
                 - "%paths.base%/features/analytics.feature"
