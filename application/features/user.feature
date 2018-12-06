@@ -404,6 +404,11 @@ Feature: User
     Then the response status code should be 200
       And I should receive 2 users
 
+  Scenario: Get list of verified methods for a user
+    Given A user with 1 verified methods, 1 unverified method, 0 verified mfas, and 0 unverified mfas
+    When I request a list of verified methods
+    Then I see a list containing 1 method
+
   Scenario: Check "nag" state when user has no Methods or Mfas
     Given A user with 0 verified methods, 0 unverified method, 0 verified mfas, and 0 unverified mfas
     And the nag dates are in the past

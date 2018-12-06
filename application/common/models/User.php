@@ -33,7 +33,7 @@ class User extends UserBase
     private $ldap;
 
     /** @var string */
-    private $nagState;
+    public $nagState;
 
     /**
      * {@inheritdoc}
@@ -448,7 +448,7 @@ class User extends UserBase
         $now = time();
 
         if (strtotime($this->nag_for_mfa_after) < $now) {
-            if (count($this->mfas) === 0) {
+            if (count($this->getVerifiedMfaOptions()) === 0) {
                 $this->nagState = self::NAG_ADD_MFA;
             } else {
                 $this->nagState = self::NAG_REVIEW_MFA;
@@ -456,7 +456,7 @@ class User extends UserBase
         }
 
         if (strtotime($this->nag_for_method_after) < $now) {
-            if (count($this->methods) === 0) {
+            if (count($this->getVerifiedMethodOptions()) === 0) {
                 /*
                  * NAG_ADD_METHOD overrides NAG_REVIEW_MFA
                  */
@@ -496,6 +496,13 @@ class User extends UserBase
             }
         }
         return $mfas;
+    }
+
+    public function getVerifiedMethodOptions()
+    {
+        return array_filter($this->methods, function ($method) {
+            return $method->verified === 1;
+        });
     }
 
     /**
