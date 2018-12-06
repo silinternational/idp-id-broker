@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Added recovery method reminder flag to user resource returned from
   `/authentication` and `/user` endpoints
 - Added recovery methods, as previously defined in idp-pw-api.
-- Added "Do Not Disclose" feature for users with increased privacy concerns
+- Added "Hide" feature for users with increased privacy concerns
 - Added `PUT /mfa/{mfaId}` endpoint to update MFA labels.
 
 ### Changed
