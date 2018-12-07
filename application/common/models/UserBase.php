@@ -31,6 +31,7 @@ use Yii;
  * @property EmailLog[] $emailLogs
  * @property Method[] $methods
  * @property Mfa[] $mfas
+ * @property NewUserCode[] $newUserCodes
  * @property Password $currentPassword
  */
 class UserBase extends \yii\db\ActiveRecord
@@ -49,7 +50,7 @@ class UserBase extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['uuid', 'employee_id', 'first_name', 'last_name', 'username', 'email', 'active', 'locked', 'last_changed_utc', 'last_synced_utc', 'nag_for_mfa_after', 'nag_for_method_after'], 'required'],
+            [['uuid', 'employee_id', 'first_name', 'last_name', 'username', 'email', 'active', 'locked', 'last_changed_utc', 'last_synced_utc', 'nag_for_mfa_after', 'nag_for_method_after', 'hide'], 'required'],
             [['current_password_id'], 'integer'],
             [['active', 'locked', 'require_mfa', 'hide'], 'string'],
             [['last_changed_utc', 'last_synced_utc', 'nag_for_mfa_after', 'last_login_utc', 'nag_for_method_after'], 'safe'],
@@ -113,6 +114,14 @@ class UserBase extends \yii\db\ActiveRecord
     public function getMfas()
     {
         return $this->hasMany(Mfa::className(), ['user_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getNewUserCodes()
+    {
+        return $this->hasMany(NewUserCode::className(), ['user_id' => 'id']);
     }
 
     /**

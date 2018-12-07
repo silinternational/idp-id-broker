@@ -22,6 +22,7 @@ class AuthenticationController extends BaseRestController
         $authentication = new Authentication(
             (string)Yii::$app->request->getBodyParam('username'),
             (string)Yii::$app->request->getBodyParam('password'),
+            (string)Yii::$app->request->getBodyParam('code'),
             $migratePasswords ? Yii::$app->ldap : null
         );
 
@@ -31,6 +32,11 @@ class AuthenticationController extends BaseRestController
             return $authenticatedUser;
         }
 
-        throw new BadRequestHttpException();
+        \Yii::error([
+            'action' => 'authentication',
+            'status' => 'error',
+            'message' => $authentication->getErrors(),
+        ]);
+        throw new BadRequestHttpException(json_encode($authentication->getErrors()));
     }
 }

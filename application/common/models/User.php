@@ -20,6 +20,7 @@ class User extends UserBase
     const SCENARIO_UPDATE_USER     = 'update_user';
     const SCENARIO_UPDATE_PASSWORD = 'update_password';
     const SCENARIO_AUTHENTICATE    = 'authenticate';
+    const SCENARIO_NEW_USER_CODE   = 'new_user_code';
 
     const NAG_NONE          = 'none';
     const NAG_ADD_MFA       = 'add_mfa';
@@ -27,6 +28,7 @@ class User extends UserBase
     const NAG_ADD_METHOD    = 'add_method';
     const NAG_REVIEW_METHOD = 'review_method';
 
+    /** @var string */
     public $password;
 
     /** @var Ldap */
@@ -127,6 +129,8 @@ class User extends UserBase
 
         $scenarios[self::SCENARIO_AUTHENTICATE] = ['username', 'password', '!active', '!locked'];
 
+        $scenarios[self::SCENARIO_NEW_USER_CODE] = ['!active', '!locked'];
+
         return $scenarios;
     }
 
@@ -152,7 +156,7 @@ class User extends UserBase
                 'nag_for_method_after', 'default', 'value' => MySqlDateTime::today(),
             ],
             [
-                ['active', 'locked', 'require_mfa'], 'in', 'range' => ['yes', 'no'],
+                ['active', 'locked', 'require_mfa', 'hide'], 'in', 'range' => ['yes', 'no'],
             ],
             [
                 'email', 'email',
@@ -178,11 +182,11 @@ class User extends UserBase
             ],
             [
                 'active', 'compare', 'compareValue' => 'yes',
-                'on' => self::SCENARIO_AUTHENTICATE,
+                'on' => [self::SCENARIO_AUTHENTICATE, self::SCENARIO_NEW_USER_CODE],
             ],
             [
                 'locked', 'compare', 'compareValue' => 'no',
-                'on' => self::SCENARIO_AUTHENTICATE,
+                'on' => [self::SCENARIO_AUTHENTICATE, self::SCENARIO_NEW_USER_CODE],
             ],
             [
                 ['manager_email', 'spouse_email'], 'email',

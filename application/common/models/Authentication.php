@@ -17,6 +17,7 @@ class Authentication
      *
      * @param string $username The username to try.
      * @param string $password The password to try.
+     * @param string $welcomeCode New user welcome code. If not blank, username and password are ignored.
      * @param Ldap|null $ldap (Optional:) The LDAP to use for lazy-loading
      *     passwords not yet stored in our local database. Defaults to null,
      *     meaning passwords will not be migrated.
@@ -24,21 +25,67 @@ class Authentication
     public function __construct(
         string $username,
         string $password,
+        string $welcomeCode = null,
         $ldap = null
     ) {
-        /* @var $user User */
-        $user = User::findByUsername($username) ??
-                User::findByEmail($username)    ?? // maybe we got an email
-                new User();
+        if ($welcomeCode == null) {
+            /* @var $user User */
+            $user = User::findByUsername($username) ??
+                    User::findByEmail($username)    ?? // maybe we got an email
+                    new User();
 
-        $user->scenario = User::SCENARIO_AUTHENTICATE;
+            $user->scenario = User::SCENARIO_AUTHENTICATE;
+            $user->password = $password;
 
-        if ($ldap instanceof Ldap) {
-            $user->setLdap($ldap);
+            if ($ldap instanceof Ldap) {
+                $user->setLdap($ldap);
+            }
+        } else {
+            /* @var $code NewUserCode */
+            $code = NewUserCode::findOne(['uuid' => $welcomeCode]);
+            if ( ! $this->isValidCode($code)) {
+                return;
+            }
+
+            /* @var $user User */
+            $user = $code->user;
+            $user->scenario = User::SCENARIO_NEW_USER_CODE;
         }
 
-        $user->password = $password;
+        $this->validateUser($user);
+    }
 
+    /**
+     * Run NewUserCode validation rules. It is assumed that the uuid is a match
+     * if the provided object is not null.
+     *
+     * @param NewUserCode|null $code
+     * @return bool
+     */
+    protected function isValidCode($code): bool
+    {
+        if ($code instanceof NewUserCode) {
+            if ( ! $code->validate()) {
+                $this->errors = $code->getErrors();
+                return false;
+            }
+            return true;
+        }
+        $this->errors = [
+            'code' => ['Invalid code']
+        ];
+        return false;
+    }
+
+    /**
+     * Run User validation rules. If all rules pass, $this->authenticatedUser will be a
+     * clone of the User, and the User record in the database will be updated with new
+     * login and reminder dates.
+     *
+     * @param User $user
+     */
+    protected function validateUser(User $user)
+    {
         if ($user->validate()) {
 
             $this->authenticatedUser = clone $user;
