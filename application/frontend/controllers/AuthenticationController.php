@@ -37,6 +37,6 @@ class AuthenticationController extends BaseRestController
             'status' => 'error',
             'message' => $authentication->getErrors(),
         ]);
-        throw new BadRequestHttpException(json_encode($authentication->getErrors()));
+        throw new BadRequestHttpException();
     }
 }

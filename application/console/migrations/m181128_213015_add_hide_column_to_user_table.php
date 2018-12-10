@@ -12,7 +12,7 @@ class m181128_213015_add_hide_column_to_user_table extends Migration
      */
     public function safeUp()
     {
-        $this->addColumn('user', 'hide', "enum('no','yes') not null");
+        $this->addColumn('user', 'hide', "enum('no','yes') not null default 'no'");
     }
 
     /**
