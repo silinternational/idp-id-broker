@@ -207,6 +207,41 @@ Feature: Authentication
       | mfa.add       | no                    |
       | mfa.review    | no                    |
 
+  Scenario: Correct "new user" code for an account with no password in the db
+    Given the user "shep_clark" has no password in the database
+    And the user "shep_clark" has a non-expired new user code "xyz123"
+    And I provide the following valid data:
+      | property  | value       |
+      | code      | xyz123      |
+    When I request "/authentication" be created
+    Then the response status code should be 200
+
+  Scenario: Correct "new user" code for an account with a password in the db
+    Given the user "shep_clark" has a non-expired new user code "xyz123"
+    And I provide the following valid data:
+      | property  | value       |
+      | code      | xyz123      |
+    When I request "/authentication" be created
+    Then the response status code should be 400
+
+  Scenario: Correct but expired "new user" code for an account with no password in the db
+    Given the user "shep_clark" has no password in the database
+    And the user "shep_clark" has an expired new user code "xyz123"
+    And I provide the following valid data:
+      | property  | value       |
+      | code      | xyz123      |
+    When I request "/authentication" be created
+    Then the response status code should be 400
+
+  Scenario: Incorrect "new user" code for an account with no password in the db
+    Given the user "shep_clark" has no password in the database
+    And the user "shep_clark" has a non-expired new user code "xyz123"
+    And I provide the following valid data:
+      | property  | value       |
+      | code      | abc123      |
+    When I request "/authentication" be created
+    Then the response status code should be 400
+
 # TODO: attempt to authenticate a user who doesn't have a password yet, expect 400 (ensure timing attack protection is enforced)
 # TODO: need test for check that a user's password is good all the way until midnight of the expiration/grace period dates
 # TODO: need test to allow username or email address to be used for authentication

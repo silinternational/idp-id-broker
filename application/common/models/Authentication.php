@@ -28,7 +28,7 @@ class Authentication
         string $welcomeCode = null,
         $ldap = null
     ) {
-        if ($welcomeCode == null) {
+        if ($welcomeCode == null || $welcomeCode == '') {
             /* @var $user User */
             $user = User::findByUsername($username) ??
                     User::findByEmail($username)    ?? // maybe we got an email
@@ -43,38 +43,26 @@ class Authentication
         } else {
             /* @var $code NewUserCode */
             $code = NewUserCode::findOne(['uuid' => $welcomeCode]);
-            if ( ! $this->isValidCode($code)) {
+            if ($code === null) {
+                $this->errors = ['Invalid code.'];
+                return;
+            }
+            if ( ! $code->isValidCode()) {
+                $this->errors = ['Expired code.'];
                 return;
             }
 
             /* @var $user User */
             $user = $code->user;
             $user->scenario = User::SCENARIO_NEW_USER_CODE;
+
+            if($user->current_password_id !== null) {
+                $this->errors = ['Code invalid. Password has been set.'];
+                return;
+            }
         }
 
         $this->validateUser($user);
-    }
-
-    /**
-     * Run NewUserCode validation rules. It is assumed that the uuid is a match
-     * if the provided object is not null.
-     *
-     * @param NewUserCode|null $code
-     * @return bool
-     */
-    protected function isValidCode($code): bool
-    {
-        if ($code instanceof NewUserCode) {
-            if ( ! $code->validate()) {
-                $this->errors = $code->getErrors();
-                return false;
-            }
-            return true;
-        }
-        $this->errors = [
-            'code' => ['Invalid code']
-        ];
-        return false;
     }
 
     /**

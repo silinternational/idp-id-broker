@@ -22,23 +22,9 @@ class NewUserCode extends NewUserCodeBase
                 'created_utc', 'default', 'value' => MySqlDateTime::now(),
             ],
             [
-                'expires_on',
-                $this->validateExpiration(),
+                'expires_on', 'default', 'value' => $this->expires(),
             ],
         ], parent::rules());
-    }
-
-    public function behaviors(): array
-    {
-        return [
-            'expirationTracker' => [
-                'class' => AttributeBehavior::className(),
-                'attributes' => [
-                    ActiveRecord::EVENT_BEFORE_INSERT => 'expires_on',
-                ],
-                'value' => $this->expires()
-            ],
-        ];
     }
 
     private function expires(): Closure
@@ -60,16 +46,14 @@ class NewUserCode extends NewUserCodeBase
         return $labels;
     }
 
-    private function validateExpiration(): Closure
+    public function isValidCode()
     {
-        return function ($attributeName) {
-            $expiration = strtotime($this->expires_on);
+        $expiration = strtotime($this->expires_on);
 
-            $now = time();
-
-            if ($now > $expiration) {
-                $this->addError($attributeName, 'Expired code.');
-            }
-        };
+        $now = time();
+        if ($now > $expiration) {
+            return false;
+        }
+        return true;
     }
 }
