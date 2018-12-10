@@ -143,7 +143,7 @@ class User extends UserBase
                 'nag_for_method_after', 'default', 'value' => MySqlDateTime::today(),
             ],
             [
-                ['active', 'locked', 'require_mfa'], 'in', 'range' => ['yes', 'no'],
+                ['active', 'locked', 'require_mfa', 'hide'], 'in', 'range' => ['yes', 'no'],
             ],
             [
                 'email', 'email',
