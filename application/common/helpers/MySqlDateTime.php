@@ -75,4 +75,24 @@ class MySqlDateTime
 
         return strtotime($dbDate) >= strtotime($recentDate);
     }
+
+    /**
+     * Compare a time in MySQL format (yyyy-mm-dd) to an epoch time as returned from time().
+     * Returns true if $eventTime is the same day or before $now.
+     *
+     * @param string $eventTime
+     * @param int $now
+     * @return bool
+     * @throws \Exception
+     */
+    public static function isBefore(string $eventTime, int $now)
+    {
+        $eventTimeEpoch = strtotime($eventTime);
+        if ($eventTimeEpoch === false) {
+            throw new \Exception('could not interpret time string');
+        }
+
+        return ! ($eventTimeEpoch > $now);
+    }
+
 }
