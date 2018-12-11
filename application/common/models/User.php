@@ -79,6 +79,19 @@ class User extends UserBase
             }
         }
 
+        foreach ($this->newUserCodes as $newUserCode) {
+            if (! $newUserCode->delete()) {
+                \Yii::error([
+                    'action' => 'delete new_user_code record before deleting user',
+                    'status' => 'error',
+                    'error' => $newUserCode->getFirstErrors(),
+                    'newUserCode_id' => $newUserCode->id,
+                    'user_id' => $this->id,
+                ]);
+                return false;
+            }
+        }
+
         return true;
     }
     
