@@ -836,6 +836,8 @@ class User extends UserBase
                 $this->nag_for_method_after = MySqlDateTime::relative(\Yii::$app->params['methodReviewInterval']);
                 break;
         }
+
+        $this->resetNagState();
     }
 
     public function resetNagState(): void
