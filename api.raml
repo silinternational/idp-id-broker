@@ -312,6 +312,29 @@ types:
         description: A server-side error occurred.
         body:
           type: Error
+  /newuser:
+    post:
+      body:
+        properties:
+          code: string
+      responses:
+        200:
+          description: >
+            The given code was acceptable/valid (i.e. - the
+            authentication succeeded). The body of the response will have the
+            attributes of the authenticated User.
+          body:
+            type: UserResponse
+        400:
+          description: >
+            The given code was NOT acceptable/valid (i.e. - the
+            authentication failed).
+          body:
+            type: Error
+        500:
+          description: A server-side error occurred.
+          body:
+            type: Error
 /user:
   get:
     description: Get a list of the existing users.
