@@ -17,7 +17,7 @@ class Authentication
      *
      * @param string $username The username to try.
      * @param string $password The password to try.
-     * @param string $welcomeCode New user welcome code. If not blank, username and password are ignored.
+     * @param string $code New user invite code. If not blank, username and password are ignored.
      * @param Ldap|null $ldap (Optional:) The LDAP to use for lazy-loading
      *     passwords not yet stored in our local database. Defaults to null,
      *     meaning passwords will not be migrated.
@@ -25,10 +25,10 @@ class Authentication
     public function __construct(
         string $username,
         string $password,
-        string $welcomeCode = null,
+        string $code = null,
         $ldap = null
     ) {
-        if ($welcomeCode == null || $welcomeCode == '') {
+        if ($code == null || $code == '') {
             /* @var $user User */
             $user = User::findByUsername($username) ??
                     User::findByEmail($username)    ?? // maybe we got an email
@@ -41,19 +41,19 @@ class Authentication
                 $user->setLdap($ldap);
             }
         } else {
-            /* @var $code NewUserCode */
-            $code = NewUserCode::findOne(['uuid' => $welcomeCode]);
-            if ($code === null) {
+            /* @var $newUserCode NewUserCode */
+            $newUserCode = NewUserCode::findOne(['uuid' => $code]);
+            if ($newUserCode === null) {
                 $this->errors = ['Invalid code.'];
                 return;
             }
-            if ( ! $code->isValidCode()) {
+            if ( ! $newUserCode->isValidCode()) {
                 $this->errors = ['Expired code.'];
                 return;
             }
 
             /* @var $user User */
-            $user = $code->user;
+            $user = $newUserCode->user;
             $user->scenario = User::SCENARIO_NEW_USER_CODE;
 
             if($user->current_password_id !== null) {
