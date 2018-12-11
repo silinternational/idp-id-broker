@@ -6,8 +6,6 @@ use Closure;
 use common\helpers\MySqlDateTime;
 use Ramsey\Uuid\Uuid;
 use Yii;
-use yii\behaviors\AttributeBehavior;
-use yii\db\ActiveRecord;
 use yii\helpers\ArrayHelper;
 
 class NewUserCode extends NewUserCodeBase
@@ -55,5 +53,32 @@ class NewUserCode extends NewUserCodeBase
             return false;
         }
         return true;
+    }
+
+    public static function getInviteCode(int $userId): string
+    {
+        /* @var $newUserCode NewUserCode */
+        $newUserCode = self::find()
+            ->where(['user_id' => $userId])
+            ->andWhere(['>', 'expires_on', MySqlDateTime::today()])
+            ->one();
+
+        try {
+            if ($newUserCode === null) {
+                $newUserCode = new NewUserCode();
+                $newUserCode->user_id = $userId;
+                $newUserCode->save();
+            }
+        } catch (\Throwable $t) {
+            \Yii::error([
+                'action' => 'create invite code',
+                'status' => 'error',
+                'userId' => $userId,
+                'message' => $t->getMessage(),
+            ]);
+            return '';
+        }
+
+        return $newUserCode->uuid;
     }
 }
