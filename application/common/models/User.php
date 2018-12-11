@@ -803,14 +803,23 @@ class User extends UserBase
      */
     public function updateNagDates()
     {
-        if ($this->getNagState() === self::NAG_ADD_MFA || $this->getNagState() === self::NAG_REVIEW_MFA) {
-            $this->nag_for_mfa_after = MySqlDateTime::relative(\Yii::$app->params['mfaNagInterval']);
-            return;
-        }
+        switch($this->getNagState())
+        {
+            case self::NAG_ADD_MFA:
+                $this->nag_for_mfa_after = MySqlDateTime::relative(\Yii::$app->params['mfaAddInterval']);
+                break;
 
-        if ($this->getNagState() === self::NAG_ADD_METHOD || $this->getNagState() === self::NAG_REVIEW_METHOD) {
-            $this->nag_for_method_after = MySqlDateTime::relative(\Yii::$app->params['methodNagInterval']);
-            return;
+            case self::NAG_REVIEW_MFA:
+                $this->nag_for_mfa_after = MySqlDateTime::relative(\Yii::$app->params['mfaReviewInterval']);
+                break;
+
+            case self::NAG_ADD_METHOD:
+                $this->nag_for_method_after = MySqlDateTime::relative(\Yii::$app->params['methodAddInterval']);
+                break;
+
+            case self::NAG_REVIEW_METHOD:
+                $this->nag_for_method_after = MySqlDateTime::relative(\Yii::$app->params['methodReviewInterval']);
+                break;
         }
     }
 
