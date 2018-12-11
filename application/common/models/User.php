@@ -443,7 +443,9 @@ class User extends UserBase
         /*
          * Don't recalculate in case the date has changed since the last calculation.
          */
-        if ($this->nagState !== null) return $this->nagState;
+        if ($this->nagState !== null) {
+            return $this->nagState;
+        }
 
         $now = time();
 
