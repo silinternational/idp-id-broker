@@ -161,10 +161,5 @@ class UnitTestsContext extends YiiContext
     public function iUpdateTheNagDates()
     {
         $this->tempUser->updateNagDates();
-
-        /*
-         * Force an update the next time getNagState() is called
-         */
-        $this->tempUser->resetNagState();
     }
 }
