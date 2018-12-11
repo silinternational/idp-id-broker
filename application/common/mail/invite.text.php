@@ -41,16 +41,8 @@ If you have any difficulties completing this task, please contact
 
 Instructions:
 -------------
-1. Go to <?= $passwordForgotUrl ?>
-2. Enter your username, <?= $username ?>
-3. Check the box next to "I'm not a robot" and click "Continue"
-4. Check your <?= $email ?> email inbox for a message 
-   with the subject "<?= $idpDisplayName ?> password reset request"
-5. Click the link in the email
-6. Enter a new password that meets the requirements as described on 
-   the page
-7. Enter your password again to confirm it
-8. Click the "Change" button to set your new password
+1. Go to <?= $passwordProfileUrl . '/intro?invite=' . $inviteCode ?>
+2. Follow the step-by-step instructions on that website.
 
 Please note that this <?= $idpDisplayName ?> Identity account (username and password) is
 unique and its password is not synchronized with any other accounts

@@ -46,7 +46,7 @@ use yii\helpers\Html as yHtml;
 
 <p><b>Instructions:</b></p>
 <ol>
-  <li>Go to <?= yHtml::encode($passwordProfileUrl . '/intro?invite=' . $inviteCode) ?></li>
+  <li><a href="<?= yHtml::encode($passwordProfileUrl . '/intro?invite=' . $inviteCode) ?>">Click here</a></li>
   <li>Follow the step-by-step instructions on that website.
 </ol>
 
