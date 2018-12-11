@@ -33,7 +33,7 @@ class User extends UserBase
     private $ldap;
 
     /** @var string */
-    public $nagState;
+    protected $nagState;
 
     /**
      * {@inheritdoc}
@@ -812,5 +812,10 @@ class User extends UserBase
             $this->nag_for_method_after = MySqlDateTime::relative(\Yii::$app->params['methodNagInterval']);
             return;
         }
+    }
+
+    public function resetNagState(): void
+    {
+        $this->nagState = null;
     }
 }

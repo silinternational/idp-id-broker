@@ -165,6 +165,6 @@ class UnitTestsContext extends YiiContext
         /*
          * Force an update the next time getNagState() is called
          */
-        $this->tempUser->nagState = null;
+        $this->tempUser->resetNagState();
     }
 }
