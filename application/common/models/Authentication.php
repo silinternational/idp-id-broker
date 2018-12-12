@@ -29,13 +29,9 @@ class Authentication
         $ldap = null
     ) {
         if ($invite == '') {
-            $user = $this->authenticateByPassword($username, $password, $ldap);
+            $this->authenticateByPassword($username, $password, $ldap);
         } else {
-            $user = $this->authenticateByInvite($invite);
-        }
-
-        if ($user !== null) {
-            $this->validateUser($user);
+            $this->authenticateByInvite($invite);
         }
     }
 
@@ -47,7 +43,6 @@ class Authentication
      * @param Ldap|null $ldap (Optional:) The LDAP to use for lazy-loading
      *     passwords not yet stored in our local database. Defaults to null,
      *     meaning passwords will not be migrated.
-     * @return User|null
      */
     protected function authenticateByPassword(string $username, string $password, $ldap)
     {
@@ -63,14 +58,13 @@ class Authentication
             $user->setLdap($ldap);
         }
 
-        return $user;
+        $this->validateUser($user);
     }
 
     /**
      * Attempt an authentication by new user invite.
      *
      * @param string $invite New user invite code. If not blank, username and password are ignored.
-     * @return User|null
      */
     protected function authenticateByInvite($invite)
     {
@@ -78,11 +72,11 @@ class Authentication
         $invite = Invite::findOne(['uuid' => $invite]);
         if ($invite === null) {
             $this->errors['invite'] = ['Invalid code.'];
-            return null;
+            return;
         }
         if ( ! $invite->isValidCode()) {
             $this->errors = $invite->getErrors();
-            return null;
+            return;
         }
 
         /* @var $user User */
@@ -91,10 +85,10 @@ class Authentication
 
         if($user->current_password_id !== null) {
             $this->errors['invite'] = ['Invitation invalid. User has a password.'];
-            return null;
+            return;
         }
 
-        return $user;
+        $this->validateUser($user);
     }
     /**
      * Run User validation rules. If all rules pass, $this->authenticatedUser will be a
