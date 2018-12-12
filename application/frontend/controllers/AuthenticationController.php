@@ -32,11 +32,6 @@ class AuthenticationController extends BaseRestController
             return $authenticatedUser;
         }
 
-        \Yii::error([
-            'action' => 'authentication',
-            'status' => 'error',
-            'message' => $authentication->getErrors(),
-        ]);
         throw new BadRequestHttpException();
     }
 }
