@@ -17,16 +17,16 @@ class Authentication
      *
      * @param string $username The username to try.
      * @param string $password The password to try.
-     * @param string $invite New user invite code. If not blank, username and password are ignored.
      * @param Ldap|null $ldap (Optional:) The LDAP to use for lazy-loading
      *     passwords not yet stored in our local database. Defaults to null,
      *     meaning passwords will not be migrated.
+     * @param string $invite New user invite code. If not blank, username and password are ignored.
      */
     public function __construct(
         string $username,
         string $password,
-        string $invite = '',
-        $ldap = null
+        $ldap = null,
+        string $invite = ''
     ) {
         if (empty($invite)) {
             $this->authenticateByPassword($username, $password, $ldap);

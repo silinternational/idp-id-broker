@@ -94,7 +94,6 @@ class LdapContext extends YiiContext
         $authentication = new Authentication(
             $username,
             $password,
-            '',
             $this->ldap
         );
         $this->authenticatedUser = $authentication->getAuthenticatedUser();

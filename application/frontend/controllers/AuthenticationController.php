@@ -22,8 +22,8 @@ class AuthenticationController extends BaseRestController
         $authentication = new Authentication(
             (string)Yii::$app->request->getBodyParam('username'),
             (string)Yii::$app->request->getBodyParam('password'),
-            (string)Yii::$app->request->getBodyParam('invite'),
-            $migratePasswords ? Yii::$app->ldap : null
+            $migratePasswords ? Yii::$app->ldap : null,
+            (string)Yii::$app->request->getBodyParam('invite')
         );
 
         $authenticatedUser = $authentication->getAuthenticatedUser();
