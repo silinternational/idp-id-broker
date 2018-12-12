@@ -50,6 +50,7 @@ class Invite extends InviteBase
 
         $now = time();
         if ($now > $expiration) {
+            $this->addError('expires_on', 'Expired code.');
             return false;
         }
         return true;

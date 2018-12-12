@@ -77,11 +77,11 @@ class Authentication
         /* @var $invite Invite */
         $invite = Invite::findOne(['uuid' => $invite]);
         if ($invite === null) {
-            $this->errors = ['Invalid code.'];
+            $this->errors['invite'] = ['Invalid code.'];
             return null;
         }
         if ( ! $invite->isValidCode()) {
-            $this->errors = ['Expired code.'];
+            $this->errors = $invite->getErrors();
             return null;
         }
 
@@ -90,7 +90,7 @@ class Authentication
         $user->scenario = User::SCENARIO_INVITE;
 
         if($user->current_password_id !== null) {
-            $this->errors = ['Invitation invalid. User has a password.'];
+            $this->errors['invite'] = ['Invitation invalid. User has a password.'];
             return null;
         }
 
