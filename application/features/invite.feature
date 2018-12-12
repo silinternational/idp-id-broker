@@ -4,11 +4,7 @@ Feature: Invite
     Given the database contains a user with no invite codes
     When I request an invite code
     Then I receive a code that is not expired
-
-  Scenario: New invite codes should be in UUID format
-    Given the database contains a user with no invite codes
-    When I request an invite code
-    Then the code should be in UUID format
+    And the code should be in UUID format
 
   Scenario: Request an invite code when one already exists, before its expiration
     Given the database contains a user with a non-expired invite code
