@@ -44,9 +44,19 @@ class Invite extends InviteBase
         return $labels;
     }
 
+    /**
+     * Checks expiration date. If `expires_on` is today or before, `isValidCode`
+     * returns `false` and adds an error message.
+     *
+     * @return bool
+     * @throws \Exception
+     */
     public function isValidCode()
     {
         $expiration = strtotime($this->expires_on);
+        if ($expiration === false) {
+            throw new \Exception('Unable to parse expires_on');
+        }
 
         $now = time();
         if ($now > $expiration) {
@@ -56,6 +66,14 @@ class Invite extends InviteBase
         return true;
     }
 
+    /**
+     * Return an existing, non-expired invite code, or create a new object and
+     * return the new code.
+     *
+     * @param int $userId
+     * @return string
+     * @throws \Exception
+     */
     public static function getInviteCode(int $userId): string
     {
         /* @var $invite Invite */
@@ -77,7 +95,7 @@ class Invite extends InviteBase
                 'userId' => $userId,
                 'message' => $t->getMessage(),
             ]);
-            return '';
+            throw new \Exception('Error creating new user invite');
         }
 
         return $invite->uuid;
