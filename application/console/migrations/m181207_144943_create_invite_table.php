@@ -3,9 +3,9 @@
 use yii\db\Migration;
 
 /**
- * Handles the creation of table `new_user_code`.
+ * Handles the creation of table `invite`.
  */
-class m181207_144943_create_new_user_code_table extends Migration
+class m181207_144943_create_invite_table extends Migration
 {
     /**
      * {@inheritdoc}
@@ -13,7 +13,7 @@ class m181207_144943_create_new_user_code_table extends Migration
     public function safeUp()
     {
         $this->createTable(
-            'new_user_code',
+            'invite',
             [
                 'id' => 'pk',
                 'user_id' => 'int(11) not null',
@@ -24,7 +24,7 @@ class m181207_144943_create_new_user_code_table extends Migration
             "ENGINE=InnoDB DEFAULT CHARSET=utf8"
         );
 
-        $this->addForeignKey('fk_new_user_code_user_id', '{{new_user_code}}', 'user_id',
+        $this->addForeignKey('fk_invite_user_id', '{{invite}}', 'user_id',
             '{{user}}', 'id', 'NO ACTION', 'NO ACTION');
     }
 
@@ -33,6 +33,6 @@ class m181207_144943_create_new_user_code_table extends Migration
      */
     public function safeDown()
     {
-        $this->dropTable('new_user_code');
+        $this->dropTable('invite');
     }
 }

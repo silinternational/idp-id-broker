@@ -5,7 +5,7 @@ namespace common\models;
 use Yii;
 
 /**
- * This is the model class for table "new_user_code".
+ * This is the model class for table "invite".
  *
  * @property int $id
  * @property int $user_id
@@ -15,14 +15,14 @@ use Yii;
  *
  * @property User $user
  */
-class NewUserCodeBase extends \yii\db\ActiveRecord
+class InviteBase extends \yii\db\ActiveRecord
 {
     /**
      * {@inheritdoc}
      */
     public static function tableName()
     {
-        return 'new_user_code';
+        return 'invite';
     }
 
     /**

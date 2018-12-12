@@ -29,9 +29,9 @@ use Yii;
  * @property string $hide
  *
  * @property EmailLog[] $emailLogs
+ * @property Invite[] $invites
  * @property Method[] $methods
  * @property Mfa[] $mfas
- * @property NewUserCode[] $newUserCodes
  * @property Password $currentPassword
  */
 class UserBase extends \yii\db\ActiveRecord
@@ -103,6 +103,14 @@ class UserBase extends \yii\db\ActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */
+    public function getInvites()
+    {
+        return $this->hasMany(Invite::className(), ['user_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
     public function getMethods()
     {
         return $this->hasMany(Method::className(), ['user_id' => 'id']);
@@ -114,14 +122,6 @@ class UserBase extends \yii\db\ActiveRecord
     public function getMfas()
     {
         return $this->hasMany(Mfa::className(), ['user_id' => 'id']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getNewUserCodes()
-    {
-        return $this->hasMany(NewUserCode::className(), ['user_id' => 'id']);
     }
 
     /**

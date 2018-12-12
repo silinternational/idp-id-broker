@@ -207,38 +207,38 @@ Feature: Authentication
       | mfa.add       | no                    |
       | mfa.review    | no                    |
 
-  Scenario: Correct "new user" code for an account with no password in the db
+  Scenario: Correct invite code for an account with no password in the db
     Given the user "shep_clark" has no password in the database
-    And the user "shep_clark" has a non-expired new user code "xyz123"
+    And the user "shep_clark" has a non-expired invite code "xyz123"
     And I provide the following valid data:
       | property  | value       |
-      | code      | xyz123      |
+      | invite    | xyz123      |
     When I request "/authentication" be created
     Then the response status code should be 200
 
-  Scenario: Correct "new user" code for an account with a password in the db
-    Given the user "shep_clark" has a non-expired new user code "xyz123"
+  Scenario: Correct invite code for an account with a password in the db
+    Given the user "shep_clark" has a non-expired invite code "xyz123"
     And I provide the following valid data:
       | property  | value       |
-      | code      | xyz123      |
+      | invite    | xyz123      |
     When I request "/authentication" be created
     Then the response status code should be 400
 
-  Scenario: Correct but expired "new user" code for an account with no password in the db
+  Scenario: Correct but expired invite code for an account with no password in the db
     Given the user "shep_clark" has no password in the database
-    And the user "shep_clark" has an expired new user code "xyz123"
+    And the user "shep_clark" has an expired invite code "xyz123"
     And I provide the following valid data:
       | property  | value       |
-      | code      | xyz123      |
+      | invite    | xyz123      |
     When I request "/authentication" be created
     Then the response status code should be 400
 
-  Scenario: Incorrect "new user" code for an account with no password in the db
+  Scenario: Incorrect invite code for an account with no password in the db
     Given the user "shep_clark" has no password in the database
-    And the user "shep_clark" has a non-expired new user code "xyz123"
+    And the user "shep_clark" has a non-expired invite code "xyz123"
     And I provide the following valid data:
       | property  | value       |
-      | code      | abc123      |
+      | invite    | abc123      |
     When I request "/authentication" be created
     Then the response status code should be 400
 

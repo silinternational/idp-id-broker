@@ -20,7 +20,7 @@ class User extends UserBase
     const SCENARIO_UPDATE_USER     = 'update_user';
     const SCENARIO_UPDATE_PASSWORD = 'update_password';
     const SCENARIO_AUTHENTICATE    = 'authenticate';
-    const SCENARIO_NEW_USER_CODE   = 'new_user_code';
+    const SCENARIO_INVITE          = 'invite';
 
     const NAG_NONE          = 'none';
     const NAG_ADD_MFA       = 'add_mfa';
@@ -79,13 +79,13 @@ class User extends UserBase
             }
         }
 
-        foreach ($this->newUserCodes as $newUserCode) {
-            if (! $newUserCode->delete()) {
+        foreach ($this->invites as $invite) {
+            if (! $invite->delete()) {
                 \Yii::error([
-                    'action' => 'delete new_user_code record before deleting user',
+                    'action' => 'delete invite record before deleting user',
                     'status' => 'error',
-                    'error' => $newUserCode->getFirstErrors(),
-                    'newUserCode_id' => $newUserCode->id,
+                    'error' => $invite->getFirstErrors(),
+                    'invite_id' => $invite->id,
                     'user_id' => $this->id,
                 ]);
                 return false;
@@ -142,7 +142,7 @@ class User extends UserBase
 
         $scenarios[self::SCENARIO_AUTHENTICATE] = ['username', 'password', '!active', '!locked'];
 
-        $scenarios[self::SCENARIO_NEW_USER_CODE] = ['!active', '!locked'];
+        $scenarios[self::SCENARIO_INVITE] = ['!active', '!locked'];
 
         return $scenarios;
     }
@@ -195,11 +195,11 @@ class User extends UserBase
             ],
             [
                 'active', 'compare', 'compareValue' => 'yes',
-                'on' => [self::SCENARIO_AUTHENTICATE, self::SCENARIO_NEW_USER_CODE],
+                'on' => [self::SCENARIO_AUTHENTICATE, self::SCENARIO_INVITE],
             ],
             [
                 'locked', 'compare', 'compareValue' => 'no',
-                'on' => [self::SCENARIO_AUTHENTICATE, self::SCENARIO_NEW_USER_CODE],
+                'on' => [self::SCENARIO_AUTHENTICATE, self::SCENARIO_INVITE],
             ],
             [
                 ['manager_email', 'spouse_email'], 'email',
@@ -333,7 +333,7 @@ class User extends UserBase
             'isMfaEnabled' => count($this->mfas) > 0 ? true : false,
             'mfaOptions' => $this->getVerifiedMfaOptions(),
             'numRemainingCodes' => $this->countMfaBackupCodes(),
-            'inviteCode' => NewUserCode::getInviteCode($this->id),
+            'inviteCode' => Invite::getInviteCode($this->id),
         ];
         if ($this->currentPassword !== null) {
             $attrs['passwordExpiresUtc'] = MySqlDateTime::formatDateForHumans($this->currentPassword->getExpiresOn());

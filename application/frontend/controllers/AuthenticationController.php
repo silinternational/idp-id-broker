@@ -10,7 +10,7 @@ use yii\web\BadRequestHttpException;
 class AuthenticationController extends BaseRestController
 {
     /**
-     * Authenticates the given user based on his/her password
+     * Authenticates a user based on his/her password or invite code
      *
      * @return User
      * @throws BadRequestHttpException
@@ -22,7 +22,7 @@ class AuthenticationController extends BaseRestController
         $authentication = new Authentication(
             (string)Yii::$app->request->getBodyParam('username'),
             (string)Yii::$app->request->getBodyParam('password'),
-            (string)Yii::$app->request->getBodyParam('code'),
+            (string)Yii::$app->request->getBodyParam('invite'),
             $migratePasswords ? Yii::$app->ldap : null
         );
 

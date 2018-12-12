@@ -17,7 +17,7 @@ class Authentication
      *
      * @param string $username The username to try.
      * @param string $password The password to try.
-     * @param string $code New user invite code. If not blank, username and password are ignored.
+     * @param string $invite New user invite code. If not blank, username and password are ignored.
      * @param Ldap|null $ldap (Optional:) The LDAP to use for lazy-loading
      *     passwords not yet stored in our local database. Defaults to null,
      *     meaning passwords will not be migrated.
@@ -25,46 +25,77 @@ class Authentication
     public function __construct(
         string $username,
         string $password,
-        string $code = null,
+        string $invite = null,
         $ldap = null
     ) {
-        if ($code == null || $code == '') {
-            /* @var $user User */
-            $user = User::findByUsername($username) ??
-                    User::findByEmail($username)    ?? // maybe we got an email
-                    new User();
-
-            $user->scenario = User::SCENARIO_AUTHENTICATE;
-            $user->password = $password;
-
-            if ($ldap instanceof Ldap) {
-                $user->setLdap($ldap);
-            }
+        if ($invite == null || $invite == '') {
+            $user = $this->authenticateByPassword($username, $password, $ldap);
         } else {
-            /* @var $newUserCode NewUserCode */
-            $newUserCode = NewUserCode::findOne(['uuid' => $code]);
-            if ($newUserCode === null) {
-                $this->errors = ['Invalid code.'];
-                return;
-            }
-            if ( ! $newUserCode->isValidCode()) {
-                $this->errors = ['Expired code.'];
-                return;
-            }
-
-            /* @var $user User */
-            $user = $newUserCode->user;
-            $user->scenario = User::SCENARIO_NEW_USER_CODE;
-
-            if($user->current_password_id !== null) {
-                $this->errors = ['Code invalid. Password has been set.'];
-                return;
-            }
+            $user = $this->authenticateByInvite($invite);
         }
 
-        $this->validateUser($user);
+        if ($user !== null) {
+            $this->validateUser($user);
+        }
     }
 
+    /**
+     * Attempt an authentication by password.
+     *
+     * @param string $username The username to try.
+     * @param string $password The password to try.
+     * @param Ldap|null $ldap (Optional:) The LDAP to use for lazy-loading
+     *     passwords not yet stored in our local database. Defaults to null,
+     *     meaning passwords will not be migrated.
+     * @return User|null
+     */
+    protected function authenticateByPassword(string $username, string $password, $ldap)
+    {
+        /* @var $user User */
+        $user = User::findByUsername($username) ??
+                User::findByEmail($username)    ?? // maybe we got an email
+                new User();
+
+        $user->scenario = User::SCENARIO_AUTHENTICATE;
+        $user->password = $password;
+
+        if ($ldap instanceof Ldap) {
+            $user->setLdap($ldap);
+        }
+
+        return $user;
+    }
+
+    /**
+     * Attempt an authentication by new user invite.
+     *
+     * @param string $invite New user invite code. If not blank, username and password are ignored.
+     * @return User|null
+     */
+    protected function authenticateByInvite($invite)
+    {
+        /* @var $invite Invite */
+        $invite = Invite::findOne(['uuid' => $invite]);
+        if ($invite === null) {
+            $this->errors = ['Invalid code.'];
+            return null;
+        }
+        if ( ! $invite->isValidCode()) {
+            $this->errors = ['Expired code.'];
+            return null;
+        }
+
+        /* @var $user User */
+        $user = $invite->user;
+        $user->scenario = User::SCENARIO_INVITE;
+
+        if($user->current_password_id !== null) {
+            $this->errors = ['Invitation invalid. User has a password.'];
+            return null;
+        }
+
+        return $user;
+    }
     /**
      * Run User validation rules. If all rules pass, $this->authenticatedUser will be a
      * clone of the User, and the User record in the database will be updated with new

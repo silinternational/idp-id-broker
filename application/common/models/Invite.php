@@ -8,7 +8,7 @@ use Ramsey\Uuid\Uuid;
 use Yii;
 use yii\helpers\ArrayHelper;
 
-class NewUserCode extends NewUserCodeBase
+class Invite extends InviteBase
 {
     public function rules(): array
     {
@@ -28,7 +28,7 @@ class NewUserCode extends NewUserCodeBase
     private function expires(): Closure
     {
         return function() {
-            $lifespan = Yii::$app->params['newUserCodeLifespan'];
+            $lifespan = Yii::$app->params['inviteLifespan'];
 
             return MySqlDateTime::formatDate(strtotime($lifespan, strtotime($this->created_utc)));
         };
@@ -57,17 +57,17 @@ class NewUserCode extends NewUserCodeBase
 
     public static function getInviteCode(int $userId): string
     {
-        /* @var $newUserCode NewUserCode */
-        $newUserCode = self::find()
+        /* @var $invite Invite */
+        $invite = self::find()
             ->where(['user_id' => $userId])
             ->andWhere(['>', 'expires_on', MySqlDateTime::today()])
             ->one();
 
         try {
-            if ($newUserCode === null) {
-                $newUserCode = new NewUserCode();
-                $newUserCode->user_id = $userId;
-                $newUserCode->save();
+            if ($invite === null) {
+                $invite = new Invite();
+                $invite->user_id = $userId;
+                $invite->save();
             }
         } catch (\Throwable $t) {
             \Yii::error([
@@ -79,6 +79,6 @@ class NewUserCode extends NewUserCodeBase
             return '';
         }
 
-        return $newUserCode->uuid;
+        return $invite->uuid;
     }
 }
