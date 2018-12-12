@@ -28,7 +28,7 @@ class Authentication
         string $invite = '',
         $ldap = null
     ) {
-        if ($invite == '') {
+        if (empty($invite)) {
             $this->authenticateByPassword($username, $password, $ldap);
         } else {
             $this->authenticateByInvite($invite);
