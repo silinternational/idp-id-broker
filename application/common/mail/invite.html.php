@@ -40,15 +40,17 @@ use yii\helpers\Html as yHtml;
 </p>
 
 <p>
-  If you have any difficulties completing this task, please contact
-  <?= yHtml::encode($supportName) ?> at: <?= yHtml::encode($supportEmail) ?>
+    If you have any difficulties completing this task, please contact
+    <?= yHtml::encode($supportName) ?> at: <?= yHtml::encode($supportEmail) ?>
 </p>
 
 <p><b>Instructions:</b></p>
-<ol>
-  <li><a href="<?= yHtml::encode($passwordProfileUrl . '/intro?invite=' . $inviteCode) ?>">Click here</a></li>
-  <li>Follow the step-by-step instructions on that website.
-</ol>
+<p>
+    To proceed with establishing your account, please follow the step-by-step guidance
+    <a href="<?= yHtml::encode($passwordProfileUrl . '/intro?invite=' . $inviteCode) ?>">
+        here
+    </a>.
+</p>
 
 <p>
     Please note that this <?= yHtml::encode($idpDisplayName) ?> Identity account (username and password) is

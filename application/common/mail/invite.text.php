@@ -41,8 +41,8 @@ If you have any difficulties completing this task, please contact
 
 Instructions:
 -------------
-1. Go to <?= $passwordProfileUrl . '/intro?invite=' . $inviteCode ?>
-2. Follow the step-by-step instructions on that website.
+To proceed with establishing your account, please follow the step-by-step
+guidance here: <?= $passwordProfileUrl . '/intro?invite=' . $inviteCode ?>
 
 Please note that this <?= $idpDisplayName ?> Identity account (username and password) is
 unique and its password is not synchronized with any other accounts
