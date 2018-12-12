@@ -6,7 +6,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 ### Added
-- Added recovery method reminder flag to user resource returned from
+- Added recovery method and MFA review flags to user resource returned from
   `/authentication` and `/user` endpoints
 - Added recovery methods, as previously defined in idp-pw-api.
 - Added "Hide" feature for users with increased privacy concerns

@@ -3,6 +3,9 @@ Feature: User
   As an authorized requester
   I need to be able to manage user information
 
+  Background:
+    Given the user store is empty
+
   Scenario: Create a new user
     Given a record does not exist with an employee_id of "123"
       And the requester is authorized
@@ -400,6 +403,42 @@ Feature: User
     When I request "/user" be retrieved
     Then the response status code should be 200
       And I should receive 2 users
+
+  Scenario: Get list of verified methods for a user
+    Given A user with 1 verified method, 1 unverified method, 0 verified mfas, and 0 unverified mfas
+    When I request a list of verified methods
+    Then I see a list containing 1 method
+
+  Scenario Outline: Check "nag" state when user has or doesn't have methods and mfas
+    Given A user with <verifiedMethods> verified methods, <unverifiedMethods> unverified methods, <verifiedMfas> verified mfas, and <unverifiedMfas> unverified mfas
+    And the nag dates are in the past
+    When I request the nag state
+    Then I see that the nag state is <state1>
+    And I update the nag dates
+    When I request the nag state
+    Then I see that the nag state is <state2>
+    And I update the nag dates
+    When I request the nag state
+    Then I see that the nag state is "none"
+
+  Examples:
+  | verifiedMethods | unverifiedMethods | verifiedMfas | unverifiedMfas | state1     | state2        |
+  | 0               | 0                 | 0            | 0              | add_mfa    | add_method    |
+  | 0               | 0                 | 0            | 1              | add_mfa    | add_method    |
+  | 0               | 0                 | 1            | 0              | add_method | review_mfa    |
+  | 0               | 0                 | 1            | 1              | add_method | review_mfa    |
+  | 0               | 1                 | 0            | 0              | add_mfa    | add_method    |
+  | 0               | 1                 | 0            | 1              | add_mfa    | add_method    |
+  | 0               | 1                 | 1            | 0              | add_method | review_mfa    |
+  | 0               | 1                 | 1            | 1              | add_method | review_mfa    |
+  | 1               | 0                 | 0            | 0              | add_mfa    | review_method |
+  | 1               | 0                 | 0            | 1              | add_mfa    | review_method |
+  | 1               | 0                 | 1            | 0              | review_mfa | review_method |
+  | 1               | 0                 | 1            | 1              | review_mfa | review_method |
+  | 1               | 1                 | 0            | 0              | add_mfa    | review_method |
+  | 1               | 1                 | 0            | 1              | add_mfa    | review_method |
+  | 1               | 1                 | 1            | 0              | review_mfa | review_method |
+  | 1               | 1                 | 1            | 1              | review_mfa | review_method |
 
 #TODO: get a user with/without a match
 #TODO: get a user with invalid id

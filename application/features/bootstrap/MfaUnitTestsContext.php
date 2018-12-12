@@ -6,73 +6,8 @@ use common\models\MfaBackupcode;
 use common\models\User;
 use Webmozart\Assert\Assert;
 
-class MfaUnitTestsContext extends YiiContext
+class MfaUnitTestsContext extends UnitTestsContext
 {
-    /** @var int */
-    protected $mfaId = null;
-
-    /** var Mfa */
-    protected $mfa;
-
-    /** var bool  */
-    protected $mfaIsNew;
-
-    /** @var User */
-    protected $tempUser;
-
-    /** @var bool whether the Mfa option is considered newly verified */
-    protected $mfaIsNewlyVerified;
-
-    /** @var array The array of changed attributes for an Mfa option */
-    protected $mfaChangedAttrs = ['label' => ''];
-
-    /**
-     * Create a new user in the database with the given username (and other
-     * details based off that username). If a user already exists with that
-     * username, they will be deleted.
-     *
-     * @param string $username
-     * @return User
-     */
-    protected function createNewUserInDatabase($username)
-    {
-        $existingUser = User::findByUsername($username);
-        if ($existingUser !== null) {
-            Assert::notSame($existingUser->delete(), false);
-        }
-
-        $user = new User([
-            'email' => $username . '@example.com',
-            'employee_id' => (string)uniqid(),
-            'first_name' => 'Test',
-            'last_name' => 'User',
-            'username' => $username,
-        ]);
-        $user->scenario = User::SCENARIO_NEW_USER;
-        Assert::true(
-            $user->save(),
-            var_export($user->getErrors(), true)
-        );
-        Assert::notNull($user);
-        return $user;
-    }
-
-    protected function createMfa($type, $verified=1, $user=null)
-    {
-        if ($user ===null) {
-            $user = $this->tempUser;
-        }
-        $mfa = new Mfa();
-        $mfa->user_id = $user->id;
-        $mfa->type = $type;
-        $mfa->verified = $verified;
-
-        Assert::true($mfa->save(), "Could not create new mfa.");
-        $user->refresh();
-        $this->mfaId = $mfa['id'];
-        $this->mfa = $mfa; 
-    }
-
     /**
      * @Given I have a user with a backup codes mfa option
      */
