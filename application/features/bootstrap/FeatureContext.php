@@ -84,8 +84,9 @@ class FeatureContext extends YiiContext
 
     /**
      * @Given the user store is empty
+     * @AfterSuite
      */
-    public function theUserStoreIsEmpty()
+    public static function theUserStoreIsEmpty()
     {
         // To avoid calls to try to remove TOTP/U2F entries from their
         // respective backend services, we are simply deleting all relevant
