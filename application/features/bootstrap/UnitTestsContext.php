@@ -185,7 +185,7 @@ class UnitTestsContext extends YiiContext
     }
 
     /**
-     * @Given /^the database contains a user with a (nonexpired|expired) invite code$/
+     * @Given /^the database contains a user with a (non-expired|expired) invite code$/
      */
     public function theDatabaseContainsAUserWithANonExpiredInviteCode($expiredOrNot)
     {
