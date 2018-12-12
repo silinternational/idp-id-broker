@@ -71,10 +71,10 @@ class Invite extends InviteBase
      * return the new code.
      *
      * @param int $userId
-     * @return string
+     * @return Invite
      * @throws \Exception
      */
-    public static function getInviteCode(int $userId): string
+    public static function getInviteCode(int $userId): Invite
     {
         /* @var $invite Invite */
         $invite = self::find()
@@ -98,6 +98,6 @@ class Invite extends InviteBase
             throw new \Exception('Error creating new user invite');
         }
 
-        return $invite->uuid;
+        return $invite;
     }
 }

@@ -333,7 +333,7 @@ class User extends UserBase
             'isMfaEnabled' => count($this->mfas) > 0 ? true : false,
             'mfaOptions' => $this->getVerifiedMfaOptions(),
             'numRemainingCodes' => $this->countMfaBackupCodes(),
-            'inviteCode' => Invite::getInviteCode($this->id),
+            'inviteCode' => Invite::getInviteCode($this->id)->uuid,
         ];
         if ($this->currentPassword !== null) {
             $attrs['passwordExpiresUtc'] = MySqlDateTime::formatDateForHumans($this->currentPassword->getExpiresOn());
