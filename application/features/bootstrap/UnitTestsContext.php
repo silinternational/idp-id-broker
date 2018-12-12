@@ -2,6 +2,7 @@
 namespace Sil\SilIdBroker\Behat\Context;
 
 use common\helpers\MySqlDateTime;
+use common\models\Invite;
 use common\models\Method;
 use common\models\Mfa;
 use common\models\User;
@@ -9,6 +10,8 @@ use Webmozart\Assert\Assert;
 
 class UnitTestsContext extends YiiContext
 {
+    protected const UUID_PATTERN = '/[a-f0-9]{8}\-[a-f0-9]{4}\-4[a-f0-9]{3}\-(8|9|a|b)[a-f0-9]{3}\-[a-f0-9]{12}/';
+
     /** @var int */
     protected $mfaId = null;
 
@@ -29,6 +32,12 @@ class UnitTestsContext extends YiiContext
 
     /** @var string */
     protected $nagState;
+
+    /** @var Invite */
+    protected $oldInviteCode;
+
+    /** @var Invite */
+    protected $inviteCode;
 
     /**
      * Create a new user in the database with the given username (and other
@@ -161,5 +170,80 @@ class UnitTestsContext extends YiiContext
     public function iUpdateTheNagDates()
     {
         $this->tempUser->updateNagDates();
+    }
+
+    /**
+     * @Given the database contains a user with no invite codes
+     */
+    public function theDatabaseContainsAUserWithNoInviteCodes()
+    {
+        $this->tempUser = $this->createNewUserInDatabase('method_tester');
+
+        foreach ($this->tempUser->invites as $invite) {
+            Assert::true($invite->delete(), 'Could not purge invites.');
+        }
+    }
+
+    /**
+     * @Given /^the database contains a user with a (nonexpired|expired) invite code$/
+     */
+    public function theDatabaseContainsAUserWithANonExpiredInviteCode($expiredOrNot)
+    {
+        $this->theDatabaseContainsAUserWithNoInviteCodes();
+
+        $invite = new Invite();
+        $invite->user_id = $this->tempUser->id;
+        $invite->expires_on = MySqlDateTime::relative(
+            ($expiredOrNot == 'expired') ? '+0 days' : '+1 day'
+        );
+
+        Assert::true($invite->save(), 'Could not create new invite.');
+        $this->tempUser->refresh();
+    }
+
+    /**
+     * @When I request an invite code
+     */
+    public function iRequestAnInviteCode()
+    {
+        $this->oldInviteCode = $this->tempUser->invites[0] ?? null;
+        $this->inviteCode = Invite::getInviteCode($this->tempUser->id);
+    }
+
+    /**
+     * @Then I receive a code that is not expired
+     */
+    public function iReceiveACodeThatIsNotExpired()
+    {
+        Assert::notNull($this->inviteCode);
+        Assert::true($this->inviteCode->isValidCode());
+    }
+
+    /**
+     * @Then the code should be in UUID format
+     */
+    public function theCodeShouldBeInUuidFormat()
+    {
+        Assert::notNull($this->inviteCode);
+        Assert::regex($this->inviteCode->uuid, self::UUID_PATTERN);
+    }
+
+
+    /**
+     * @Then I receive a new code
+     */
+    public function iReceiveANewCode()
+    {
+        Assert::notNull($this->inviteCode, 'inviteCode is null');
+        Assert::notNull($this->oldInviteCode, 'oldInviteCode is null');
+        Assert::notEq($this->inviteCode->uuid, $this->oldInviteCode->uuid);
+    }
+
+    /**
+     * @Then the new code is not expired
+     */
+    public function theNewCodeIsNotExpired()
+    {
+        $this->iReceiveACodeThatIsNotExpired();
     }
 }
