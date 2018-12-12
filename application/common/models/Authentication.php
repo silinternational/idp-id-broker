@@ -25,10 +25,10 @@ class Authentication
     public function __construct(
         string $username,
         string $password,
-        string $invite = null,
+        string $invite = '',
         $ldap = null
     ) {
-        if ($invite == null || $invite == '') {
+        if ($invite == '') {
             $user = $this->authenticateByPassword($username, $password, $ldap);
         } else {
             $user = $this->authenticateByInvite($invite);
