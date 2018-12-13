@@ -47,9 +47,7 @@ use yii\helpers\Html as yHtml;
 <p><b>Instructions:</b></p>
 <p>
     To proceed with establishing your account, please follow the step-by-step guidance
-    <a href="<?= yHtml::encode($passwordProfileUrl . '/intro?invite=' . $inviteCode) ?>">
-        here
-    </a>.
+    <a href="<?= yHtml::encode($passwordProfileUrl . '/intro?invite=' . $inviteCode) ?>">here</a>.
 </p>
 
 <p>
