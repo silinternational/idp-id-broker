@@ -180,7 +180,11 @@ class UnitTestsContext extends YiiContext
         $this->tempUser = $this->createNewUserInDatabase('method_tester');
 
         foreach ($this->tempUser->invites as $invite) {
-            Assert::true($invite->delete(), 'Could not purge invites.');
+            Assert::notEq(
+                false,
+                $invite->delete(),
+                'Could not purge invites. ' . var_export($invite->getFirstErrors(), true)
+            );
         }
     }
 
