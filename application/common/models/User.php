@@ -334,7 +334,6 @@ class User extends UserBase
             'isMfaEnabled' => count($this->mfas) > 0 ? true : false,
             'mfaOptions' => $this->getVerifiedMfaOptions(),
             'numRemainingCodes' => $this->countMfaBackupCodes(),
-            'inviteCode' => Invite::getInviteCode($this->id),
         ];
         if ($this->currentPassword !== null) {
             $attrs['passwordExpiresUtc'] = MySqlDateTime::formatDateForHumans($this->currentPassword->getExpiresOn());
@@ -607,8 +606,9 @@ class User extends UserBase
         $emailer = \Yii::$app->emailer;
         
         if ($emailer->shouldSendInviteMessageTo($this, $isNewUser)) {
-            Invite::findOrCreate($this->id);
-            $emailer->sendMessageTo(EmailLog::MESSAGE_TYPE_INVITE, $this);
+            $invite = Invite::findOrCreate($this->id);
+            $data = ['inviteCode' => $invite->getCode()];
+            $emailer->sendMessageTo(EmailLog::MESSAGE_TYPE_INVITE, $this, $data);
         }
         
         if ($emailer->shouldSendPasswordChangedMessageTo($this, $changedAttributes)) {

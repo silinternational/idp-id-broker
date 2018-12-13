@@ -66,25 +66,9 @@ class Invite extends InviteBase
         return true;
     }
 
-    /**
-     * Return an existing, non-expired invite code if one exists.
-     *
-     * @param int $userId
-     * @return string
-     * @throws \Exception
-     */
-    public static function getInviteCode(int $userId): string
+    public function getCode(): string
     {
-        $invite = self::find()
-            ->where(['user_id' => $userId])
-            ->andWhere(['>', 'expires_on', MySqlDateTime::today()])
-            ->one();
-
-        if ($invite instanceof Invite) {
-            return $invite->uuid;
-        } else {
-            return '';
-        }
+        return $this->uuid;
     }
 
     /**
