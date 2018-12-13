@@ -78,7 +78,7 @@ return [
                 'supportName' => Env::get('SUPPORT_NAME', 'support'),
             ],
             
-            'sendInviteEmails' => Env::get('SEND_INVITE_EMAILS', false),
+            'sendInviteEmails' => Env::get('SEND_INVITE_EMAILS', true),
             'sendMfaRateLimitEmails' => Env::get('SEND_MFA_RATE_LIMIT_EMAILS', true),
             'sendPasswordChangedEmails' => Env::get('SEND_PASSWORD_CHANGED_EMAILS', true),
             'sendWelcomeEmails' => Env::get('SEND_WELCOME_EMAILS', true),
