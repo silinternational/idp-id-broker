@@ -153,7 +153,7 @@ services:
             MYSQL_PASSWORD: appfortests
             MYSQL_USER: appfortests
             PASSWORD_FORGOT_URL: https://www.example.com/forgot
-            PASSWORD_PROFILE_URL: https://www.example.com/profile
+            PASSWORD_PROFILE_URL: https://www.example.com
             SUPPORT_EMAIL: support@example.com
         command: ./run-tests.sh
         # running isolated tests
