@@ -314,6 +314,7 @@ class User extends UserBase
      *       the User's "employee_id" will have a key of "employeeId".
      *
      * @return array
+     * @throws Exception
      */
     public function getAttributesForEmail()
     {
@@ -333,7 +334,7 @@ class User extends UserBase
             'isMfaEnabled' => count($this->mfas) > 0 ? true : false,
             'mfaOptions' => $this->getVerifiedMfaOptions(),
             'numRemainingCodes' => $this->countMfaBackupCodes(),
-            'inviteCode' => Invite::getInviteCode($this->id)->uuid,
+            'inviteCode' => Invite::getInviteCode($this->id),
         ];
         if ($this->currentPassword !== null) {
             $attrs['passwordExpiresUtc'] = MySqlDateTime::formatDateForHumans($this->currentPassword->getExpiresOn());
@@ -594,13 +595,19 @@ class User extends UserBase
 
         return parent::save($runValidation, $attributeNames);
     }
-    
+
+    /**
+     * @param bool $isNewUser
+     * @param array $changedAttributes
+     * @throws Exception
+     */
     protected function sendAppropriateMessages($isNewUser, $changedAttributes)
     {
         /* @var $emailer Emailer */
         $emailer = \Yii::$app->emailer;
         
         if ($emailer->shouldSendInviteMessageTo($this, $isNewUser)) {
+            Invite::findOrCreate($this->id);
             $emailer->sendMessageTo(EmailLog::MESSAGE_TYPE_INVITE, $this);
         }
         

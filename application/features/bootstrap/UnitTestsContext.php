@@ -211,7 +211,7 @@ class UnitTestsContext extends YiiContext
     public function iRequestAnInviteCode()
     {
         $this->oldInviteCode = $this->tempUser->invites[0] ?? null;
-        $this->inviteCode = Invite::getInviteCode($this->tempUser->id);
+        $this->inviteCode = Invite::findOrCreate($this->tempUser->id);
     }
 
     /**
