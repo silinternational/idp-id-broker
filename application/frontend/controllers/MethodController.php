@@ -78,7 +78,11 @@ class MethodController extends BaseRestController
     }
 
     /**
-     * Create new unverified method. Also sends verification message.
+     * Create new password recovery method, normally un-verified, and send a
+     * verification message to the user. If 'created' parameter is specified,
+     * then the record is created pre-verified and no message is sent to the
+     * user.
+     *
      * @return Method
      * @throws BadRequestHttpException
      * @throws ConflictHttpException
@@ -88,6 +92,8 @@ class MethodController extends BaseRestController
     {
         // ensure we don't use expired methods
         Method::deleteExpiredUnverifiedMethods();
+
+        $created = (string)\Yii::$app->request->post('created');
 
         $value = \Yii::$app->request->post('value');
         if ($value === null) {
@@ -107,7 +113,7 @@ class MethodController extends BaseRestController
 
         $userId = User::findOne(['employee_id' => $employeeId])->id ?? null;
 
-        return Method::findOrCreate($userId, $value);
+        return Method::findOrCreate($userId, $value, $created);
     }
 
     /**
