@@ -17,13 +17,19 @@ types:
   Authentication:
     type: object
     properties:
-      username: string
-      password: string
-    example: |
-      {
-        "username": "john_smith",
-        "password": "correcthorsebatterystaple"
-      }
+      username?: string
+      password?: string
+      invite?: string
+    examples:
+      password: |
+        {
+          "username": "john_smith",
+          "password": "correcthorsebatterystaple"
+        }
+      invite: |
+        {
+          "invite": "726fa32e-015d-46fb-ba5c-a579b4a4dcbf"
+        }
   Error:
     type: object
     properties:

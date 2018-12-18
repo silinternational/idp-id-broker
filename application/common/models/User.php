@@ -20,6 +20,7 @@ class User extends UserBase
     const SCENARIO_UPDATE_USER     = 'update_user';
     const SCENARIO_UPDATE_PASSWORD = 'update_password';
     const SCENARIO_AUTHENTICATE    = 'authenticate';
+    const SCENARIO_INVITE          = 'invite';
 
     const NAG_NONE          = 'none';
     const NAG_ADD_MFA       = 'add_mfa';
@@ -27,6 +28,7 @@ class User extends UserBase
     const NAG_ADD_METHOD    = 'add_method';
     const NAG_REVIEW_METHOD = 'review_method';
 
+    /** @var string */
     public $password;
 
     /** @var Ldap */
@@ -71,6 +73,19 @@ class User extends UserBase
                     'status' => 'error',
                     'error' => $method->getFirstErrors(),
                     'mfa_id' => $method->id,
+                    'user_id' => $this->id,
+                ]);
+                return false;
+            }
+        }
+
+        foreach ($this->invites as $invite) {
+            if (! $invite->delete()) {
+                \Yii::error([
+                    'action' => 'delete invite record before deleting user',
+                    'status' => 'error',
+                    'error' => $invite->getFirstErrors(),
+                    'invite_id' => $invite->id,
                     'user_id' => $this->id,
                 ]);
                 return false;
@@ -127,6 +142,8 @@ class User extends UserBase
 
         $scenarios[self::SCENARIO_AUTHENTICATE] = ['username', 'password', '!active', '!locked'];
 
+        $scenarios[self::SCENARIO_INVITE] = ['!active', '!locked'];
+
         return $scenarios;
     }
 
@@ -178,11 +195,11 @@ class User extends UserBase
             ],
             [
                 'active', 'compare', 'compareValue' => 'yes',
-                'on' => self::SCENARIO_AUTHENTICATE,
+                'on' => [self::SCENARIO_AUTHENTICATE, self::SCENARIO_INVITE],
             ],
             [
                 'locked', 'compare', 'compareValue' => 'no',
-                'on' => self::SCENARIO_AUTHENTICATE,
+                'on' => [self::SCENARIO_AUTHENTICATE, self::SCENARIO_INVITE],
             ],
             [
                 ['manager_email', 'spouse_email'], 'email',
@@ -297,6 +314,7 @@ class User extends UserBase
      *       the User's "employee_id" will have a key of "employeeId".
      *
      * @return array
+     * @throws Exception
      */
     public function getAttributesForEmail()
     {
@@ -576,14 +594,21 @@ class User extends UserBase
 
         return parent::save($runValidation, $attributeNames);
     }
-    
+
+    /**
+     * @param bool $isNewUser
+     * @param array $changedAttributes
+     * @throws Exception
+     */
     protected function sendAppropriateMessages($isNewUser, $changedAttributes)
     {
         /* @var $emailer Emailer */
         $emailer = \Yii::$app->emailer;
         
         if ($emailer->shouldSendInviteMessageTo($this, $isNewUser)) {
-            $emailer->sendMessageTo(EmailLog::MESSAGE_TYPE_INVITE, $this);
+            $invite = Invite::findOrCreate($this->id);
+            $data = ['inviteCode' => $invite->getCode()];
+            $emailer->sendMessageTo(EmailLog::MESSAGE_TYPE_INVITE, $this, $data);
         }
         
         if ($emailer->shouldSendPasswordChangedMessageTo($this, $changedAttributes)) {
