@@ -43,3 +43,6 @@ test: appfortests rmldap ldap ldapload
 clean:
 	docker-compose kill
 	docker system prune -f
+
+raml2html:
+	docker-compose run --rm raml2html
