@@ -664,6 +664,10 @@ types:
             description: User not found or method not found
             body:
               type: Error
+          410:
+            description: Expired verification code
+            body:
+              type: Error
           429:
             description: Too many verification attempts
             body:
