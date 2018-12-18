@@ -41,7 +41,7 @@ app:
         LDAP_USE_TLS: false
         MIGRATE_PW_FROM_LDAP: true
         PASSWORD_FORGOT_URL: https://www.example.com/forgot
-        PASSWORD_PROFILE_URL: https://password-profile
+        PASSWORD_PROFILE_URL: https://www.example.com
         SUPPORT_EMAIL: support@example.com
 
 ldap:

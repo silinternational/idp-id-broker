@@ -105,6 +105,7 @@ class Method extends MethodBase
         $data = [
             'toAddress' => $this->value,
             'code' => $this->verification_code,
+            'uid' => $this->uid,
         ];
 
         $emailer->sendMessageTo(EmailLog::MESSAGE_TYPE_METHOD_VERIFY, $this->user, $data);
