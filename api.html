@@ -1075,6 +1075,18 @@
   "code": 1542395933,
   "status": 409
 }
+</code></pre></div><h2>HTTP status code <a href="http://httpstatus.es/410" target="_blank">410</a></h2><p>Expired verification code</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: object</p><strong>Properties</strong><ul><li><strong>name</strong>: <em>required (string)</em></li><li><strong>message</strong>: <em>required (string)</em></li><li><strong>code</strong>: <em>required (integer)</em></li><li><strong>status</strong>: <em>required (integer)</em></li></ul><p><strong>Examples</strong>:</p><div class="examples"><pre><code>{
+  "name": "Bad Request",
+  "message": "",
+  "code": 0,
+  "status": 400
+}
+</code></pre><pre><code>{
+  "name": "Conflict",
+  "message": "May not be reused yet.",
+  "code": 1542395933,
+  "status": 409
+}
 </code></pre></div><h2>HTTP status code <a href="http://httpstatus.es/429" target="_blank">429</a></h2><p>Too many verification attempts</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: object</p><strong>Properties</strong><ul><li><strong>name</strong>: <em>required (string)</em></li><li><strong>message</strong>: <em>required (string)</em></li><li><strong>code</strong>: <em>required (integer)</em></li><li><strong>status</strong>: <em>required (integer)</em></li></ul><p><strong>Examples</strong>:</p><div class="examples"><pre><code>{
   "name": "Bad Request",
   "message": "",
