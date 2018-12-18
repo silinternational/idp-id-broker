@@ -214,6 +214,25 @@ class Method extends MethodBase
     }
 
     /**
+     * Change code, update expiration date, and send a new verification message.
+     *
+     * @throws ServerErrorHttpException
+     */
+    public function restartVerification()
+    {
+        $this->verified = 0;
+        $this->verification_attempts = 1;
+        $this->verification_code = $this->createCode();
+        $this->verification_expires = $this->calculateExpirationDate();
+
+        if (! $this->save()) {
+            throw new ServerErrorHttpException('Save error while restarting verification', 1545154473);
+        }
+
+        $this->sendVerificationEmail();
+    }
+
+    /**
      * Generate and return a new verification code
      *
      * @return string
@@ -231,6 +250,18 @@ class Method extends MethodBase
     protected function calculateExpirationDate(): string
     {
         return MySqlDateTime::formatDateTime(time() + \Yii::$app->params['method']['lifetimeSeconds']);
+    }
+
+    /**
+     * Test verification expiration against the current time. If the time has passed,
+     * return true. Otherwise, return false.
+     *
+     * @return bool
+     * @throws \Exception
+     */
+    public function isVerificationExpired(): bool
+    {
+        return MySqlDateTime::isBefore($this->verification_expires, time());
     }
 
     /**

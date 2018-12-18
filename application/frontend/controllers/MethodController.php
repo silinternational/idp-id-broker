@@ -7,6 +7,7 @@ use common\models\User;
 use frontend\components\BaseRestController;
 use yii\web\BadRequestHttpException;
 use yii\web\ConflictHttpException;
+use yii\web\HttpException;
 use yii\web\NotFoundHttpException;
 use yii\web\ServerErrorHttpException;
 use yii\web\TooManyRequestsHttpException;
@@ -127,8 +128,6 @@ class MethodController extends BaseRestController
      */
     public function actionVerify($uid)
     {
-        Method::deleteExpiredUnverifiedMethods();
-
         /** @var Method $method */
         $method = $this->getRequestedMethod($uid);
 
@@ -143,6 +142,12 @@ class MethodController extends BaseRestController
         $code = \Yii::$app->request->getBodyParam('code');
         if ($code === null) {
             throw new BadRequestHttpException(\Yii::t('app', 'Code is required'));
+        }
+
+        if ($method->isVerificationExpired()) {
+            $method->validateProvidedCode($code);
+            $method->restartVerification();
+            throw new HttpException(410);
         }
 
         try {
