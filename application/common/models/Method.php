@@ -30,12 +30,16 @@ class Method extends MethodBase
                 ],
 
                 [
-                    'verification_code', 'default', 'when' => function() { return $this->getIsNewRecord(); },
+                    'verification_code', 'default', 'when' => function () {
+                        return $this->getIsNewRecord() && $this->verified != 1;
+                    },
                     'value' => Utils::getRandomDigits(\Yii::$app->params['method']['codeLength']),
                 ],
 
                 [
-                    'verification_expires', 'default', 'when' => function() { return $this->getIsNewRecord(); },
+                    'verification_expires', 'default', 'when' => function () {
+                        return $this->getIsNewRecord() && $this->verified != 1;
+                    },
                     'value' => MySqlDateTime::formatDateTime(time() + \Yii::$app->params['method']['lifetimeSeconds']),
                 ],
 
@@ -177,13 +181,20 @@ class Method extends MethodBase
     }
 
     /**
+     * Create new password recovery method, normally un-verified, and send a
+     * verification message to the user. If a matching record already exists,
+     * record creation is bypassed. If 'created' parameter is specified,
+     * then the record is created pre-verified and no message is sent to the
+     * user.
+     *
      * @param integer $userId
      * @param string $value
+     * @param string $created Date recovery method was created, in MySQL datetime format.
      * @return Method
      * @throws ConflictHttpException
      * @throws ServerErrorHttpException
      */
-    public static function findOrCreate($userId, $value)
+    public static function findOrCreate($userId, $value, $created = '')
     {
         $method = Method::findOne(['value' => $value, 'user_id' => $userId]);
 
@@ -191,6 +202,10 @@ class Method extends MethodBase
             $method = new Method();
             $method->user_id = $userId;
             $method->value = mb_strtolower($value);
+            if (! empty($created)) {
+                $method->created = $created;
+                $method->verified = 1;
+            }
         }
 
         if ( ! $method->save()) {
@@ -200,7 +215,9 @@ class Method extends MethodBase
             );
         }
 
-        $method->sendVerification();
+        if (empty($created)) {
+            $method->sendVerification();
+        }
 
         return $method;
     }
