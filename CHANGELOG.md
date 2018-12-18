@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Added recovery methods, as previously defined in idp-pw-api.
 - Added "Hide" feature for users with increased privacy concerns
 - Added `PUT /mfa/{mfaId}` endpoint to update MFA labels.
+- Added `invite` property on `/authentication` for new user invite authenticaton
 
 ### Changed
 - Changed password reuse error HTTP status code from 422 to 409

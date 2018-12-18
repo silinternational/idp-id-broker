@@ -78,7 +78,7 @@ return [
                 'supportName' => Env::get('SUPPORT_NAME', 'support'),
             ],
             
-            'sendInviteEmails' => Env::get('SEND_INVITE_EMAILS', false),
+            'sendInviteEmails' => Env::get('SEND_INVITE_EMAILS', true),
             'sendMfaRateLimitEmails' => Env::get('SEND_MFA_RATE_LIMIT_EMAILS', true),
             'sendPasswordChangedEmails' => Env::get('SEND_PASSWORD_CHANGED_EMAILS', true),
             'sendWelcomeEmails' => Env::get('SEND_WELCOME_EMAILS', true),
@@ -211,6 +211,7 @@ return [
         'passwordLifespan'              => Env::get('PASSWORD_LIFESPAN', '+1 year'),
         'passwordMfaLifespanExtension'  => Env::get('PASSWORD_MFA_LIFESPAN_EXTENSION', '+1 year'),
         'passwordExpirationGracePeriod' => Env::get('PASSWORD_EXPIRATION_GRACE_PERIOD', '+30 days'),
+        'inviteLifespan'                => Env::get('INVITE_LIFESPAN', '+1 month'),
         'googleAnalytics'               => [
             'trackingId' => Env::get('GA_TRACKING_ID'),
             'clientId'   => Env::get('GA_CLIENT_ID'),

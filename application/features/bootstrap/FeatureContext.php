@@ -8,6 +8,7 @@ use common\models\Mfa;
 use common\models\MfaBackupcode;
 use common\models\MfaFailedAttempt;
 use common\models\User;
+use common\models\Invite;
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Response;
 use Psr\Http\Message\ResponseInterface;
@@ -83,8 +84,9 @@ class FeatureContext extends YiiContext
 
     /**
      * @Given the user store is empty
+     * @AfterSuite
      */
-    public function theUserStoreIsEmpty()
+    public static function theUserStoreIsEmpty()
     {
         // To avoid calls to try to remove TOTP/U2F entries from their
         // respective backend services, we are simply deleting all relevant
@@ -94,6 +96,7 @@ class FeatureContext extends YiiContext
         MfaFailedAttempt::deleteAll();
         Mfa::deleteAll();
         Method::deleteAll();
+        Invite::deleteAll();
         User::deleteAll();
     }
 
@@ -484,5 +487,39 @@ class FeatureContext extends YiiContext
         $user = User::findByUsername($username);
         Assert::notNull($user);
         Assert::notNull($user->currentPassword);
+    }
+
+    protected function createInviteCode($user, $code, $expired = false)
+    {
+        $inviteCode = new Invite();
+        $inviteCode->uuid = $code;
+        $inviteCode->user_id = $user->id;
+        $inviteCode->expires_on = ($expired) ? '2018-01-01' : null;
+        Assert::true(
+            $inviteCode->save(),
+            var_export($inviteCode->getErrors(), true)
+        );
+    }
+
+    /**
+     * @Given the user :username has an expired invite code :code
+     */
+    public function theUserHasAnExpiredInviteCode($username, $code)
+    {
+        $user = User::findByUsername($username);
+        Assert::notNull($user);
+
+        $this->createInviteCode($user, $code, true);
+    }
+
+    /**
+     * @Given the user :username has a non-expired invite code :code
+     */
+    public function theUserHasANonExpiredInviteCode($username, $code)
+    {
+        $user = User::findByUsername($username);
+        Assert::notNull($user);
+
+        $this->createInviteCode($user, $code);
     }
 }

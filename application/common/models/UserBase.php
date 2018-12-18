@@ -29,6 +29,7 @@ use Yii;
  * @property string $hide
  *
  * @property EmailLog[] $emailLogs
+ * @property Invite[] $invites
  * @property Method[] $methods
  * @property Mfa[] $mfas
  * @property Password $currentPassword
@@ -97,6 +98,14 @@ class UserBase extends \yii\db\ActiveRecord
     public function getEmailLogs()
     {
         return $this->hasMany(EmailLog::className(), ['user_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getInvites()
+    {
+        return $this->hasMany(Invite::className(), ['user_id' => 'id']);
     }
 
     /**
