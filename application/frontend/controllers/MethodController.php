@@ -144,10 +144,14 @@ class MethodController extends BaseRestController
             throw new BadRequestHttpException(\Yii::t('app', 'Code is required'));
         }
 
-        if ($method->isVerificationExpired()) {
-            $method->validateProvidedCode($code);
-            $method->restartVerification();
-            throw new HttpException(410);
+        try {
+            if ($method->isVerificationExpired()) {
+                $method->validateProvidedCode($code);
+                $method->restartVerification();
+                throw new HttpException(410);
+            }
+        } catch (InvalidCodeException $e) {
+            throw new BadRequestHttpException(\Yii::t('app', 'Invalid verification code'), 1470315942);
         }
 
         try {
