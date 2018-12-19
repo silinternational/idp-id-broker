@@ -54,7 +54,7 @@ class MySqlDateTime
      */
     public static function formatDateForHumans(string $timestamp = null)
     {
-        if ( ! is_numeric($timestamp)) {
+        if (! is_numeric($timestamp)) {
             $timestamp = strtotime($timestamp);
         }
 

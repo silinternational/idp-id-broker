@@ -59,9 +59,13 @@ class Method extends MethodBase
     public function fields()
     {
         return [
-            'id' => function() { return $this->uid; },
+            'id' => function () {
+                return $this->uid;
+            },
             'value',
-            'verified' => function() { return $this->verified == 1; }
+            'verified' => function () {
+                return $this->verified == 1;
+            }
         ];
     }
 
@@ -137,7 +141,7 @@ class Method extends MethodBase
         $this->verification_attempts = null;
         $this->verified = 1;
 
-        if ( ! $this->save()) {
+        if (! $this->save()) {
             \Yii::error([
                 'action' => 'validate and set method as verified',
                 'status' => 'error',
@@ -199,7 +203,7 @@ class Method extends MethodBase
             }
         }
 
-        if ( ! $method->save()) {
+        if (! $method->save()) {
             throw new ServerErrorHttpException(
                 sprintf('Unable to save new method'),
                 1461441851

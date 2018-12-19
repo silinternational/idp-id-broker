@@ -178,7 +178,7 @@ class MethodController extends BaseRestController
     {
         $method = $this->getRequestedMethod($uid);
 
-        if ( ! $method->delete()) {
+        if (! $method->delete()) {
             throw new ServerErrorHttpException('Unable to delete method', 1540673326);
         }
 
