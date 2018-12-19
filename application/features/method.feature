@@ -85,7 +85,7 @@ Feature: Recovery Method API
     When I send a "DELETE" to "/method/{uid}" with a valid uid
     Then the response status code should be 204
 
-  Scenario: Verify a Method with expired verification date
+  Scenario: Verify a Method with expired verification code
     Given user with employee id 123 has an unverified Method "unverified@example.com"
     And the verification expiration time has passed
     When I send the correct code to verify that Method
@@ -95,3 +95,25 @@ Feature: Recovery Method API
     And the verification should not be expired
     And the verification attempts counter should be 1
     And the verification code should have changed
+
+  Scenario: Verify a Method with expired verification code and incorrect code
+    Given user with employee id 123 has an unverified Method "unverified@example.com"
+    And the verification expiration time has passed
+    When I send an incorrect code to verify that Method
+    Then the response status code should be 400
+    And a method record exists with a value of "unverified@example.com"
+    And the method should remain unverified
+    And the verification should be expired
+    And the verification attempts counter should be 1
+    And the verification code should not have changed
+
+  Scenario: Verify a Method with an incorrect code
+    Given user with employee id 123 has an unverified Method "unverified@example.com"
+    When I send an incorrect code to verify that Method
+    Then the response status code should be 400
+    And a method record exists with a value of "unverified@example.com"
+    And the method should remain unverified
+    And the verification should not be expired
+    And the verification attempts counter should be 1
+    And the verification code should not have changed
+

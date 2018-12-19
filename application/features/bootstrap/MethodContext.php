@@ -80,6 +80,16 @@ class MethodContext extends \FeatureContext
     }
 
     /**
+     * @When I send an incorrect code to verify that Method
+     */
+    public function iSendAnIncorrectCodeToVerifyThatMethod()
+    {
+        $method = Method::findOne(['uid' => $this->tempUid]);
+        $this->iChangeThe('code', 'abcdef');
+        $this->iSendAToWithAValidUid('PUT', '/method/{uid}/verify');
+    }
+
+    /**
      * @Given the verification expiration time has passed
      */
     public function theVerificationExpirationTimeHasPassed()
@@ -105,6 +115,14 @@ class MethodContext extends \FeatureContext
     }
 
     /**
+     * @Then the verification should be expired
+     */
+    public function theVerificationShouldBeExpired()
+    {
+        Assert::true($this->methodFromDb->isVerificationExpired(), 'Verification is not expired but should be.');
+    }
+
+    /**
      * @Then the verification attempts counter should be :arg1
      */
     public function theVerificationAttemptsCounterShouldBe($arg1)
@@ -118,5 +136,13 @@ class MethodContext extends \FeatureContext
     public function theVerificationCodeShouldHaveChanged()
     {
         Assert::notEq($this->methodFromDb->verification_code, $this->tempMethod->verification_code);
+    }
+
+    /**
+     * @Then the verification code should not have changed
+     */
+    public function theVerificationCodeShouldNotHaveChanged()
+    {
+        Assert::eq($this->methodFromDb->verification_code, $this->tempMethod->verification_code);
     }
 }
