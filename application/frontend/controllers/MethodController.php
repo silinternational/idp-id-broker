@@ -145,19 +145,18 @@ class MethodController extends BaseRestController
         }
 
         try {
-            if ($method->isVerificationExpired()) {
-                $method->validateProvidedCode($code);
-                $method->restartVerification();
-                throw new HttpException(410);
-            }
+            $method->validateProvidedCode($code);
         } catch (InvalidCodeException $e) {
             throw new BadRequestHttpException(\Yii::t('app', 'Invalid verification code'), 1470315942);
         }
 
+        if ($method->isVerificationExpired()) {
+            $method->restartVerification();
+            throw new HttpException(410);
+        }
+
         try {
-            $method->validateAndSetAsVerified($code);
-        } catch (InvalidCodeException $e) {
-            throw new BadRequestHttpException(\Yii::t('app', 'Invalid verification code'), 1470315942);
+            $method->setAsVerified($code);
         } catch (\Exception $e) {
             throw new ServerErrorHttpException(
                 'Unable to set method as verified: ' . $e->getMessage(),

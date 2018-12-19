@@ -117,22 +117,11 @@ class Method extends MethodBase
     }
 
     /**
-     * Validate user submitted code and update record to be verified if valid
-     * @param string $userSubmitted
+     * Update record to be verified
      * @throws \Exception
-     * @throws InvalidCodeException
-     * @throws ServerErrorHttpException
      */
-    public function validateAndSetAsVerified($userSubmitted)
+    public function setAsVerified()
     {
-        /*
-         * Increase attempts count before verifying code in case verification fails
-         * for some reason
-         */
-        $this->incrementVerificationAttempts();
-
-        $this->validateProvidedCode($userSubmitted);
-
         /*
          * Update attributes to be verified
          */
@@ -273,9 +262,12 @@ class Method extends MethodBase
      *
      * @param $userSubmitted
      * @throws InvalidCodeException
+     * @throws ServerErrorHttpException
      */
     public function validateProvidedCode($userSubmitted): void
     {
+        $this->incrementVerificationAttempts();
+
         if ($this->verification_code !== $userSubmitted) {
             throw new InvalidCodeException('Invalid verification code', 1461442988);
         }
