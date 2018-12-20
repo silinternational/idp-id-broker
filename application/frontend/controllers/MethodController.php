@@ -156,7 +156,7 @@ class MethodController extends BaseRestController
         }
 
         try {
-            $method->setAsVerified($code);
+            $method->setAsVerified();
         } catch (\Exception $e) {
             throw new ServerErrorHttpException(
                 'Unable to set method as verified: ' . $e->getMessage(),

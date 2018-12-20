@@ -84,7 +84,6 @@ class MethodContext extends \FeatureContext
      */
     public function iSendAnIncorrectCodeToVerifyThatMethod()
     {
-        $method = Method::findOne(['uid' => $this->tempUid]);
         $this->iChangeThe('code', 'abcdef');
         $this->iSendAToWithAValidUid('PUT', '/method/{uid}/verify');
     }
