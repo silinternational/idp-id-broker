@@ -14,24 +14,27 @@ class Invite extends InviteBase
     {
         return ArrayHelper::merge([
             [
-                'uuid', 'default', 'value' => Uuid::uuid4()->toString()
+                'uuid', 'default', 'value' => self::newCode(),
             ],
             [
                 'created_utc', 'default', 'value' => MySqlDateTime::now(),
             ],
             [
-                'expires_on', 'default', 'value' => $this->expires(),
+                'expires_on', 'default', 'value' => self::newExpireDate(),
             ],
         ], parent::rules());
     }
 
-    private function expires(): Closure
+    private static function newExpireDate()
     {
-        return function() {
-            $lifespan = Yii::$app->params['inviteLifespan'];
+        $lifespan = Yii::$app->params['inviteLifespan'];
 
-            return MySqlDateTime::formatDate(strtotime($lifespan, strtotime($this->created_utc)));
-        };
+        return MySqlDateTime::relative($lifespan);
+    }
+
+    private static function newCode()
+    {
+        return Uuid::uuid4()->toString();
     }
 
     public function attributeLabels(): array
@@ -105,5 +108,18 @@ class Invite extends InviteBase
         }
 
         return $invite;
+    }
+
+    /**
+     * Create a new code and extend expiration.
+     * @return string
+     */
+    public function renew(): string
+    {
+        $this->uuid = self::newCode();
+        $this->expires_on = self::newExpireDate();
+        $this->save();
+
+        return $this->getCode();
     }
 }
