@@ -25,18 +25,30 @@ class Invite extends InviteBase
         ], parent::rules());
     }
 
-    private static function newExpireDate()
+    /**
+     * Calculate and return a new expire date.
+     * @return string
+     */
+    private static function newExpireDate(): string
     {
         $lifespan = Yii::$app->params['inviteLifespan'];
 
         return MySqlDateTime::relative($lifespan);
     }
 
-    private static function newCode()
+    /**
+     * Generate and return a new code.
+     * @return string
+     * @throws \Exception
+     */
+    private static function newCode():string
     {
         return Uuid::uuid4()->toString();
     }
 
+    /**
+     * @inheritdoc
+     */
     public function attributeLabels(): array
     {
         $labels = parent::attributeLabels();
@@ -69,6 +81,10 @@ class Invite extends InviteBase
         return true;
     }
 
+    /**
+     * Return the invite code.
+     * @return string
+     */
     public function getCode(): string
     {
         return $this->uuid;

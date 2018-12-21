@@ -67,7 +67,7 @@ class Authentication
      * Attempt an authentication by new user invite.
      *
      * @param string $invite New user invite code. If not blank, username and password are ignored.
-     * @throws \Exception
+     * @throws HttpException
      */
     protected function authenticateByInvite($invite)
     {
