@@ -1,5 +1,5 @@
 #%RAML 1.0
-title: ID Broker API
+title: ID Broker
 version: 4
 protocols: [ HTTPS ]
 mediaType: application/json
@@ -662,6 +662,10 @@ types:
             description: Missing or invalid code
           404:
             description: User not found or method not found
+            body:
+              type: Error
+          410:
+            description: Expired verification code
             body:
               type: Error
           429:

@@ -7,6 +7,7 @@ use common\models\User;
 use frontend\components\BaseRestController;
 use yii\web\BadRequestHttpException;
 use yii\web\ConflictHttpException;
+use yii\web\HttpException;
 use yii\web\NotFoundHttpException;
 use yii\web\ServerErrorHttpException;
 use yii\web\TooManyRequestsHttpException;
@@ -127,8 +128,6 @@ class MethodController extends BaseRestController
      */
     public function actionVerify($uid)
     {
-        Method::deleteExpiredUnverifiedMethods();
-
         /** @var Method $method */
         $method = $this->getRequestedMethod($uid);
 
@@ -146,9 +145,18 @@ class MethodController extends BaseRestController
         }
 
         try {
-            $method->validateAndSetAsVerified($code);
+            $method->validateProvidedCode($code);
         } catch (InvalidCodeException $e) {
             throw new BadRequestHttpException(\Yii::t('app', 'Invalid verification code'), 1470315942);
+        }
+
+        if ($method->isVerificationExpired()) {
+            $method->restartVerification();
+            throw new HttpException(410);
+        }
+
+        try {
+            $method->setAsVerified();
         } catch (\Exception $e) {
             throw new ServerErrorHttpException(
                 'Unable to set method as verified: ' . $e->getMessage(),
@@ -173,7 +181,7 @@ class MethodController extends BaseRestController
     {
         $method = $this->getRequestedMethod($uid);
 
-        if ( ! $method->delete()) {
+        if (! $method->delete()) {
             throw new ServerErrorHttpException('Unable to delete method', 1540673326);
         }
 

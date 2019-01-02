@@ -33,14 +33,14 @@ class Method extends MethodBase
                     'verification_code', 'default', 'when' => function () {
                         return $this->getIsNewRecord() && $this->verified != 1;
                     },
-                    'value' => Utils::getRandomDigits(\Yii::$app->params['method']['codeLength']),
+                    'value' => $this->createCode(),
                 ],
 
                 [
                     'verification_expires', 'default', 'when' => function () {
                         return $this->getIsNewRecord() && $this->verified != 1;
                     },
-                    'value' => MySqlDateTime::formatDateTime(time() + \Yii::$app->params['method']['lifetimeSeconds']),
+                    'value' => $this->calculateExpirationDate(),
                 ],
 
                 [
@@ -59,9 +59,13 @@ class Method extends MethodBase
     public function fields()
     {
         return [
-            'id' => function() { return $this->uid; },
+            'id' => function () {
+                return $this->uid;
+            },
             'value',
-            'verified' => function() { return $this->verified == 1; }
+            'verified' => function () {
+                return $this->verified == 1;
+            }
         ];
     }
 
@@ -90,10 +94,7 @@ class Method extends MethodBase
             throw new ConflictHttpException('Method already verified', 1540689804);
         }
 
-        $this->verification_attempts++;
-        if ( ! $this->save()) {
-            throw new ServerErrorHttpException('Save error after incrementing attempts', 1461441850);
-        }
+        $this->incrementVerificationAttempts();
 
         $this->sendVerificationEmail();
     }
@@ -116,28 +117,11 @@ class Method extends MethodBase
     }
 
     /**
-     * Validate user submitted code and update record to be verified if valid
-     * @param string $userSubmitted
+     * Update record to be verified
      * @throws \Exception
      */
-    public function validateAndSetAsVerified($userSubmitted)
+    public function setAsVerified()
     {
-        /*
-         * Increase attempts count before verifying code in case verification fails
-         * for some reason
-         */
-        $this->verification_attempts++;
-        if ( ! $this->save()) {
-            throw new \Exception('Unable to increment verification attempts', 1462903086);
-        }
-
-        /*
-         * Verify user provided code
-         */
-        if ( $this->verification_code !== $userSubmitted) {
-            throw new InvalidCodeException('Invalid verification code', 1461442988);
-        }
-
         /*
          * Update attributes to be verified
          */
@@ -146,7 +130,7 @@ class Method extends MethodBase
         $this->verification_attempts = null;
         $this->verified = 1;
 
-        if ( ! $this->save()) {
+        if (! $this->save()) {
             \Yii::error([
                 'action' => 'validate and set method as verified',
                 'status' => 'error',
@@ -208,7 +192,7 @@ class Method extends MethodBase
             }
         }
 
-        if ( ! $method->save()) {
+        if (! $method->save()) {
             throw new ServerErrorHttpException(
                 sprintf('Unable to save new method'),
                 1461441851
@@ -220,5 +204,85 @@ class Method extends MethodBase
         }
 
         return $method;
+    }
+
+    /**
+     * Change code, update expiration date, and send a new verification message.
+     *
+     * @throws ServerErrorHttpException
+     */
+    public function restartVerification()
+    {
+        $this->verified = 0;
+        $this->verification_attempts = 1;
+        $this->verification_code = $this->createCode();
+        $this->verification_expires = $this->calculateExpirationDate();
+
+        if (! $this->save()) {
+            throw new ServerErrorHttpException('Save error while restarting verification', 1545154473);
+        }
+
+        $this->sendVerificationEmail();
+    }
+
+    /**
+     * Generate and return a new verification code
+     *
+     * @return string
+     */
+    protected function createCode(): string
+    {
+        return Utils::getRandomDigits(\Yii::$app->params['method']['codeLength']);
+    }
+
+    /**
+     * Calculate and return a new expiration date for the verification code
+     *
+     * @return string
+     */
+    protected function calculateExpirationDate(): string
+    {
+        return MySqlDateTime::formatDateTime(time() + \Yii::$app->params['method']['lifetimeSeconds']);
+    }
+
+    /**
+     * Test verification expiration against the current time. If the time has passed,
+     * return true. Otherwise, return false.
+     *
+     * @return bool
+     * @throws \Exception
+     */
+    public function isVerificationExpired(): bool
+    {
+        return MySqlDateTime::isBefore($this->verification_expires, time());
+    }
+
+    /**
+     * Check provided code against the stored code. If not matching, throw an exception.
+     *
+     * @param $userSubmitted
+     * @throws InvalidCodeException
+     * @throws ServerErrorHttpException
+     */
+    public function validateProvidedCode($userSubmitted): void
+    {
+        $this->incrementVerificationAttempts();
+
+        if ($this->verification_code !== $userSubmitted) {
+            throw new InvalidCodeException('Invalid verification code', 1461442988);
+        }
+    }
+
+    /**
+     * Increment verification attempts and save to database.
+     *
+     * @throws ServerErrorHttpException
+     */
+    protected function incrementVerificationAttempts(): void
+    {
+        $this->verification_attempts++;
+        if (!$this->save()) {
+            throw new ServerErrorHttpException('Save error after incrementing attempts', 1461441850);
+        }
     }
 }
