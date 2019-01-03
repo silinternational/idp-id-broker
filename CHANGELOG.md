@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Changed password reuse error HTTP status code from 422 to 409
 - Unverified recovery methods are now included in listing from `GET /user/{id}/method`
 - Updated Welcome email to remove Insite obsolescense notification
+- /method/{uid}/verify no longer requires `employee_id`
 
 ## [3.5.0] - 2018-07-17
 ### Added

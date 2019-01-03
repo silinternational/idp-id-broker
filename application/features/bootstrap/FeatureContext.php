@@ -522,4 +522,12 @@ class FeatureContext extends YiiContext
 
         $this->createInviteCode($user, $code);
     }
+
+    /**
+     * @Given I do not provide an employee_id
+     */
+    public function iDoNotProvideAnEmployeeId()
+    {
+        unset($this->reqBody['employee_id']);
+    }
 }

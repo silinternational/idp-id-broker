@@ -129,7 +129,13 @@ class MethodController extends BaseRestController
     public function actionVerify($uid)
     {
         /** @var Method $method */
-        $method = $this->getRequestedMethod($uid);
+        $method = Method::findOne(['uid' => $uid]);
+        if ($method === null) {
+            throw new NotFoundHttpException(
+                'method ' . var_export($uid, true) . ' not found',
+                1546540650
+            );
+        }
 
         if ($method->isVerified()) {
             return $method;
