@@ -220,7 +220,7 @@ class UnitTestsContext extends YiiContext
     public function iReceiveACodeThatIsNotExpired()
     {
         Assert::notNull($this->inviteCode);
-        Assert::true($this->inviteCode->isValidCode());
+        Assert::false($this->inviteCode->isExpired());
     }
 
     /**

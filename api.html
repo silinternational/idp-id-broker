@@ -264,6 +264,12 @@
   "code": 0,
   "status": 400
 }
+</code></pre></div><h2>HTTP status code <a href="http://httpstatus.es/410" target="_blank">410</a></h2><p>The invite has expired. A new code has been generated and emailed to the user.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: object</p><strong>Properties</strong><ul><li><strong>name</strong>: <em>required (string)</em></li><li><strong>message</strong>: <em>required (string)</em></li><li><strong>code</strong>: <em>required (integer)</em></li><li><strong>status</strong>: <em>required (integer)</em></li></ul><p><strong>Example</strong>:</p><div class="examples"><pre><code>{
+  "name": "Bad Request",
+  "message": "",
+  "code": 0,
+  "status": 400
+}
 </code></pre></div><h2>HTTP status code <a href="http://httpstatus.es/500" target="_blank">500</a></h2><p>A server-side error occurred.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: object</p><strong>Properties</strong><ul><li><strong>name</strong>: <em>required (string)</em></li><li><strong>message</strong>: <em>required (string)</em></li><li><strong>code</strong>: <em>required (integer)</em></li><li><strong>status</strong>: <em>required (integer)</em></li></ul><p><strong>Example</strong>:</p><div class="examples"><pre><code>{
   "name": "Bad Request",
   "message": "",

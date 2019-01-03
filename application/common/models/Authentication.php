@@ -1,8 +1,10 @@
 <?php
 namespace common\models;
 
+use common\components\Emailer;
 use common\helpers\MySqlDateTime;
 use common\ldap\Ldap;
+use yii\web\HttpException;
 
 /**
  * An immutable class for checking authentication credentials.
@@ -65,6 +67,7 @@ class Authentication
      * Attempt an authentication by new user invite.
      *
      * @param string $invite New user invite code. If not blank, username and password are ignored.
+     * @throws HttpException
      */
     protected function authenticateByInvite($invite)
     {
@@ -74,9 +77,15 @@ class Authentication
             $this->errors['invite'] = ['Invalid code.'];
             return;
         }
-        if ( ! $invite->isValidCode()) {
-            $this->errors = $invite->getErrors();
-            return;
+
+        if ($invite->isExpired()) {
+            $emailData = ['inviteCode' => $invite->renew()];
+
+            /* @var $emailer Emailer */
+            $emailer = \Yii::$app->emailer;
+            $emailer->sendMessageTo(EmailLog::MESSAGE_TYPE_INVITE, $invite->user, $emailData);
+
+            throw new HttpException(410);
         }
 
         /* @var $user User */

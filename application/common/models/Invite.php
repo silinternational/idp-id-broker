@@ -14,26 +14,41 @@ class Invite extends InviteBase
     {
         return ArrayHelper::merge([
             [
-                'uuid', 'default', 'value' => Uuid::uuid4()->toString()
+                'uuid', 'default', 'value' => self::newCode(),
             ],
             [
                 'created_utc', 'default', 'value' => MySqlDateTime::now(),
             ],
             [
-                'expires_on', 'default', 'value' => $this->expires(),
+                'expires_on', 'default', 'value' => self::newExpireDate(),
             ],
         ], parent::rules());
     }
 
-    private function expires(): Closure
+    /**
+     * Calculate and return a new expire date.
+     * @return string
+     */
+    private static function newExpireDate(): string
     {
-        return function() {
-            $lifespan = Yii::$app->params['inviteLifespan'];
+        $lifespan = Yii::$app->params['inviteLifespan'];
 
-            return MySqlDateTime::formatDate(strtotime($lifespan, strtotime($this->created_utc)));
-        };
+        return MySqlDateTime::relative($lifespan);
     }
 
+    /**
+     * Generate and return a new code.
+     * @return string
+     * @throws \Exception
+     */
+    private static function newCode():string
+    {
+        return Uuid::uuid4()->toString();
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function attributeLabels(): array
     {
         $labels = parent::attributeLabels();
@@ -45,13 +60,13 @@ class Invite extends InviteBase
     }
 
     /**
-     * Checks expiration date. If `expires_on` is today or before, `isValidCode`
-     * returns `false` and adds an error message.
+     * Checks expiration date. If `expires_on` is today or before,
+     * returns `true` and adds an error message.
      *
      * @return bool
      * @throws \Exception
      */
-    public function isValidCode()
+    public function isExpired()
     {
         $expiration = strtotime($this->expires_on);
         if ($expiration === false) {
@@ -61,11 +76,15 @@ class Invite extends InviteBase
         $now = time();
         if ($now > $expiration) {
             $this->addError('expires_on', 'Expired code.');
-            return false;
+            return true;
         }
-        return true;
+        return false;
     }
 
+    /**
+     * Return the invite code.
+     * @return string
+     */
     public function getCode(): string
     {
         return $this->uuid;
@@ -105,5 +124,18 @@ class Invite extends InviteBase
         }
 
         return $invite;
+    }
+
+    /**
+     * Create a new code and extend expiration.
+     * @return string
+     */
+    public function renew(): string
+    {
+        $this->uuid = self::newCode();
+        $this->expires_on = self::newExpireDate();
+        $this->save();
+
+        return $this->getCode();
     }
 }

@@ -314,6 +314,12 @@ types:
           authentication failed).
         body:
           type: Error
+      410:
+        description: >
+          The invite has expired. A new code has been generated and emailed
+          to the user.
+        body:
+          type: Error
       500:
         description: A server-side error occurred.
         body:

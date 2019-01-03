@@ -231,7 +231,7 @@ Feature: Authentication
       | property  | value       |
       | invite    | xyz123      |
     When I request "/authentication" be created
-    Then the response status code should be 400
+    Then the response status code should be 410
 
   Scenario: Incorrect invite code for an account with no password in the db
     Given the user "shep_clark" has no password in the database
