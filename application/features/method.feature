@@ -67,6 +67,7 @@ Feature: Recovery Method API
 
   Scenario: Verify a Method
     Given user with employee id 123 has an unverified Method "unverified@example.com"
+    And I do not provide an employee_id
     When I send the correct code to verify that Method
     Then the response status code should be 200
     And the following data is returned:
@@ -88,6 +89,7 @@ Feature: Recovery Method API
   Scenario: Verify a Method with expired verification code
     Given user with employee id 123 has an unverified Method "unverified@example.com"
     And the verification expiration time has passed
+    And I do not provide an employee_id
     When I send the correct code to verify that Method
     Then the response status code should be 410
     And a method record exists with a value of "unverified@example.com"
@@ -99,6 +101,7 @@ Feature: Recovery Method API
   Scenario: Verify a Method with expired verification code and incorrect code
     Given user with employee id 123 has an unverified Method "unverified@example.com"
     And the verification expiration time has passed
+    And I do not provide an employee_id
     When I send an incorrect code to verify that Method
     Then the response status code should be 400
     And a method record exists with a value of "unverified@example.com"
@@ -109,6 +112,7 @@ Feature: Recovery Method API
 
   Scenario: Verify a Method with an incorrect code
     Given user with employee id 123 has an unverified Method "unverified@example.com"
+    And I do not provide an employee_id
     When I send an incorrect code to verify that Method
     Then the response status code should be 400
     And a method record exists with a value of "unverified@example.com"
