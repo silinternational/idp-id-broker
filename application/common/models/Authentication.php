@@ -78,7 +78,7 @@ class Authentication
             return;
         }
 
-        if ( ! $invite->isValidCode()) {
+        if ($invite->isExpired()) {
             $emailData = ['inviteCode' => $invite->renew()];
 
             /* @var $emailer Emailer */

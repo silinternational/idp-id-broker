@@ -60,13 +60,13 @@ class Invite extends InviteBase
     }
 
     /**
-     * Checks expiration date. If `expires_on` is today or before, `isValidCode`
-     * returns `false` and adds an error message.
+     * Checks expiration date. If `expires_on` is today or before,
+     * returns `true` and adds an error message.
      *
      * @return bool
      * @throws \Exception
      */
-    public function isValidCode()
+    public function isExpired()
     {
         $expiration = strtotime($this->expires_on);
         if ($expiration === false) {
@@ -76,9 +76,9 @@ class Invite extends InviteBase
         $now = time();
         if ($now > $expiration) {
             $this->addError('expires_on', 'Expired code.');
-            return false;
+            return true;
         }
-        return true;
+        return false;
     }
 
     /**
