@@ -197,7 +197,9 @@ class Method extends MethodBase
                 $method->verified = 1;
             }
         } else {
-            $method->restartVerification();
+            if (! $method->isVerified()) {
+                $method->restartVerification();
+            }
             return $method;
         }
 
