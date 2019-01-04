@@ -196,6 +196,9 @@ class Method extends MethodBase
                 $method->created = $created;
                 $method->verified = 1;
             }
+        } else {
+            $method->restartVerification();
+            return $method;
         }
 
         if (! $method->save()) {

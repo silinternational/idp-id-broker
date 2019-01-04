@@ -2,6 +2,7 @@
 namespace console\controllers;
 
 use common\models\Invite;
+use common\models\Method;
 use common\models\Mfa;
 use common\models\User;
 use common\components\Emailer;
@@ -13,6 +14,12 @@ class CronController extends Controller
 {
     public function actionRemoveOldUnverifiedRecords()
     {
+        \Yii::warning([
+            'action' => 'delete old unverified method records',
+            'status' => 'starting',
+        ]);
+        Method::deleteExpiredUnverifiedMethods();
+
         \Yii::warning([
             'action' => 'delete old invite records',
             'status' => 'starting',
