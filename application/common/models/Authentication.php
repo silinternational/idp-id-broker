@@ -78,6 +78,14 @@ class Authentication
             return;
         }
 
+        /* @var $user User */
+        $user = $invite->user;
+
+        if($user->current_password_id !== null) {
+            $this->errors['invite'] = ['Invitation invalid. User has a password.'];
+            return;
+        }
+
         if ($invite->isExpired()) {
             $emailData = ['inviteCode' => $invite->renew()];
 
@@ -88,15 +96,7 @@ class Authentication
             throw new HttpException(410);
         }
 
-        /* @var $user User */
-        $user = $invite->user;
         $user->scenario = User::SCENARIO_INVITE;
-
-        if($user->current_password_id !== null) {
-            $this->errors['invite'] = ['Invitation invalid. User has a password.'];
-            return;
-        }
-
         $this->validateUser($user);
     }
     /**
