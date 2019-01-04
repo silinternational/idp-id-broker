@@ -98,11 +98,17 @@ class CronController extends Controller
         \Yii::warning($gaEvents);
     }
 
-
     public function actionSendDelayedMfaRelatedEmails()
     {
         /* @var $emailer Emailer */
         $emailer = \Yii::$app->emailer;
         $emailer->sendDelayedMfaRelatedEmails();
+    }
+
+    public function actionSendMethodVerifyEmails()
+    {
+        /* @var $emailer Emailer */
+        $emailer = \Yii::$app->emailer;
+        $emailer->sendMethodVerifyEmails();
     }
 }

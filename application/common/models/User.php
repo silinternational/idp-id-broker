@@ -547,6 +547,16 @@ class User extends UserBase
     }
 
     /**
+     * @return Method[]
+     */
+    public function getUnverifiedMethods()
+    {
+        return array_filter($this->methods, function ($method) {
+            return $method->verified === 0;
+        });
+    }
+
+    /**
      * Return method-related properties to include in /user responses
      *
      * @return array method-related properties
