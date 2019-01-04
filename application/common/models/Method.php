@@ -142,12 +142,18 @@ class Method extends MethodBase
 
     /**
      * Delete all method records that are not verified and verification_expires date is in the past
+     * by more than a configured "grace period."
      */
     public static function deleteExpiredUnverifiedMethods()
     {
+        /*
+         * Replace '+' with '-' so all env parameters can be defined consistently as '+n unit'
+         */
+        $methodGracePeriod = str_replace('+', '-', \Yii::$app->params['method']['gracePeriod']);
+        $removeOlderThan = MySqlDateTime::relativeTime($methodGracePeriod);
         $methods = self::find()
             ->where(['verified' => 0])
-            ->andWhere(['<', 'verification_expires', MySqlDateTime::now()])
+            ->andWhere(['<', 'verification_expires', $removeOlderThan])
             ->all();
 
         foreach ($methods as $method) {
