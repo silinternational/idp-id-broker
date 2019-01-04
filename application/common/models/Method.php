@@ -242,7 +242,7 @@ class Method extends MethodBase
      */
     protected function calculateExpirationDate(): string
     {
-        return MySqlDateTime::formatDateTime(time() + \Yii::$app->params['method']['lifetimeSeconds']);
+        return MySqlDateTime::relativeTime(\Yii::$app->params['method']['lifetime']);
     }
 
     /**

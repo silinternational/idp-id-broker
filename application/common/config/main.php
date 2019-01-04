@@ -44,15 +44,6 @@ $emailServiceConfig = Env::getArrayFromPrefix('EMAIL_SERVICE_');
 // Re-retrieve the validIpRanges as an array.
 $emailServiceConfig['validIpRanges'] = Env::getArray('EMAIL_SERVICE_validIpRanges');
 
-$methodParams = ArrayHelper::merge(
-    [
-        'lifetimeSeconds' => 3600,
-        'codeLength' => 6,
-        'maxAttempts' => 10,
-    ],
-    Env::getArrayFromPrefix('METHOD_')
-);
-
 return [
     'id' => 'app-common',
     'bootstrap' => ['log'],
@@ -216,6 +207,13 @@ return [
             'trackingId' => Env::get('GA_TRACKING_ID'),
             'clientId'   => Env::get('GA_CLIENT_ID'),
         ],
-        'method' => $methodParams,
+        'method' => ArrayHelper::merge(
+            [
+                'lifetime' => '+1 hour',
+                'codeLength' => 6,
+                'maxAttempts' => 10,
+            ],
+            Env::getArrayFromPrefix('METHOD_')
+        ),
     ],
 ];
