@@ -138,4 +138,31 @@ class Invite extends InviteBase
 
         return $this->getCode();
     }
+
+    /**
+     * Delete all invite records where expires_on date is in the past
+     * by more than a configured "grace period."
+     */
+    public static function deleteOldInvites()
+    {
+        /*
+         * Replace '+' with '-' so all env parameters can be defined consistently as '+n unit'
+         */
+        $inviteGracePeriod = str_replace('+', '-', \Yii::$app->params['inviteGracePeriod']);
+        $removeOlderThan = MySqlDateTime::relative($inviteGracePeriod);
+        $invites = self::find()->andWhere(['<', 'expires_on', $removeOlderThan])->all();
+
+        foreach ($invites as $invite) {
+            try {
+                $invite->delete();
+            } catch (\Exception $e) {
+                \Yii::error([
+                    'action' => 'delete old invites',
+                    'status' => 'failed',
+                    'error' => $e->getMessage(),
+                    'uuid' => $invite->uuid,
+                ]);
+            }
+        }
+    }
 }
