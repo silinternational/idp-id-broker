@@ -210,7 +210,7 @@ return [
         ],
         'method' => ArrayHelper::merge(
             [
-                'lifetime' => '+1 hour',
+                'lifetime' => '+1 day',
                 'gracePeriod' => '+15 days',
                 'codeLength' => 6,
                 'maxAttempts' => 10,
