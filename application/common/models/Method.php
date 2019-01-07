@@ -150,10 +150,10 @@ class Method extends MethodBase
          * Replace '+' with '-' so all env parameters can be defined consistently as '+n unit'
          */
         $methodGracePeriod = str_replace('+', '-', \Yii::$app->params['method']['gracePeriod']);
-        $removeOlderThan = MySqlDateTime::relativeTime($methodGracePeriod);
+        $removeExpireBefore = MySqlDateTime::relativeTime($methodGracePeriod);
         $methods = self::find()
             ->where(['verified' => 0])
-            ->andWhere(['<', 'verification_expires', $removeOlderThan])
+            ->andWhere(['<', 'verification_expires', $removeExpireBefore])
             ->all();
 
         foreach ($methods as $method) {

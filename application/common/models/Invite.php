@@ -149,8 +149,8 @@ class Invite extends InviteBase
          * Replace '+' with '-' so all env parameters can be defined consistently as '+n unit'
          */
         $inviteGracePeriod = str_replace('+', '-', \Yii::$app->params['inviteGracePeriod']);
-        $removeOlderThan = MySqlDateTime::relative($inviteGracePeriod);
-        $invites = self::find()->andWhere(['<', 'expires_on', $removeOlderThan])->all();
+        $removeExpireBefore = MySqlDateTime::relative($inviteGracePeriod);
+        $invites = self::find()->andWhere(['<', 'expires_on', $removeExpireBefore])->all();
 
         foreach ($invites as $invite) {
             try {
