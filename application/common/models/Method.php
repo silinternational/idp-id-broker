@@ -156,9 +156,12 @@ class Method extends MethodBase
             ->andWhere(['<', 'verification_expires', $removeExpireBefore])
             ->all();
 
+        $numDeleted = 0;
         foreach ($methods as $method) {
             try {
-                $method->delete();
+                if ($method->delete() !== false) {
+                    $numDeleted += 1;
+                }
             } catch (\Exception $e) {
                 \Yii::error([
                     'action' => 'delete expired unverified methods',
@@ -168,6 +171,12 @@ class Method extends MethodBase
                 ]);
             }
         }
+
+        \Yii::warning([
+            'action' => 'delete old unverified method records',
+            'status' => 'complete',
+            'count' => $numDeleted,
+        ]);
     }
 
     /**
