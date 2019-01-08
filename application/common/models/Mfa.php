@@ -436,11 +436,17 @@ class Mfa extends MfaBase
      * Remove records that were not verified within the given time frame
      * @param int $maxAgeHours
      */
-    public static function removeOldUnverifiedRecords($maxAgeHours = 2)
+    public static function removeOldUnverifiedRecords()
     {
-        $removeOlderThan = MySqlDateTime::relative('-' . $maxAgeHours . ' hours');
-        $mfas = self::find()->where(['verified' => 0])
-            ->andWhere(['<', 'created_utc', $removeOlderThan])->all();
+        /*
+         * Replace '+' with '-' so all env parameters can be defined consistently as '+n unit'
+         */
+        $mfaLifetime = str_replace('+', '-', \Yii::$app->params['mfaLifetime']);
+        $removeOlderThan = MySqlDateTime::relativeTime($mfaLifetime);
+        $mfas = self::find()
+            ->where(['verified' => 0])
+            ->andWhere(['<', 'created_utc', $removeOlderThan])
+            ->all();
 
         $numDeleted = 0;
         foreach ($mfas as $mfa) {

@@ -44,15 +44,6 @@ $emailServiceConfig = Env::getArrayFromPrefix('EMAIL_SERVICE_');
 // Re-retrieve the validIpRanges as an array.
 $emailServiceConfig['validIpRanges'] = Env::getArray('EMAIL_SERVICE_validIpRanges');
 
-$methodParams = ArrayHelper::merge(
-    [
-        'lifetimeSeconds' => 3600,
-        'codeLength' => 6,
-        'maxAttempts' => 10,
-    ],
-    Env::getArrayFromPrefix('METHOD_')
-);
-
 return [
     'id' => 'app-common',
     'bootstrap' => ['log'],
@@ -212,10 +203,20 @@ return [
         'passwordMfaLifespanExtension'  => Env::get('PASSWORD_MFA_LIFESPAN_EXTENSION', '+1 year'),
         'passwordExpirationGracePeriod' => Env::get('PASSWORD_EXPIRATION_GRACE_PERIOD', '+30 days'),
         'inviteLifespan'                => Env::get('INVITE_LIFESPAN', '+1 month'),
+        'inviteGracePeriod'             => Env::get('INVITE_GRACE_PERIOD', '+3 months'),
         'googleAnalytics'               => [
             'trackingId' => Env::get('GA_TRACKING_ID'),
             'clientId'   => Env::get('GA_CLIENT_ID'),
         ],
-        'method' => $methodParams,
+        'method' => ArrayHelper::merge(
+            [
+                'lifetime' => '+1 day',
+                'gracePeriod' => '+15 days',
+                'codeLength' => 6,
+                'maxAttempts' => 10,
+            ],
+            Env::getArrayFromPrefix('METHOD_')
+        ),
+        'mfaLifetime' => Env::get('MFA_LIFETIME', '+2 hours'),
     ],
 ];

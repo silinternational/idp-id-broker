@@ -337,6 +337,29 @@ class Emailer extends Component
         }
     }
 
+    /**
+     * Iterates over all users and sends method verify emails as appropriate
+     */
+    public function sendMethodVerifyEmails()
+    {
+        $query = (new Query)->from('user');
+
+        // iterate over one user at a time.
+        foreach ($query->each() as $userData) {
+            $user = User::findOne($userData['id']);
+
+            $methods = $user->getUnverifiedMethods();
+            foreach ($methods as $method) {
+                $data = [
+                    'toAddress' => $method->value,
+                    'code' => $method->verification_code,
+                    'uid' => $method->uid,
+                ];
+
+                $this->sendMessageTo(EmailLog::MESSAGE_TYPE_METHOD_VERIFY, $user, $data);
+            }
+        }
+    }
 
     /**
      *

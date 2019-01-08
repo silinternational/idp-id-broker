@@ -4,3 +4,4 @@
 
 0 1 * * * root /data/yii cron/google-analytics 2>&1 | /usr/bin/logger -t id-broker-cron
 0 2 * * * root /data/yii cron/send-delayed-mfa-related-emails 2>&1 | /usr/bin/logger -t id-broker-cron
+0 3 * * * root /data/yii cron/send-method-verify-emails 2>&1 | /usr/bin/logger -t id-broker-cron

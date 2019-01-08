@@ -142,17 +142,26 @@ class Method extends MethodBase
 
     /**
      * Delete all method records that are not verified and verification_expires date is in the past
+     * by more than a configured "grace period."
      */
     public static function deleteExpiredUnverifiedMethods()
     {
+        /*
+         * Replace '+' with '-' so all env parameters can be defined consistently as '+n unit'
+         */
+        $methodGracePeriod = str_replace('+', '-', \Yii::$app->params['method']['gracePeriod']);
+        $removeExpireBefore = MySqlDateTime::relativeTime($methodGracePeriod);
         $methods = self::find()
             ->where(['verified' => 0])
-            ->andWhere(['<', 'verification_expires', MySqlDateTime::now()])
+            ->andWhere(['<', 'verification_expires', $removeExpireBefore])
             ->all();
 
+        $numDeleted = 0;
         foreach ($methods as $method) {
             try {
-                $method->delete();
+                if ($method->delete() !== false) {
+                    $numDeleted += 1;
+                }
             } catch (\Exception $e) {
                 \Yii::error([
                     'action' => 'delete expired unverified methods',
@@ -162,6 +171,12 @@ class Method extends MethodBase
                 ]);
             }
         }
+
+        \Yii::warning([
+            'action' => 'delete old unverified method records',
+            'status' => 'complete',
+            'count' => $numDeleted,
+        ]);
     }
 
     /**
@@ -190,6 +205,11 @@ class Method extends MethodBase
                 $method->created = $created;
                 $method->verified = 1;
             }
+        } else {
+            if (! $method->isVerified()) {
+                $method->restartVerification();
+            }
+            return $method;
         }
 
         if (! $method->save()) {
@@ -242,7 +262,7 @@ class Method extends MethodBase
      */
     protected function calculateExpirationDate(): string
     {
-        return MySqlDateTime::formatDateTime(time() + \Yii::$app->params['method']['lifetimeSeconds']);
+        return MySqlDateTime::relativeTime(\Yii::$app->params['method']['lifetime']);
     }
 
     /**

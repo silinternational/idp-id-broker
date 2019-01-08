@@ -91,9 +91,6 @@ class MethodController extends BaseRestController
      */
     public function actionCreate()
     {
-        // ensure we don't use expired methods
-        Method::deleteExpiredUnverifiedMethods();
-
         $created = (string)\Yii::$app->request->post('created');
 
         $value = \Yii::$app->request->post('value');
