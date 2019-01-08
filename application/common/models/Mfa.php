@@ -442,6 +442,11 @@ class Mfa extends MfaBase
          * Replace '+' with '-' so all env parameters can be defined consistently as '+n unit'
          */
         $mfaLifetime = str_replace('+', '-', \Yii::$app->params['mfaLifetime']);
+
+        /**
+         * @var string $removeExpireBefore   All unverified records that expired before this date
+         * should be deleted. Calculated relative to now (time of execution).
+         */
         $removeOlderThan = MySqlDateTime::relativeTime($mfaLifetime);
         $mfas = self::find()
             ->where(['verified' => 0])

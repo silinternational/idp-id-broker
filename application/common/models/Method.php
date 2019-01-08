@@ -150,6 +150,11 @@ class Method extends MethodBase
          * Replace '+' with '-' so all env parameters can be defined consistently as '+n unit'
          */
         $methodGracePeriod = str_replace('+', '-', \Yii::$app->params['method']['gracePeriod']);
+
+        /**
+         * @var string $removeExpireBefore   All unverified records that expired before this date
+         * should be deleted. Calculated relative to now (time of execution).
+         */
         $removeExpireBefore = MySqlDateTime::relativeTime($methodGracePeriod);
         $methods = self::find()
             ->where(['verified' => 0])
