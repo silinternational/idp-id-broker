@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Unverified recovery methods are now included in listing from `GET /user/{id}/method`
 - Updated Welcome email to remove Insite obsolescense notification
 - /method/{uid}/verify no longer requires `employee_id`
+- Changed dates in API to use ISO-8601 format (e.g. 2019-01-08T12:54:00Z)
 
 ## [3.5.0] - 2018-07-17
 ### Added
