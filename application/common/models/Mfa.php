@@ -3,6 +3,7 @@ namespace common\models;
 
 use common\components\MfaBackendInterface;
 use common\helpers\MySqlDateTime;
+use common\helpers\Utils;
 use yii\helpers\ArrayHelper;
 use yii\web\BadRequestHttpException;
 use yii\web\ServerErrorHttpException;
@@ -44,11 +45,11 @@ class Mfa extends MfaBase
             'type',
             'label',
             'created_utc' => function($model) {
-                return date('c', strtotime($model->created_utc));
+                return Utils::getIso8601($model->created_utc);
             },
             'last_used_utc' => function($model) {
                 if ($model->last_used_utc !== null) {
-                    return date('c', strtotime($model->last_used_utc));
+                    return Utils::getIso8601($model->last_used_utc);
                 }
                 return null;
             },

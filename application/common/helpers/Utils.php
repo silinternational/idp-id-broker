@@ -6,6 +6,7 @@ use yii\base\Security;
 class Utils
 {
     const FRIENDLY_DT_FORMAT = 'l F j, Y g:iA T';
+    const DT_ISO8601 = 'Y-m-d\TH:i:s\Z';
 
     /**
      * @param int $length
@@ -47,6 +48,22 @@ class Utils
         return date(self::FRIENDLY_DT_FORMAT, $timestamp);
     }
 
+    /**
+     * @param integer|string|null $timestamp time as unix timestamp, MYSQL datetime. If omitted,
+     *        the current time is used.
+     * @return string date in ISO8601 format (e.g. 2019-01-08T12:54:00Z)
+     * @throws \Exception if a badly-formatted time string is provided in $timestamp
+     */
+    public static function getIso8601($timestamp = null)
+    {
+        $timestamp = $timestamp ?? time();
+        $timestamp = is_int($timestamp) ? $timestamp : strtotime($timestamp);
+        if ($timestamp === false) {
+            throw new \Exception('Unable to parse date to timestamp', 1546977533);
+        }
+        $dt = date_create_from_format('U', $timestamp);
+        return $dt->format(self::DT_ISO8601);
+    }
 
     /**
      * @param string $email an email address

@@ -5,6 +5,7 @@ namespace common\models;
 use Closure;
 use common\components\Emailer;
 use common\helpers\MySqlDateTime;
+use common\helpers\Utils;
 use common\ldap\Ldap;
 use Exception;
 use Ramsey\Uuid\Uuid;
@@ -420,7 +421,9 @@ class User extends UserBase
             'email',
             'active',
             'locked',
-            'last_login_utc',
+            'last_login_utc' => function ($model) {
+                return Utils::getIso8601($model->last_login_utc);
+            },
             'manager_email',
             'spouse_email',
             'hide',

@@ -4,6 +4,7 @@ namespace common\models;
 
 use Closure;
 use common\helpers\MySqlDateTime;
+use common\helpers\Utils;
 use Yii;
 use yii\behaviors\AttributeBehavior;
 use yii\db\ActiveRecord;
@@ -18,8 +19,6 @@ use yii\web\ConflictHttpException;
  */
 class Password extends PasswordBase
 {
-    const DATE_FORMAT = 'Y-m-d 23:59:59 \G\M\T';
-
     public $password;
 
     public function rules(): array
@@ -131,7 +130,7 @@ class Password extends PasswordBase
     {
         $fields = [
             'created_utc' => function ($model) {
-                return "{$model->created_utc} UTC";
+                return Utils::getIso8601($model->created_utc);
             },
             'expires_on' => function (Password $model) {
                 return $model->getExpiresOn();
@@ -154,17 +153,27 @@ class Password extends PasswordBase
     }
 
     /**
+     * Returns a date extended by the MFA Lifespan Extension, if applicable
+     * @param string $date date in yyyy-mm-dd format
+     * @return string conditionally extended and converted to ISO8601 format
+     */
+    protected function getMfaExtendedDate($date)
+    {
+        $dateIso = $date . 'T23:59:59Z';
+        if (count($this->user->mfas) > 0) {
+            $extended = strtotime(\Yii::$app->params['passwordMfaLifespanExtension'], strtotime($dateIso));
+            return Utils::getIso8601($extended);
+        }
+        return $dateIso;
+    }
+
+    /**
      * Calculate expires_on date based on if user has MFA configured
      * @return string
      */
     public function getExpiresOn()
     {
-        if (count($this->user->mfas) > 0) {
-            $expiresOnTimestamp = strtotime($this->expires_on . ' 23:59:59 UTC');
-            $extendedTimestamp = strtotime(\Yii::$app->params['passwordMfaLifespanExtension'], $expiresOnTimestamp);
-            return date(self::DATE_FORMAT, $extendedTimestamp);
-        }
-        return $this->expires_on . ' 23:59:59 UTC';
+        return $this->getMfaExtendedDate($this->expires_on);
     }
 
     /**
@@ -173,12 +182,7 @@ class Password extends PasswordBase
      */
     public function getGracePeriodEndsOn()
     {
-        if (count($this->user->mfas) > 0) {
-            $graceEndsOnTimestamp = strtotime($this->grace_period_ends_on . ' 23:59:59 UTC');
-            $extendedTimestamp = strtotime(\Yii::$app->params['passwordMfaLifespanExtension'], $graceEndsOnTimestamp);
-            return date(self::DATE_FORMAT, $extendedTimestamp);
-        }
-        return $this->grace_period_ends_on . ' 23:59:59 UTC';
+        return $this->getMfaExtendedDate($this->grace_period_ends_on);
     }
 
     /**
