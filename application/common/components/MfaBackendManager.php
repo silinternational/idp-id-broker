@@ -71,10 +71,24 @@ class MfaBackendManager extends Component implements MfaBackendInterface
      * @param string $value Value provided by user, such as TOTP number or U2F challenge response
      * @return bool
      * @throws ServerErrorHttpException
+     * @throws \Exception
      */
     public function verify(int $mfaId, $value): bool
     {
-        return MfaBackupcode::validateAndRemove($mfaId, $value);
+        if (! MfaBackupcode::validateAndRemove($mfaId, $value)) {
+            return false;
+        }
+
+        $mfa = Mfa::findOne(['id' => $mfaId]);
+        if ($mfa === null) {
+            throw new \Exception("MFA record not found", 1547074716);
+        }
+
+        if (count($mfa->mfaBackupcodes) == 0) {
+            $mfa->delete();
+        }
+
+        return true;
     }
 
     /**
