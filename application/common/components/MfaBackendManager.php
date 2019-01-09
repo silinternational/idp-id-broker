@@ -1,20 +1,16 @@
 <?php
 namespace common\components;
 
+use common\components\Emailer;
+use common\models\EmailLog;
 use common\models\Mfa;
 use common\models\MfaBackupcode;
 use yii\base\Component;
 use yii\web\NotFoundHttpException;
 use yii\web\ServerErrorHttpException;
 
-class MfaBackendBackupcode extends Component implements MfaBackendInterface
+class MfaBackendManager extends Component implements MfaBackendInterface
 {
-    /**
-     * Number of backup codes to generate
-     * @var int
-     */
-    public $numBackupCodes = 10;
-
     /**
      * Initialize a new MFA backend registration
      * @param int $userId
@@ -23,17 +19,40 @@ class MfaBackendBackupcode extends Component implements MfaBackendInterface
      */
     public function regInit(int $userId): array
     {
-        // Get existing MFA record for backupcode to create/update codes for
-        $mfa = Mfa::findOne(['user_id' => $userId, 'type' => Mfa::TYPE_BACKUPCODE]);
+        // Get existing MFA record for manager to create/update codes for
+        $mfa = Mfa::findOne(['user_id' => $userId, 'type' => Mfa::TYPE_MANAGER]);
         if ($mfa === null) {
-            throw new \Exception("A backupcode MFA record does not exist for this user", 1507904428);
+            throw new \Exception("A manager MFA record does not exist for this user", 1507904428);
         }
 
         $mfa->setVerified();
 
         MfaBackupcode::deleteCodesForMfaId($mfa->id);
 
-        return MfaBackupcode::createBackupCodes($mfa->id, $this->numBackupCodes);
+        $codes = MfaBackupcode::createBackupCodes($mfa->id, 1);
+        $this->sendManagerEmail($mfa, $codes[0]);
+
+        /*
+         * Don't return the code because it's being sent by email.
+         */
+        return [];
+    }
+
+    /**
+     * Send a email message to the manager with the code
+     */
+    protected function sendManagerEmail($mfa, $code)
+    {
+        /* @var $emailer Emailer */
+        $emailer = \Yii::$app->emailer;
+
+        $data = [
+            'toAddress' => $mfa->user->manager_email,
+            'code' => $code,
+            'id' => $mfa->id,
+        ];
+
+        $emailer->sendMessageTo(EmailLog::MESSAGE_TYPE_MFA_MANAGER, $mfa->user, $data);
     }
 
     /**

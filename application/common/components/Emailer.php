@@ -30,6 +30,8 @@ class Emailer extends Component
     const SUBJECT_MFA_OPTION_REMOVED_DEFAULT = 'A 2-Step Verification option was removed from your %s account';
     const SUBJECT_MFA_ENABLED_DEFAULT = '2-Step Verification was enabled on your %s account';
     const SUBJECT_MFA_DISABLED_DEFAULT = '2-Step Verification was disabled on your %s account';
+    const SUBJECT_MFA_MANAGER_DEFAULT = 'Someone on your team has sent you a login code for their profile';
+
     const SUBJECT_METHOD_VERIFY_DEFAULT = 'Please verify your new password recovery method';
 
     /**
@@ -94,6 +96,7 @@ class Emailer extends Component
     public $subjectForMfaOptionRemoved;
     public $subjectForMfaEnabled;
     public $subjectForMfaDisabled;
+    public $subjectForMfaManager;
 
     public $subjectForMethodVerify;
 
@@ -251,6 +254,7 @@ class Emailer extends Component
         $this->subjectForMfaOptionRemoved = $this->subjectForMfaOptionRemoved ?? self::SUBJECT_MFA_OPTION_REMOVED_DEFAULT;
         $this->subjectForMfaEnabled = $this->subjectForMfaEnabled ?? self::SUBJECT_MFA_ENABLED_DEFAULT;
         $this->subjectForMfaDisabled = $this->subjectForMfaDisabled ?? self::SUBJECT_MFA_DISABLED_DEFAULT;
+        $this->subjectForMfaManager = $this->subjectForMfaManager ?? self::SUBJECT_MFA_MANAGER_DEFAULT;
 
         $this->subjectForMethodVerify = $this->subjectForMethodVerify ?? self::SUBJECT_METHOD_VERIFY_DEFAULT;
 
@@ -267,6 +271,7 @@ class Emailer extends Component
             EmailLog::MESSAGE_TYPE_MFA_ENABLED => $this->subjectForMfaEnabled,
             EmailLog::MESSAGE_TYPE_MFA_DISABLED => $this->subjectForMfaDisabled,
             EmailLog::MESSAGE_TYPE_METHOD_VERIFY => $this->subjectForMethodVerify,
+            EmailLog::MESSAGE_TYPE_MFA_MANAGER => $this->subjectForMfaManager,
         ];
         
         $this->assertConfigIsValid();
