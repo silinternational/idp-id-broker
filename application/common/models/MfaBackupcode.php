@@ -114,7 +114,10 @@ class MfaBackupcode extends MfaBackupcodeBase
                 'status' => 'error',
                 'error' => $code->getFirstErrors(),
             ]);
-            throw new ServerErrorHttpException("Unable to save new backup code, error: " . print_r($code->getFirstErrors(), true), 1506692503);
+            throw new ServerErrorHttpException(
+                "Unable to save new backup code, error: " . print_r($code->getFirstErrors(), true),
+                1506692503
+            );
         }
     }
 

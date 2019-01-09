@@ -24,7 +24,7 @@ use yii\helpers\Html as yHtml;
     to add it to your account.
 </p>
 <p>
-    Verification Code: <?= yHtml::encode($code); ?>
+    Verification Code: <?= yHtml::encode($code) ?>
 </p>
 <p>
     If you did not do this it could be a sign someone else has compromised your account.
