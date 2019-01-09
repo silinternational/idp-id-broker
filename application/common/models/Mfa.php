@@ -60,7 +60,7 @@ class Mfa extends MfaBase
                 if ($model->verified === 1 && $model->scenario === User::SCENARIO_AUTHENTICATE) {
                     $data += $model->authInit();
                 }
-                if ($model->type === self::TYPE_BACKUPCODE) {
+                if ($model->type === self::TYPE_BACKUPCODE || $model->type === self::TYPE_MANAGER) {
                     $data += ['count' => count($model->mfaBackupcodes)];
                 }
                 return $data;
