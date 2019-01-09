@@ -13,7 +13,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Added `PUT /mfa/{mfaId}` endpoint to update MFA labels.
 - Added `invite` property on `/authentication` for new user invite authentication
 - Added ability to restart a password recovery method verification
-- New 'manager' MFA type -- on request, send a backup code to user's manager.
 
 ### Changed
 - Changed password reuse error HTTP status code from 422 to 409

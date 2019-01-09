@@ -19,16 +19,6 @@ class MfaUnitTestsContext extends UnitTestsContext
     }
 
     /**
-     * @Given I have a user with a manager rescue mfa option
-     */
-    public function iHaveAUserWithAManagerRescueMfaOption()
-    {
-        $this->tempUser = $this->createNewUserInDatabase('mfa_tester');
-        $this->createMfa(Mfa::TYPE_MANAGER);
-        MfaBackupcode::deleteAll();
-    }
-
-    /**
      * @Given I have a user with an unverified totp mfa option
      */
     public function iHaveAUserWithAnUnverifiedTotpMfaOption()
@@ -136,9 +126,9 @@ class MfaUnitTestsContext extends UnitTestsContext
     }
 
     /**
-     * @When I check if the new mfa option is newly verified
+     * @When I check if the new backup codes mfa option is newly verified
      */
-    public function iCheckIfTheNewMfaOptionIsNewlyVerified()
+    public function iCheckIfTheNewBackupCodesMfaOptionIsNewlyVerified()
     {
         $this->mfaIsNewlyVerified = $this->mfa->isNewlyVerified(true, []);
     }

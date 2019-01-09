@@ -2,7 +2,6 @@
 
 use common\components\Emailer;
 use common\components\MfaBackendBackupcode;
-use common\components\MfaBackendManager;
 use common\components\MfaBackendTotp;
 use common\components\MfaBackendU2f;
 use common\ldap\Ldap;
@@ -95,7 +94,6 @@ return [
             'subjectForMfaOptionRemoved' => Env::get('SUBJECT_FOR_MFA_OPTION_REMOVED'),
             'subjectForMfaEnabled' => Env::get('SUBJECT_FOR_MFA_ENABLED'),
             'subjectForMfaDisabled' => Env::get('SUBJECT_FOR_MFA_DISABLED'),
-            'subjectForMfaManager' => Env::get('SUBJECT_FOR_MFA_MANAGER'),
             'subjectForMethodVerify' => Env::get('SUBJECT_FOR_METHOD_VERIFY'),
 
             'lostSecurityKeyEmailDays' => Env::get('LOST_SECURITY_KEY_EMAIL_DAYS', 62),
@@ -127,7 +125,6 @@ return [
             ['class' => MfaBackendU2f::class],
             $mfaU2fConfig
         ),
-        'manager' => ['class' => MfaBackendManager::class],
         // http://www.yiiframework.com/doc-2.0/guide-runtime-logging.html
         'log' => [
             'targets' => [

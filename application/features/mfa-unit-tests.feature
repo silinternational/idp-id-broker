@@ -18,12 +18,7 @@ Feature: Unit Tests for the Mfa model
 
   Scenario: Check that a new backup codes mfa option is seen as "newly verified"
     Given I have a user with a backup codes mfa option
-    When I check if the new mfa option is newly verified
-    Then I see that the mfa option is newly verified
-
-  Scenario: Check that a new manager rescue mfa option is seen as "newly verified"
-    Given I have a user with a manager rescue mfa option
-    When I check if the new mfa option is newly verified
+    When I check if the new backup codes mfa option is newly verified
     Then I see that the mfa option is newly verified
 
   Scenario: Check that a new totp mfa option is NOT seen as "newly verified"
