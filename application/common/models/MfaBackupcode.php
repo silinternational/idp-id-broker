@@ -77,7 +77,7 @@ class MfaBackupcode extends MfaBackupcodeBase
     }
 
     /**
-     * Clear out previous backup codes and generate new ones
+     * Generate new backup codes
      * @param int $mfaId
      * @param int $howMany
      * @return array
@@ -85,13 +85,10 @@ class MfaBackupcode extends MfaBackupcodeBase
      */
     public static function createBackupCodes(int $mfaId, int $howMany = 10): array
     {
-        // Delete any existing codes
-        self::deleteCodesForMfaId($mfaId);
-
         // Generate and store new codes
         $clearTextCodes = [];
         for ($i = 0; $i < $howMany; $i++) {
-            $code = substr(random_int(100000000, 200000000),1);
+            $code = substr(random_int(100000000, 200000000), 1);
             $clearTextCodes[] = $code;
             self::insertBackupCode($mfaId, $code);
         }

@@ -29,6 +29,10 @@ class MfaBackendBackupcode extends Component implements MfaBackendInterface
             throw new ServerErrorHttpException("A backupcode MFA record does not exist for this user", 1507904428);
         }
 
+        $mfa->setVerified();
+
+        MfaBackupcode::deleteCodesForMfaId($mfa->id);
+
         return MfaBackupcode::createBackupCodes($mfa->id, $this->numBackupCodes);
     }
 

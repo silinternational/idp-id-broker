@@ -281,7 +281,6 @@ class Mfa extends MfaBase
 
         $mfa->user_id = $userId;
         $mfa->type = $type;
-        $mfa->verified = ($type == self::TYPE_BACKUPCODE) ? 1 : 0;
 
         if (empty($label)) {
             $existingCount = count($user->mfas);
@@ -494,6 +493,20 @@ class Mfa extends MfaBase
 
         } else if ($emailer->shouldSendMfaDisabledMessageTo($user, $eventType, $mfa)) {
             $emailer->sendMessageTo(EmailLog::MESSAGE_TYPE_MFA_DISABLED, $user);
+        }
+    }
+
+    /**
+     * Set verified=1 and save if necessary
+     * @throws \Exception if save failed
+     */
+    public function setVerified(): void
+    {
+        if ($this->verified == 0) {
+            $this->verified = 1;
+            if (! $this->save()) {
+                throw new \Exception("Error saving MFA record", 1547066350);
+            }
         }
     }
 }
