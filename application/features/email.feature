@@ -299,7 +299,13 @@ Feature: Email
 
   Scenario: Resend a recovery method verify email for an existing object
     Given a user already exists
-    And an unverified method exists
-    And I remove records of any emails that have been sent
+      And an unverified method exists
+      And I remove records of any emails that have been sent
     When I request that the verify email is resent
     Then a Method Verify email is sent to that method
+
+  Scenario: Send a manager rescue code email after creation of manager mfa
+    Given a user already exists
+      And no mfas exist
+    When I request a new manager mfa
+    Then a Manager Rescue email is sent to the manager
