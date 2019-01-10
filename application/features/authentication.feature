@@ -128,7 +128,7 @@ Feature: Authentication
 #TODO: need test(s) for expired passwords
 
   Scenario Outline: Attempt to act upon an authentication in an undefined way
-      And the user store is empty
+    Given the user store is empty
     When I request "/authentication" be <action>
     Then the response status code should be 404
       And the property message should contain ""
@@ -209,36 +209,36 @@ Feature: Authentication
 
   Scenario: Correct invite code for an account with no password in the db
     Given the user "shep_clark" has no password in the database
-    And the user "shep_clark" has a non-expired invite code "xyz123"
-    And I provide the following valid data:
-      | property  | value       |
-      | invite    | xyz123      |
+      And the user "shep_clark" has a non-expired invite code "xyz123"
+      And I provide the following valid data:
+        | property  | value       |
+        | invite    | xyz123      |
     When I request "/authentication" be created
     Then the response status code should be 200
 
   Scenario: Correct invite code for an account with a password in the db
     Given the user "shep_clark" has a non-expired invite code "xyz123"
-    And I provide the following valid data:
-      | property  | value       |
-      | invite    | xyz123      |
+      And I provide the following valid data:
+        | property  | value       |
+        | invite    | xyz123      |
     When I request "/authentication" be created
     Then the response status code should be 400
 
   Scenario: Correct but expired invite code for an account with no password in the db
     Given the user "shep_clark" has no password in the database
-    And the user "shep_clark" has an expired invite code "xyz123"
-    And I provide the following valid data:
-      | property  | value       |
-      | invite    | xyz123      |
+      And the user "shep_clark" has an expired invite code "xyz123"
+      And I provide the following valid data:
+        | property  | value       |
+        | invite    | xyz123      |
     When I request "/authentication" be created
     Then the response status code should be 410
 
   Scenario: Incorrect invite code for an account with no password in the db
     Given the user "shep_clark" has no password in the database
-    And the user "shep_clark" has a non-expired invite code "xyz123"
-    And I provide the following valid data:
-      | property  | value       |
-      | invite    | abc123      |
+      And the user "shep_clark" has a non-expired invite code "xyz123"
+      And I provide the following valid data:
+        | property  | value       |
+        | invite    | abc123      |
     When I request "/authentication" be created
     Then the response status code should be 400
 

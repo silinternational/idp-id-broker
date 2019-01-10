@@ -304,20 +304,20 @@ Feature: User
 
   Scenario Outline: Attempt to create a new user while providing an invalid value for an optional property
     Given the requester is authorized
-    And the user store is empty
-    And I provide the following valid data:
-      | property     | value                 |
-      | employee_id  | 456                   |
-      | first_name   | John                  |
-      | last_name    | Smith                 |
-      | display_name | John Smith            |
-      | username     | john_smith            |
-      | email        | john_smith@example.org|
-    But I provide an invalid <property> of <value>
+      And the user store is empty
+      And I provide the following valid data:
+        | property     | value                 |
+        | employee_id  | 456                   |
+        | first_name   | John                  |
+        | last_name    | Smith                 |
+        | display_name | John Smith            |
+        | username     | john_smith            |
+        | email        | john_smith@example.org|
+      But I provide an invalid <property> of <value>
     When I request "/user" be created
     Then the response status code should be 422
-    And the property message should contain "<contents>"
-    And the user store is still empty
+      And the property message should contain "<contents>"
+      And the user store is still empty
 
     Examples:
       | property      | value           | contents      |
@@ -411,13 +411,13 @@ Feature: User
 
   Scenario Outline: Check "nag" state when user has or doesn't have methods and mfas
     Given A user with <verifiedMethods> verified methods, <unverifiedMethods> unverified methods, <verifiedMfas> verified mfas, and <unverifiedMfas> unverified mfas
-    And the nag dates are in the past
+      And the nag dates are in the past
     When I request the nag state
     Then I see that the nag state is <state1>
-    And I update the nag dates
+      And I update the nag dates
     When I request the nag state
     Then I see that the nag state is <state2>
-    And I update the nag dates
+      And I update the nag dates
     When I request the nag state
     Then I see that the nag state is "none"
 

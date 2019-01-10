@@ -191,11 +191,11 @@ Feature: Email
 
   Scenario Outline: When to send mfa disabled emails (after one has been added or deleted)
     Given we are configured <sendMfaDisabledEml> mfa disabled emails
-    And no mfas exist
-    And a user already exists
-    And a verified u2f mfa option <u2fExistsOrNot>
-    And a totp mfa option <totpExistsOrNot>
-    And the latest mfa event type was <mfaEventType>
+      And no mfas exist
+      And a user already exists
+      And a verified u2f mfa option <u2fExistsOrNot>
+      And a totp mfa option <totpExistsOrNot>
+      And the latest mfa event type was <mfaEventType>
     When I check if a mfa disabled email should be sent
     Then I see that a mfa disabled email <shouldOrNot> be sent
 
@@ -234,9 +234,9 @@ Feature: Email
 
   Scenario: When to send a mfa disabled email after an unverified u2f mfa option has been deleted.
     Given we are configured to send mfa disabled emails
-    And no mfas exist
-    And a user already exists
-    And an unverified u2f mfa option was just deleted
+      And no mfas exist
+      And a user already exists
+      And an unverified u2f mfa option was just deleted
     When I check if a mfa disabled email should be sent
     Then I see that a mfa disabled email should not be sent
 
