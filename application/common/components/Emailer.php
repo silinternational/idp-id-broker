@@ -30,7 +30,7 @@ class Emailer extends Component
     const SUBJECT_MFA_OPTION_REMOVED_DEFAULT = 'A 2-Step Verification option was removed from your %s account';
     const SUBJECT_MFA_ENABLED_DEFAULT = '2-Step Verification was enabled on your %s account';
     const SUBJECT_MFA_DISABLED_DEFAULT = '2-Step Verification was disabled on your %s account';
-    const SUBJECT_MFA_MANAGER_DEFAULT = 'Someone on your team has sent you a login code for their profile';
+    const SUBJECT_MFA_MANAGER_DEFAULT = 'Someone has sent you a login code for their %s account';
 
     const SUBJECT_METHOD_VERIFY_DEFAULT = 'Please verify your new password recovery method';
 
