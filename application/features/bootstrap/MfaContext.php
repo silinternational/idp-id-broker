@@ -145,6 +145,6 @@ class MfaContext extends \FeatureContext
     public function theMfaRecordIsNotStored()
     {
         $this->mfa = Mfa::findOne(['id' => $this->mfa->id]);
-        Assert::null($this->mfa, 'No MFA record found for that user.');
+        Assert::null($this->mfa, 'A matching record was found in the database');
     }
 }
