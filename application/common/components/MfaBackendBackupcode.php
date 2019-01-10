@@ -56,20 +56,7 @@ class MfaBackendBackupcode extends Component implements MfaBackendInterface
      */
     public function verify(int $mfaId, $value): bool
     {
-        if (! MfaBackupcode::validateAndRemove($mfaId, $value)) {
-            return false;
-        }
-
-        $mfa = Mfa::findOne(['id' => $mfaId]);
-        if ($mfa === null) {
-            throw new \Exception("MFA record not found", 1547075022);
-        }
-
-        if (count($mfa->mfaBackupcodes) == 0) {
-            $mfa->delete();
-        }
-
-        return true;
+        return MfaBackupcode::validateAndRemove($mfaId, $value);
     }
 
     /**
