@@ -62,7 +62,8 @@ class EmailContext extends YiiContext
     {
         $matchingFakeEmails = $this->fakeEmailer->getFakeEmailsOfTypeSentToUser(
             $messageType,
-            $this->tempUser->email
+            $this->tempUser->email,
+            $this->tempUser
         );
         Assert::greaterThan(count($matchingFakeEmails), 0, sprintf(
             'Did not find any %s emails sent to that user.',
@@ -77,7 +78,8 @@ class EmailContext extends YiiContext
     {
         $matchingFakeEmails = $this->fakeEmailer->getFakeEmailsOfTypeSentToUser(
             $messageType,
-            $this->tempUser->email
+            $this->tempUser->email,
+            $this->tempUser
         );
         Assert::isEmpty($matchingFakeEmails);
     }
@@ -945,7 +947,7 @@ class EmailContext extends YiiContext
 
     protected function assertEmailSent($type, $address)
     {
-        $matchingFakeEmails = $this->fakeEmailer->getFakeEmailsOfTypeSentToUser($type, $address);
+        $matchingFakeEmails = $this->fakeEmailer->getFakeEmailsOfTypeSentToUser($type, $address, $this->tempUser);
 
         Assert::greaterThan(count($matchingFakeEmails), 0, sprintf(
             'Did not find any %s emails sent to that address.',
