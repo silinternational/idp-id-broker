@@ -19,6 +19,7 @@ class Mfa extends MfaBase
     const TYPE_TOTP = 'totp';
     const TYPE_U2F = 'u2f';
     const TYPE_BACKUPCODE = 'backupcode';
+    const TYPE_MANAGER = 'manager';
 
     const EVENT_TYPE_VERIFY = 'verify_mfa';
     const EVENT_TYPE_DELETE = 'delete_mfa';
@@ -30,7 +31,7 @@ class Mfa extends MfaBase
                 'created_utc', 'default', 'value' => MySqlDateTime::now(),
             ],
             [
-                'type', 'in', 'range' => [self::TYPE_TOTP, self::TYPE_U2F, self::TYPE_BACKUPCODE]
+                'type', 'in', 'range' => array_keys(self::getTypes()),
             ],
             [
                 'verified', 'default', 'value' => 0,
@@ -59,7 +60,7 @@ class Mfa extends MfaBase
                 if ($model->verified === 1 && $model->scenario === User::SCENARIO_AUTHENTICATE) {
                     $data += $model->authInit();
                 }
-                if ($model->type === self::TYPE_BACKUPCODE) {
+                if ($model->type === self::TYPE_BACKUPCODE || $model->type === self::TYPE_MANAGER) {
                     $data += ['count' => count($model->mfaBackupcodes)];
                 }
                 return $data;
@@ -142,10 +143,7 @@ class Mfa extends MfaBase
      */
     public static function isValidType(string $type): bool
     {
-        if (in_array($type, [self::TYPE_BACKUPCODE, self::TYPE_U2F, self::TYPE_TOTP])) {
-            return true;
-        }
-        return false;
+        return  array_key_exists($type, self::getTypes());
     }
 
     /**
@@ -154,14 +152,7 @@ class Mfa extends MfaBase
      */
     public static function getBackendForType(string $type): MfaBackendInterface
     {
-        switch ($type) {
-            case self::TYPE_BACKUPCODE:
-                return \Yii::$app->backupcode;
-            case self::TYPE_TOTP:
-                return \Yii::$app->totp;
-            case self::TYPE_U2F:
-                return \Yii::$app->u2f;
-        }
+        return \Yii::$app->$type;
     }
 
     /**
@@ -267,13 +258,17 @@ class Mfa extends MfaBase
             throw new BadRequestHttpException("User not found");
         }
 
+        if ($type == self::TYPE_MANAGER && empty($user->manager_email)) {
+            throw new BadRequestHttpException('Manager email must be valid for this MFA type');
+        }
+
         $mfa = new Mfa();
 
         /*
-         * User can only have one 'backupcode' type, so if already exists, use existing
+         * User can only have one 'backupcode' or 'manager' type, so if already exists, use existing
          */
-        if ($type == self::TYPE_BACKUPCODE) {
-            $existing = self::findOne(['user_id' => $userId, 'type' => self::TYPE_BACKUPCODE]);
+        if ($type == self::TYPE_BACKUPCODE || $type == self::TYPE_MANAGER) {
+            $existing = self::findOne(['user_id' => $userId, 'type' => $type]);
             if ($existing instanceof Mfa) {
                 $mfa = $existing;
             }
@@ -419,16 +414,28 @@ class Mfa extends MfaBase
     }
 
     /**
+     * Returns a list of MFA types and user-friendly name
+     *
+     * @return array
+     */
+    public static function getTypes()
+    {
+        return [
+            self::TYPE_BACKUPCODE => 'Printable Codes',
+            self::TYPE_MANAGER => 'Manager Backup Code',
+            self::TYPE_TOTP => 'Smartphone App',
+            self::TYPE_U2F => 'Security Key',
+        ];
+    }
+
+    /**
      * Returns a human friendly version of the Mfa's type
      *
      * @return string
      */
-    public function getReadableType() {
-        $types = [
-            self::TYPE_BACKUPCODE => 'Printable Codes',
-            self::TYPE_TOTP => 'Smartphone App',
-            self::TYPE_U2F => 'Security Key',
-        ];
+    public function getReadableType()
+    {
+        $types = self::getTypes();
         return $types[$this->type];
     }
 

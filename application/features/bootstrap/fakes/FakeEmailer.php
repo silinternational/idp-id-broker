@@ -4,6 +4,7 @@ namespace Sil\SilIdBroker\Behat\Context\fakes;
 use common\components\Emailer;
 use common\models\User;
 use Sil\SilIdBroker\Behat\Context\fakes\FakeEmailServiceClient;
+use yii\helpers\ArrayHelper;
 
 class FakeEmailer extends Emailer
 {
@@ -38,21 +39,22 @@ class FakeEmailer extends Emailer
      *
      * @param string $messageType The type of message.
      * @param string $emailAddress Email address to find.
+     * @param User $user User record for subject text completion.
      * @return array[]
      */
-    public function getFakeEmailsOfTypeSentToUser(string $messageType, string $emailAddress)
+    public function getFakeEmailsOfTypeSentToUser(string $messageType, string $emailAddress, User $user)
     {
         $fakeEmailer = $this;
         $fakeEmailsSent = $fakeEmailer->getFakeEmailsSent();
 
         return array_filter(
             $fakeEmailsSent,
-            function ($fakeEmail) use ($fakeEmailer, $messageType, $emailAddress) {
+            function ($fakeEmail) use ($fakeEmailer, $messageType, $emailAddress, $user) {
                 
                 $subject = $fakeEmail['subject'] ?? '';
                 $toAddress = $fakeEmail['to_address'] ?? '';
                 
-                return $fakeEmailer->isSubjectForMessageType($subject, $messageType)
+                return $fakeEmailer->isSubjectForMessageType($subject, $messageType, $user)
                     && ($toAddress === $emailAddress);
             }
         );
@@ -63,8 +65,13 @@ class FakeEmailer extends Emailer
         return $this->getEmailServiceClient()->emailsSent;
     }
     
-    public function isSubjectForMessageType(string $subject, string $messageType)
+    public function isSubjectForMessageType(string $subject, string $messageType, User $user)
     {
-        return ($this->getSubjectForMessage($messageType) === $subject);
+        $dataForEmail = ArrayHelper::merge(
+            $user->getAttributesForEmail(),
+            $this->otherDataForEmails
+        );
+
+        return ($this->getSubjectForMessage($messageType, $dataForEmail) === $subject);
     }
 }

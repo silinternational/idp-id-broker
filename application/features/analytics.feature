@@ -7,7 +7,7 @@ Feature: User
     Given the user store is empty
 
   Scenario: Get a count of active users with a verified mfa
-      Given I create a new user
+    Given I create a new user
         And that user has a backup code mfa record
       And I create a new user
         And that user has a verified totp mfa record
@@ -23,7 +23,7 @@ Feature: User
     Then the count of active users with a verified mfa should be 3
 
   Scenario: Get a count of active users with a backup code mfa
-      Given I create a new user
+    Given I create a new user
         And that user has a backup code mfa record
       And I create a new user
         And that user has a verified totp mfa record
@@ -34,7 +34,7 @@ Feature: User
     Then the count of active users with a backup code mfa should be 1
 
   Scenario: Get a count of active users with a verified totp mfa
-      Given I create a new user
+    Given I create a new user
         And that user has a backup code mfa record
       And I create a new user
         And that user has a verified totp mfa record
@@ -49,7 +49,7 @@ Feature: User
     Then the count of active users with a verified totp mfa should be 2
 
   Scenario: Get a count of active users with a verified u2f mfa
-      Given I create a new user
+    Given I create a new user
         And that user has a backup code mfa record
       And I create a new user
         And that user has a verified totp mfa record
@@ -63,7 +63,7 @@ Feature: User
     Then the count of active users with a verified u2f mfa should be 1
 
   Scenario: Get a count of active users with a password
-      Given I create a new user with a password
+    Given I create a new user with a password
       And I create a new user with a password
       And I create a new user with a password
       And I create a new user without a password
@@ -72,7 +72,7 @@ Feature: User
     Then the count of active users with a password should be 3
 
   Scenario: Get the average number of mfas per active user with a verified mfa
-      Given I create a new user
+    Given I create a new user
         And that user has a backup code mfa record
       And I create a new user
         And that user has a verified totp mfa record
@@ -90,7 +90,7 @@ Feature: User
     Then the average number of mfas per active user with mfas should be 2
 
   Scenario: Get a count of active users with require mfa
-      Given I create a new user with require mfa
+    Given I create a new user with require mfa
       And I create a new user with require mfa
       And I create a new user
       And I create a new user

@@ -53,6 +53,7 @@ class EmailContext extends YiiContext
     protected $testMethod;
 
     const METHOD_EMAIL_ADDRESS = 'method@example.com';
+    const MANAGER_EMAIL = 'manager@example.com';
 
     /**
      * @Then a(n) :messageType email should have been sent to them
@@ -61,7 +62,8 @@ class EmailContext extends YiiContext
     {
         $matchingFakeEmails = $this->fakeEmailer->getFakeEmailsOfTypeSentToUser(
             $messageType,
-            $this->tempUser->email
+            $this->tempUser->email,
+            $this->tempUser
         );
         Assert::greaterThan(count($matchingFakeEmails), 0, sprintf(
             'Did not find any %s emails sent to that user.',
@@ -76,7 +78,8 @@ class EmailContext extends YiiContext
     {
         $matchingFakeEmails = $this->fakeEmailer->getFakeEmailsOfTypeSentToUser(
             $messageType,
-            $this->tempUser->email
+            $this->tempUser->email,
+            $this->tempUser
         );
         Assert::isEmpty($matchingFakeEmails);
     }
@@ -121,6 +124,7 @@ class EmailContext extends YiiContext
             'last_name' => 'User',
             'username' => 'test_user_' . $employeeId,
             'email' => 'test_user_' . $employeeId . '@example.com',
+            'manager_email' => self::MANAGER_EMAIL,
         ]);
         $user->scenario = User::SCENARIO_NEW_USER;
         if ( ! $user->save()) {
@@ -941,20 +945,30 @@ class EmailContext extends YiiContext
         $this->createMethod(self::METHOD_EMAIL_ADDRESS);
     }
 
+    protected function assertEmailSent($type, $address)
+    {
+        $matchingFakeEmails = $this->fakeEmailer->getFakeEmailsOfTypeSentToUser($type, $address, $this->tempUser);
+
+        Assert::greaterThan(count($matchingFakeEmails), 0, sprintf(
+            'Did not find any %s emails sent to that address.',
+            $type
+        ));
+    }
+
     /**
      * @Then a Method Verify email is sent to that method
      */
     public function aMethodVerifyEmailIsSentToThatMethod()
     {
-        $matchingFakeEmails = $this->fakeEmailer->getFakeEmailsOfTypeSentToUser(
-            EmailLog::MESSAGE_TYPE_METHOD_VERIFY,
-            self::METHOD_EMAIL_ADDRESS
-        );
+        $this->assertEmailSent(EmailLog::MESSAGE_TYPE_METHOD_VERIFY, self::METHOD_EMAIL_ADDRESS);
+    }
 
-        Assert::greaterThan(count($matchingFakeEmails), 0, sprintf(
-            'Did not find any %s emails sent to that address.',
-            EmailLog::MESSAGE_TYPE_METHOD_VERIFY
-        ));
+    /**
+     * @Then a Manager Rescue email is sent to the manager
+     */
+    public function aManagerRescueEmailIsSentToTheManager()
+    {
+        $this->assertEmailSent(EmailLog::MESSAGE_TYPE_MFA_MANAGER, self::MANAGER_EMAIL);
     }
 
     /**
@@ -971,5 +985,13 @@ class EmailContext extends YiiContext
     public function iRequestThatTheVerifyEmailIsResent()
     {
         $this->testMethod->sendVerification();
+    }
+
+    /**
+     * @When I request a new manager mfa
+     */
+    public function iRequestANewManagerMfa()
+    {
+        Mfa::create( $this->tempUser->id, Mfa::TYPE_MANAGER, 'label');
     }
 }

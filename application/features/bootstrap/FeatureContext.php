@@ -178,7 +178,11 @@ class FeatureContext extends YiiContext
         Assert::eq(
             $this->response->getStatusCode(),
             $statusCode,
-            sprintf("Unexpected response: %s", var_export($this->resBody, true))
+            sprintf(
+                "Unexpected response. status=%d, body=%s",
+                $this->response->getStatusCode(),
+                var_export($this->resBody, true)
+            )
         );
     }
 
@@ -529,5 +533,23 @@ class FeatureContext extends YiiContext
     public function iDoNotProvideAnEmployeeId()
     {
         unset($this->reqBody['employee_id']);
+    }
+
+    /**
+     * @Given the response should contain a :key array with :num items
+     */
+    public function theResponseShouldContainAArrayWithItems($key, $num)
+    {
+        Assert::keyExists($this->resBody, $key);
+        Assert::eq(count($this->resBody[$key]), $num);
+    }
+
+    /**
+     * @param $property
+     * @return mixed
+     */
+    public function getResponseProperty($property)
+    {
+        return $this->resBody[$property];
     }
 }

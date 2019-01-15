@@ -17,20 +17,22 @@ use yii\db\Query;
 
 class Emailer extends Component
 {
-    const SUBJECT_INVITE_DEFAULT = 'Your new %s Identity account';
-    const SUBJECT_MFA_RATE_LIMIT_DEFAULT = 'Too many 2-Step Verification attempts on your %s Identity account';
-    const SUBJECT_PASSWORD_CHANGED_DEFAULT = 'Your %s Identity account password has been changed';
-    const SUBJECT_WELCOME_DEFAULT = 'Welcome to your new %s Identity account';
+    const SUBJ_INVITE = 'Your new {idpDisplayName} Identity account';
+    const SUBJ_MFA_RATE_LIMIT = 'Too many 2-Step Verification attempts on your {idpDisplayName} Identity account';
+    const SUBJ_PASSWORD_CHANGED = 'Your {idpDisplayName} Identity account password has been changed';
+    const SUBJ_WELCOME = 'Welcome to your new {idpDisplayName} Identity account';
 
-    const SUBJECT_GET_BACKUP_CODES_DEFAULT = 'Get printable codes for your %s account';
-    const SUBJECT_REFRESH_BACKUP_CODES_DEFAULT = 'Get a new set of printable codes for your %s account';
-    const SUBJECT_LOST_SECURITY_KEY_DEFAULT = 'Have you lost the security key you use with your %s account';
+    const SUBJ_GET_BACKUP_CODES = 'Get printable codes for your {idpDisplayName} account';
+    const SUBJ_REFRESH_BACKUP_CODES = 'Get a new set of printable codes for your {idpDisplayName} account';
+    const SUBJ_LOST_SECURITY_KEY = 'Have you lost the security key you use with your {idpDisplayName} account';
 
-    const SUBJECT_MFA_OPTION_ADDED_DEFAULT = 'A 2-Step Verification option was added to your %s account';
-    const SUBJECT_MFA_OPTION_REMOVED_DEFAULT = 'A 2-Step Verification option was removed from your %s account';
-    const SUBJECT_MFA_ENABLED_DEFAULT = '2-Step Verification was enabled on your %s account';
-    const SUBJECT_MFA_DISABLED_DEFAULT = '2-Step Verification was disabled on your %s account';
-    const SUBJECT_METHOD_VERIFY_DEFAULT = 'Please verify your new password recovery method';
+    const SUBJ_MFA_OPTION_ADDED = 'A 2-Step Verification option was added to your {idpDisplayName} account';
+    const SUBJ_MFA_OPTION_REMOVED = 'A 2-Step Verification option was removed from your {idpDisplayName} account';
+    const SUBJ_MFA_ENABLED = '2-Step Verification was enabled on your {idpDisplayName} account';
+    const SUBJ_MFA_DISABLED = '2-Step Verification was disabled on your {idpDisplayName} account';
+    const SUBJ_MFA_MANAGER = '{displayName} has sent you a login code for their {idpDisplayName} account';
+
+    const SUBJ_METHOD_VERIFY = 'Please verify your new password recovery method';
 
     /**
      * The configuration for the email-service client.
@@ -94,6 +96,7 @@ class Emailer extends Component
     public $subjectForMfaOptionRemoved;
     public $subjectForMfaEnabled;
     public $subjectForMfaDisabled;
+    public $subjectForMfaManager;
 
     public $subjectForMethodVerify;
 
@@ -194,15 +197,23 @@ class Emailer extends Component
     }
 
     /**
+     * Return the subject line for the given $messageType, after substituting
+     * $data properties by key into tokens surrounded by {}.
      * @param string $messageType
-     * @return null|string
+     * @param array $data properties to insert into subject text
+     * @return string
      */
-    protected function getSubjectForMessage(string $messageType)
+    protected function getSubjectForMessage(string $messageType, array $data): string
     {
-        if ( ! empty($this->subjects[$messageType]) && strpos($this->subjects[$messageType], '%') !== false) {
-            return sprintf($this->subjects[$messageType], $this->otherDataForEmails['idpDisplayName'] ?? '');
+        $subject = $this->subjects[$messageType] ?? '';
+
+        foreach ($data as $key => $value) {
+            if (is_scalar($value)) {
+                $subject = str_replace('{' . $key . '}', $value, $subject);
+            }
         }
-        return $this->subjects[$messageType] ?? null;
+
+        return $subject;
     }
 
     /**
@@ -238,21 +249,22 @@ class Emailer extends Component
             $this->logger = new Psr3Yii2Logger();
         }
 
-        $this->subjectForInvite = $this->subjectForInvite ?? self::SUBJECT_INVITE_DEFAULT;
-        $this->subjectForMfaRateLimit = $this->subjectForMfaRateLimit ?? self::SUBJECT_MFA_RATE_LIMIT_DEFAULT;
-        $this->subjectForPasswordChanged = $this->subjectForPasswordChanged ?? self::SUBJECT_PASSWORD_CHANGED_DEFAULT;
-        $this->subjectForWelcome = $this->subjectForWelcome ?? self::SUBJECT_WELCOME_DEFAULT;
+        $this->subjectForInvite = $this->subjectForInvite ?? self::SUBJ_INVITE;
+        $this->subjectForMfaRateLimit = $this->subjectForMfaRateLimit ?? self::SUBJ_MFA_RATE_LIMIT;
+        $this->subjectForPasswordChanged = $this->subjectForPasswordChanged ?? self::SUBJ_PASSWORD_CHANGED;
+        $this->subjectForWelcome = $this->subjectForWelcome ?? self::SUBJ_WELCOME;
 
-        $this->subjectForGetBackupCodes = $this->subjectForGetBackupCodes ?? self::SUBJECT_GET_BACKUP_CODES_DEFAULT;
-        $this->subjectForRefreshBackupCodes = $this->subjectForRefreshBackupCodes ?? self::SUBJECT_REFRESH_BACKUP_CODES_DEFAULT;
-        $this->subjectForLostSecurityKey = $this->subjectForLostSecurityKey ?? self::SUBJECT_LOST_SECURITY_KEY_DEFAULT;
+        $this->subjectForGetBackupCodes = $this->subjectForGetBackupCodes ?? self::SUBJ_GET_BACKUP_CODES;
+        $this->subjectForRefreshBackupCodes = $this->subjectForRefreshBackupCodes ?? self::SUBJ_REFRESH_BACKUP_CODES;
+        $this->subjectForLostSecurityKey = $this->subjectForLostSecurityKey ?? self::SUBJ_LOST_SECURITY_KEY;
 
-        $this->subjectForMfaOptionAdded = $this->subjectForMfaOptionAdded ?? self::SUBJECT_MFA_OPTION_ADDED_DEFAULT;
-        $this->subjectForMfaOptionRemoved = $this->subjectForMfaOptionRemoved ?? self::SUBJECT_MFA_OPTION_REMOVED_DEFAULT;
-        $this->subjectForMfaEnabled = $this->subjectForMfaEnabled ?? self::SUBJECT_MFA_ENABLED_DEFAULT;
-        $this->subjectForMfaDisabled = $this->subjectForMfaDisabled ?? self::SUBJECT_MFA_DISABLED_DEFAULT;
+        $this->subjectForMfaOptionAdded = $this->subjectForMfaOptionAdded ?? self::SUBJ_MFA_OPTION_ADDED;
+        $this->subjectForMfaOptionRemoved = $this->subjectForMfaOptionRemoved ?? self::SUBJ_MFA_OPTION_REMOVED;
+        $this->subjectForMfaEnabled = $this->subjectForMfaEnabled ?? self::SUBJ_MFA_ENABLED;
+        $this->subjectForMfaDisabled = $this->subjectForMfaDisabled ?? self::SUBJ_MFA_DISABLED;
+        $this->subjectForMfaManager = $this->subjectForMfaManager ?? self::SUBJ_MFA_MANAGER;
 
-        $this->subjectForMethodVerify = $this->subjectForMethodVerify ?? self::SUBJECT_METHOD_VERIFY_DEFAULT;
+        $this->subjectForMethodVerify = $this->subjectForMethodVerify ?? self::SUBJ_METHOD_VERIFY;
 
         $this->subjects = [
             EmailLog::MESSAGE_TYPE_INVITE => $this->subjectForInvite,
@@ -267,6 +279,7 @@ class Emailer extends Component
             EmailLog::MESSAGE_TYPE_MFA_ENABLED => $this->subjectForMfaEnabled,
             EmailLog::MESSAGE_TYPE_MFA_DISABLED => $this->subjectForMfaDisabled,
             EmailLog::MESSAGE_TYPE_METHOD_VERIFY => $this->subjectForMethodVerify,
+            EmailLog::MESSAGE_TYPE_MFA_MANAGER => $this->subjectForMfaManager,
         ];
         
         $this->assertConfigIsValid();
@@ -309,7 +322,7 @@ class Emailer extends Component
         
         $this->email(
             $data['toAddress'] ?? $user->email,
-            $this->getSubjectForMessage($messageType),
+            $this->getSubjectForMessage($messageType, $dataForEmail),
             \Yii::$app->view->render($htmlView, $dataForEmail),
             \Yii::$app->view->render($textView, $dataForEmail)
         );
