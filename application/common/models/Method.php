@@ -65,7 +65,10 @@ class Method extends MethodBase
             'value',
             'verified' => function () {
                 return $this->verified == 1;
-            }
+            },
+            'created' => function ($model) {
+                return Utils::getIso8601($model->created);
+            },
         ];
     }
 
