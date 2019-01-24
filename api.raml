@@ -47,7 +47,9 @@ types:
   UserResponse:
     description: >
       Information on user record. Password is not included if a password
-      has not been assigned to the user.
+      has not been assigned to the user. Method options are included only
+      if `method.review` is 'yes' and only in response to `POST /authentication`,
+      otherwise it will be an empty list.
     type: object
     properties:
       uuid?: string
@@ -87,6 +89,7 @@ types:
           review:
             enum: [ yes, no ]
             description: Flag to indicate whether to remind the user to review their recovery methods
+          options: MethodResponse[]
       password?:
         type: object
         properties:
@@ -150,7 +153,15 @@ types:
         },
         "method": {
           "add": "no",
-          "review": "no"
+          "review": "no",
+          "options": [
+            {
+              "id": "0YrSiNp2P6sfkleepNNvFYMQWuLfssve",
+              "value": "email@example.org",
+              "verified": true,
+              "created": "2017-10-24T20:40:47Z"
+            }
+          ]
         }
       }
   UserCreation:
@@ -287,14 +298,16 @@ types:
     description:
     type: object
     properties:
-      uid: string
+      id: string
       value: string
       verified: boolean
+      created: string
     example: |
       {
-          "uid": "0YrSiNp2P6sfkleepNNvFYMQWuLfssve",
+          "id": "0YrSiNp2P6sfkleepNNvFYMQWuLfssve",
           "value": "email@example.org",
-          "verified": true
+          "verified": true,
+          "created": "2017-10-24T20:41:05Z"
       }
 /authentication:
   post:
