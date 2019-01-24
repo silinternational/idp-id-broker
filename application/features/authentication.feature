@@ -128,7 +128,7 @@ Feature: Authentication
 #TODO: need test(s) for expired passwords
 
   Scenario Outline: Attempt to act upon an authentication in an undefined way
-      And the user store is empty
+    Given the user store is empty
     When I request "/authentication" be <action>
     Then the response status code should be 404
       And the property message should contain ""
@@ -177,6 +177,72 @@ Feature: Authentication
     When I request "/authentication" be created
     Then the response status code should be 200
 
-#    TODO: attempt to authenticate a user who doesn't have a password yet, expect 400 (ensure timing attack protection is enforced)
+  Scenario: Check "nag" flags on user resource in response to authenticate call
+    Given I provide the following valid data:
+      | property  | value       |
+      | username  | shep_clark  |
+      | password  | govols!!!   |
+    When I request "/authentication" be created
+    Then the following data is returned:
+      | property      | value                 |
+      | employee_id   | 123                   |
+      | method.add    | no                    |
+      | method.review | no                    |
+      | mfa.add       | yes                   |
+      | mfa.review    | no                    |
+    When I request "/authentication" be created
+    Then the following data is returned:
+      | property      | value                 |
+      | employee_id   | 123                   |
+      | method.add    | yes                   |
+      | method.review | no                    |
+      | mfa.add       | no                    |
+      | mfa.review    | no                    |
+    When I request "/authentication" be created
+    Then the following data is returned:
+      | property      | value                 |
+      | employee_id   | 123                   |
+      | method.add    | no                    |
+      | method.review | no                    |
+      | mfa.add       | no                    |
+      | mfa.review    | no                    |
+
+  Scenario: Correct invite code for an account with no password in the db
+    Given the user "shep_clark" has no password in the database
+      And the user "shep_clark" has a non-expired invite code "xyz123"
+      And I provide the following valid data:
+        | property  | value       |
+        | invite    | xyz123      |
+    When I request "/authentication" be created
+    Then the response status code should be 200
+
+  Scenario: Correct invite code for an account with a password in the db
+    Given the user "shep_clark" has a non-expired invite code "xyz123"
+      And I provide the following valid data:
+        | property  | value       |
+        | invite    | xyz123      |
+    When I request "/authentication" be created
+    Then the response status code should be 400
+
+  Scenario: Correct but expired invite code for an account with no password in the db
+    Given the user "shep_clark" has no password in the database
+      And the user "shep_clark" has an expired invite code "xyz123"
+      And I provide the following valid data:
+        | property  | value       |
+        | invite    | xyz123      |
+    When I request "/authentication" be created
+    Then the response status code should be 410
+
+  Scenario: Incorrect invite code for an account with no password in the db
+    Given the user "shep_clark" has no password in the database
+      And the user "shep_clark" has a non-expired invite code "xyz123"
+      And I provide the following valid data:
+        | property  | value       |
+        | invite    | abc123      |
+    When I request "/authentication" be created
+    Then the response status code should be 400
+
+# TODO: attempt to authenticate a user who doesn't have a password yet, expect 400 (ensure timing attack protection is enforced)
 # TODO: need test for check that a user's password is good all the way until midnight of the expiration/grace period dates
 # TODO: need test to allow username or email address to be used for authentication
+

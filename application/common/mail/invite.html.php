@@ -22,6 +22,7 @@ use yii\helpers\Html as yHtml;
  * @var string $supportEmail
  * @var string $supportName
  * @var bool   $isMfaEnabled
+ * @var string $inviteCode
  */
 ?>
 <p>Dear <?= yHtml::encode($displayName) ?>,</p>
@@ -39,21 +40,15 @@ use yii\helpers\Html as yHtml;
 </p>
 
 <p>
-  If you have any difficulties completing this task, please contact
-  <?= yHtml::encode($supportName) ?> at: <?= yHtml::encode($supportEmail) ?>
+    If you have any difficulties completing this task, please contact
+    <?= yHtml::encode($supportName) ?> at: <?= yHtml::encode($supportEmail) ?>
 </p>
 
 <p><b>Instructions:</b></p>
-<ol>
-  <li>Go to <?= yHtml::encode($passwordForgotUrl) ?></li>
-  <li>Enter your username, <?= yHtml::encode($username) ?></li>
-  <li>Check the box next to "I'm not a robot" and click "Continue"</li>
-  <li>Check your <?= yHtml::encode($email) ?> email inbox for a message with the subject "<?= yHtml::encode($idpDisplayName) ?> password reset request"</li>
-  <li>Click the link in the email</li>
-  <li>Enter a new password that meets the requirements as described on the page</li>
-  <li>Enter your password again to confirm it</li>
-  <li>Click the "Change" button to set your new password</li>
-</ol>
+<p>
+    To proceed with establishing your account, please follow the step-by-step guidance
+    <a href="<?= yHtml::encode($passwordProfileUrl . '/intro?invite=' . $inviteCode) ?>">here</a>.
+</p>
 
 <p>
     Please note that this <?= yHtml::encode($idpDisplayName) ?> Identity account (username and password) is

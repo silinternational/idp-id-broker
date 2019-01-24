@@ -3,6 +3,7 @@ namespace Sil\SilIdBroker\Behat\Context;
 
 use common\helpers\MySqlDateTime;
 use common\models\EmailLog;
+use common\models\Method;
 use common\models\Mfa;
 use common\models\MfaBackupcode;
 use common\models\User;
@@ -45,6 +46,15 @@ class EmailContext extends YiiContext
     /** @var string */
     protected $mfaEventType;
 
+    /** @var Mfa */
+    protected $testMfaOption;
+
+    /** @var Method */
+    protected $testMethod;
+
+    const METHOD_EMAIL_ADDRESS = 'method@example.com';
+    const MANAGER_EMAIL = 'manager@example.com';
+
     /**
      * @Then a(n) :messageType email should have been sent to them
      */
@@ -52,6 +62,7 @@ class EmailContext extends YiiContext
     {
         $matchingFakeEmails = $this->fakeEmailer->getFakeEmailsOfTypeSentToUser(
             $messageType,
+            $this->tempUser->email,
             $this->tempUser
         );
         Assert::greaterThan(count($matchingFakeEmails), 0, sprintf(
@@ -67,6 +78,7 @@ class EmailContext extends YiiContext
     {
         $matchingFakeEmails = $this->fakeEmailer->getFakeEmailsOfTypeSentToUser(
             $messageType,
+            $this->tempUser->email,
             $this->tempUser
         );
         Assert::isEmpty($matchingFakeEmails);
@@ -112,6 +124,7 @@ class EmailContext extends YiiContext
             'last_name' => 'User',
             'username' => 'test_user_' . $employeeId,
             'email' => 'test_user_' . $employeeId . '@example.com',
+            'manager_email' => self::MANAGER_EMAIL,
         ]);
         $user->scenario = User::SCENARIO_NEW_USER;
         if ( ! $user->save()) {
@@ -123,7 +136,12 @@ class EmailContext extends YiiContext
         return $user;
     }
 
-    protected function createMfa($type, $lastUsedDaysAgo=null, $user=null)
+    protected function createMfa(
+        $type,
+        $lastUsedDaysAgo=null,
+        $user=null,
+        $verified=1
+    )
     {
         if ($user ===null) {
             $user = $this->tempUser;
@@ -131,7 +149,9 @@ class EmailContext extends YiiContext
         $mfa = new Mfa();
         $mfa->user_id = $user->id;
         $mfa->type = $type;
-        $mfa->verified = 1;
+        $mfa->verified = $verified;
+
+        $this->testMfaOption = $mfa;
 
         if ($lastUsedDaysAgo !== null) {
             $diffConfig = "-" . $lastUsedDaysAgo . " days";
@@ -139,6 +159,16 @@ class EmailContext extends YiiContext
         }
         Assert::true($mfa->save(), "Could not create new mfa.");
         $user->refresh();
+    }
+
+    protected function createTempMfa($type, $verified) {
+        $user = $this->tempUser;
+        $mfa = new Mfa();
+        $mfa->user_id = $user->id;
+        $mfa->type = $type;
+        $mfa->verified = $verified;
+
+        return $mfa;
     }
 
     protected function deleteMfaOfType($type) {
@@ -503,15 +533,42 @@ class EmailContext extends YiiContext
     }
 
     /**
-     * @Given a u2f mfa option does Exist
+     * @Given a verified u2f mfa option does exist
      */
-    public function aU2fMfaOptionDoesExist()
+    public function aVerifiedU2fMfaOptionDoesExist()
     {
         $this->createMfa(Mfa::TYPE_U2F);
     }
 
+
     /**
-     * @Given a u2f mfa option does NOT Exist
+     * @Given a verified u2f mfa option was just deleted
+     */
+    public function aVerifiedU2fMfaOptionWasJustDeleted()
+    {
+        $this->testMfaOption = $this->createTempMfa(Mfa::TYPE_U2F, 1);
+        $this->mfaEventType = 'delete_mfa';
+    }
+
+    /**
+     * @Given an unverified u2f mfa option was just deleted
+     */
+    public function anUnverifiedU2fMfaOptionWasJustDeleted()
+    {
+        $this->testMfaOption = $this->createTempMfa(Mfa::TYPE_U2F, 0);
+        $this->mfaEventType = 'delete_mfa';
+    }
+
+    /**
+     * @Given an unverified u2f mfa option does exist
+     */
+    public function anUnverifiedU2fMfaOptionDoesExist()
+    {
+        $this->createMfa(Mfa::TYPE_U2F, null, null, 0);
+    }
+
+    /**
+     * @Given a (verified) u2f mfa option does NOT Exist
      */
     public function aU2fMfaOptionDoesNotExist()
     {
@@ -656,7 +713,8 @@ class EmailContext extends YiiContext
     {
         $this->mfaOptionRemovedEmailShouldBeSent = $this->fakeEmailer->shouldSendMfaOptionRemovedMessageTo(
             $this->tempUser,
-            $this->mfaEventType
+            $this->mfaEventType,
+            $this->testMfaOption
         );
     }
 
@@ -667,7 +725,8 @@ class EmailContext extends YiiContext
     {
         $this->mfaDisabledEmailShouldBeSent = $this->fakeEmailer->shouldSendMfaDisabledMessageTo(
             $this->tempUser,
-            $this->mfaEventType
+            $this->mfaEventType,
+            $this->testMfaOption
         );
     }
 
@@ -855,5 +914,84 @@ class EmailContext extends YiiContext
     public function iSeeThatTheSecondUserHasReceivedAGetBackupCodesEmail()
     {
         Assert::true($this->fakeEmailer->hasReceivedMessageRecently($this->tempUser2->id, EmailLog::MESSAGE_TYPE_GET_BACKUP_CODES));
+    }
+
+    /**
+     * @Given no methods exist
+     */
+    public function noMethodsExist()
+    {
+        Method::deleteAll();
+    }
+
+    /**
+     * @param string $value
+     */
+    protected function createMethod($value)
+    {
+        $user = $this->tempUser;
+        $method = Method::findOrCreate($user->id, $value);
+
+        $this->testMethod = $method;
+
+        Assert::true($method->save(), "Could not create new method.");
+    }
+
+    /**
+     * @When I create a new recovery method
+     */
+    public function iCreateANewRecoveryMethod()
+    {
+        $this->createMethod(self::METHOD_EMAIL_ADDRESS);
+    }
+
+    protected function assertEmailSent($type, $address)
+    {
+        $matchingFakeEmails = $this->fakeEmailer->getFakeEmailsOfTypeSentToUser($type, $address, $this->tempUser);
+
+        Assert::greaterThan(count($matchingFakeEmails), 0, sprintf(
+            'Did not find any %s emails sent to that address.',
+            $type
+        ));
+    }
+
+    /**
+     * @Then a Method Verify email is sent to that method
+     */
+    public function aMethodVerifyEmailIsSentToThatMethod()
+    {
+        $this->assertEmailSent(EmailLog::MESSAGE_TYPE_METHOD_VERIFY, self::METHOD_EMAIL_ADDRESS);
+    }
+
+    /**
+     * @Then a Manager Rescue email is sent to the manager
+     */
+    public function aManagerRescueEmailIsSentToTheManager()
+    {
+        $this->assertEmailSent(EmailLog::MESSAGE_TYPE_MFA_MANAGER, self::MANAGER_EMAIL);
+    }
+
+    /**
+     * @Given an unverified method exists
+     */
+    public function anUnverifiedMethodExists()
+    {
+        $this->createMethod(self::METHOD_EMAIL_ADDRESS);
+    }
+
+    /**
+     * @When I request that the verify email is resent
+     */
+    public function iRequestThatTheVerifyEmailIsResent()
+    {
+        $this->testMethod->sendVerification();
+    }
+
+    /**
+     * @When I request a new manager mfa
+     */
+    public function iRequestANewManagerMfa()
+    {
+        Mfa::create( $this->tempUser->id, Mfa::TYPE_MANAGER, 'label');
     }
 }

@@ -3,31 +3,38 @@ Feature: User
   As an authorized requester
   I need to be able to manage user information
 
+  Background:
+    Given the user store is empty
+
   Scenario: Create a new user
     Given a record does not exist with an employee_id of "123"
       And the requester is authorized
       And I provide the following valid data:
-        | property     | value                 |
-        | employee_id  | 123                   |
-        | first_name   | Shep                  |
-        | last_name    | Clark                 |
-        | display_name | Shep Clark            |
-        | username     | shep_clark            |
-        | email        | shep_clark@example.org|
-        | require_mfa  | yes                   |
+        | property        | value                 |
+        | employee_id     | 123                   |
+        | first_name      | Shep                  |
+        | last_name       | Clark                 |
+        | display_name    | Shep Clark            |
+        | username        | shep_clark            |
+        | email           | shep_clark@example.org|
+        | manager_email   | boss_man@example.org  |
+        | require_mfa     | yes                   |
+        | hide            | yes                   |
     When I request "/user" be created
     Then the response status code should be 200
       And the following data is returned:
-        | property     | value                 |
+        | property      | value                 |
 #TODO:need to ensure uuid came back but not sure about value...
-        | employee_id  | 123                   |
-        | first_name   | Shep                  |
-        | last_name    | Clark                 |
-        | display_name | Shep Clark            |
-        | username     | shep_clark            |
-        | email        | shep_clark@example.org|
-        | active       | yes                   |
-        | locked       | no                    |
+        | employee_id     | 123                   |
+        | first_name      | Shep                  |
+        | last_name       | Clark                 |
+        | display_name    | Shep Clark            |
+        | username        | shep_clark            |
+        | email           | shep_clark@example.org|
+        | active          | yes                   |
+        | locked          | no                    |
+        | manager_email   | boss_man@example.org  |
+        | hide            | yes                   |
       And the following data is not returned:
         | property                |
         | current_password_id     |
@@ -43,7 +50,10 @@ Feature: User
         | current_password_id | NULL                  |
         | active              | yes                   |
         | locked              | no                    |
+        | manager_email       | boss_man@example.org  |
         | require_mfa         | yes                   |
+        | spouse_email        | NULL                  |
+        | hide                | yes                   |
       And last_changed_utc should be stored as now UTC
       And last_synced_utc should be stored as now UTC
 
@@ -69,13 +79,14 @@ Feature: User
     Given a record does not exist with an employee_id of "123"
       And the requester is authorized
       And I provide the following valid data:
-        | property     | value                 |
-        | employee_id  | 123                   |
-        | first_name   | Shep                  |
-        | last_name    | Clark                 |
-        | display_name | Shep Clark            |
-        | username     | shep_clark            |
-        | email        | shep_clark@example.org|
+        | property        | value                 |
+        | employee_id     | 123                   |
+        | first_name      | Shep                  |
+        | last_name       | Clark                 |
+        | display_name    | Shep Clark            |
+        | username        | shep_clark            |
+        | email           | shep_clark@example.org|
+        | hide            | yes                   |
       And I request "/user" be created
       And the response status code should be 200
       And a record exists with an employee_id of "123"
@@ -90,6 +101,7 @@ Feature: User
         | active              | yes                   |
         | locked              | no                    |
         | require_mfa         | no                    |
+        | hide                | yes                   |
       And I change the <property> to <value>
     When I request "/user/123" be updated
     Then the response status code should be 200
@@ -98,18 +110,21 @@ Feature: User
       And last_synced_utc should be stored as now UTC
 
     Examples:
-      | property    | value           |
-      | first_name  | FIRST           |
-      | last_name   | LAST            |
-      | display_name| DISPLAY         |
-      | username    | USER            |
-      | email       | chg@example.org |
-      | active      | no              |
-      | active      | yes             |
-      | locked      | no              |
-      | locked      | yes             |
-      | require_mfa | no              |
-      | require_mfa | yes             |
+      | property        | value              |
+      | first_name      | FIRST              |
+      | last_name       | LAST               |
+      | display_name    | DISPLAY            |
+      | username        | USER               |
+      | email           | chg@example.org    |
+      | active          | no                 |
+      | active          | yes                |
+      | locked          | no                 |
+      | locked          | yes                |
+      | spouse_email    | spouse@example.org |
+      | require_mfa     | no                 |
+      | require_mfa     | yes                |
+      | hide            | no                 |
+      | hide            | yes                |
 
 #TODO: consider creating a new security.feature file for all these security-related tests.
 #TODO: need to think through tests for API_ACCESS_KEYS config, i.e., need tests for ApiConsumer
@@ -287,6 +302,32 @@ Feature: User
       | username     | Username     |
       | email        | Email        |
 
+  Scenario Outline: Attempt to create a new user while providing an invalid value for an optional property
+    Given the requester is authorized
+      And the user store is empty
+      And I provide the following valid data:
+        | property     | value                 |
+        | employee_id  | 456                   |
+        | first_name   | John                  |
+        | last_name    | Smith                 |
+        | display_name | John Smith            |
+        | username     | john_smith            |
+        | email        | john_smith@example.org|
+      But I provide an invalid <property> of <value>
+    When I request "/user" be created
+    Then the response status code should be 422
+      And the property message should contain "<contents>"
+      And the user store is still empty
+
+    Examples:
+      | property      | value           | contents      |
+      | spouse_email  | true            | Spouse Email  |
+      | spouse_email  | 123             | Spouse Email  |
+      | spouse_email  | invalid.address | Spouse Email  |
+      | manager_email | true            | Manager Email |
+      | manager_email | 123             | Manager Email |
+      | manager_email | invalid.address | Manager Email |
+
   Scenario: Attempt to create a new user with a username that already exists
     Given the requester is authorized
       And the user store is empty
@@ -362,6 +403,42 @@ Feature: User
     When I request "/user" be retrieved
     Then the response status code should be 200
       And I should receive 2 users
+
+  Scenario: Get list of verified methods for a user
+    Given A user with 1 verified method, 1 unverified method, 0 verified mfas, and 0 unverified mfas
+    When I request a list of verified methods
+    Then I see a list containing 1 method
+
+  Scenario Outline: Check "nag" state when user has or doesn't have methods and mfas
+    Given A user with <verifiedMethods> verified methods, <unverifiedMethods> unverified methods, <verifiedMfas> verified mfas, and <unverifiedMfas> unverified mfas
+      And the nag dates are in the past
+    When I request the nag state
+    Then I see that the nag state is <state1>
+      And I update the nag dates
+    When I request the nag state
+    Then I see that the nag state is <state2>
+      And I update the nag dates
+    When I request the nag state
+    Then I see that the nag state is "none"
+
+  Examples:
+  | verifiedMethods | unverifiedMethods | verifiedMfas | unverifiedMfas | state1     | state2        |
+  | 0               | 0                 | 0            | 0              | add_mfa    | add_method    |
+  | 0               | 0                 | 0            | 1              | add_mfa    | add_method    |
+  | 0               | 0                 | 1            | 0              | add_method | review_mfa    |
+  | 0               | 0                 | 1            | 1              | add_method | review_mfa    |
+  | 0               | 1                 | 0            | 0              | add_mfa    | add_method    |
+  | 0               | 1                 | 0            | 1              | add_mfa    | add_method    |
+  | 0               | 1                 | 1            | 0              | add_method | review_mfa    |
+  | 0               | 1                 | 1            | 1              | add_method | review_mfa    |
+  | 1               | 0                 | 0            | 0              | add_mfa    | review_method |
+  | 1               | 0                 | 0            | 1              | add_mfa    | review_method |
+  | 1               | 0                 | 1            | 0              | review_mfa | review_method |
+  | 1               | 0                 | 1            | 1              | review_mfa | review_method |
+  | 1               | 1                 | 0            | 0              | add_mfa    | review_method |
+  | 1               | 1                 | 0            | 1              | add_mfa    | review_method |
+  | 1               | 1                 | 1            | 0              | review_mfa | review_method |
+  | 1               | 1                 | 1            | 1              | review_mfa | review_method |
 
 #TODO: get a user with/without a match
 #TODO: get a user with invalid id

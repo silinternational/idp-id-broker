@@ -2,6 +2,7 @@
 
 use common\components\Emailer;
 use common\components\MfaBackendBackupcode;
+use common\components\MfaBackendManager;
 use common\components\MfaBackendTotp;
 use common\components\MfaBackendU2f;
 use common\ldap\Ldap;
@@ -69,7 +70,7 @@ return [
                 'supportName' => Env::get('SUPPORT_NAME', 'support'),
             ],
             
-            'sendInviteEmails' => Env::get('SEND_INVITE_EMAILS', false),
+            'sendInviteEmails' => Env::get('SEND_INVITE_EMAILS', true),
             'sendMfaRateLimitEmails' => Env::get('SEND_MFA_RATE_LIMIT_EMAILS', true),
             'sendPasswordChangedEmails' => Env::get('SEND_PASSWORD_CHANGED_EMAILS', true),
             'sendWelcomeEmails' => Env::get('SEND_WELCOME_EMAILS', true),
@@ -94,6 +95,8 @@ return [
             'subjectForMfaOptionRemoved' => Env::get('SUBJECT_FOR_MFA_OPTION_REMOVED'),
             'subjectForMfaEnabled' => Env::get('SUBJECT_FOR_MFA_ENABLED'),
             'subjectForMfaDisabled' => Env::get('SUBJECT_FOR_MFA_DISABLED'),
+            'subjectForMfaManager' => Env::get('SUBJECT_FOR_MFA_MANAGER'),
+            'subjectForMethodVerify' => Env::get('SUBJECT_FOR_METHOD_VERIFY'),
 
             'lostSecurityKeyEmailDays' => Env::get('LOST_SECURITY_KEY_EMAIL_DAYS', 62),
             'minimumBackupCodesBeforeNag' => Env::get('MINIMUM_BACKUP_CODES_BEFORE_NAG', 4),
@@ -124,6 +127,7 @@ return [
             ['class' => MfaBackendU2f::class],
             $mfaU2fConfig
         ),
+        'manager' => ['class' => MfaBackendManager::class],
         // http://www.yiiframework.com/doc-2.0/guide-runtime-logging.html
         'log' => [
             'targets' => [
@@ -192,15 +196,30 @@ return [
         'authorizedTokens'              => Env::getArray('API_ACCESS_KEYS'),
         'idpName'                       => $idpName,
         'idpDisplayName'                => $idpDisplayName,
-        'mfaNagInterval'                => Env::get('MFA_NAG_INTERVAL', '+30 days'),
+        'mfaAddInterval'                => Env::get('MFA_ADD_INTERVAL', '+30 days'),
+        'mfaReviewInterval'             => Env::get('MFA_REVIEW_INTERVAL', '+6 months'),
+        'methodAddInterval'             => Env::get('METHOD_ADD_INTERVAL', '+6 months'),
+        'methodReviewInterval'          => Env::get('METHOD_REVIEW_INTERVAL', '+12 months'),
         'migratePasswordsFromLdap'      => Env::get('MIGRATE_PW_FROM_LDAP', false),
         'passwordReuseLimit'            => Env::get('PASSWORD_REUSE_LIMIT', 10),
         'passwordLifespan'              => Env::get('PASSWORD_LIFESPAN', '+1 year'),
         'passwordMfaLifespanExtension'  => Env::get('PASSWORD_MFA_LIFESPAN_EXTENSION', '+1 year'),
         'passwordExpirationGracePeriod' => Env::get('PASSWORD_EXPIRATION_GRACE_PERIOD', '+30 days'),
+        'inviteLifespan'                => Env::get('INVITE_LIFESPAN', '+1 month'),
+        'inviteGracePeriod'             => Env::get('INVITE_GRACE_PERIOD', '+3 months'),
         'googleAnalytics'               => [
             'trackingId' => Env::get('GA_TRACKING_ID'),
             'clientId'   => Env::get('GA_CLIENT_ID'),
-        ]
+        ],
+        'method' => ArrayHelper::merge(
+            [
+                'lifetime' => '+1 day',
+                'gracePeriod' => '+15 days',
+                'codeLength' => 6,
+                'maxAttempts' => 10,
+            ],
+            Env::getArrayFromPrefix('METHOD_')
+        ),
+        'mfaLifetime' => Env::get('MFA_LIFETIME', '+2 hours'),
     ],
 ];

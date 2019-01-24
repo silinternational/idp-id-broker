@@ -6,60 +6,78 @@ use common\models\MfaBackupcode;
 use common\models\User;
 use Webmozart\Assert\Assert;
 
-class MfaUnitTestsContext extends YiiContext
+class MfaUnitTestsContext extends UnitTestsContext
 {
-    /** @var int */
-    protected $mfaId = null;
-
-    /** @var MfaBackupcode that was input by the user for validation */
-    protected $inputBackupCode;
-
-    /** @var bool  */
-    protected $backupCodeWasValid;
-
-
-    /**
-     * Create a new user in the database with the given username (and other
-     * details based off that username). If a user already exists with that
-     * username, they will be deleted.
-     *
-     * @param string $username
-     * @return User
-     */
-    protected function createNewUserInDatabase($username)
-    {
-        $existingUser = User::findByUsername($username);
-        if ($existingUser !== null) {
-            Assert::notSame($existingUser->delete(), false);
-        }
-
-        $user = new User([
-            'email' => $username . '@example.com',
-            'employee_id' => (string)uniqid(),
-            'first_name' => 'Test',
-            'last_name' => 'User',
-            'username' => $username,
-        ]);
-        $user->scenario = User::SCENARIO_NEW_USER;
-        Assert::true(
-            $user->save(),
-            var_export($user->getErrors(), true)
-        );
-        Assert::notNull($user);
-        return $user;
-    }
-
     /**
      * @Given I have a user with a backup codes mfa option
      */
     public function iHaveAUserWithABackupCodesMfaOption()
     {
-        $user = $this->createNewUserInDatabase('mfa_tester');
-        $mfaCreateResult = Mfa::create($user->id, Mfa::TYPE_BACKUPCODE);
-
-        $this->mfaId = $mfaCreateResult['id'];
-        Assert::notEmpty($this->mfaId);
+        $this->tempUser = $this->createNewUserInDatabase('mfa_tester');
+        $this->createMfa(Mfa::TYPE_BACKUPCODE);
         MfaBackupcode::deleteAll();
+    }
+
+    /**
+     * @Given I have a user with a manager rescue mfa option
+     */
+    public function iHaveAUserWithAManagerRescueMfaOption()
+    {
+        $this->tempUser = $this->createNewUserInDatabase('mfa_tester');
+        $this->createMfa(Mfa::TYPE_MANAGER);
+        MfaBackupcode::deleteAll();
+    }
+
+    /**
+     * @Given I have a user with an unverified totp mfa option
+     */
+    public function iHaveAUserWithAnUnverifiedTotpMfaOption()
+    {
+        Mfa::deleteAll();
+        $this->tempUser = $this->createNewUserInDatabase('mfa_tester');
+        $this->createMfa(Mfa::TYPE_TOTP, 0);
+        Assert::isEmpty(
+            $this->mfa->verified,
+            'Totp option should not have been verified already'
+        );
+    }
+
+    /**
+     * @Given I have a user with a verified totp mfa option
+     */
+    public function iHaveAUserWithAVerifiedTotpMfaOption()
+    {
+        Mfa::deleteAll([]);
+        $this->tempUser = $this->createNewUserInDatabase('mfa_tester');
+        $this->createMfa(Mfa::TYPE_TOTP, 1);
+        Assert::notEmpty(
+            $this->mfa->verified,
+            'Totp option should have been verified already'
+        );
+    }
+
+    /**
+     * @Given the totp mfa option is new
+     */
+    public function theTotpMfaOptionIsNew()
+    {
+        $this->mfaIsNew = true;
+    }
+
+    /**
+     * @Given the totp mfa option is old
+     */
+    public function theTotpMfaOptionIsOld()
+    {
+        $this->mfaIsNew = false;
+    }
+
+    /**
+     * @Given the totp mfa option has just been verified
+     */
+    public function theTotpMfaOptionHasJustBeenVerified()
+    {
+        $this->mfaChangedAttrs['verified'] = 0;
     }
 
     /**
@@ -118,6 +136,25 @@ class MfaUnitTestsContext extends YiiContext
     }
 
     /**
+     * @When I check if the new mfa option is newly verified
+     */
+    public function iCheckIfTheNewMfaOptionIsNewlyVerified()
+    {
+        $this->mfaIsNewlyVerified = $this->mfa->isNewlyVerified(true, []);
+    }
+
+    /**
+     * @When I check if the mfa option is newly verified
+     */
+    public function iCheckIfTheMfaOptionIsNewlyVerified()
+    {
+        $this->mfaIsNewlyVerified = $this->mfa->isNewlyVerified(
+            $this->mfaIsNew,
+            $this->mfaChangedAttrs
+        );
+    }
+
+    /**
      * @Then a backup code match should be detected
      */
     public function aBackupCodeMatchShouldBeDetected()
@@ -139,5 +176,21 @@ class MfaUnitTestsContext extends YiiContext
     public function xBackupCodesShouldExist($number)
     {
         Assert::eq($number, MfaBackupcode::find()->count());
+    }
+
+    /**
+     * @Then I see that the mfa option is newly verified
+     */
+    public function iSeeThatTheMfaOptionIsNewlyVerified()
+    {
+        Assert::true($this->mfaIsNewlyVerified);
+    }
+
+    /**
+     * @Then I see that the mfa option is NOT newly verified
+     */
+    public function iSeeThatTheMfaOptionIsNotNewlyVerified()
+    {
+        Assert::false($this->mfaIsNewlyVerified);
     }
 }

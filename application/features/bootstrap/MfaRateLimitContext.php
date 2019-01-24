@@ -204,6 +204,7 @@ class MfaRateLimitContext extends YiiContext
         
         $matchingFakeEmails = $this->fakeEmailer->getFakeEmailsOfTypeSentToUser(
             EmailLog::MESSAGE_TYPE_MFA_RATE_LIMIT,
+            $mfa->user->email,
             $mfa->user
         );
         Assert::greaterThan(count($matchingFakeEmails), 0, sprintf(

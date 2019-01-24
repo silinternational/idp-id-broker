@@ -4,10 +4,12 @@ use Behat\Gherkin\Node\TableNode;
 use common\helpers\MySqlDateTime;
 use common\models\EmailLog;
 use common\models\Password;
+use common\models\Method;
 use common\models\Mfa;
 use common\models\MfaBackupcode;
 use common\models\MfaFailedAttempt;
 use common\models\User;
+use common\models\Invite;
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Response;
 use Psr\Http\Message\ResponseInterface;
@@ -33,6 +35,46 @@ class FeatureContext extends YiiContext
     private $now;
     const ACCEPTABLE_DELTA_IN_SECONDS = 1;
 
+    protected $tempEmployeeId = null;
+
+    protected $tempUid = null;
+
+    /**
+     * @Given I add a user with a(n) :property of :value
+     */
+    public function iAddAUserWithAnOf($property, $value)
+    {
+        $sampleUserData = [
+            'employee_id' => '10000',
+            'first_name' => 'John',
+            'last_name' => 'Smith',
+            'display_name' => 'John Smith',
+            'username' => 'john_smith',
+            'email' => 'john_smith@example.org',
+        ];
+        $sampleUserData[$property] = $value;
+
+        $this->tempEmployeeId = $sampleUserData['employee_id'];
+
+        $dataForTableNode = [
+            ['property', 'value'],
+        ];
+        foreach ($sampleUserData as $sampleProperty => $sampleValue) {
+            $dataForTableNode[] = [$sampleProperty, $sampleValue];
+        }
+        $this->iProvideTheFollowingValidData(new TableNode($dataForTableNode));
+        $this->iRequestTheResourceBe('/user', 'created');
+        $this->theResponseStatusCodeShouldBe(200);
+    }
+
+    /**
+     * @Then I should receive :numRecords record(s)
+     */
+    public function iShouldReceiveRecords($numRecords)
+    {
+        $this->iShouldReceiveUsers($numRecords);
+    }
+
     /**
      * @Given the requester is not authorized
      */
@@ -43,8 +85,9 @@ class FeatureContext extends YiiContext
 
     /**
      * @Given the user store is empty
+     * @AfterSuite
      */
-    public function theUserStoreIsEmpty()
+    public static function theUserStoreIsEmpty()
     {
         // To avoid calls to try to remove TOTP/U2F entries from their
         // respective backend services, we are simply deleting all relevant
@@ -53,6 +96,8 @@ class FeatureContext extends YiiContext
         MfaBackupcode::deleteAll();
         MfaFailedAttempt::deleteAll();
         Mfa::deleteAll();
+        Method::deleteAll();
+        Invite::deleteAll();
         EmailLog::deleteAll();
         User::deleteAll();
     }
@@ -103,6 +148,23 @@ class FeatureContext extends YiiContext
         }
     }
 
+    /**
+     * @When I send a :verb to :resource with a valid uid
+     */
+    public function iSendAToWithAValidUid($verb, $resource)
+    {
+        $client = $this->buildClient();
+
+        $this->response = call_user_func(
+            [$client, strtolower($verb)],
+            str_replace('{uid}', $this->tempUid, $resource)
+        );
+
+        $this->now = MySqlDateTime::now();
+
+        $this->resBody = $this->extractBody($this->response);
+    }
+
     private function extractBody(Response $response): array
     {
         $jsonBlob = $response->getBody()->getContents();
@@ -118,7 +180,11 @@ class FeatureContext extends YiiContext
         Assert::eq(
             $this->response->getStatusCode(),
             $statusCode,
-            sprintf("Unexpected response: %s", var_export($this->resBody, true))
+            sprintf(
+                "Unexpected response. status=%d, body=%s",
+                $this->response->getStatusCode(),
+                var_export($this->resBody, true)
+            )
         );
     }
 
@@ -213,8 +279,26 @@ class FeatureContext extends YiiContext
     public function theFollowingDataReturned($isOrIsNot, TableNode $data)
     {
         foreach ($data as $row) {
-            $isOrIsNot === 'is' ? Assert::eq($this->resBody[$row['property']], $row['value'])
-                                : Assert::keyNotExists($this->resBody, $row['property']);
+            if (strpos($row['property'], '.') !== false) {
+                $name = explode('.', $row['property'], 2);
+                if ($isOrIsNot === 'is') {
+                    Assert::eq(
+                        $this->resBody[$name[0]][$name[1]],
+                        $row['value'],
+                        sprintf(
+                            '"%s" not equal to "%s", "%s" found',
+                            $row['property'],
+                            $row['value'],
+                            $this->resBody[$name[0]][$name[1]]
+                        )
+                    );
+                } else {
+                    Assert::true(false, "invalid test condition");
+                }
+            } else {
+                $isOrIsNot === 'is' ? Assert::eq($this->resBody[$row['property']], $row['value'])
+                    : Assert::keyNotExists($this->resBody, $row['property']);
+            }
         }
     }
 
@@ -246,9 +330,9 @@ class FeatureContext extends YiiContext
     }
 
     //TODO: remove once https://github.com/Behat/Behat/issues/777 is resolved for tables.
-    private function transformNULLs($value)
+    protected function transformNULLs($value)
     {
-        return ($value === "NULL") ? null : $value;
+        return ($value === "NULL" || $value === "null") ? null : $value;
     }
 
     /**
@@ -409,5 +493,65 @@ class FeatureContext extends YiiContext
         $user = User::findByUsername($username);
         Assert::notNull($user);
         Assert::notNull($user->currentPassword);
+    }
+
+    protected function createInviteCode($user, $code, $expired = false)
+    {
+        $inviteCode = new Invite();
+        $inviteCode->uuid = $code;
+        $inviteCode->user_id = $user->id;
+        $inviteCode->expires_on = ($expired) ? '2018-01-01' : null;
+        Assert::true(
+            $inviteCode->save(),
+            var_export($inviteCode->getErrors(), true)
+        );
+    }
+
+    /**
+     * @Given the user :username has an expired invite code :code
+     */
+    public function theUserHasAnExpiredInviteCode($username, $code)
+    {
+        $user = User::findByUsername($username);
+        Assert::notNull($user);
+
+        $this->createInviteCode($user, $code, true);
+    }
+
+    /**
+     * @Given the user :username has a non-expired invite code :code
+     */
+    public function theUserHasANonExpiredInviteCode($username, $code)
+    {
+        $user = User::findByUsername($username);
+        Assert::notNull($user);
+
+        $this->createInviteCode($user, $code);
+    }
+
+    /**
+     * @Given I do not provide an employee_id
+     */
+    public function iDoNotProvideAnEmployeeId()
+    {
+        unset($this->reqBody['employee_id']);
+    }
+
+    /**
+     * @Given the response should contain a :key array with :num items
+     */
+    public function theResponseShouldContainAArrayWithItems($key, $num)
+    {
+        Assert::keyExists($this->resBody, $key);
+        Assert::eq(count($this->resBody[$key]), $num);
+    }
+
+    /**
+     * @param $property
+     * @return mixed
+     */
+    public function getResponseProperty($property)
+    {
+        return $this->resBody[$property];
     }
 }

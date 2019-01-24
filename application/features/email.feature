@@ -71,7 +71,7 @@ Feature: Email
       And I remove records of any emails that have been sent
       And no mfas exist
       And a user already exists
-      And a u2f mfa option <u2fExistsOrNot>
+      And a verified u2f mfa option <u2fExistsOrNot>
       And a backup code mfa option was used <backupUsedDaysAgo> days ago
       And a totp mfa option was used <totpUsedDaysAgo> days ago
       And a "lost-security-key" email <hasOrHasNot> been sent to that user
@@ -112,7 +112,7 @@ Feature: Email
       And I remove records of any emails that have been sent
       And no mfas exist
       And a user already exists
-      And a u2f mfa option <u2fExistsOrNot>
+      And a verified u2f mfa option <u2fExistsOrNot>
       And a totp mfa option <totpExistsOrNot>
       And a backup code mfa option <backupExistsOrNot>
       And a "get-backup-codes" email <hasOrHasNot> been sent to that user
@@ -136,7 +136,7 @@ Feature: Email
     Given we are configured <sendMfaOptionAddedEml> mfa option added emails
       And no mfas exist
       And a user already exists
-      And a u2f mfa option <u2fExistsOrNot>
+      And a verified u2f mfa option <u2fExistsOrNot>
       And a totp mfa option <totpExistsOrNot>
       And the latest mfa event type was <mfaEventType>
     When I check if a mfa option added email should be sent
@@ -144,10 +144,10 @@ Feature: Email
 
     Examples:
       | sendMfaOptionAddedEml | u2fExistsOrNot | totpExistsOrNot | mfaEventType      | shouldOrNot |
-      | to send               | does exist     | does NOT exist  | create_mfa        | should NOT  |
-      | to send               | does NOT exist | does exist      | create_mfa        | should NOT  |
-      | to send               | does exist     | does exist      | create_mfa        | should      |
-      | Not to send           | does exist     | does exist      | create_mfa        | should NOT  |
+      | to send               | does exist     | does NOT exist  | verify_mfa        | should NOT  |
+      | to send               | does NOT exist | does exist      | verify_mfa        | should NOT  |
+      | to send               | does exist     | does exist      | verify_mfa        | should      |
+      | Not to send           | does exist     | does exist      | verify_mfa        | should NOT  |
       | to send               | does exist     | does exist      | delete_mfa        | should NOT  |
       | Not to send           | does exist     | does exist      | delete_mfa        | should NOT  |
 
@@ -155,7 +155,7 @@ Feature: Email
     Given we are configured <sendMfaEnabledEml> mfa enabled emails
       And no mfas exist
       And a user already exists
-      And a u2f mfa option <u2fExistsOrNot>
+      And a verified u2f mfa option <u2fExistsOrNot>
       And a totp mfa option <totpExistsOrNot>
       And the latest mfa event type was <mfaEventType>
     When I check if a mfa enabled email should be sent
@@ -163,10 +163,10 @@ Feature: Email
 
     Examples:
       | sendMfaEnabledEml     | u2fExistsOrNot | totpExistsOrNot | mfaEventType      | shouldOrNot |
-      | to send               | does exist     | does NOT exist  | create_mfa        | should      |
-      | to send               | does NOT exist | does exist      | create_mfa        | should      |
-      | to send               | does exist     | does exist      | create_mfa        | should NOT  |
-      | NOT to send           | does NOT exist | does exist      | create_mfa        | should NOT  |
+      | to send               | does exist     | does NOT exist  | verify_mfa        | should      |
+      | to send               | does NOT exist | does exist      | verify_mfa        | should      |
+      | to send               | does exist     | does exist      | verify_mfa        | should NOT  |
+      | NOT to send           | does NOT exist | does exist      | verify_mfa        | should NOT  |
       | to send               | does exist     | does NOT exist  | delete_mfa        | should NOT  |
       | NOT to send           | does exist     | does NOT exist  | delete_mfa        | should NOT  |
 
@@ -174,7 +174,7 @@ Feature: Email
     Given we are configured <sendMfaOptionRemovedEml> mfa option removed emails
       And no mfas exist
       And a user already exists
-      And a u2f mfa option <u2fExistsOrNot>
+      And a verified u2f mfa option <u2fExistsOrNot>
       And a totp mfa option <totpExistsOrNot>
       And the latest mfa event type was <mfaEventType>
     When I check if a mfa option removed email should be sent
@@ -185,30 +185,61 @@ Feature: Email
       | to send                 | does exist     | does NOT exist  | delete_mfa        | should      |
       | to send                 | does NOT exist | does exist      | delete_mfa        | should      |
       | to send                 | does exist     | does exist      | delete_mfa        | should      |
-      | to send                 | does NOT exist | does NOT exist  | delete_mfa        | should NOT  |
       | NOT to send             | does exist     | does exist      | delete_mfa        | should NOT  |
-      | to send                 | does exist     | does NOT exist  | create_mfa        | should NOT  |
-      | NOT to send             | does exist     | does exist      | create_mfa        | should NOT  |
+      | to send                 | does exist     | does NOT exist  | verify_mfa        | should NOT  |
+      | NOT to send             | does exist     | does exist      | verify_mfa        | should NOT  |
 
   Scenario Outline: When to send mfa disabled emails (after one has been added or deleted)
     Given we are configured <sendMfaDisabledEml> mfa disabled emails
       And no mfas exist
       And a user already exists
-      And a u2f mfa option <u2fExistsOrNot>
+      And a verified u2f mfa option <u2fExistsOrNot>
       And a totp mfa option <totpExistsOrNot>
       And the latest mfa event type was <mfaEventType>
     When I check if a mfa disabled email should be sent
     Then I see that a mfa disabled email <shouldOrNot> be sent
 
     Examples:
-      | sendMfaDisabledEml      | u2fExistsOrNot | totpExistsOrNot | mfaEventType      | shouldOrNot |
-      | to send                 | does exist     | does NOT exist  | delete_mfa        | should NOT  |
-      | to send                 | does NOT exist | does exist      | delete_mfa        | should NOT  |
-      | to send                 | does exist     | does exist      | delete_mfa        | should NOT  |
-      | to send                 | does NOT exist | does NOT exist  | delete_mfa        | should      |
-      | NOT to send             | does NOT exist | does NOT exist  | delete_mfa        | should NOT  |
-      | to send                 | does NOT exist | does NOT exist  | create_mfa        | should NOT  |
-      | NOT to send             | does NOT exist | does NOT exist  | create_mfa        | should NOT  |
+      | sendMfaDisabledEml | u2fExistsOrNot | totpExistsOrNot | mfaEventType | shouldOrNot |
+      | to send            | does exist     | does NOT exist  | delete_mfa   | should NOT  |
+      | to send            | does NOT exist | does exist      | delete_mfa   | should NOT  |
+      | to send            | does exist     | does exist      | delete_mfa   | should NOT  |
+      | NOT to send        | does NOT exist | does NOT exist  | delete_mfa   | should NOT  |
+      | to send            | does NOT exist | does NOT exist  | verify_mfa   | should NOT  |
+      | NOT to send        | does NOT exist | does NOT exist  | verify_mfa   | should NOT  |
+
+
+  Scenario Outline: What kind of email to send after the last verified mfa option has been deleted.
+    Given we are configured to send mfa disabled emails
+      And we are configured to send mfa option removed emails
+      And no mfas exist
+      And a user already exists
+      And a verified u2f mfa option was just deleted
+    When I check if a mfa <optionRemovedOrDisabled> email should be sent
+    Then I see that a mfa <optionRemovedOrDisabled> email <shouldOrNot> be sent
+
+    Examples:
+      | optionRemovedOrDisabled | shouldOrNot |
+      | option removed          | should NOT  |
+      | disabled                | should      |
+
+  Scenario: When to send a mfa option removed email after an unverified u2f mfa option has been deleted.
+    Given we are configured to send mfa option removed emails
+      And no mfas exist
+      And a user already exists
+      And a verified u2f mfa option does exist
+      And an unverified u2f mfa option was just deleted
+    When I check if a mfa option removed email should be sent
+    Then I see that a mfa option removed email should not be sent
+
+  Scenario: When to send a mfa disabled email after an unverified u2f mfa option has been deleted.
+    Given we are configured to send mfa disabled emails
+      And no mfas exist
+      And a user already exists
+      And an unverified u2f mfa option was just deleted
+    When I check if a mfa disabled email should be sent
+    Then I see that a mfa disabled email should not be sent
+
 
   Scenario Outline: When to send refresh backup codes emails
     Given we are configured <sendRefreshBackupCodesEml> refresh backup codes emails
@@ -258,3 +289,23 @@ Feature: Email
     When I send delayed mfa related emails
     Then I see that the first user has received a lost-security-key email
       And I see that the second user has received a get-backup-codes email
+
+  Scenario: Send a recovery method verify email upon creation of the object
+    Given a user already exists
+      And no methods exist
+      And I remove records of any emails that have been sent
+    When I create a new recovery method
+    Then a Method Verify email is sent to that method
+
+  Scenario: Resend a recovery method verify email for an existing object
+    Given a user already exists
+      And an unverified method exists
+      And I remove records of any emails that have been sent
+    When I request that the verify email is resent
+    Then a Method Verify email is sent to that method
+
+  Scenario: Send a manager rescue code email after creation of manager mfa
+    Given a user already exists
+      And no mfas exist
+    When I request a new manager mfa
+    Then a Manager Rescue email is sent to the manager

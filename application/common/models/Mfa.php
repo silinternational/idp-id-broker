@@ -3,6 +3,7 @@ namespace common\models;
 
 use common\components\MfaBackendInterface;
 use common\helpers\MySqlDateTime;
+use common\helpers\Utils;
 use yii\helpers\ArrayHelper;
 use yii\web\BadRequestHttpException;
 use yii\web\ServerErrorHttpException;
@@ -18,8 +19,9 @@ class Mfa extends MfaBase
     const TYPE_TOTP = 'totp';
     const TYPE_U2F = 'u2f';
     const TYPE_BACKUPCODE = 'backupcode';
+    const TYPE_MANAGER = 'manager';
 
-    const EVENT_TYPE_CREATE = 'create_mfa';
+    const EVENT_TYPE_VERIFY = 'verify_mfa';
     const EVENT_TYPE_DELETE = 'delete_mfa';
 
     public function rules(): array
@@ -29,7 +31,7 @@ class Mfa extends MfaBase
                 'created_utc', 'default', 'value' => MySqlDateTime::now(),
             ],
             [
-                'type', 'in', 'range' => [self::TYPE_TOTP, self::TYPE_U2F, self::TYPE_BACKUPCODE]
+                'type', 'in', 'range' => array_keys(self::getTypes()),
             ],
             [
                 'verified', 'default', 'value' => 0,
@@ -44,11 +46,11 @@ class Mfa extends MfaBase
             'type',
             'label',
             'created_utc' => function($model) {
-                return date('c', strtotime($model->created_utc));
+                return Utils::getIso8601($model->created_utc);
             },
             'last_used_utc' => function($model) {
                 if ($model->last_used_utc !== null) {
-                    return date('c', strtotime($model->last_used_utc));
+                    return Utils::getIso8601($model->last_used_utc);
                 }
                 return null;
             },
@@ -58,7 +60,7 @@ class Mfa extends MfaBase
                 if ($model->verified === 1 && $model->scenario === User::SCENARIO_AUTHENTICATE) {
                     $data += $model->authInit();
                 }
-                if ($model->type === self::TYPE_BACKUPCODE) {
+                if ($model->type === self::TYPE_BACKUPCODE || $model->type === self::TYPE_MANAGER) {
                     $data += ['count' => count($model->mfaBackupcodes)];
                 }
                 return $data;
@@ -66,12 +68,42 @@ class Mfa extends MfaBase
         ];
     }
 
+    /**
+     * Whether this is both a new Mfa instance and already verified
+     *   (basically just for a new backup code Mfa option)
+     *  -- OR --
+     * Whether the Mfa option both had its verified value changed and is now verified
+     *
+     * @param bool $insert Whether the mfa is being inserted
+     * @param array $changedAttributes
+     * @return bool
+     */
+    public function isNewlyVerified($insert, $changedAttributes)
+    {
+        if ($insert  && $this->verified) {
+            return true;
+        }
+        return (array_key_exists('verified', $changedAttributes) && $this->verified);
+    }
+
     public function afterSave($insert, $changedAttributes)
     {
         parent::afterSave($insert, $changedAttributes);
 
-        if ($insert) {
-            $this->sendAppropriateMessages($this->user, self::EVENT_TYPE_CREATE);
+        /*
+         *   Send an "Mfa Added email" for a new backup code option and for
+         * other types of mfa options that are newly verified
+         *
+         *   Don't send emails before they are verified, since the email will
+         * not include the most recently added option.
+         */
+        if ($this->isNewlyVerified($insert, $changedAttributes)) {
+
+            self::sendAppropriateMessages(
+                $this->user,
+                self::EVENT_TYPE_VERIFY,
+                $this
+            );
         }
     }
 
@@ -97,8 +129,11 @@ class Mfa extends MfaBase
             'status' => 'success',
         ]);
 
-
-        $this->sendAppropriateMessages($this->user, self::EVENT_TYPE_DELETE);
+        self::sendAppropriateMessages(
+            $this->user,
+            self::EVENT_TYPE_DELETE,
+            $this
+        );
     }
 
     /**
@@ -108,10 +143,7 @@ class Mfa extends MfaBase
      */
     public static function isValidType(string $type): bool
     {
-        if (in_array($type, [self::TYPE_BACKUPCODE, self::TYPE_U2F, self::TYPE_TOTP])) {
-            return true;
-        }
-        return false;
+        return  array_key_exists($type, self::getTypes());
     }
 
     /**
@@ -120,14 +152,7 @@ class Mfa extends MfaBase
      */
     public static function getBackendForType(string $type): MfaBackendInterface
     {
-        switch ($type) {
-            case self::TYPE_BACKUPCODE:
-                return \Yii::$app->backupcode;
-            case self::TYPE_TOTP:
-                return \Yii::$app->totp;
-            case self::TYPE_U2F:
-                return \Yii::$app->u2f;
-        }
+        return \Yii::$app->$type;
     }
 
     /**
@@ -233,13 +258,17 @@ class Mfa extends MfaBase
             throw new BadRequestHttpException("User not found");
         }
 
+        if ($type == self::TYPE_MANAGER && empty($user->manager_email)) {
+            throw new BadRequestHttpException('Manager email must be valid for this MFA type');
+        }
+
         $mfa = new Mfa();
 
         /*
-         * User can only have one 'backupcode' type, so if already exists, use existing
+         * User can only have one 'backupcode' or 'manager' type, so if already exists, use existing
          */
-        if ($type == self::TYPE_BACKUPCODE) {
-            $existing = self::findOne(['user_id' => $userId, 'type' => self::TYPE_BACKUPCODE]);
+        if ($type == self::TYPE_BACKUPCODE || $type == self::TYPE_MANAGER) {
+            $existing = self::findOne(['user_id' => $userId, 'type' => $type]);
             if ($existing instanceof Mfa) {
                 $mfa = $existing;
             }
@@ -247,7 +276,6 @@ class Mfa extends MfaBase
 
         $mfa->user_id = $userId;
         $mfa->type = $type;
-        $mfa->verified = ($type == self::TYPE_BACKUPCODE) ? 1 : 0;
 
         if (empty($label)) {
             $existingCount = count($user->mfas);
@@ -386,16 +414,28 @@ class Mfa extends MfaBase
     }
 
     /**
+     * Returns a list of MFA types and user-friendly name
+     *
+     * @return array
+     */
+    public static function getTypes()
+    {
+        return [
+            self::TYPE_BACKUPCODE => 'Printable Codes',
+            self::TYPE_MANAGER => 'Manager Backup Code',
+            self::TYPE_TOTP => 'Smartphone App',
+            self::TYPE_U2F => 'Security Key',
+        ];
+    }
+
+    /**
      * Returns a human friendly version of the Mfa's type
      *
      * @return string
      */
-    public function getReadableType() {
-        $types = [
-            self::TYPE_BACKUPCODE => 'Printable Codes',
-            self::TYPE_TOTP => 'Smartphone App',
-            self::TYPE_U2F => 'Security Key',
-        ];
+    public function getReadableType()
+    {
+        $types = self::getTypes();
         return $types[$this->type];
     }
 
@@ -403,11 +443,22 @@ class Mfa extends MfaBase
      * Remove records that were not verified within the given time frame
      * @param int $maxAgeHours
      */
-    public static function removeOldUnverifiedRecords($maxAgeHours = 2)
+    public static function removeOldUnverifiedRecords()
     {
-        $removeOlderThan = MySqlDateTime::relative('-' . $maxAgeHours . ' hours');
-        $mfas = self::find()->where(['verified' => 0])
-            ->andWhere(['<', 'created_utc', $removeOlderThan])->all();
+        /*
+         * Replace '+' with '-' so all env parameters can be defined consistently as '+n unit'
+         */
+        $mfaLifetime = str_replace('+', '-', \Yii::$app->params['mfaLifetime']);
+
+        /**
+         * @var string $removeExpireBefore   All unverified records that expired before this date
+         * should be deleted. Calculated relative to now (time of execution).
+         */
+        $removeOlderThan = MySqlDateTime::relativeTime($mfaLifetime);
+        $mfas = self::find()
+            ->where(['verified' => 0])
+            ->andWhere(['<', 'created_utc', $removeOlderThan])
+            ->all();
 
         $numDeleted = 0;
         foreach ($mfas as $mfa) {
@@ -431,7 +482,7 @@ class Mfa extends MfaBase
     }
 
 
-    protected function sendAppropriateMessages($user, $eventType)
+    protected static function sendAppropriateMessages($user, $eventType, $mfa)
     {
         /* @var $emailer Emailer */
         $emailer = \Yii::$app->emailer;
@@ -443,12 +494,26 @@ class Mfa extends MfaBase
         } else if ($emailer->shouldSendMfaEnabledMessageTo($user, $eventType)) {
             $emailer->sendMessageTo(EmailLog::MESSAGE_TYPE_MFA_ENABLED, $user);
 
-        } else if ($emailer->shouldSendMfaOptionRemovedMessageTo($user, $eventType)) {
-            $emailer->otherDataForEmails['mfaTypeDisabled'] = $this->getReadableType();
+        } else if ($emailer->shouldSendMfaOptionRemovedMessageTo($user, $eventType, $mfa)) {
+            $emailer->otherDataForEmails['mfaTypeDisabled'] = $mfa->getReadableType();
             $emailer->sendMessageTo(EmailLog::MESSAGE_TYPE_MFA_OPTION_REMOVED, $user);
 
-        } else if ($emailer->shouldSendMfaDisabledMessageTo($user, $eventType)) {
+        } else if ($emailer->shouldSendMfaDisabledMessageTo($user, $eventType, $mfa)) {
             $emailer->sendMessageTo(EmailLog::MESSAGE_TYPE_MFA_DISABLED, $user);
+        }
+    }
+
+    /**
+     * Set verified=1 and save if necessary
+     * @throws \Exception if save failed
+     */
+    public function setVerified(): void
+    {
+        if ($this->verified == 0) {
+            $this->verified = 1;
+            if (! $this->save()) {
+                throw new \Exception("Error saving MFA record", 1547066350);
+            }
         }
     }
 }

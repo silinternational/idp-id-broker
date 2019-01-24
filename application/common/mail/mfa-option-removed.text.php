@@ -27,7 +27,7 @@
 ?>
 Dear <?= $displayName ?>,
 
-You have disabled the ability to use a <?= $mfaTypeDisabled ?> for 2-Step Verification when logging in using
+You have disabled the ability to use your <?= $mfaTypeDisabled ?> for 2-Step Verification when logging in using
 your <?= $idpDisplayName ?> Identity account. If this was not intentional, go to <?= $passwordProfileUrl ?>,
 log in if needed, and add it back to your account.
 

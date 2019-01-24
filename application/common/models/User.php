@@ -5,6 +5,7 @@ namespace common\models;
 use Closure;
 use common\components\Emailer;
 use common\helpers\MySqlDateTime;
+use common\helpers\Utils;
 use common\ldap\Ldap;
 use Exception;
 use Ramsey\Uuid\Uuid;
@@ -20,11 +21,22 @@ class User extends UserBase
     const SCENARIO_UPDATE_USER     = 'update_user';
     const SCENARIO_UPDATE_PASSWORD = 'update_password';
     const SCENARIO_AUTHENTICATE    = 'authenticate';
+    const SCENARIO_INVITE          = 'invite';
 
+    const NAG_NONE          = 'none';
+    const NAG_ADD_MFA       = 'add_mfa';
+    const NAG_REVIEW_MFA    = 'review_mfa';
+    const NAG_ADD_METHOD    = 'add_method';
+    const NAG_REVIEW_METHOD = 'review_method';
+
+    /** @var string */
     public $password;
 
     /** @var Ldap */
     private $ldap;
+
+    /** @var string */
+    protected $nagState;
 
     /**
      * {@inheritdoc}
@@ -96,7 +108,33 @@ class User extends UserBase
                 return false;
             }
         }
-        
+
+        foreach ($this->methods as $method) {
+            if (! $method->delete()) {
+                \Yii::error([
+                    'action' => 'delete method record before deleting user',
+                    'status' => 'error',
+                    'error' => $method->getFirstErrors(),
+                    'mfa_id' => $method->id,
+                    'user_id' => $this->id,
+                ]);
+                return false;
+            }
+        }
+
+        foreach ($this->invites as $invite) {
+            if (! $invite->delete()) {
+                \Yii::error([
+                    'action' => 'delete invite record before deleting user',
+                    'status' => 'error',
+                    'error' => $invite->getFirstErrors(),
+                    'invite_id' => $invite->id,
+                    'user_id' => $this->id,
+                ]);
+                return false;
+            }
+        }
+
         return true;
     }
     
@@ -121,8 +159,12 @@ class User extends UserBase
             'email',
             'active',
             'locked',
+            'manager_email',
             'require_mfa',
             'nag_for_mfa_after',
+            'nag_for_method_after',
+            'spouse_email',
+            'hide',
         ];
 
         $scenarios[self::SCENARIO_UPDATE_USER] = [
@@ -133,12 +175,17 @@ class User extends UserBase
             'email',
             'active',
             'locked',
+            'manager_email',
             'require_mfa',
+            'spouse_email',
+            'hide',
         ];
 
         $scenarios[self::SCENARIO_UPDATE_PASSWORD] = ['password'];
 
         $scenarios[self::SCENARIO_AUTHENTICATE] = ['username', 'password', '!active', '!locked'];
+
+        $scenarios[self::SCENARIO_INVITE] = ['!active', '!locked'];
 
         return $scenarios;
     }
@@ -162,7 +209,10 @@ class User extends UserBase
                 'nag_for_mfa_after', 'default', 'value' => MySqlDateTime::today(),
             ],
             [
-                ['active', 'locked', 'require_mfa'], 'in', 'range' => ['yes', 'no'],
+                'nag_for_method_after', 'default', 'value' => MySqlDateTime::today(),
+            ],
+            [
+                ['active', 'locked', 'require_mfa', 'hide'], 'in', 'range' => ['yes', 'no'],
             ],
             [
                 'email', 'email',
@@ -188,11 +238,14 @@ class User extends UserBase
             ],
             [
                 'active', 'compare', 'compareValue' => 'yes',
-                'on' => self::SCENARIO_AUTHENTICATE,
+                'on' => [self::SCENARIO_AUTHENTICATE, self::SCENARIO_INVITE],
             ],
             [
                 'locked', 'compare', 'compareValue' => 'no',
-                'on' => self::SCENARIO_AUTHENTICATE,
+                'on' => [self::SCENARIO_AUTHENTICATE, self::SCENARIO_INVITE],
+            ],
+            [
+                ['manager_email', 'spouse_email'], 'email',
             ],
             [
                 ['last_synced_utc', 'last_changed_utc'],
@@ -304,6 +357,7 @@ class User extends UserBase
      *       the User's "employee_id" will have a key of "employeeId".
      *
      * @return array
+     * @throws Exception
      */
     public function getAttributesForEmail()
     {
@@ -409,9 +463,17 @@ class User extends UserBase
             'email',
             'active',
             'locked',
-            'last_login_utc',
+            'last_login_utc' => function ($model) {
+                return Utils::getIso8601($model->last_login_utc);
+            },
+            'manager_email',
+            'spouse_email',
+            'hide',
             'mfa' => function ($model) {
                 return $model->getMfaFields();
+            },
+            'method' => function ($model) {
+                return $model->getMethodFields();
             },
         ];
 
@@ -434,20 +496,79 @@ class User extends UserBase
     {
         return $this->display_name ?? "$this->first_name $this->last_name";
     }
-    
+
+    public function isTimeToNagToAddMfa(int $now): bool
+    {
+        return MySqlDateTime::isBefore($this->nag_for_mfa_after, $now)
+            && (count($this->getVerifiedMfaOptions()) === 0);
+    }
+
+    public function isTimeToNagToAddMethod(int $now): bool
+    {
+        return MySqlDateTime::isBefore($this->nag_for_method_after, $now)
+            && (count($this->getVerifiedMethodOptions()) === 0);
+    }
+
+    public function isTimeToNagToReviewMfa(int $now): bool
+    {
+        return MySqlDateTime::isBefore($this->nag_for_mfa_after, $now)
+            && (count($this->getVerifiedMfaOptions()) > 0);
+    }
+
+    public function isTimeToNagToReviewMethod(int $now): bool
+    {
+        return MySqlDateTime::isBefore($this->nag_for_method_after, $now)
+            && (count($this->getVerifiedMethodOptions()) > 0);
+    }
+
+    /**
+     * Based on current time and presence of MFA and Method options,
+     * determine which "nag" to present to the user.
+     */
+    public function getNagState()
+    {
+        /*
+         * Don't recalculate in case the date has changed since the last calculation.
+         */
+        if ($this->nagState !== null) {
+            return $this->nagState;
+        }
+
+        $possibleNags = [
+            self::NAG_ADD_MFA => 'isTimeToNagToAddMfa',
+            self::NAG_ADD_METHOD => 'isTimeToNagToAddMethod',
+            self::NAG_REVIEW_MFA => 'isTimeToNagToReviewMfa',
+            self::NAG_REVIEW_METHOD => 'isTimeToNagToReviewMethod',
+        ];
+
+        $now = time();
+
+        foreach ($possibleNags as $nagType => $isTime) {
+            if ($this->$isTime($now)) {
+                $this->nagState = $nagType;
+                return $this->nagState;
+            }
+        }
+
+        return self::NAG_NONE;
+    }
+
     /**
      * @return array MFA related properties
      */
     public function getMfaFields()
     {
-        $promptForMfa = $this->isPromptForMfa() ? 'yes' : 'no';
         return [
-            'prompt'  => $promptForMfa,
-            'nag'     => ($promptForMfa == 'no' && strtotime($this->nag_for_mfa_after) < time()) ? 'yes' : 'no',
+            'prompt'  => $this->isPromptForMfa() ? 'yes' : 'no',
+            'add'     => $this->getNagState() == self::NAG_ADD_MFA ? 'yes' : 'no',
+            'review'  => $this->getNagState() == self::NAG_REVIEW_MFA ? 'yes' : 'no',
             'options' => $this->getVerifiedMfaOptions(),
         ];
     }
 
+    /**
+     * @return Mfa[]
+     */
     public function getVerifiedMfaOptions()
     {
         $mfas = [];
@@ -458,6 +579,45 @@ class User extends UserBase
             }
         }
         return $mfas;
+    }
+
+    /**
+     * @return Method[]
+     */
+    public function getVerifiedMethodOptions()
+    {
+        return array_filter($this->methods, function ($method) {
+            return $method->verified === 1;
+        });
+    }
+
+    /**
+     * @return Method[]
+     */
+    public function getUnverifiedMethods()
+    {
+        return array_filter($this->methods, function ($method) {
+            return $method->verified === 0;
+        });
+    }
+
+    /**
+     * Return method-related properties to include in /user responses
+     *
+     * @return array method-related properties
+     * @throws \Exception
+     */
+    public function getMethodFields()
+    {
+        return [
+            'add' => $this->getNagState() == self::NAG_ADD_METHOD ? 'yes' : 'no',
+            'review' => $this->getNagState() == self::NAG_REVIEW_METHOD ? 'yes' : 'no',
+            'options' =>
+                $this->getNagState() == self::NAG_REVIEW_METHOD &&
+                $this->scenario == self::SCENARIO_AUTHENTICATE
+                    ? $this->methods
+                    : [],
+        ];
     }
 
     /*
@@ -494,14 +654,21 @@ class User extends UserBase
 
         return parent::save($runValidation, $attributeNames);
     }
-    
+
+    /**
+     * @param bool $isNewUser
+     * @param array $changedAttributes
+     * @throws Exception
+     */
     protected function sendAppropriateMessages($isNewUser, $changedAttributes)
     {
         /* @var $emailer Emailer */
         $emailer = \Yii::$app->emailer;
         
         if ($emailer->shouldSendInviteMessageTo($this, $isNewUser)) {
-            $emailer->sendMessageTo(EmailLog::MESSAGE_TYPE_INVITE, $this);
+            $invite = Invite::findOrCreate($this->id);
+            $data = ['inviteCode' => $invite->getCode()];
+            $emailer->sendMessageTo(EmailLog::MESSAGE_TYPE_INVITE, $this, $data);
         }
         
         if ($emailer->shouldSendPasswordChangedMessageTo($this, $changedAttributes)) {
@@ -731,4 +898,35 @@ class User extends UserBase
         return false;
     }
 
+    /**
+     * Update the nag_for_*_after date that corresponds to the current nag state
+     */
+    public function updateNagDates()
+    {
+        switch($this->getNagState())
+        {
+            case self::NAG_ADD_MFA:
+                $this->nag_for_mfa_after = MySqlDateTime::relative(\Yii::$app->params['mfaAddInterval']);
+                break;
+
+            case self::NAG_REVIEW_MFA:
+                $this->nag_for_mfa_after = MySqlDateTime::relative(\Yii::$app->params['mfaReviewInterval']);
+                break;
+
+            case self::NAG_ADD_METHOD:
+                $this->nag_for_method_after = MySqlDateTime::relative(\Yii::$app->params['methodAddInterval']);
+                break;
+
+            case self::NAG_REVIEW_METHOD:
+                $this->nag_for_method_after = MySqlDateTime::relative(\Yii::$app->params['methodReviewInterval']);
+                break;
+        }
+
+        $this->resetNagState();
+    }
+
+    public function resetNagState(): void
+    {
+        $this->nagState = null;
+    }
 }
