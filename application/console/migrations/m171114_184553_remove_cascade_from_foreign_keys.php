@@ -21,21 +21,22 @@ class m171114_184553_remove_cascade_from_foreign_keys extends Migration
             'current_password_id',
             '{{password}}',
             'id',
-            'NO ACTION',
-            'NO ACTION'
+            'SET NULL',
+            'SET NULL'
         );
         
         // For consistency's sake, also remove any other CASCADE-ing foreign
         // keys we've set up, using the models' beforeDelete() methods instead.
         $this->dropForeignKey('fk_user_id', '{{email_log}}');
+        $this->alterColumn('{{email_log}}', 'user_id', 'integer NULL');
         $this->addForeignKey(
             'fk_user_id',
             '{{email_log}}',
             'user_id',
             '{{user}}',
             'id',
-            'NO ACTION',
-            'NO ACTION'
+            'SET NULL',
+            'SET NULL'
         );
     }
     
