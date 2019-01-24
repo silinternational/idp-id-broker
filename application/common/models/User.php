@@ -570,7 +570,11 @@ class User extends UserBase
         return [
             'add' => $this->getNagState() == self::NAG_ADD_METHOD ? 'yes' : 'no',
             'review' => $this->getNagState() == self::NAG_REVIEW_METHOD ? 'yes' : 'no',
-            'options' => $this->methods,
+            'options' =>
+                $this->getNagState() == self::NAG_REVIEW_METHOD &&
+                $this->scenario == self::SCENARIO_AUTHENTICATE
+                    ? $this->methods
+                    : [],
         ];
     }
 
