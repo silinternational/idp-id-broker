@@ -9,8 +9,8 @@ db:
 app:
     build:
         image: silintl/idp-id-broker
-        dockerfile_path: ./Dockerfile
-        cached: true
+        dockerfile: ./Dockerfile
+    cached: true
     depends_on:
         - db
         - ldap
