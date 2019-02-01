@@ -430,7 +430,11 @@ class User extends UserBase
             'spouse_email',
             'hide',
             'groups' => function ($model) {
-                return explode(',', $model->groups);
+                if (empty($model->groups)) {
+                    return [];
+                } else {
+                    return explode(',', $model->groups);
+                }
             },
             'mfa' => function ($model) {
                 return $model->getMfaFields();
