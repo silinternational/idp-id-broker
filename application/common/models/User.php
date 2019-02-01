@@ -123,6 +123,7 @@ class User extends UserBase
             'nag_for_method_after',
             'spouse_email',
             'hide',
+            'groups',
         ];
 
         $scenarios[self::SCENARIO_UPDATE_USER] = [
@@ -137,6 +138,7 @@ class User extends UserBase
             'require_mfa',
             'spouse_email',
             'hide',
+            'groups',
         ];
 
         $scenarios[self::SCENARIO_UPDATE_PASSWORD] = ['password'];
@@ -427,6 +429,13 @@ class User extends UserBase
             'manager_email',
             'spouse_email',
             'hide',
+            'groups' => function ($model) {
+                if (empty($model->groups)) {
+                    return [];
+                } else {
+                    return explode(',', $model->groups);
+                }
+            },
             'mfa' => function ($model) {
                 return $model->getMfaFields();
             },
@@ -765,7 +774,7 @@ class User extends UserBase
      * @param string|null $mfaType
      * @return ActiveQuery of active Users with a (certain type of) verified Mfa option
      */
-    public static function getQueryOfUsersWithMfa($mfaType=null)
+    public static function getQueryOfUsersWithMfa($mfaType = null)
     {
         $criteria = ['verified' => 1];
         if ($mfaType !== null) {
@@ -802,7 +811,7 @@ class User extends UserBase
             return 0;
         }
 
-        return $mfaCount/$userCount;
+        return $mfaCount / $userCount;
     }
 
     public static function search($params): ActiveDataProvider
@@ -861,8 +870,7 @@ class User extends UserBase
      */
     public function updateNagDates()
     {
-        switch($this->getNagState())
-        {
+        switch ($this->getNagState()) {
             case self::NAG_ADD_MFA:
                 $this->nag_for_mfa_after = MySqlDateTime::relative(\Yii::$app->params['mfaAddInterval']);
                 break;

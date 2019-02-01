@@ -54,6 +54,7 @@ Feature: User
         | require_mfa         | yes                   |
         | spouse_email        | NULL                  |
         | hide                | yes                   |
+        | groups              | NULL                  |
       And last_changed_utc should be stored as now UTC
       And last_synced_utc should be stored as now UTC
 
@@ -125,6 +126,7 @@ Feature: User
       | require_mfa     | yes                |
       | hide            | no                 |
       | hide            | yes                |
+      | groups          | mensa,hackers      |
 
 #TODO: consider creating a new security.feature file for all these security-related tests.
 #TODO: need to think through tests for API_ACCESS_KEYS config, i.e., need tests for ApiConsumer
@@ -301,6 +303,7 @@ Feature: User
       | display_name | Display Name |
       | username     | Username     |
       | email        | Email        |
+      | groups       | Groups       |
 
   Scenario Outline: Attempt to create a new user while providing an invalid value for an optional property
     Given the requester is authorized
