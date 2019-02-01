@@ -30,9 +30,9 @@ class EmailLogBase extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['user_id', 'sent_utc'], 'required'],
             [['user_id'], 'integer'],
             [['message_type'], 'string'],
+            [['sent_utc'], 'required'],
             [['sent_utc'], 'safe'],
             [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['user_id' => 'id']],
         ];

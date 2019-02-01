@@ -21,82 +21,21 @@ class m190124_230000_remove_cascade_from_foreign_keys extends Migration
             'current_password_id',
             '{{password}}',
             'id',
-            'SET NULL',
-            'SET NULL'
+            'NO ACTION',
+            'NO ACTION'
         );
         
         // For consistency's sake, also remove any other CASCADE-ing foreign
         // keys we've set up, using the models' beforeDelete() methods instead.
         $this->dropForeignKey('fk_user_id', '{{email_log}}');
-        $this->alterColumn('{{email_log}}', 'user_id', 'integer NULL');
         $this->addForeignKey(
             'fk_user_id',
             '{{email_log}}',
             'user_id',
             '{{user}}',
             'id',
-            'SET NULL',
-            'SET NULL'
-        );
-
-        $this->dropForeignKey('fk_invite_user_id', '{{invite}}');
-        $this->alterColumn('{{invite}}', 'user_id', 'integer NULL');
-        $this->addForeignKey(
-            'fk_invite_user_id',
-            '{{invite}}',
-            'user_id',
-            '{{user}}',
-            'id',
-            'SET NULL',
-            'SET NULL'
-        );
-
-        $this->dropForeignKey('fk_method_user_id', '{{method}}');
-        $this->alterColumn('{{method}}', 'user_id', 'integer NULL');
-        $this->addForeignKey(
-            'fk_method_user_id',
-            '{{method}}',
-            'user_id',
-            '{{user}}',
-            'id',
-            'SET NULL',
-            'SET NULL'
-        );
-
-        $this->dropForeignKey('fk_mfa_user_id', '{{mfa}}');
-        $this->alterColumn('{{mfa}}', 'user_id', 'integer NULL');
-        $this->addForeignKey(
-            'fk_mfa_user_id',
-            '{{mfa}}',
-            'user_id',
-            '{{user}}',
-            'id',
-            'SET NULL',
-            'SET NULL'
-        );
-
-        $this->dropForeignKey('fk_mfa_backupcode_mfa_id', '{{mfa_backupcode}}');
-        $this->alterColumn('{{mfa_backupcode}}', 'mfa_id', 'integer NULL');
-        $this->addForeignKey(
-            'fk_mfa_backupcode_mfa_id',
-            '{{mfa_backupcode}}',
-            'mfa_id',
-            '{{mfa}}',
-            'id',
-            'SET NULL',
-            'SET NULL'
-        );
-
-        $this->dropForeignKey('fk_mfa_failed_attempt_mfa_id', '{{mfa_failed_attempt}}');
-        $this->alterColumn('{{mfa_failed_attempt}}', 'mfa_id', 'integer NULL');
-        $this->addForeignKey(
-            'fk_mfa_failed_attempt_mfa_id',
-            '{{mfa_failed_attempt}}',
-            'mfa_id',
-            '{{mfa}}',
-            'id',
-            'SET NULL',
-            'SET NULL'
+            'NO ACTION',
+            'NO ACTION'
         );
     }
     
@@ -105,66 +44,6 @@ class m190124_230000_remove_cascade_from_foreign_keys extends Migration
      */
     public function safeDown()
     {
-        $this->dropForeignKey('fk_mfa_failed_attempt_mfa_id', '{{mfa_failed_attempt}}');
-        $this->alterColumn('{{mfa_failed_attempt}}', 'mfa_id', 'integer NOT NULL');
-        $this->addForeignKey(
-            'fk_mfa_failed_attempt_mfa_id',
-            '{{mfa_failed_attempt}}',
-            'mfa_id',
-            '{{mfa}}',
-            'id',
-            'NO ACTION',
-            'NO ACTION'
-        );
-
-        $this->dropForeignKey('fk_mfa_backupcode_mfa_id', '{{mfa_backupcode}}');
-        $this->alterColumn('{{mfa_backupcode}}', 'mfa_id', 'integer NOT NULL');
-        $this->addForeignKey(
-            'fk_mfa_backupcode_mfa_id',
-            '{{mfa_backupcode}}',
-            'mfa_id',
-            '{{mfa}}',
-            'id',
-            'NO ACTION',
-            'NO ACTION'
-        );
-
-        $this->dropForeignKey('fk_mfa_user_id', '{{mfa}}');
-        $this->alterColumn('{{mfa}}', 'user_id', 'integer NOT NULL');
-        $this->addForeignKey(
-            'fk_mfa_user_id',
-            '{{mfa}}',
-            'user_id',
-            '{{user}}',
-            'id',
-            'NO ACTION',
-            'NO ACTION'
-        );
-
-        $this->dropForeignKey('fk_method_user_id', '{{method}}');
-        $this->alterColumn('{{method}}', 'user_id', 'integer NOT NULL');
-        $this->addForeignKey(
-            'fk_method_user_id',
-            '{{method}}',
-            'user_id',
-            '{{user}}',
-            'id',
-            'NO ACTION',
-            'NO ACTION'
-        );
-
-        $this->dropForeignKey('fk_invite_user_id', '{{invite}}');
-        $this->alterColumn('{{invite}}', 'user_id', 'integer NOT NULL');
-        $this->addForeignKey(
-            'fk_invite_user_id',
-            '{{invite}}',
-            'user_id',
-            '{{user}}',
-            'id',
-            'NO ACTION',
-            'NO ACTION'
-        );
-
         $this->dropForeignKey('fk_user_id', '{{email_log}}');
         $this->addForeignKey(
             'fk_user_id',

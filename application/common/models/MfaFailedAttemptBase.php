@@ -29,8 +29,8 @@ class MfaFailedAttemptBase extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['mfa_id', 'at_utc'], 'required'],
             [['mfa_id'], 'integer'],
+            [['at_utc'], 'required'],
             [['at_utc'], 'safe'],
             [['mfa_id'], 'exist', 'skipOnError' => true, 'targetClass' => Mfa::className(), 'targetAttribute' => ['mfa_id' => 'id']],
         ];

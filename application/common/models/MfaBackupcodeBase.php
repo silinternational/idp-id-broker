@@ -31,8 +31,8 @@ class MfaBackupcodeBase extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['mfa_id', 'value', 'created_utc'], 'required'],
             [['mfa_id'], 'integer'],
+            [['value', 'created_utc'], 'required'],
             [['created_utc', 'expires_utc'], 'safe'],
             [['value'], 'string', 'max' => 255],
             [['mfa_id'], 'exist', 'skipOnError' => true, 'targetClass' => Mfa::className(), 'targetAttribute' => ['mfa_id' => 'id']],
