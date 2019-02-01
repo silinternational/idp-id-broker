@@ -83,19 +83,6 @@ class User extends UserBase
             }
         }
         
-        foreach ($this->emailLogs as $emailLog) {
-            if (! $emailLog->delete()) {
-                \Yii::error([
-                    'action' => 'delete email log record before deleting user',
-                    'status' => 'error',
-                    'error' => $emailLog->getFirstErrors(),
-                    'email log id' => $emailLog->id,
-                    'user_id' => $emailLog->user_id,
-                ]);
-                return false;
-            }
-        }
-        
         foreach ($this->mfas as $mfa) {
             if (! $mfa->delete()) {
                 \Yii::error([
@@ -130,6 +117,22 @@ class User extends UserBase
                     'error' => $invite->getFirstErrors(),
                     'invite_id' => $invite->id,
                     'user_id' => $this->id,
+                ]);
+                return false;
+            }
+        }
+
+        /*
+         * Delete email logs last in case other deletions trigger new emails
+         */
+        foreach ($this->emailLogs as $emailLog) {
+            if (! $emailLog->delete()) {
+                \Yii::error([
+                    'action' => 'delete email log record before deleting user',
+                    'status' => 'error',
+                    'error' => $emailLog->getFirstErrors(),
+                    'email log id' => $emailLog->id,
+                    'user_id' => $emailLog->user_id,
                 ]);
                 return false;
             }
