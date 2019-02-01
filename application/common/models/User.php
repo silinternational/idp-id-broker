@@ -770,7 +770,7 @@ class User extends UserBase
      * @param string|null $mfaType
      * @return ActiveQuery of active Users with a (certain type of) verified Mfa option
      */
-    public static function getQueryOfUsersWithMfa($mfaType=null)
+    public static function getQueryOfUsersWithMfa($mfaType = null)
     {
         $criteria = ['verified' => 1];
         if ($mfaType !== null) {
@@ -807,7 +807,7 @@ class User extends UserBase
             return 0;
         }
 
-        return $mfaCount/$userCount;
+        return $mfaCount / $userCount;
     }
 
     public static function search($params): ActiveDataProvider
@@ -866,8 +866,7 @@ class User extends UserBase
      */
     public function updateNagDates()
     {
-        switch($this->getNagState())
-        {
+        switch ($this->getNagState()) {
             case self::NAG_ADD_MFA:
                 $this->nag_for_mfa_after = MySqlDateTime::relative(\Yii::$app->params['mfaAddInterval']);
                 break;
