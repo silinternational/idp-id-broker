@@ -9,8 +9,6 @@ term_handler() {
 }
 trap 'kill ${!}; term_handler' SIGTERM
 
-touch /data/vendor/simplesamlphp/simplesamlphp/modules/exampleauth/enable
-
 if [[ "x" == "x$LOGENTRIES_KEY" ]]; then
     echo "Missing LOGENTRIES_KEY environment variable";
 else
