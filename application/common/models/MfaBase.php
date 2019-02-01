@@ -36,8 +36,8 @@ class MfaBase extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
+            [['user_id', 'type', 'verified', 'created_utc'], 'required'],
             [['user_id', 'verified'], 'integer'],
-            [['type', 'verified', 'created_utc'], 'required'],
             [['type'], 'string'],
             [['created_utc', 'last_used_utc'], 'safe'],
             [['external_uuid', 'label'], 'string', 'max' => 64],

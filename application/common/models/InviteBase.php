@@ -31,8 +31,8 @@ class InviteBase extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
+            [['user_id', 'uuid', 'created_utc', 'expires_on'], 'required'],
             [['user_id'], 'integer'],
-            [['uuid', 'created_utc', 'expires_on'], 'required'],
             [['created_utc', 'expires_on'], 'safe'],
             [['uuid'], 'string', 'max' => 36],
             [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['user_id' => 'id']],
