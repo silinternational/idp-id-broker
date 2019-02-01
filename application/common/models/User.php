@@ -123,6 +123,7 @@ class User extends UserBase
             'nag_for_method_after',
             'spouse_email',
             'hide',
+            'groups',
         ];
 
         $scenarios[self::SCENARIO_UPDATE_USER] = [
@@ -137,6 +138,7 @@ class User extends UserBase
             'require_mfa',
             'spouse_email',
             'hide',
+            'groups',
         ];
 
         $scenarios[self::SCENARIO_UPDATE_PASSWORD] = ['password'];
@@ -427,6 +429,9 @@ class User extends UserBase
             'manager_email',
             'spouse_email',
             'hide',
+            'groups' => function ($model) {
+                return explode(',', $model->groups);
+            },
             'mfa' => function ($model) {
                 return $model->getMfaFields();
             },

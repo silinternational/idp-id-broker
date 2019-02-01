@@ -27,6 +27,7 @@ use Yii;
  * @property string $spouse_email
  * @property string $nag_for_method_after
  * @property string $hide
+ * @property string $groups
  *
  * @property EmailLog[] $emailLogs
  * @property Invite[] $invites
@@ -55,7 +56,7 @@ class UserBase extends \yii\db\ActiveRecord
             [['active', 'locked', 'require_mfa', 'hide'], 'string'],
             [['last_changed_utc', 'last_synced_utc', 'nag_for_mfa_after', 'last_login_utc', 'nag_for_method_after'], 'safe'],
             [['uuid'], 'string', 'max' => 64],
-            [['employee_id', 'first_name', 'last_name', 'display_name', 'username', 'email', 'manager_email', 'spouse_email'], 'string', 'max' => 255],
+            [['employee_id', 'first_name', 'last_name', 'display_name', 'username', 'email', 'manager_email', 'spouse_email', 'groups'], 'string', 'max' => 255],
             [['employee_id'], 'unique'],
             [['username'], 'unique'],
             [['email'], 'unique'],
@@ -89,6 +90,7 @@ class UserBase extends \yii\db\ActiveRecord
             'spouse_email' => Yii::t('app', 'Spouse Email'),
             'nag_for_method_after' => Yii::t('app', 'Nag For Method After'),
             'hide' => Yii::t('app', 'Hide'),
+            'groups' => Yii::t('app', 'Groups'),
         ];
     }
 
