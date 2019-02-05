@@ -28,49 +28,46 @@ use yii\helpers\Html as yHtml;
     Dear <?=yHtml::encode($displayName)?>,
 </p>
 <p>
-    Congratulations! You have logged into your new <?=yHtml::encode($idpDisplayName)?> account for the first time.
-    <?=yHtml::encode($idpDisplayName)?> is in the process of transitioning from logging into websites using
-    an Insite account to this new "<?=yHtml::encode($idpDisplayName)?> account". In January 2018 the option to log in
-    to some websites using your Insite account will begin to go away. It will take some time for all the Insite-login
-    associated websites to change to using the new <?=yHtml::encode($idpDisplayName)?> login. Wherever you have the
-    option to use your new <?=yHtml::encode($idpDisplayName)?> account it is recommended you do so, but keep track of
-    your Insite username and password to use where only the Insite login screen is presented.
+    Congratulations! You have logged into your new <?=yHtml::encode($idpDisplayName)?>
+    account for the first time. Please remember that this account will be your
+    primary means for logging into many corporate applications. It is also
+    important to note that this account (username and password) is unique and
+    will not be kept in sync with any other accounts you have.
 </p>
 <p>
-    Password expires on: <?=yHtml::encode($passwordExpiresUtc)?>
+    Your password expires on: <?=yHtml::encode($passwordExpiresUtc)?>
 </p>
 <p>
     Please be sure to configure <strong>recovery methods</strong> for
-    the potential event that you forget your password. You can reset your password using your email address,
-    <?=yHtml::encode($email)?>, but you can also add other addresses and even phone numbers for SMS verification.
+    the potential event that you forget your password.  You can reset your password
+    using your primary email address, <?=yHtml::encode($email)?>, but you can also
+    add other addresses for verification.
 </p>
 <p>
     <strong>Instructions to add recovery methods:</strong>
 </p>
 <ol>
     <li>Go to <?=yHtml::a(yHtml::encode($passwordProfileUrl), $passwordProfileUrl)?>.</li>
-    <li>Click the "Add" button next to <i>Password recovery methods</i>.</li>
-    <li>Select the option for either an Email or Phone recovery method.</li>
-    <li>Enter the email address or phone number you wish to use and click "Send Code"</li>
-    <li>If you entered an email address, check the inbox for that email address for a new email and retrieve the code
-        from that email.</li>
-    <li>If you entered a phone number, watch for a text message or phone call and take note of the code you receive.</li>
-    <li>Enter the verification code into the form on your screen and click "Verify".</li>
-
+    <li>Click the "Add" button next to <i>Password recovery</i>.</li>
+    <li>Enter the email address you wish to use and click the add button</li>
+    <li>Check for a new email in the inbox for that address and click the link in that email.</li>
 </ol>
 
 <p>
     <strong>Enable 2-Step Verification</strong> (please)
 </p>
 <p>
-    Using 2-Step Verification can help keep bad guys out, even if they have your password. With 2-Step Verification, you'll
-    protect your account with something you know (your password) and something you have (your phone or Security Key).
-    Setup is easy and with the option to remember your computer for 30 days at a time, you'll only need to use the second
-    step every month or so, but anyone trying to hack into your account would need both steps. This not only increases the
-    security of your own account, it increases the privacy and protection of your colleagues by keeping intruders out of
-    the systems that have sensitive information about many of us.
+    2-Step Verification can help keep bad guys out, even if they have your
+    password. With 2-Step Verification, you'll protect your account with
+    something you know (your password) and something you have (your phone or
+    Security Key). Setup is easy and with the option to remember your computer
+    for 30 days at a time, you’ll only need to use the second step every month or
+    so, but anyone trying to hack into your account would need both steps. This
+    not only increases the security of your own account, it increases the privacy
+    and protection of your colleagues by keeping intruders out of the systems
+    that have sensitive information about many of us.
 </p>
-<strong>Instructions to set up 2-Step Verification:</strong>
+    <strong>Instructions to set up 2-Step Verification:</strong>
 <ol>
     <li>Go to <?=yHtml::a(yHtml::encode($passwordProfileUrl), $passwordProfileUrl)?></li>
     <li>Under 2-Step Verification, set up the options that suit you best (USB Security Key, Smartphone App, and/or
@@ -85,6 +82,9 @@ use yii\helpers\Html as yHtml;
 <p>
     If you have any difficulties completing this task, please contact <?=yHtml::encode($supportName)?> at
     <?=yHtml::encode($supportEmail)?>.
+</p>
+<p>
+    Thanks,
 </p>
 <p>
     <i><?=yHtml::encode($emailSignature)?></i>

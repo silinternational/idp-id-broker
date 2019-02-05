@@ -20,34 +20,34 @@
  * @var string $supportEmail
  * @var string $supportName
  * @var bool   $isMfaEnabled
+ * @var string $inviteCode
  */
 ?>
 Dear <?= $displayName ?>,
 
-A new <?= $idpDisplayName ?> Identity account has been created for you and is ready for
-you to create your password. Please note this account is not an email account. Instead
-this account is for use with many corporate websites and applications such as the
-corporate Wiki and personnel systems.
+A new <?= $idpDisplayName ?> Identity account has been created for you and is
+ready for you to set your password. Please note this account is not an
+email account. Instead this account is for use with many corporate websites
+and applications such as the corporate Wiki and personnel systems.
 
-After creating your password you'll also
-be given the opportunity to set up recovery methods in case you ever 
-forget your password. We highly recommended that you set up at least 
-one or two recovery methods. You can also enhance the security of your 
-account by enabling 2-Step Verification which will help ensure bad 
-guys cannot get into your account even if they guess your password.
+After creating your password you'll also be given the opportunity to set up
+recovery methods in case you ever forget your password. We highly recommended
+that you set up at least one or two recovery methods. You can also enhance
+the security of your account by enabling 2-Step Verification which will help
+ensure bad guys cannot get into your account even if they guess your
+password.
 
-If you have any difficulties completing this task, please contact 
-<?= $supportName ?> at: <?= $supportEmail ?>
+If you have any difficulties completing this task, please contact
+<?= $supportName ?> at: <?= $supportEmail . PHP_EOL ?>
 
 Instructions:
 -------------
-To proceed with establishing your account, please follow the step-by-step guidance
-here: <?= $passwordProfileUrl . '/intro?invite=' . $inviteCode ?>
+To proceed with establishing your account, please follow the step-by-step
+guidance here: <?= $passwordProfileUrl . '/intro?invite=' . $inviteCode ?>
 
-Please note that this <?= $idpDisplayName ?> Identity account (username and password) is
-unique and its password is not synchronized with any other accounts
-you may have.
+Please note that this <?= $idpDisplayName ?> Identity account (username and
+password) is unique and its password is not synchronized with any other
+accounts you may have.
 
 Thank you,
-
 <?= $emailSignature ?>

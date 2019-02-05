@@ -41,5 +41,8 @@ use yii\helpers\Html as yHtml;
     <?= yHtml::encode($supportName) ?> at <?= yHtml::encode($supportEmail) ?>.
 </p>
 <p>
+    Thanks,
+</p>
+<p>
     <i><?= yHtml::encode($emailSignature) ?></i>
 </p>

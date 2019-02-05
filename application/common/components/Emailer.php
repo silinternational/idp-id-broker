@@ -24,7 +24,7 @@ class Emailer extends Component
 
     const SUBJ_GET_BACKUP_CODES = 'Get printable codes for your {idpDisplayName} account';
     const SUBJ_REFRESH_BACKUP_CODES = 'Get a new set of printable codes for your {idpDisplayName} account';
-    const SUBJ_LOST_SECURITY_KEY = 'Have you lost the security key you use with your {idpDisplayName} account';
+    const SUBJ_LOST_SECURITY_KEY = 'Have you lost the security key you use with your {idpDisplayName} account?';
 
     const SUBJ_MFA_OPTION_ADDED = 'A 2-Step Verification option was added to your {idpDisplayName} account';
     const SUBJ_MFA_OPTION_REMOVED = 'A 2-Step Verification option was removed from your {idpDisplayName} account';

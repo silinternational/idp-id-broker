@@ -26,9 +26,10 @@
 ?>
 Dear <?= $displayName ?>,
 
-You have added a new option for 2-Step Verification to your <?= $idpDisplayName ?> Identity account.
-When you are prompted for 2-Step Verification in the future, you will now have the option to choose a different
-method of 2-Step Verification if you do not have access to the primary method.
+You have added a new option for 2-Step Verification to your <?= $idpDisplayName . PHP_EOL ?>
+Identity account. When you are prompted for 2-Step Verification in the
+future, you will now have the option to choose a different method of 2-Step
+Verification if you do not have access to the primary method.
 
 You now have the following 2-Step Verification options enabled:
 <?php
@@ -37,7 +38,8 @@ You now have the following 2-Step Verification options enabled:
     }
 ?>
 
-If you have any questions or concerns about this, please contact <?= $supportName ?> at
-<?= $supportEmail ?>.
+If you have any questions or concerns about this, please contact <?= $supportName . PHP_EOL ?>
+at <?= $supportEmail ?>.
 
+Thanks,
 <?= $emailSignature ?>

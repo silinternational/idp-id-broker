@@ -24,18 +24,16 @@ use yii\helpers\Html as yHtml;
     to add it to your account.
 </p>
 <p>
-    Verification Code: <?= yHtml::encode($code) ?>
-</p>
-<p>
     If you did not do this it could be a sign someone else has compromised your account.
-    Please contact <?= yHtml::encode($supportName) ?> at <?= yHtml::encode($supportEmail) ?> as soon as possible to report the incident.
+    Please contact <?= yHtml::encode($supportName) ?> at <?= yHtml::encode($supportEmail) ?>
+    as soon as possible to report the incident.
 </p>
 <p>
-    To keep your account secure, please don't forward this email to anyone.
-    See our Help Center for <a href="<?= yHtml::encode($helpCenterUrl); ?>">more security tips</a>.
+    To maintain security, please don't forward this email to anyone.
+    See our <?= yHtml::a('Help Center', $helpCenterUrl) ?> for more security tips.
 </p>
 <p>
-    Thanks!
+    Thanks,
 </p>
 <p>
     <i><?= yHtml::encode($emailSignature); ?></i>
