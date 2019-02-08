@@ -528,13 +528,6 @@ class Mfa extends MfaBase
      */
     protected function setLabel($label)
     {
-        $labelTypes = [
-            self::TYPE_TOTP => 'Smartphone',
-            self::TYPE_U2F => 'USB security key',
-            self::TYPE_BACKUPCODE => 'Printable codes',
-            self::TYPE_MANAGER => 'Rescue code',
-        ];
-
         if (is_string($label)) {
             $this->label = $label;
         } elseif (is_numeric($label)) {
