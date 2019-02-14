@@ -122,6 +122,7 @@ class User extends UserBase
             'nag_for_mfa_after',
             'nag_for_method_after',
             'spouse_email',
+            'personal_email',
             'hide',
             'groups',
         ];
@@ -137,6 +138,7 @@ class User extends UserBase
             'manager_email',
             'require_mfa',
             'spouse_email',
+            'personal_email',
             'hide',
             'groups',
         ];
@@ -205,7 +207,7 @@ class User extends UserBase
                 'on' => [self::SCENARIO_AUTHENTICATE, self::SCENARIO_INVITE],
             ],
             [
-                ['manager_email', 'spouse_email'], 'email',
+                ['manager_email', 'spouse_email', 'personal_email'], 'email',
             ],
             [
                 ['last_synced_utc', 'last_changed_utc'],
@@ -428,6 +430,7 @@ class User extends UserBase
             },
             'manager_email',
             'spouse_email',
+            'personal_email',
             'hide',
             'groups' => function ($model) {
                 if (empty($model->groups)) {

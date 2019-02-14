@@ -53,6 +53,7 @@ Feature: User
         | manager_email       | boss_man@example.org  |
         | require_mfa         | yes                   |
         | spouse_email        | NULL                  |
+        | personal_email      | NULL                  |
         | hide                | yes                   |
         | groups              | NULL                  |
       And last_changed_utc should be stored as now UTC
@@ -122,6 +123,7 @@ Feature: User
       | locked          | no                 |
       | locked          | yes                |
       | spouse_email    | spouse@example.org |
+      | personal_email  | my@example.org     |
       | require_mfa     | no                 |
       | require_mfa     | yes                |
       | hide            | no                 |
@@ -330,6 +332,9 @@ Feature: User
       | manager_email | true            | Manager Email |
       | manager_email | 123             | Manager Email |
       | manager_email | invalid.address | Manager Email |
+      | personal_email| true            | Manager Email |
+      | personal_email| 123             | Manager Email |
+      | personal_email| invalid.address | Manager Email |
 
   Scenario: Attempt to create a new user with a username that already exists
     Given the requester is authorized
