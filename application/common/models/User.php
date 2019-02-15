@@ -694,59 +694,6 @@ class User extends UserBase
         return true;
     }
 
-    /**
-     * @param $criteria array Criteria to be used for filtering users based upon their password
-     *                        expiration, e.g., ['grace_period_ends_on' => '2018-07-16', 'expires_on' => '2018-06-17'].
-     * @return array Users matching given criteria
-     */
-    public static function getExpiringUsers($criteria): array
-    {
-        if (empty($criteria)) {
-            return [];
-        }
-
-        $users = User::find()->joinWith('currentPassword')
-                             ->where(['active' => 'yes']);
-
-        foreach ($criteria as $name => $value) {
-            switch ($name) {
-                case 'expires_on':
-                case 'grace_period_ends_on':
-                    $users->andWhere(["password.$name" => $value]);
-                    break;
-                default:
-                    // if no criteria names match, this will ensure an empty result is returned
-                    $users->where('0=1');
-            }
-        }
-
-        return $users->all();
-    }
-
-    public static function getUsersWithFirstPasswords($createdOn): array
-    {
-        //  find the earliest password for each user, if it matches the provided date, then return
-        //  that user's info:
-        //        SELECT *
-        //        FROM user
-        //        WHERE id in (
-        //          SELECT user_id
-        //	        FROM password
-        //	        GROUP BY user_id
-        //	        HAVING DATE(MIN(created_utc)) = "2017-06-07"
-        //        )
-        $oldestPasswords = Password::find()->select('user_id')
-                                           ->groupBy('user_id')
-                                           ->having(['=', "DATE(MIN(created_utc))", $createdOn]);
-
-        $users = User::find()->where([
-                                'active' => 'yes',
-                                'id' => $oldestPasswords
-                               ]);
-
-        return $users->all();
-    }
-
     /*
      * @return integer Count of active users with a password
      */
