@@ -7,6 +7,7 @@ use common\components\Emailer;
 use common\helpers\MySqlDateTime;
 use common\helpers\Utils;
 use common\ldap\Ldap;
+use common\models\Method;
 use Exception;
 use Ramsey\Uuid\Uuid;
 use Yii;
@@ -44,7 +45,11 @@ class User extends UserBase
     public function afterSave($insert, $changedAttributes)
     {
         parent::afterSave($insert, $changedAttributes);
-        
+
+        if (array_key_exists('personal_email', $changedAttributes) && $this->personal_email !== $this->email) {
+            $this->updateRecoveryMethods($insert, $changedAttributes['personal_email']);
+        }
+
         $this->sendAppropriateMessages($insert, $changedAttributes);
     }
     
@@ -122,6 +127,7 @@ class User extends UserBase
             'nag_for_mfa_after',
             'nag_for_method_after',
             'spouse_email',
+            'personal_email',
             'hide',
             'groups',
         ];
@@ -137,6 +143,7 @@ class User extends UserBase
             'manager_email',
             'require_mfa',
             'spouse_email',
+            'personal_email',
             'hide',
             'groups',
         ];
@@ -205,7 +212,7 @@ class User extends UserBase
                 'on' => [self::SCENARIO_AUTHENTICATE, self::SCENARIO_INVITE],
             ],
             [
-                ['manager_email', 'spouse_email'], 'email',
+                ['manager_email', 'spouse_email', 'personal_email'], 'email',
             ],
             [
                 ['last_synced_utc', 'last_changed_utc'],
@@ -428,6 +435,7 @@ class User extends UserBase
             },
             'manager_email',
             'spouse_email',
+            'personal_email',
             'hide',
             'groups' => function ($model) {
                 if (empty($model->groups)) {
@@ -894,5 +902,51 @@ class User extends UserBase
     public function resetNagState(): void
     {
         $this->nagState = null;
+    }
+
+    /**
+     * Update personal email in recovery methods table. On insert ($insert == true) the personal
+     * email address is added to the list of recovery methods. On update ($insert == false) the
+     * old personal email address is removed and the new one is added.
+     * @param bool $insert
+     * @param string|null $oldPersonalEmail
+     */
+    public function updateRecoveryMethods(bool $insert, $oldPersonalEmail)
+    {
+        if ($insert === false && $oldPersonalEmail !== null) {
+            $oldMethod = Method::findOne(['value' => $oldPersonalEmail, 'user_id' => $this->id]);
+            if ($oldMethod === null) {
+                \Yii::warning([
+                    'action' => 'look up old personal email',
+                    'status' => 'notice',
+                    'employee_id' => $this->employee_id,
+                    'email' => $oldPersonalEmail,
+                    'message' => 'failed to locate old personal email in method table',
+                ]);
+            } else {
+                if ($oldMethod->delete() === false) {
+                    \Yii::error([
+                        'action' => 'delete old personal email',
+                        'status' => 'error',
+                        'employee_id' => $this->employee_id,
+                        'email' => $oldPersonalEmail,
+                        'message' => 'failed to delete old personal email from method table'
+                    ]);
+                };
+            }
+        }
+
+        if ($this->personal_email === null) {
+            return;
+        }
+
+        \Yii::warning([
+            'action' => 'adding personal email',
+            'status' => 'notice',
+            'employee_id' => $this->employee_id,
+            'email' => $this->personal_email,
+        ]);
+
+        Method::findOrCreate($this->id, $this->personal_email, MySqlDateTime::now());
     }
 }

@@ -206,25 +206,12 @@ class Method extends MethodBase
         $method = Method::findOne(['value' => $value, 'user_id' => $userId]);
 
         if ($method === null) {
-            $method = new Method();
-            $method->user_id = $userId;
-            $method->value = mb_strtolower($value);
-            if (! empty($created)) {
-                $method->created = $created;
-                $method->verified = 1;
-            }
+            $method = self::create($userId, $value, $created);
         } else {
             if (! $method->isVerified()) {
                 $method->restartVerification();
             }
             return $method;
-        }
-
-        if (! $method->save()) {
-            throw new ServerErrorHttpException(
-                sprintf('Unable to save new method'),
-                1461441851
-            );
         }
 
         if (empty($created)) {
@@ -312,5 +299,35 @@ class Method extends MethodBase
         if (!$this->save()) {
             throw new ServerErrorHttpException('Save error after incrementing attempts', 1461441850);
         }
+    }
+
+    /**
+     * Create new password recovery method. If 'created' parameter is specified,
+     * then the record is created pre-verified.
+     *
+     * @param integer $userId
+     * @param string $value
+     * @param string $created Date recovery method was created, in MySQL datetime format.
+     * @return Method
+     * @throws ServerErrorHttpException
+     */
+    public static function create($userId, $value, $created = '')
+    {
+        $method = new Method();
+        $method->user_id = $userId;
+        $method->value = mb_strtolower($value);
+        if (! empty($created)) {
+            $method->created = $created;
+            $method->verified = 1;
+        }
+
+        if (! $method->save()) {
+            throw new ServerErrorHttpException(
+                sprintf('Unable to save new method'),
+                1461441851
+            );
+        }
+
+        return $method;
     }
 }

@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Added `invite` property on `/authentication` for new user invite authentication
 - Added ability to restart a password recovery method verification
 - New 'manager' MFA type -- on request, send a backup code to user's manager.
+- Added 'groups' and 'personal_email' fields to User object and database table.
 
 ### Changed
 - Changed password reuse error HTTP status code from 422 to 409
@@ -21,6 +22,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Updated Welcome email to remove Insite obsolescense notification
 - /method/{uid}/verify no longer requires `employee_id`
 - Changed dates in API to use ISO-8601 format (e.g. 2019-01-08T12:54:00Z)
+- Default MFA labels are now set according to the type of MFA (e.g. "Smartphone #1")
 
 ## [3.5.0] - 2018-07-17
 ### Added
