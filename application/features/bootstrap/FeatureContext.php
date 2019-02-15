@@ -31,6 +31,9 @@ class FeatureContext extends YiiContext
     /** @var User */
     private $userFromDbBefore;
 
+    /** @var Method */
+    protected $methodFromDb;
+
     private $now;
     const ACCEPTABLE_DELTA_IN_SECONDS = 1;
 
@@ -551,5 +554,52 @@ class FeatureContext extends YiiContext
     public function getResponseProperty($property)
     {
         return $this->resBody[$property];
+    }
+
+    /**
+     * @Then /^a method record exists with (?:a|an) (.*) of "?([^"]*)"?$/
+     */
+    public function aMethodRecordExistsForThisKey($lookupKey, $lookupValue)
+    {
+        $this->methodFromDb = Method::findOne([$lookupKey => $lookupValue]);
+
+        Assert::notNull($this->methodFromDb, sprintf(
+            'Failed to find a method with a %s of %s.',
+            $lookupKey,
+            var_export($lookupValue, true)
+        ));
+    }
+
+    /**
+     * @Then a method record exists with a value of :address text to change signature
+     */
+    public function aMethodRecordExistsForEmployeeIdWithAValueOf($address)
+    {
+        $this->methodFromDb = Method::findOne(['value' => $address, 'user_id' => $this->userFromDb->id]);
+
+        Assert::notNull($this->methodFromDb, sprintf(
+            'Failed to find a method with a value of %s.',
+            $address
+        ));
+    }
+
+
+    /**
+     * @Then the method record is marked as verified
+     */
+    public function theMethodRecordIsMarkedAsVerified()
+    {
+        Assert::eq(1, $this->methodFromDb->verified, 'method is not marked as verified');
+    }
+
+    /**
+     * @Then a method record does not exist with a value of :address
+     */
+    public function aMethodRecordDoesNotExistForEmployeeIdWithAValueOf($address)
+    {
+        Assert::null(
+            Method::findOne(['value' => $address, 'user_id' => $this->userFromDb->id]),
+            'method should have been deleted but still exists'
+        );
     }
 }
