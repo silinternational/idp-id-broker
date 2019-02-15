@@ -13,11 +13,6 @@ class MethodContext extends \FeatureContext
     /**
      * @var Method
      */
-    protected $methodFromDb;
-
-    /**
-     * @var Method
-     */
     protected $tempMethod;
 
     /**
@@ -40,20 +35,6 @@ class MethodContext extends \FeatureContext
 
         $this->tempMethod = $method;
         $this->tempUid = $method->uid;
-    }
-
-    /**
-     * @Then /^a method record exists with (?:a|an) (.*) of "?([^"]*)"?$/
-     */
-    public function aMethodRecordExistsForThisKey($lookupKey, $lookupValue)
-    {
-        $this->methodFromDb = Method::findOne([$lookupKey => $lookupValue]);
-
-        Assert::notNull($this->methodFromDb, sprintf(
-            'Failed to find a method with a %s of %s.',
-            $lookupKey,
-            var_export($lookupValue, true)
-        ));
     }
 
     /**
