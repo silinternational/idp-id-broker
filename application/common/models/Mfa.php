@@ -278,10 +278,13 @@ class Mfa extends MfaBase
         $mfa->type = $type;
 
         if (empty($label)) {
-            $existingCount = count($user->mfas);
-            $label = sprintf("2SV #%s", $existingCount+1);
+            $existingCount = count(array_filter($user->mfas, function ($otherMfa) use ($mfa) {
+                return $otherMfa->type === $mfa->type;
+            }));
+            $mfa->setLabel($existingCount + 1);
+        } else {
+            $mfa->setLabel($label);
         }
-        $mfa->label = $label;
 
         /*
          * Save $mfa before calling backend->regInit because type backupcode needs mfa record to exist first
@@ -513,6 +516,25 @@ class Mfa extends MfaBase
             $this->verified = 1;
             if (! $this->save()) {
                 throw new \Exception("Error saving MFA record", 1547066350);
+            }
+        }
+    }
+
+    /**
+     * Set the label. If `$label` is numeric, use a default label using a predefined prefix
+     * and the number given in $label. If `$label` is a string, simply assign it to the `label`
+     * property.
+     * @param mixed $label
+     */
+    protected function setLabel($label)
+    {
+        if (is_string($label)) {
+            $this->label = $label;
+        } elseif (is_numeric($label)) {
+            if ($this->type == self::TYPE_BACKUPCODE) {
+                $this->label = $this->getReadableType();
+            } else {
+                $this->label = sprintf("%s #%s", $this->getReadableType(), $label);
             }
         }
     }
