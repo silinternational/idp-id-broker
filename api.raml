@@ -474,32 +474,6 @@ types:
             description: A server-side error occurred.
             body:
               type: Error
-  /expiring:
-    get:
-      description: Get a list of the active users whose password is expiring on a given date.
-      queryParameters:
-        grace_period_ends_on:
-          type: string
-          example: "grace_period_ends_on=2017-06-14"
-        expires_on:
-          type: string
-          example: "expires_on=2017-06-14"
-      responses:
-        200:
-          body:
-            type: UserResponse[]
-  /first-password:
-    get:
-      description: Get a list of the active users whose first password was created on a given date.
-      queryParameters:
-        created_on?:
-          type: string
-          default: "created_on=<today's date>"
-          example: "created_on=2017-06-14"
-      responses:
-        200:
-          body:
-            type: UserResponse[]
 /mfa:
   post:
     description: Create a new mfa record.
