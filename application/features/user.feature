@@ -483,6 +483,22 @@ Feature: User
      And a method record exists with a value of "my@example.com"
      And the method record is marked as verified
 
+  Scenario: Add a user with personal email address same as primary, expect a recovery method NOT to be added.
+    Given a record does not exist with an employee_id of "123"
+    And the requester is authorized
+    And I provide the following valid data:
+      | property        | value                 |
+      | employee_id     | 123                   |
+      | first_name      | Shep                  |
+      | last_name       | Clark                 |
+      | username        | shep_clark            |
+      | email           | shep_clark@example.org|
+      | personal_email  | shep_clark@example.org|
+    When I request "/user" be created
+    Then the response status code should be 200
+    And a record exists with an employee_id of "123"
+    And a method record does not exist with a value of "shep_clark@example.org"
+
   Scenario: Update a user with a personal email address, expect a recovery method to be added.
     Given a record does not exist with an employee_id of "123"
     And the requester is authorized

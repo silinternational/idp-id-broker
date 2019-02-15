@@ -46,7 +46,7 @@ class User extends UserBase
     {
         parent::afterSave($insert, $changedAttributes);
 
-        if (array_key_exists('personal_email', $changedAttributes)) {
+        if (array_key_exists('personal_email', $changedAttributes) && $this->personal_email !== $this->email) {
             $this->updateRecoveryMethods($insert, $changedAttributes['personal_email']);
         }
 
