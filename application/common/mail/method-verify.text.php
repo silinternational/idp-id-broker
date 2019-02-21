@@ -22,11 +22,11 @@ following address to add it to your account:
 
 <?= $passwordProfileUrl . '/password/recovery/' . $uid . '/verify?code=' . $code . PHP_EOL ?>
 
-If you did not do this it could be a sign someone else has compromised your
+If you did not do this, it could be a sign someone else has compromised your
 account. Please contact <?= $supportName ?> at <?= $supportEmail ?> as soon
 as possible to report the incident.
 
-To keep your account secure, please don't forward this email to anyone. See
+To maintain security, please don't forward this email to anyone. See
 our Help Center at <?= $helpCenterUrl ?> for more security tips.
 
 Thanks,

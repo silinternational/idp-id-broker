@@ -46,7 +46,7 @@ use yii\helpers\Html as yHtml;
     ?>
 </ol>
 <p>
-    If you did not do this it could be a sign someone else has compromised your account. Please contact
+    If you did not do this, it could be a sign someone else has compromised your account. Please contact
     <?= yHtml::encode($supportName) ?> at <?= yHtml::encode($supportEmail) ?>
     as soon as possible to report the incident.
 </p>

@@ -39,7 +39,7 @@ foreach ($mfaOptions as $mfa) {
 }
 ?>
 
-If you did not do this it could be a sign someone else has compromised your
+If you did not do this, it could be a sign someone else has compromised your
 account. Please contact <?= $supportName ?> at <?= $supportEmail ?> as
 soon as possible to report the incident.
 

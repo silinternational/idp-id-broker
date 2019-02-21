@@ -19,7 +19,7 @@ only providing the following backup code to them and not to someone else.
 
 Backup Code: <?= $code . PHP_EOL ?>
 
-If <?= $firstName ?> did not do this it could be a sign someone else has
+If <?= $firstName ?> did not do this, it could be a sign someone else has
 compromised their account. Please contact <?= $supportName . PHP_EOL ?>
 at <?= $supportEmail ?> as soon as possible to report the incident.
 

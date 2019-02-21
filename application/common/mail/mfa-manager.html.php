@@ -24,7 +24,7 @@ use yii\helpers\Html as yHtml;
     Backup Code: <?= yHtml::encode($code) ?>
 </p>
 <p>
-    If <?= yHtml::encode($firstName) ?> did not do this it could be a sign someone else has compromised
+    If <?= yHtml::encode($firstName) ?> did not do this, it could be a sign someone else has compromised
     their account. Please contact <?= yHtml::encode($supportName) ?> at <?= yHtml::encode($supportEmail) ?>
     as soon as possible to report the incident.
 </p>

@@ -31,7 +31,7 @@ use yii\helpers\Html as yHtml;
     If this was not intentional, follow the instructions below to setup 2-Step Verification on your account.
 </p>
 <p>
-    If you did not do this it could be a sign someone else has compromised your account.
+    If you did not do this, it could be a sign someone else has compromised your account.
     Please contact <?= yHtml::encode($supportName) ?> at <?= yHtml::encode($supportEmail) ?>
     as soon as possible to report the incident.
 </p>

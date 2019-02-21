@@ -29,7 +29,7 @@ Dear <?= $displayName ?>,
 account. If this was not intentional, follow the instructions below to setup
 2-Step Verification on your account.
 
-If you did not do this it could be a sign someone else has compromised your
+If you did not do this, it could be a sign someone else has compromised your
 account. Please contact <?= $supportName ?> at <?= $supportEmail ?> as soon
 as possible to report the incident.
 

@@ -29,7 +29,7 @@ use yii\helpers\Html as yHtml;
 <p>
     You currently only have one method of 2-Step Verification configured for your <?= yHtml::encode($idpDisplayName) ?>
     Identity account and have not generated Printable Codes as a backup. You are not required to have Printable Codes
-    but we do recommend them as a backup in case you lose your other option. If you do not want Printable Codes you can
+    but we do recommend them as a backup in case you lose your other option. If you do not want Printable Codes, you can
     delete and ignore this email.
 </p>
 <p>
@@ -43,7 +43,7 @@ use yii\helpers\Html as yHtml;
 </ol>
 <p>
     Treat these codes as you would your password and keep them safe. Also note that these codes are one-time use only.
-    If you ever lose, misplace, or use them up you can revisit
+    If you ever lose, misplace, or use them up, you can revisit
     <?=yHtml::a(yHtml::encode($passwordProfileUrl), $passwordProfileUrl)?> to generate new codes (which also
     invalidates any remaining previous codes).
 </p>
