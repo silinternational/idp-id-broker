@@ -5,7 +5,7 @@ use yii\helpers\Html as yHtml;
  * @var string $displayName     Name of user. Provided by user profile.
  * @var string $firstName       First name of user. Provided by user profile.
  * @var string $idpDisplayName  Display name of IDP instance. Provided by environment variable IDP_DISPLAY_NAME.
- * @var string $code            Backup code. Generated at runtime.
+ * @var string $code            Rescue code. Generated at runtime.
  * @var string $supportName     Help center name.  Provided by environment variable SUPPORT_NAME.
  * @var string $supportEmail    Help center email address.  Provided by environment variable SUPPORT_EMAIL.
  * @var string $helpCenterUrl   Help center website URL.  Provided by environment variable HELP_CENTER_URL.
@@ -24,16 +24,16 @@ use yii\helpers\Html as yHtml;
     Backup Code: <?= yHtml::encode($code) ?>
 </p>
 <p>
-    If <?= yHtml::encode($firstName) ?> did not do this it could be a sign someone else has compromised
+    If <?= yHtml::encode($firstName) ?> did not do this, it could be a sign someone else has compromised
     their account. Please contact <?= yHtml::encode($supportName) ?> at <?= yHtml::encode($supportEmail) ?>
     as soon as possible to report the incident.
 </p>
 <p>
     To maintain security, please don't forward this email to anyone.
-    See our Help Center for <a href="<?= yHtml::encode($helpCenterUrl); ?>">more security tips</a>.
+    See our <?= yHtml::a('Help Center', $helpCenterUrl) ?> for more security tips.
 </p>
 <p>
-    Thanks!
+    Thanks,
 </p>
 <p>
     <i><?= yHtml::encode($emailSignature); ?></i>

@@ -25,16 +25,17 @@
 ?>
 Dear <?= $displayName ?>,
 
-There have been too many failed 2-Step Verification attempts on your 
-<?= $idpDisplayName ?> Identity account. You will need to wait at least 
-5 minutes and try again.
+There have been too many failed 2-Step Verification attempts on your
+<?= $idpDisplayName ?> Identity account. You will need to wait at least 5
+minutes and try again.
 
-If you are not currently trying to log into your <?= $idpDisplayName ?> Identity 
-account, it could be a sign someone else is trying to access your account. 
-Please contact <?= $supportName ?> at <?= $supportEmail ?> as soon as possible 
-to report the incident.
+If you are not currently trying to log into your <?= $idpDisplayName . PHP_EOL ?>
+Identity account, it could be a sign someone else is trying to access your
+account. Please contact <?= $supportName ?> at <?= $supportEmail ?> as soon
+as possible to report the incident.
 
 If you continue to have problems accessing your account, please contact 
 <?= $supportName ?> at <?= $supportEmail ?>.
 
+Thanks,
 <?= $emailSignature ?>

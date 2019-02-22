@@ -27,9 +27,10 @@
 ?>
 Dear <?= $displayName ?>,
 
-You have disabled the ability to use your <?= $mfaTypeDisabled ?> for 2-Step Verification when logging in using
-your <?= $idpDisplayName ?> Identity account. If this was not intentional, go to <?= $passwordProfileUrl ?>,
-log in if needed, and add it back to your account.
+You have disabled the ability to use your <?= $mfaTypeDisabled ?> for 2-Step
+Verification when logging in using your <?= $idpDisplayName ?> Identity
+account. If this was not intentional, go to <?= $passwordProfileUrl ?>, log
+in if needed, and add it back to your account.
 
 You can continue to use 2-Step Verification using the following option(s):
 <?php
@@ -38,8 +39,10 @@ foreach ($mfaOptions as $mfa) {
 }
 ?>
 
-If you did not do this it could be a sign someone else has compromised your account. Please contact <?= $supportName ?>
-at <?= $supportEmail ?> as soon as possible to report the incident.
+If you did not do this, it could be a sign someone else has compromised your
+account. Please contact <?= $supportName ?> at <?= $supportEmail ?> as
+soon as possible to report the incident.
 
+Thanks,
 <?= $emailSignature ?>
 
