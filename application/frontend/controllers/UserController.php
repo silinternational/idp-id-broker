@@ -81,16 +81,4 @@ class UserController extends BaseRestController
 
         return $user;
     }
-
-    public function actionExpiring(): array
-    {
-        return User::getExpiringUsers(Yii::$app->request->queryParams);
-    }
-
-    public function actionFirstPassword(): array
-    {
-        $createdOn = Yii::$app->request->queryParams['created_on'] ?? MySqlDateTime::today();
-
-        return User::getUsersWithFirstPasswords($createdOn);
-    }
 }
