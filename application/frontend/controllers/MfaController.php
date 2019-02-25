@@ -84,8 +84,7 @@ class MfaController extends BaseRestController
             throw new BadRequestHttpException();
         }
 
-        \Yii::$app->response->statusCode = 204;
-        return null;
+        return $mfa;
     }
 
     /**

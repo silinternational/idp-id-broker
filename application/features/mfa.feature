@@ -83,13 +83,13 @@ Feature: MFA
   Scenario: Verify a backupcode MFA code
     Given the user has a verified "backupcode" MFA
     When I request to verify one of the codes
-    Then the response status code should be 204
+    Then the response status code should be 200
       And 9 codes should be stored
 
   Scenario: Verify a manager MFA code
     Given the user has a verified "manager" MFA
     When I request to verify the code
-    Then the response status code should be 204
+    Then the response status code should be 200
       And 0 codes should be stored
 
   Scenario: Delete a backupcode MFA option
