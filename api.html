@@ -961,7 +961,33 @@
   "employee_id": "12345",
   "value": "01234987"
 }
-</code></pre></div></div><div class="tab-pane" id="mfa__id__verify_post_response"><h2>HTTP status code <a href="http://httpstatus.es/204" target="_blank">204</a></h2><p>Value provided passed verification</p><h2>HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><p>Value provided failed verification or was unacceptable for some other reason (such as an invalid <code>employee_id</code>).</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: object</p><strong>Properties</strong><ul><li><strong>name</strong>: <em>required (string)</em></li><li><strong>message</strong>: <em>required (string)</em></li><li><strong>code</strong>: <em>required (integer)</em></li><li><strong>status</strong>: <em>required (integer)</em></li></ul><p><strong>Examples</strong>:</p><div class="examples"><pre><code>{
+</code></pre></div></div><div class="tab-pane" id="mfa__id__verify_post_response"><h2>HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><p>Value provided passed verification</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: object</p><strong>Properties</strong><ul><li><strong>id</strong>: <em>required (integer)</em></li><li><strong>type</strong>: <em>required (one of backupcode, totp, u2f)</em></li><li><strong>label</strong>: <em>required (string)</em></li><li><strong>created_utc</strong>: <em>required (string)</em></li><li><strong>last_used_utc</strong>: <em>required (union of string or nil)</em></li><li><strong>data</strong>: <em>required (union of object or array)</em></li></ul><p><strong>Examples</strong>:</p><div class="examples"><p><strong>backupcode</strong>:<br></p><pre><code>{
+    "id": 7,
+    "type": "backupcode",
+    "label": "2SV #1",
+    "created_utc": "2017-10-24T20:40:47Z",
+    "last_used_utc": null,
+    "data": {
+        "count": 10
+    }
+}
+</code></pre><p><strong>u2f</strong>:<br></p><pre><code>{
+    "id": 8,
+    "type": "u2f",
+    "label": "2SV #2",
+    "created_utc": "2017-10-24T20:40:57Z",
+    "last_used_utc": null,
+    "data": []
+}
+</code></pre><p><strong>totp</strong>:<br></p><pre><code>{
+    "id": 9,
+    "type": "totp",
+    "label": "2SV #3",
+    "created_utc": "2017-10-24T20:41:05Z",
+    "last_used_utc": null,
+    "data": []
+}
+</code></pre></div><h2>HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><p>Value provided failed verification or was unacceptable for some other reason (such as an invalid <code>employee_id</code>).</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: object</p><strong>Properties</strong><ul><li><strong>name</strong>: <em>required (string)</em></li><li><strong>message</strong>: <em>required (string)</em></li><li><strong>code</strong>: <em>required (integer)</em></li><li><strong>status</strong>: <em>required (integer)</em></li></ul><p><strong>Examples</strong>:</p><div class="examples"><pre><code>{
   "name": "Bad Request",
   "message": "",
   "code": 0,

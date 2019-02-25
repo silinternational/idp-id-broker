@@ -23,6 +23,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - /method/{uid}/verify no longer requires `employee_id`
 - Changed dates in API to use ISO-8601 format (e.g. 2019-01-08T12:54:00Z)
 - Default MFA labels are now set according to the type of MFA (e.g. "Smartphone #1")
+- `/mfa/{id}/verify` returns the mfa object
 
 ## [3.5.0] - 2018-07-17
 ### Added
