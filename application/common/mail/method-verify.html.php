@@ -20,7 +20,7 @@ use yii\helpers\Html as yHtml;
     Someone recently requested to add this email address, <?= yHtml::encode($toAddress); ?>,
     as a method for verifying themselves should they need to reset their
     <?= yHtml::encode($idpDisplayName); ?> account password. If this was you, you may click
-    <?= yHtml::a('here', $passwordProfileUrl . '/password/recovery/' . $uid . '/verify?code=' . $code) ?>
+    <?= yHtml::a('here', $passwordProfileUrl . '/password/recovery/' . $uid . '/verify/' . $code) ?>
     to add it to your account.
 </p>
 <p>
