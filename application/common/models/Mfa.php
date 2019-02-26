@@ -6,6 +6,7 @@ use common\helpers\MySqlDateTime;
 use common\helpers\Utils;
 use yii\helpers\ArrayHelper;
 use yii\web\BadRequestHttpException;
+use yii\web\ConflictHttpException;
 use yii\web\ServerErrorHttpException;
 use yii\web\TooManyRequestsHttpException;
 
@@ -240,6 +241,7 @@ class Mfa extends MfaBase
      * @return array
      * @throws BadRequestHttpException
      * @throws ServerErrorHttpException
+     * @throws ConflictHttpException
      */
     public static function create(int $userId, string $type, string $label = null): array
     {
@@ -262,42 +264,33 @@ class Mfa extends MfaBase
             throw new BadRequestHttpException('Manager email must be valid for this MFA type');
         }
 
-        $mfa = new Mfa();
+        $existing = self::findOne(['user_id' => $userId, 'type' => $type]);
 
-        /*
-         * User can only have one 'backupcode' or 'manager' type, so if already exists, use existing
-         */
-        if ($type == self::TYPE_BACKUPCODE || $type == self::TYPE_MANAGER) {
-            $existing = self::findOne(['user_id' => $userId, 'type' => $type]);
-            if ($existing instanceof Mfa) {
+        if ($existing instanceof Mfa) {
+            if ($type == self::TYPE_BACKUPCODE || $type == self::TYPE_MANAGER) {
                 $mfa = $existing;
+            } else {
+                throw new ConflictHttpException('An MFA of type ' . $type . ' already exists.', 1551190694);
             }
-        }
-
-        $mfa->user_id = $userId;
-        $mfa->type = $type;
-
-        if (empty($label)) {
-            $existingCount = count(array_filter($user->mfas, function ($otherMfa) use ($mfa) {
-                return $otherMfa->type === $mfa->type;
-            }));
-            $mfa->setLabel($existingCount + 1);
         } else {
+            $mfa = new Mfa();
+            $mfa->user_id = $userId;
+            $mfa->type = $type;
             $mfa->setLabel($label);
-        }
 
-        /*
-         * Save $mfa before calling backend->regInit because type backupcode needs mfa record to exist first
-         */
-        if ( ! $mfa->save()) {
-            \Yii::error([
-                'action' => 'create mfa',
-                'type' => $type,
-                'user' => $user->email,
-                'status' => 'error',
-                'error' => $mfa->getFirstErrors(),
-            ]);
-            throw new ServerErrorHttpException("Unable to save new MFA record", 1507904193);
+            /*
+             * Save $mfa before calling backend->regInit because type backupcode needs mfa record to exist first
+             */
+            if ( ! $mfa->save()) {
+                \Yii::error([
+                    'action' => 'create mfa',
+                    'type' => $type,
+                    'user' => $user->email,
+                    'status' => 'error',
+                    'error' => $mfa->getFirstErrors(),
+                ]);
+                throw new ServerErrorHttpException("Unable to save new MFA record", 1507904193);
+            }
         }
 
         $backend = self::getBackendForType($type);
@@ -329,7 +322,6 @@ class Mfa extends MfaBase
             'id' => $mfa->id,
             'data' => $results,
         ];
-
     }
 
     /**
@@ -521,21 +513,16 @@ class Mfa extends MfaBase
     }
 
     /**
-     * Set the label. If `$label` is numeric, use a default label using a predefined prefix
-     * and the number given in $label. If `$label` is a string, simply assign it to the `label`
-     * property.
+     * Set the label. If `$label` is null, use a default label for the mfa type. If `$label`
+     * is a string, simply assign it to the `label` property.
      * @param mixed $label
      */
     protected function setLabel($label)
     {
         if (is_string($label)) {
             $this->label = $label;
-        } elseif (is_numeric($label)) {
-            if ($this->type == self::TYPE_BACKUPCODE) {
-                $this->label = $this->getReadableType();
-            } else {
-                $this->label = sprintf("%s #%s", $this->getReadableType(), $label);
-            }
+        } elseif ($label === null) {
+            $this->label = $this->getReadableType();
         }
     }
 }
