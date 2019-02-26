@@ -491,6 +491,13 @@ types:
         description: The given mfa data does not satisfy some validation rule.
         body:
           type: Error
+      409:
+        description: >
+          An MFA of the requested type already exists. Note that this would only
+          be returned for 'totp' or 'u2f'. The code types ('backupcode' and
+          'manager') reuse the existing MFA and create new codes.
+        body:
+          type: Error
       500:
         description: The server encountered an error
         body:

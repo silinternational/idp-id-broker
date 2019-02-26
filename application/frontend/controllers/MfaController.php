@@ -1,11 +1,11 @@
 <?php
 namespace frontend\controllers;
 
-use common\components\MfaBackendInterface;
 use common\models\Mfa;
 use common\models\User;
 use frontend\components\BaseRestController;
 use yii\web\BadRequestHttpException;
+use yii\web\ConflictHttpException;
 use yii\web\NotFoundHttpException;
 use yii\web\ServerErrorHttpException;
 use yii\web\TooManyRequestsHttpException;
@@ -17,6 +17,8 @@ class MfaController extends BaseRestController
      * Create new MFA record
      * @return array
      * @throws BadRequestHttpException
+     * @throws ConflictHttpException
+     * @throws ServerErrorHttpException
      */
     public function actionCreate()
     {

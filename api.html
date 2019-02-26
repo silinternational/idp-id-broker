@@ -840,6 +840,18 @@
   "code": 1542395933,
   "status": 409
 }
+</code></pre></div><h2>HTTP status code <a href="http://httpstatus.es/409" target="_blank">409</a></h2><p>An MFA of the requested type already exists. Note that this would only be returned for &#39;totp&#39; or &#39;u2f&#39;. The code types (&#39;backupcode&#39; and &#39;manager&#39;) reuse the existing MFA and create new codes.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: object</p><strong>Properties</strong><ul><li><strong>name</strong>: <em>required (string)</em></li><li><strong>message</strong>: <em>required (string)</em></li><li><strong>code</strong>: <em>required (integer)</em></li><li><strong>status</strong>: <em>required (integer)</em></li></ul><p><strong>Examples</strong>:</p><div class="examples"><pre><code>{
+  "name": "Bad Request",
+  "message": "",
+  "code": 0,
+  "status": 400
+}
+</code></pre><pre><code>{
+  "name": "Conflict",
+  "message": "May not be reused yet.",
+  "code": 1542395933,
+  "status": 409
+}
 </code></pre></div><h2>HTTP status code <a href="http://httpstatus.es/500" target="_blank">500</a></h2><p>The server encountered an error</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: object</p><strong>Properties</strong><ul><li><strong>name</strong>: <em>required (string)</em></li><li><strong>message</strong>: <em>required (string)</em></li><li><strong>code</strong>: <em>required (integer)</em></li><li><strong>status</strong>: <em>required (integer)</em></li></ul><p><strong>Examples</strong>:</p><div class="examples"><pre><code>{
   "name": "Bad Request",
   "message": "",
