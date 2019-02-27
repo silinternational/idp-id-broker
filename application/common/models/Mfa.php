@@ -264,7 +264,7 @@ class Mfa extends MfaBase
             throw new BadRequestHttpException('Manager email must be valid for this MFA type');
         }
 
-        $existing = self::findOne(['user_id' => $userId, 'type' => $type]);
+        $existing = self::findOne(['user_id' => $userId, 'type' => $type, 'verified' => 1]);
 
         if ($existing instanceof Mfa) {
             if ($type == self::TYPE_BACKUPCODE || $type == self::TYPE_MANAGER) {
