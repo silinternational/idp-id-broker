@@ -309,3 +309,10 @@ Feature: Email
       And no mfas exist
     When I request a new manager mfa
     Then a Manager Rescue email is sent to the manager
+
+  Scenario: Copy a user's personal email address on invite email message
+    Given a specific user does NOT exist
+      And I remove records of any emails that have been sent
+     When that user is created with a personal email address
+     Then an "invite" email should have been sent to them
+      And that email should have been copied to the personal email address

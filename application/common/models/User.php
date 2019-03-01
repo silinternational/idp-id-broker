@@ -643,6 +643,9 @@ class User extends UserBase
         if ($emailer->shouldSendInviteMessageTo($this, $isNewUser)) {
             $invite = Invite::findOrCreate($this->id);
             $data = ['inviteCode' => $invite->getCode()];
+            if ($this->personal_email) {
+                $data['ccAddress'] = $this->personal_email;
+            }
             $emailer->sendMessageTo(EmailLog::MESSAGE_TYPE_INVITE, $this, $data);
         }
         
@@ -653,7 +656,6 @@ class User extends UserBase
         if ($emailer->shouldSendWelcomeMessageTo($this, $changedAttributes)) {
             $emailer->sendMessageTo(EmailLog::MESSAGE_TYPE_WELCOME, $this);
         }
-
     }
 
     private function updatePassword(): bool
@@ -661,7 +663,6 @@ class User extends UserBase
         $transaction = ActiveRecord::getDb()->beginTransaction();
 
         try {
-
             if (! $this->savePassword()) {
                 return false;
             }
