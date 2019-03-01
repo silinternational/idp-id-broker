@@ -109,6 +109,10 @@ class MfaBackendTotp extends Component implements MfaBackendInterface
             throw new NotFoundHttpException('MFA configuration not found');
         }
 
-        return $this->client->deleteTotp($mfa->external_uuid);
+        if (is_string($mfa->external_uuid)) {
+            return $this->client->deleteTotp($mfa->external_uuid);
+        }
+
+        return true;
     }
 }
