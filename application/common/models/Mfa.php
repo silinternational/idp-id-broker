@@ -446,7 +446,7 @@ class Mfa extends MfaBase
         $mfaLifetime = str_replace('+', '-', \Yii::$app->params['mfaLifetime']);
 
         /**
-         * @var string $removeExpireBefore   All unverified records that expired before this date
+         * @var string $removeOlderThan   All unverified records that expired before this date
          * should be deleted. Calculated relative to now (time of execution).
          */
         $removeOlderThan = MySqlDateTime::relativeTime($mfaLifetime);
@@ -457,15 +457,24 @@ class Mfa extends MfaBase
 
         $numDeleted = 0;
         foreach ($mfas as $mfa) {
-            if ($mfa->delete() === false) {
+            try {
+                if ($mfa->delete() === false) {
+                    \Yii::error([
+                        'action' => 'delete old unverified mfa records',
+                        'status' => 'error',
+                        'error' => $mfa->getFirstErrors(),
+                        'mfa_id' => $mfa->id,
+                    ]);
+                } else {
+                    $numDeleted += 1;
+                }
+            } catch (\Exception $e) {
                 \Yii::error([
                     'action' => 'delete old unverified mfa records',
                     'status' => 'error',
-                    'error' => $mfa->getFirstErrors(),
+                    'error' => $e->getMessage(),
                     'mfa_id' => $mfa->id,
                 ]);
-            } else {
-                $numDeleted += 1;
             }
         }
         
