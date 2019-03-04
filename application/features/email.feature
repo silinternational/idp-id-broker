@@ -308,7 +308,8 @@ Feature: Email
     Given a user already exists
       And no mfas exist
     When I request a new manager mfa
-    Then a Manager Rescue email is sent to the manager
+     Then a "mfa-manager-help" email should have been sent to them
+      And a Manager Rescue email is sent to the manager
 
   Scenario: Copy a user's personal email address on invite email message
     Given a specific user does NOT exist
