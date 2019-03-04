@@ -114,18 +114,31 @@ class EmailContext extends YiiContext
         Assert::null($this->tempUser, 'The user should not have existed yet.');
         $this->tempUser = $this->createNewUser();
     }
-    
-    protected function createNewUser()
+
+    /**
+     * @When that user is created with a personal email address
+     */
+    public function thatUserIsCreatedWithAPersonalEmailAddress()
+    {
+        Assert::null($this->tempUser, 'The user should not have existed yet.');
+        $this->tempUser = $this->createNewUser(true);
+    }
+
+    protected function createNewUser($withPersonalEmail = false)
     {
         $employeeId = uniqid();
-        $user = new User([
+        $properties = [
             'employee_id' => strval($employeeId),
             'first_name' => 'Test',
             'last_name' => 'User',
             'username' => 'test_user_' . $employeeId,
             'email' => 'test_user_' . $employeeId . '@example.com',
             'manager_email' => self::MANAGER_EMAIL,
-        ]);
+        ];
+        if ($withPersonalEmail) {
+            $properties['personal_email'] = 'personal_' . $employeeId . '@example.org';
+        }
+        $user = new User($properties);
         $user->scenario = User::SCENARIO_NEW_USER;
         if ( ! $user->save()) {
             throw new \Exception(
@@ -993,5 +1006,18 @@ class EmailContext extends YiiContext
     public function iRequestANewManagerMfa()
     {
         Mfa::create( $this->tempUser->id, Mfa::TYPE_MANAGER, 'label');
+    }
+
+    /**
+     * @Then that email should have been copied to the personal email address
+     */
+    public function thatEmailShouldHaveBeenCopiedToThePersonalEmailAddress()
+    {
+        $matchingFakeEmails = $this->fakeEmailer->getFakeEmailsOfTypeSentToUser(
+            EmailLog::MESSAGE_TYPE_INVITE,
+            $this->tempUser->email,
+            $this->tempUser
+        );
+        Assert::eq($matchingFakeEmails[0]['cc_address'], $this->tempUser->personal_email);
     }
 }

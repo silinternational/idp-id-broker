@@ -142,7 +142,7 @@ class Emailer extends Component
             }
         }
     }
-    
+
     /**
      * Use the email service to send an email.
      *
@@ -150,19 +150,28 @@ class Emailer extends Component
      * @param string $subject The subject.
      * @param string $htmlBody The email body (as HTML).
      * @param string $textBody The email body (as plain text).
+     * @param string $ccAddress Optional. Email address to include as 'cc'.
+     * @throws \Sil\EmailService\Client\EmailServiceClientException
      */
     protected function email(
         string $toAddress,
         string $subject,
         string $htmlBody,
-        string $textBody
+        string $textBody,
+        string $ccAddress = ''
     ) {
-        $this->getEmailServiceClient()->email([
+        $properties = [
             'to_address' => $toAddress,
             'subject' => $subject,
             'html_body' => $htmlBody,
             'text_body' => $textBody,
-        ]);
+        ];
+
+        if ($ccAddress) {
+            $properties['cc_address'] = $ccAddress;
+        }
+
+        $this->getEmailServiceClient()->email($properties);
     }
     
     /**
@@ -324,7 +333,8 @@ class Emailer extends Component
             $data['toAddress'] ?? $user->email,
             $this->getSubjectForMessage($messageType, $dataForEmail),
             \Yii::$app->view->render($htmlView, $dataForEmail),
-            \Yii::$app->view->render($textView, $dataForEmail)
+            \Yii::$app->view->render($textView, $dataForEmail),
+            $data['ccAddress'] ?? ''
         );
         
         EmailLog::logMessage($messageType, $user->id);
