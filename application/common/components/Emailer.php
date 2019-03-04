@@ -160,13 +160,18 @@ class Emailer extends Component
         string $textBody,
         string $ccAddress = ''
     ) {
-        $this->getEmailServiceClient()->email([
+        $properties = [
             'to_address' => $toAddress,
-            'cc_address' => $ccAddress,
             'subject' => $subject,
             'html_body' => $htmlBody,
             'text_body' => $textBody,
-        ]);
+        ];
+
+        if ($ccAddress) {
+            $properties['cc_address'] = $ccAddress;
+        }
+
+        $this->getEmailServiceClient()->email($properties);
     }
     
     /**
