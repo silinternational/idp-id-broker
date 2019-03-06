@@ -54,7 +54,7 @@ Feature: Recovery Method API
 #    And verification_expires should be stored as ? UTC
 #    And created should be stored as now UTC
 
-### TODO: Try to create a method using the primary (or spouse/manager) address
+### TODO: Try to create a method using the primary (or manager) address
 
   Scenario: Resend a method verification
     Given user with employee id 123 has an unverified Method "unverified@example.com"
