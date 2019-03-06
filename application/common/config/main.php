@@ -96,6 +96,7 @@ return [
             'subjectForMfaEnabled' => Env::get('SUBJECT_FOR_MFA_ENABLED'),
             'subjectForMfaDisabled' => Env::get('SUBJECT_FOR_MFA_DISABLED'),
             'subjectForMfaManager' => Env::get('SUBJECT_FOR_MFA_MANAGER'),
+            'subjectForMfaManagerHelp' => Env::get('SUBJECT_FOR_MFA_MANAGER_HELP'),
             'subjectForMethodVerify' => Env::get('SUBJECT_FOR_METHOD_VERIFY'),
 
             'lostSecurityKeyEmailDays' => Env::get('LOST_SECURITY_KEY_EMAIL_DAYS', 62),

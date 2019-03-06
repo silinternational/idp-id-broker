@@ -51,8 +51,8 @@ class FakeEmailer extends Emailer
             $fakeEmailsSent,
             function ($fakeEmail) use ($fakeEmailer, $messageType, $emailAddress, $user) {
                 
-                $subject = $fakeEmail['subject'] ?? '';
-                $toAddress = $fakeEmail['to_address'] ?? '';
+                $subject = $fakeEmail[Emailer::PROP_SUBJECT] ?? '';
+                $toAddress = $fakeEmail[Emailer::PROP_TO_ADDRESS] ?? '';
                 
                 return $fakeEmailer->isSubjectForMessageType($subject, $messageType, $user)
                     && ($toAddress === $emailAddress);

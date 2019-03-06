@@ -12,7 +12,6 @@ use Sil\Psr3Adapters\Psr3Yii2Logger;
 use yii\base\Component;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Inflector;
-use yii\web\ServerErrorHttpException;
 use yii\db\Query;
 
 class Emailer extends Component
@@ -31,8 +30,15 @@ class Emailer extends Component
     const SUBJ_MFA_ENABLED = '2-Step Verification was enabled on your {idpDisplayName} account';
     const SUBJ_MFA_DISABLED = '2-Step Verification was disabled on your {idpDisplayName} account';
     const SUBJ_MFA_MANAGER = '{displayName} has sent you a login code for their {idpDisplayName} account';
+    const SUBJ_MFA_MANAGER_HELP = 'An access code for your {idpDisplayName} account has been sent to your manager';
 
     const SUBJ_METHOD_VERIFY = 'Please verify your new password recovery method';
+
+    const PROP_SUBJECT = 'subject';
+    const PROP_TO_ADDRESS = 'to_address';
+    const PROP_CC_ADDRESS = 'cc_address';
+    const PROP_HTML_BODY = 'html_body';
+    const PROP_TEXT_BODY = 'text_body';
 
     /**
      * The configuration for the email-service client.
@@ -97,6 +103,7 @@ class Emailer extends Component
     public $subjectForMfaEnabled;
     public $subjectForMfaDisabled;
     public $subjectForMfaManager;
+    public $subjectForMfaManagerHelp;
 
     public $subjectForMethodVerify;
 
@@ -161,14 +168,14 @@ class Emailer extends Component
         string $ccAddress = ''
     ) {
         $properties = [
-            'to_address' => $toAddress,
-            'subject' => $subject,
-            'html_body' => $htmlBody,
-            'text_body' => $textBody,
+            self::PROP_TO_ADDRESS => $toAddress,
+            self::PROP_SUBJECT => $subject,
+            self::PROP_HTML_BODY => $htmlBody,
+            self::PROP_TEXT_BODY => $textBody,
         ];
 
         if ($ccAddress) {
-            $properties['cc_address'] = $ccAddress;
+            $properties[self::PROP_CC_ADDRESS] = $ccAddress;
         }
 
         $this->getEmailServiceClient()->email($properties);
@@ -272,6 +279,7 @@ class Emailer extends Component
         $this->subjectForMfaEnabled = $this->subjectForMfaEnabled ?? self::SUBJ_MFA_ENABLED;
         $this->subjectForMfaDisabled = $this->subjectForMfaDisabled ?? self::SUBJ_MFA_DISABLED;
         $this->subjectForMfaManager = $this->subjectForMfaManager ?? self::SUBJ_MFA_MANAGER;
+        $this->subjectForMfaManagerHelp = $this->subjectForMfaManagerHelp ?? self::SUBJ_MFA_MANAGER_HELP;
 
         $this->subjectForMethodVerify = $this->subjectForMethodVerify ?? self::SUBJ_METHOD_VERIFY;
 
@@ -289,6 +297,7 @@ class Emailer extends Component
             EmailLog::MESSAGE_TYPE_MFA_DISABLED => $this->subjectForMfaDisabled,
             EmailLog::MESSAGE_TYPE_METHOD_VERIFY => $this->subjectForMethodVerify,
             EmailLog::MESSAGE_TYPE_MFA_MANAGER => $this->subjectForMfaManager,
+            EmailLog::MESSAGE_TYPE_MFA_MANAGER_HELP => $this->subjectForMfaManagerHelp,
         ];
         
         $this->assertConfigIsValid();

@@ -39,7 +39,7 @@ class MfaBackendManager extends Component implements MfaBackendInterface
     }
 
     /**
-     * Send a email message to the manager with the code
+     * Send a email message to the manager with the code, and to the user with instructions
      */
     protected function sendManagerEmail($mfa, $code)
     {
@@ -53,6 +53,7 @@ class MfaBackendManager extends Component implements MfaBackendInterface
         ];
 
         $emailer->sendMessageTo(EmailLog::MESSAGE_TYPE_MFA_MANAGER, $mfa->user, $data);
+        $emailer->sendMessageTo(EmailLog::MESSAGE_TYPE_MFA_MANAGER_HELP, $mfa->user);
     }
 
     /**
