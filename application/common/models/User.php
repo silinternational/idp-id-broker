@@ -126,7 +126,6 @@ class User extends UserBase
             'require_mfa',
             'nag_for_mfa_after',
             'nag_for_method_after',
-            'spouse_email',
             'personal_email',
             'hide',
             'groups',
@@ -142,7 +141,6 @@ class User extends UserBase
             'locked',
             'manager_email',
             'require_mfa',
-            'spouse_email',
             'personal_email',
             'hide',
             'groups',
@@ -212,7 +210,7 @@ class User extends UserBase
                 'on' => [self::SCENARIO_AUTHENTICATE, self::SCENARIO_INVITE],
             ],
             [
-                ['manager_email', 'spouse_email', 'personal_email'], 'email',
+                ['manager_email', 'personal_email'], 'email',
             ],
             [
                 ['last_synced_utc', 'last_changed_utc'],
@@ -435,7 +433,6 @@ class User extends UserBase
                 return Utils::getIso8601($model->last_login_utc);
             },
             'manager_email',
-            'spouse_email',
             'personal_email',
             'hide',
             'groups' => function ($model) {

@@ -25,6 +25,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Default MFA labels are now set according to the type of MFA (e.g. "Smartphone #1")
 - `/mfa/{id}/verify` returns the mfa object
 
+### Removed
+- Removed spouse_email from user table, model, and API
+
 ## [3.5.0] - 2018-07-17
 ### Added
 - Add spouse and manager email fields
