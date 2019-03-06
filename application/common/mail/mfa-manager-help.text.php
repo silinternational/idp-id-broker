@@ -17,7 +17,7 @@ This access code can be used in place of your other 2-Factor Authentication
 options. Please contact your manager to obtain this access code from them.
 
 If you did not request this code, it could be a sign someone else has
-compromised your account. Please contact <?= $supportName ?> at <?= $supportEmail ?>
+compromised your account. Please contact <?= $supportName ?> at <?= $supportEmail . PHP_EOL ?>
 as soon as possible to report the incident.
 
 Thanks,
