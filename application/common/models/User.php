@@ -872,4 +872,15 @@ class User extends UserBase
 
         Method::findOrCreate($this->id, $this->personal_email, MySqlDateTime::now());
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function beforeSave($insert)
+    {
+        if ($insert == false && $this->personal_email !== $this->getOldAttribute('personal_email')) {
+            $this->nag_for_method_after = MySqlDateTime::relative('-1 day');
+        }
+        return parent::beforeSave($insert);
+    }
 }
