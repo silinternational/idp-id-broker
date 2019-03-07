@@ -851,38 +851,15 @@ class User extends UserBase
     }
 
     /**
-     * Update personal email in recovery methods table. On insert ($insert == true) the personal
-     * email address is added to the list of recovery methods. On update ($insert == false) the
-     * old personal email address is removed and the new one is added.
+     * Add personal email to recovery methods table. On insert ($insert == true) the personal
+     * email address is added to the list of recovery methods.
      * @param bool $insert
-     * @param string|null $oldPersonalEmail
+     * @throws \yii\web\ConflictHttpException
+     * @throws \yii\web\ServerErrorHttpException
      */
-    public function updateRecoveryMethods(bool $insert, $oldPersonalEmail)
+    public function updateRecoveryMethods(bool $insert)
     {
-        if ($insert === false && $oldPersonalEmail !== null) {
-            $oldMethod = Method::findOne(['value' => $oldPersonalEmail, 'user_id' => $this->id]);
-            if ($oldMethod === null) {
-                \Yii::warning([
-                    'action' => 'look up old personal email',
-                    'status' => 'notice',
-                    'employee_id' => $this->employee_id,
-                    'email' => $oldPersonalEmail,
-                    'message' => 'failed to locate old personal email in method table',
-                ]);
-            } else {
-                if ($oldMethod->delete() === false) {
-                    \Yii::error([
-                        'action' => 'delete old personal email',
-                        'status' => 'error',
-                        'employee_id' => $this->employee_id,
-                        'email' => $oldPersonalEmail,
-                        'message' => 'failed to delete old personal email from method table'
-                    ]);
-                };
-            }
-        }
-
-        if ($this->personal_email === null) {
+        if ($this->personal_email === null || $insert == false) {
             return;
         }
 
