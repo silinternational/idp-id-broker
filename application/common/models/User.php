@@ -171,14 +171,10 @@ class User extends UserBase
                 'require_mfa', 'default', 'value' => 'no', 'on' => self::SCENARIO_NEW_USER
             ],
             [
-                'nag_for_mfa_after',
-                'default',
-                'value' => MySqlDateTime::relative(\Yii::$app->params['mfaAddInterval']),
+                'nag_for_mfa_after', 'default', 'value' => MySqlDateTime::today(),
             ],
             [
-                'nag_for_method_after',
-                'default',
-                'value' => MySqlDateTime::relative(\Yii::$app->params['methodAddInterval']),
+                'nag_for_method_after', 'default', 'value' => MySqlDateTime::today(),
             ],
             [
                 ['active', 'locked', 'require_mfa', 'hide'], 'in', 'range' => ['yes', 'no'],
