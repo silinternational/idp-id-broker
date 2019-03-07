@@ -602,4 +602,13 @@ class FeatureContext extends YiiContext
             'method should have been deleted but still exists'
         );
     }
+
+    /**
+     * @Then the method review date should be past
+     */
+    public function theMethodReviewDateShouldBePast()
+    {
+        $this->userFromDb->refresh();
+        Assert::true(MySqlDateTime::isBefore($this->userFromDb->nag_for_method_after, time()));
+    }
 }
