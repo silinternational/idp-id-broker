@@ -114,7 +114,7 @@ class Authentication
 
             $user->last_login_utc = MySqlDateTime::now();
 
-            $user->updateNagDates();
+            $user->updateProfileReviewDate();
 
             if ( ! $user->save() ){
                 \Yii::error([

@@ -604,11 +604,29 @@ class FeatureContext extends YiiContext
     }
 
     /**
-     * @Then the method review date should be past
+     * @Given there is a :username user with a review_profile_after in the :tense
      */
-    public function theMethodReviewDateShouldBePast()
+    public function thereIsAUserWithAReviewProfileAfterInThePast($username, $tense)
+    {
+        $user = User::findOne(['username' => $username]);
+
+        $relativeTimes = [
+            'past' => '-1 day',
+            'present' => '+0 day',
+            'future' => '+1 day',
+        ];
+
+        $user->review_profile_after = MySqlDateTime::relative($relativeTimes[$tense]);
+        $user->scenario = User::SCENARIO_UPDATE_USER;
+        Assert::true($user->save());
+    }
+
+    /**
+     * @Then the profile review date should be past
+     */
+    public function theProfileReviewDateShouldBePast()
     {
         $this->userFromDb->refresh();
-        Assert::true(MySqlDateTime::isBefore($this->userFromDb->nag_for_method_after, time()));
+        Assert::true(MySqlDateTime::isBefore($this->userFromDb->review_profile_after, time()));
     }
 }
