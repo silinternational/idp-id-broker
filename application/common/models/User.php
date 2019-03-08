@@ -526,7 +526,10 @@ class User extends UserBase
     public function getMethodFields()
     {
         return [
-            'options' => $this->isTimeForReview() ? $this->methods : [],
+            'options' =>
+                $this->isTimeForReview() && $this->scenario == self::SCENARIO_AUTHENTICATE
+                    ? $this->methods
+                    : [],
         ];
     }
 
