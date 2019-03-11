@@ -177,35 +177,37 @@ Feature: Authentication
     When I request "/authentication" be created
     Then the response status code should be 200
 
-  Scenario: Check "nag" flags on user resource in response to authenticate call
-    Given I provide the following valid data:
+  Scenario Outline: Check profile review flag on user resource in response to authenticate call
+    Given there is a "shep_clark" user with a review_profile_after in the <tense>
+      And I provide the following valid data:
       | property  | value       |
       | username  | shep_clark  |
       | password  | govols!!!   |
     When I request "/authentication" be created
     Then the following data is returned:
-      | property      | value                 |
-      | employee_id   | 123                   |
-      | method.add    | no                    |
-      | method.review | no                    |
-      | mfa.add       | yes                   |
-      | mfa.review    | no                    |
-    When I request "/authentication" be created
-    Then the following data is returned:
-      | property      | value                 |
-      | employee_id   | 123                   |
-      | method.add    | yes                   |
-      | method.review | no                    |
-      | mfa.add       | no                    |
-      | mfa.review    | no                    |
-    When I request "/authentication" be created
-    Then the following data is returned:
-      | property      | value                 |
-      | employee_id   | 123                   |
-      | method.add    | no                    |
-      | method.review | no                    |
-      | mfa.add       | no                    |
-      | mfa.review    | no                    |
+      | property       | value      |
+      | employee_id    | 123        |
+      | profile_review | <yesorno>  |
+
+    Examples:
+      | tense    | yesorno  |
+      | past     | yes      |
+      | present  | yes      |
+      | future   | no       |
+
+  Scenario: Check profile review flag after an authenticate call
+    Given there is a "shep_clark" user with a review_profile_after in the past
+      And I provide the following valid data:
+        | property  | value       |
+        | username  | shep_clark  |
+        | password  | govols!!!   |
+      And I request "/authentication" be created
+    When I request "/user/123" be retrieved
+    Then the response status code should be 200
+      And the following data is returned:
+        | property       | value      |
+        | username       | shep_clark |
+        | profile_review | no         |
 
   Scenario: Correct invite code for an account with no password in the db
     Given the user "shep_clark" has no password in the database

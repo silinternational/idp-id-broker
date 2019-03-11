@@ -74,22 +74,10 @@ types:
         properties:
           prompt:
             enum: [ yes, no ]
-          add:
-            enum: [ yes, no ]
-            description: Flag to indicate whether to remind the user to add an MFA option
-          review:
-            enum: [ yes, no ]
-            description: Flag to indicate whether to remind the user to review their MFA options
           options: MfaResponse[]
       method:
         type: object
         properties:
-          add:
-            enum: [ yes, no ]
-            description: Flag to indicate whether to remind the user to add a recovery method
-          review:
-            enum: [ yes, no ]
-            description: Flag to indicate whether to remind the user to review their recovery methods
           options: MethodResponse[]
       password?:
         type: object
@@ -97,6 +85,11 @@ types:
           created_utc: string
           expires_on: string
           grace_period_ends_on: string
+      profile_review:
+        enum: [ yes, no ]
+        description: >
+          Flag to indicate whether to remind the user to review their mfa options and
+          recovery methods.
     example: |
       {
         "uuid": "11111111-aaaa-1111-aaaa-111111111111",
@@ -113,8 +106,6 @@ types:
         "groups": [],
         "mfa": {
           "prompt": "yes",
-          "add": "no",
-          "review": "no",
           "options": [
             {
               "id": 123,
@@ -154,8 +145,6 @@ types:
           "grace_period_ends_on":"2018-06-23T23:59:59Z"
         },
         "method": {
-          "add": "no",
-          "review": "no",
           "options": [
             {
               "id": "0YrSiNp2P6sfkleepNNvFYMQWuLfssve",
@@ -164,7 +153,8 @@ types:
               "created": "2017-10-24T20:40:47Z"
             }
           ]
-        }
+        },
+        "profile_review": "yes"
       }
   UserCreation:
     type: object

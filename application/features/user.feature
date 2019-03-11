@@ -35,6 +35,7 @@ Feature: User
         | locked          | no                    |
         | manager_email   | boss_man@example.org  |
         | hide            | yes                   |
+        | profile_review  | no                    |
       And the following data is not returned:
         | property                |
         | current_password_id     |
@@ -412,36 +413,6 @@ Feature: User
     When I request a list of verified methods
     Then I see a list containing 1 method
 
-  Scenario Outline: Check "nag" state when user has or doesn't have methods and mfas
-    Given A user with <verifiedMethods> verified methods, <unverifiedMethods> unverified methods, <verifiedMfas> verified mfas, and <unverifiedMfas> unverified mfas
-      And the nag dates are in the past
-    When I request the nag state
-    Then I see that the nag state is <state1>
-      And I update the nag dates
-    When I request the nag state
-    Then I see that the nag state is <state2>
-      And I update the nag dates
-    When I request the nag state
-    Then I see that the nag state is "none"
-
-  Examples:
-  | verifiedMethods | unverifiedMethods | verifiedMfas | unverifiedMfas | state1     | state2        |
-  | 0               | 0                 | 0            | 0              | add_mfa    | add_method    |
-  | 0               | 0                 | 0            | 1              | add_mfa    | add_method    |
-  | 0               | 0                 | 1            | 0              | add_method | review_mfa    |
-  | 0               | 0                 | 1            | 1              | add_method | review_mfa    |
-  | 0               | 1                 | 0            | 0              | add_mfa    | add_method    |
-  | 0               | 1                 | 0            | 1              | add_mfa    | add_method    |
-  | 0               | 1                 | 1            | 0              | add_method | review_mfa    |
-  | 0               | 1                 | 1            | 1              | add_method | review_mfa    |
-  | 1               | 0                 | 0            | 0              | add_mfa    | review_method |
-  | 1               | 0                 | 0            | 1              | add_mfa    | review_method |
-  | 1               | 0                 | 1            | 0              | review_mfa | review_method |
-  | 1               | 0                 | 1            | 1              | review_mfa | review_method |
-  | 1               | 1                 | 0            | 0              | add_mfa    | review_method |
-  | 1               | 1                 | 0            | 1              | add_mfa    | review_method |
-  | 1               | 1                 | 1            | 0              | review_mfa | review_method |
-  | 1               | 1                 | 1            | 1              | review_mfa | review_method |
 
 #TODO: get a user with/without a match
 #TODO: get a user with invalid id
@@ -551,4 +522,4 @@ Feature: User
       And I change the personal_email to new@example.com
     When I request "/user/123" be updated
     Then the response status code should be 200
-      And the method review date should be past
+      And the profile review date should be past

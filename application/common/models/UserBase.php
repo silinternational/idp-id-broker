@@ -21,13 +21,12 @@ use Yii;
  * @property string $last_changed_utc
  * @property string $last_synced_utc
  * @property string $require_mfa
- * @property string $nag_for_mfa_after
  * @property string $last_login_utc
  * @property string $manager_email
- * @property string $nag_for_method_after
  * @property string $hide
  * @property string $groups
  * @property string $personal_email
+ * @property string $review_profile_after
  *
  * @property EmailLog[] $emailLogs
  * @property Invite[] $invites
@@ -51,10 +50,10 @@ class UserBase extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['uuid', 'employee_id', 'first_name', 'last_name', 'username', 'email', 'active', 'locked', 'last_changed_utc', 'last_synced_utc', 'nag_for_mfa_after', 'nag_for_method_after'], 'required'],
+            [['uuid', 'employee_id', 'first_name', 'last_name', 'username', 'email', 'active', 'locked', 'last_changed_utc', 'last_synced_utc', 'review_profile_after'], 'required'],
             [['current_password_id'], 'integer'],
             [['active', 'locked', 'require_mfa', 'hide'], 'string'],
-            [['last_changed_utc', 'last_synced_utc', 'nag_for_mfa_after', 'last_login_utc', 'nag_for_method_after'], 'safe'],
+            [['last_changed_utc', 'last_synced_utc', 'last_login_utc', 'review_profile_after'], 'safe'],
             [['uuid'], 'string', 'max' => 64],
             [['employee_id', 'first_name', 'last_name', 'display_name', 'username', 'email', 'manager_email', 'groups', 'personal_email'], 'string', 'max' => 255],
             [['employee_id'], 'unique'],
@@ -84,13 +83,12 @@ class UserBase extends \yii\db\ActiveRecord
             'last_changed_utc' => Yii::t('app', 'Last Changed Utc'),
             'last_synced_utc' => Yii::t('app', 'Last Synced Utc'),
             'require_mfa' => Yii::t('app', 'Require Mfa'),
-            'nag_for_mfa_after' => Yii::t('app', 'Nag For Mfa After'),
             'last_login_utc' => Yii::t('app', 'Last Login Utc'),
             'manager_email' => Yii::t('app', 'Manager Email'),
-            'nag_for_method_after' => Yii::t('app', 'Nag For Method After'),
             'hide' => Yii::t('app', 'Hide'),
             'groups' => Yii::t('app', 'Groups'),
             'personal_email' => Yii::t('app', 'Personal Email'),
+            'review_profile_after' => Yii::t('app', 'Review Profile After'),
         ];
     }
 

@@ -138,40 +138,6 @@ class UnitTestsContext extends YiiContext
         Assert::count($this->methodList, $num);
     }
 
-
-    /**
-     * @Given the nag dates are in the past
-     */
-    public function theNagDatesAreInThePast()
-    {
-        $this->tempUser->nag_for_method_after = MySqlDateTime::formatDate(time() - (60 * 60 * 24));
-        $this->tempUser->nag_for_mfa_after = MySqlDateTime::formatDate(time() - (60 * 60 * 24));
-    }
-
-    /**
-     * @When I request the nag state
-     */
-    public function iRequestTheNagState()
-    {
-        $this->nagState = $this->tempUser->getNagState();
-    }
-
-    /**
-     * @Then I see that the nag state is :state
-     */
-    public function iSeeThatTheNagStateIs($state)
-    {
-        Assert::eq($this->nagState, $state);
-    }
-
-    /**
-     * @Then I update the nag dates
-     */
-    public function iUpdateTheNagDates()
-    {
-        $this->tempUser->updateNagDates();
-    }
-
     /**
      * @Given the database contains a user with no invite codes
      */
