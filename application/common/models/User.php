@@ -326,7 +326,7 @@ class User extends UserBase
             'lastName' => $this->last_name,
             'displayName' => $this->getDisplayName(),
             'username' => $this->username,
-            'email' => $this->email,
+            'email' => $this->getEmailAddress(),
             'active' => $this->active,
             'locked' => $this->locked,
             'lastChangedUtc' => MySqlDateTime::formatDateForHumans($this->last_changed_utc),
@@ -420,7 +420,9 @@ class User extends UserBase
                 return $model->getDisplayName();
             },
             'username',
-            'email',
+            'email' => function (self $model) {
+                return $model->getEmailAddress();
+            },
             'active',
             'locked',
             'last_login_utc' => function (self $model) {
@@ -816,5 +818,13 @@ class User extends UserBase
         } else {
             return null;
         }
+    }
+
+    /**
+     * @return string
+     */
+    public function getEmailAddress(): string
+    {
+        return $this->email ?? $this->personal_email;
     }
 }
