@@ -205,6 +205,11 @@ class User extends UserBase
                 ['last_synced_utc', 'last_changed_utc'],
                 'default', 'value' => MySqlDateTime::now(),
             ],
+            [
+                'expires_on',
+                'default',
+                'value' => $this->getExpiresOnInitialValue(),
+            ],
         ], parent::rules());
     }
 
@@ -799,5 +804,17 @@ class User extends UserBase
             $this->review_profile_after = MySqlDateTime::relative('-1 day');
         }
         return parent::beforeSave($insert);
+    }
+
+    /**
+     * @return string
+     */
+    public function getExpiresOnInitialValue(): string
+    {
+        if ($this->email === null) {
+            return MySqlDateTime::relative(\Yii::$app->params['contingentUserDuration']);
+        } else {
+            return null;
+        }
     }
 }
