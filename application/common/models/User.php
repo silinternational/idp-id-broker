@@ -827,4 +827,24 @@ class User extends UserBase
     {
         return $this->email ?? $this->personal_email;
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function afterFind()
+    {
+        if ($this->expires_on !== null && MySqlDateTime::isBefore($this->expires_on, time())) {
+            $this->active = 'no';
+
+            Yii::warning([
+                'event' => 'onAfterFind',
+                'status' => 'user is expired',
+                'employeeId' => $this->employee_id,
+                'scenario' => $this->scenario,
+                'expires_on' => $this->expires_on
+            ], 'application');
+        }
+
+        parent::afterFind();
+    }
 }
