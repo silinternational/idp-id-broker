@@ -809,9 +809,9 @@ class User extends UserBase
     }
 
     /**
-     * @return string
+     * @return string:null
      */
-    public function getExpiresOnInitialValue(): string
+    public function getExpiresOnInitialValue()
     {
         if ($this->email === null) {
             return MySqlDateTime::relative(\Yii::$app->params['contingentUserDuration']);
