@@ -810,6 +810,11 @@ class User extends UserBase
         if ($insert == false && $this->personal_email !== $this->getOldAttribute('personal_email')) {
             $this->review_profile_after = MySqlDateTime::relative('-1 day');
         }
+
+        if ($this->getOldAttribute('email') !== null && $this->email === null) {
+            $this->addError('email', 'email cannot be updated to null');
+        }
+
         return parent::beforeSave($insert);
     }
 
