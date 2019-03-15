@@ -825,7 +825,7 @@ class User extends UserBase
      */
     public function getEmailAddress(): string
     {
-        return $this->email ?? $this->personal_email;
+        return $this->email ?? $this->personal_email ?? '';
     }
 
     /**
