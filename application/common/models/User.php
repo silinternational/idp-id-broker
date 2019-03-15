@@ -825,9 +825,9 @@ class User extends UserBase
     {
         if ($this->email === null) {
             return MySqlDateTime::relative(\Yii::$app->params['contingentUserDuration']);
-        } else {
-            return null;
         }
+
+        return null;
     }
 
     /**
