@@ -248,3 +248,39 @@ Feature: Authentication
 # TODO: need test for check that a user's password is good all the way until midnight of the expiration/grace period dates
 # TODO: need test to allow username or email address to be used for authentication
 
+  Scenario: Authenticate a "contingent" user with an invite code
+    Given I provide the following valid data:
+        | property        | value                 |
+        | employee_id     | 456                   |
+        | first_name      | New                   |
+        | last_name       | Guy                   |
+        | username        | new_guy               |
+        | email           | null                  |
+        | personal_email  | personal@example.com  |
+      And I request "/user" be created
+      And the response status code should be 200
+      And the user "new_guy" has a non-expired invite code "xyz123"
+      And I provide the following valid data:
+        | property  | value       |
+        | invite    | xyz123      |
+    When I request "/authentication" be created
+    Then the response status code should be 200
+
+  Scenario: Attempt to authenticate an expired "contingent" user with an invite code
+    Given I provide the following valid data:
+        | property        | value                 |
+        | employee_id     | 456                   |
+        | first_name      | New                   |
+        | last_name       | Guy                   |
+        | username        | new_guy               |
+        | email           | null                  |
+        | personal_email  | personal@example.com  |
+      And I request "/user" be created
+      And the response status code should be 200
+      And the user "new_guy" has a non-expired invite code "xyz123"
+      And the user record for "new_guy" has expired
+      And I provide the following valid data:
+        | property  | value       |
+        | invite    | xyz123      |
+    When I request "/authentication" be created
+    Then the response status code should be 400
