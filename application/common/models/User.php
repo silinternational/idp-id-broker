@@ -210,6 +210,11 @@ class User extends UserBase
                 'default',
                 'value' => $this->getExpiresOnInitialValue(),
             ],
+            [
+                'email', 'required', 'when' => function ($model) {
+                    return $model->personal_email === null;
+                }
+            ],
         ], parent::rules());
     }
 
