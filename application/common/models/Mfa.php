@@ -99,7 +99,6 @@ class Mfa extends MfaBase
          * not include the most recently added option.
          */
         if ($this->isNewlyVerified($insert, $changedAttributes)) {
-
             self::sendAppropriateMessages(
                 $this->user,
                 self::EVENT_TYPE_VERIFY,
@@ -503,6 +502,10 @@ class Mfa extends MfaBase
      */
     protected static function sendAppropriateMessages($user, $eventType, $mfa)
     {
+        if ($mfa->type === self::TYPE_MANAGER) {
+            return;
+        }
+
         /* @var \common\components\Emailer $emailer */
         $emailer = \Yii::$app->emailer;
         $user->refresh();

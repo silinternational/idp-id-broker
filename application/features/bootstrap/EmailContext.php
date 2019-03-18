@@ -692,8 +692,11 @@ class EmailContext extends YiiContext
         $backupMfa = $this->getMfa(Mfa::TYPE_BACKUPCODE);
         $backUpCode = array_shift($this->tempBackupCodes);
 
-        Assert::true(MfaBackupcode::validateAndRemove($backupMfa->id, $backUpCode),
-            'Could not remove a backup code.');
+        Assert::true(
+            MfaBackupcode::validateAndRemove($backupMfa->id, $backUpCode),
+            'Could not validate a backup code.'
+        );
+        MfaBackupcode::sendRefreshCodesMessage($backupMfa->id);
     }
 
     /**

@@ -56,7 +56,11 @@ class MfaBackendBackupcode extends Component implements MfaBackendInterface
      */
     public function verify(int $mfaId, $value): bool
     {
-        return MfaBackupcode::validateAndRemove($mfaId, $value);
+        if (MfaBackupcode::validateAndRemove($mfaId, $value)) {
+            MfaBackupcode::sendRefreshCodesMessage($mfaId);
+            return true;
+        }
+        return false;
     }
 
     /**
