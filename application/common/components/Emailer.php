@@ -519,7 +519,7 @@ class Emailer extends Component
                 }
 
             // If one of the other MFA options has been used recently, remember it.
-            } else if ($lastOtherUseDate === null && ! empty($mfaOption->last_used_utc)) {
+            } elseif ($lastOtherUseDate === null && ! empty($mfaOption->last_used_utc)) {
                 $dateIsRecent = MySqlDateTime::dateIsRecent($mfaOption->last_used_utc, $recentDays);
                 $lastOtherUseDate = $dateIsRecent ? $mfaOption->last_used_utc : null;
             }

@@ -495,14 +495,14 @@ class Mfa extends MfaBase
         if ($emailer->shouldSendMfaOptionAddedMessageTo($user, $eventType)) {
             $emailer->sendMessageTo(EmailLog::MESSAGE_TYPE_MFA_OPTION_ADDED, $user);
 
-        } else if ($emailer->shouldSendMfaEnabledMessageTo($user, $eventType)) {
+        } elseif ($emailer->shouldSendMfaEnabledMessageTo($user, $eventType)) {
             $emailer->sendMessageTo(EmailLog::MESSAGE_TYPE_MFA_ENABLED, $user);
 
-        } else if ($emailer->shouldSendMfaOptionRemovedMessageTo($user, $eventType, $mfa)) {
+        } elseif ($emailer->shouldSendMfaOptionRemovedMessageTo($user, $eventType, $mfa)) {
             $emailer->otherDataForEmails['mfaTypeDisabled'] = $mfa->getReadableType();
             $emailer->sendMessageTo(EmailLog::MESSAGE_TYPE_MFA_OPTION_REMOVED, $user);
 
-        } else if ($emailer->shouldSendMfaDisabledMessageTo($user, $eventType, $mfa)) {
+        } elseif ($emailer->shouldSendMfaDisabledMessageTo($user, $eventType, $mfa)) {
             $emailer->sendMessageTo(EmailLog::MESSAGE_TYPE_MFA_DISABLED, $user);
         }
     }
