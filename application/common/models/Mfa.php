@@ -46,16 +46,16 @@ class Mfa extends MfaBase
             'id',
             'type',
             'label',
-            'created_utc' => function($model) {
+            'created_utc' => function ($model) {
                 return Utils::getIso8601($model->created_utc);
             },
-            'last_used_utc' => function($model) {
+            'last_used_utc' => function ($model) {
                 if ($model->last_used_utc !== null) {
                     return Utils::getIso8601($model->last_used_utc);
                 }
                 return null;
             },
-            'data' => function($model) {
+            'data' => function ($model) {
                 $data = [];
                 /** @var Mfa $model */
                 if ($model->verified === 1 && $model->scenario === User::SCENARIO_AUTHENTICATE) {
@@ -202,7 +202,7 @@ class Mfa extends MfaBase
         $backend = self::getBackendForType($this->type);
         if ($backend->verify($this->id, $value) === true) {
             $this->last_used_utc = MySqlDateTime::now();
-            if ( ! $this->save()) {
+            if (! $this->save()) {
                 \Yii::error([
                     'action' => 'update last_used_utc on mfa after verification',
                     'status' => 'error',
@@ -248,7 +248,7 @@ class Mfa extends MfaBase
         /*
          * Make sure $type is valid
          */
-        if ( ! self::isValidType($type)) {
+        if (! self::isValidType($type)) {
             throw new BadRequestHttpException('Invalid MFA type');
         }
 
@@ -281,7 +281,7 @@ class Mfa extends MfaBase
             /*
              * Save $mfa before calling backend->regInit because type backupcode needs mfa record to exist first
              */
-            if ( ! $mfa->save()) {
+            if (! $mfa->save()) {
                 \Yii::error([
                     'action' => 'create mfa',
                     'type' => $type,
@@ -299,7 +299,7 @@ class Mfa extends MfaBase
         if (isset($results['uuid'])) {
             $mfa->external_uuid = $results['uuid'];
             unset($results['uuid']);
-            if ( ! $mfa->save()) {
+            if (! $mfa->save()) {
                 \Yii::error([
                     'action' => 'update mfa',
                     'type' => $type,
@@ -493,17 +493,26 @@ class Mfa extends MfaBase
         $user->refresh();
 
         if ($emailer->shouldSendMfaOptionAddedMessageTo($user, $eventType)) {
-            $emailer->sendMessageTo(EmailLog::MESSAGE_TYPE_MFA_OPTION_ADDED, $user);
-
+            $emailer->sendMessageTo(
+                EmailLog::MESSAGE_TYPE_MFA_OPTION_ADDED,
+                $user
+            );
         } elseif ($emailer->shouldSendMfaEnabledMessageTo($user, $eventType)) {
-            $emailer->sendMessageTo(EmailLog::MESSAGE_TYPE_MFA_ENABLED, $user);
-
+            $emailer->sendMessageTo(
+                EmailLog::MESSAGE_TYPE_MFA_ENABLED,
+                $user
+            );
         } elseif ($emailer->shouldSendMfaOptionRemovedMessageTo($user, $eventType, $mfa)) {
             $emailer->otherDataForEmails['mfaTypeDisabled'] = $mfa->getReadableType();
-            $emailer->sendMessageTo(EmailLog::MESSAGE_TYPE_MFA_OPTION_REMOVED, $user);
-
+            $emailer->sendMessageTo(
+                EmailLog::MESSAGE_TYPE_MFA_OPTION_REMOVED,
+                $user
+            );
         } elseif ($emailer->shouldSendMfaDisabledMessageTo($user, $eventType, $mfa)) {
-            $emailer->sendMessageTo(EmailLog::MESSAGE_TYPE_MFA_DISABLED, $user);
+            $emailer->sendMessageTo(
+                EmailLog::MESSAGE_TYPE_MFA_DISABLED,
+                $user
+            );
         }
     }
 
