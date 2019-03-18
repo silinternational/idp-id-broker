@@ -339,7 +339,7 @@ class Emailer extends Component
         $textView = $this->getViewForMessage($messageType, 'text');
         
         $this->email(
-            $data['toAddress'] ?? $user->email,
+            $data['toAddress'] ?? $user->getEmailAddress(),
             $this->getSubjectForMessage($messageType, $dataForEmail),
             \Yii::$app->view->render($htmlView, $dataForEmail),
             \Yii::$app->view->render($textView, $dataForEmail),

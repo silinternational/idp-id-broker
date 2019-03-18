@@ -270,7 +270,7 @@ class FeatureContext extends YiiContext
     public function iProvideTheFollowingValidData(TableNode $data)
     {
         foreach ($data as $row) {
-            $this->reqBody[$row['property']] = $row['value'];
+            $this->reqBody[$row['property']] = ($row['value'] === 'null' ? null : $row['value']);
         }
     }
 
@@ -628,5 +628,16 @@ class FeatureContext extends YiiContext
     {
         $this->userFromDb->refresh();
         Assert::true(MySqlDateTime::isBefore($this->userFromDb->review_profile_after, time()));
+    }
+
+    /**
+     * @Given the user record for :username has expired
+     */
+    public function theUserRecordForHasExpired($username)
+    {
+        $user = User::findByUsername($username);
+        $user->expires_on = '2000-01-01';
+        $user->scenario = User::SCENARIO_UPDATE_USER;
+        Assert::true($user->save());
     }
 }

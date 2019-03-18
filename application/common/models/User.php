@@ -205,6 +205,16 @@ class User extends UserBase
                 ['last_synced_utc', 'last_changed_utc'],
                 'default', 'value' => MySqlDateTime::now(),
             ],
+            [
+                'expires_on',
+                'default',
+                'value' => $this->getExpiresOnInitialValue(),
+            ],
+            [
+                'email', 'required', 'when' => function ($model) {
+                    return $model->personal_email === null;
+                }
+            ],
         ], parent::rules());
     }
 
@@ -321,7 +331,7 @@ class User extends UserBase
             'lastName' => $this->last_name,
             'displayName' => $this->getDisplayName(),
             'username' => $this->username,
-            'email' => $this->email,
+            'email' => $this->getEmailAddress(),
             'active' => $this->active,
             'locked' => $this->locked,
             'lastChangedUtc' => MySqlDateTime::formatDateForHumans($this->last_changed_utc),
@@ -415,7 +425,9 @@ class User extends UserBase
                 return $model->getDisplayName();
             },
             'username',
-            'email',
+            'email' => function (self $model) {
+                return $model->getEmailAddress();
+            },
             'active',
             'locked',
             'last_login_utc' => function (self $model) {
@@ -798,6 +810,51 @@ class User extends UserBase
         if ($insert == false && $this->personal_email !== $this->getOldAttribute('personal_email')) {
             $this->review_profile_after = MySqlDateTime::relative('-1 day');
         }
+
+        if ($this->getOldAttribute('email') !== null && $this->email === null) {
+            $this->addError('email', 'email cannot be updated to null');
+        }
+
         return parent::beforeSave($insert);
+    }
+
+    /**
+     * @return string:null
+     */
+    public function getExpiresOnInitialValue()
+    {
+        if ($this->email === null) {
+            return MySqlDateTime::relative(\Yii::$app->params['contingentUserDuration']);
+        }
+
+        return null;
+    }
+
+    /**
+     * @return string
+     */
+    public function getEmailAddress(): string
+    {
+        return $this->email ?? $this->personal_email ?? '';
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function afterFind()
+    {
+        if ($this->expires_on !== null && MySqlDateTime::isBefore($this->expires_on, time())) {
+            $this->active = 'no';
+
+            Yii::warning([
+                'event' => 'onAfterFind',
+                'status' => 'user is expired',
+                'employeeId' => $this->employee_id,
+                'scenario' => $this->scenario,
+                'expires_on' => $this->expires_on
+            ], 'application');
+        }
+
+        parent::afterFind();
     }
 }

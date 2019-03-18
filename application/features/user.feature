@@ -23,7 +23,7 @@ Feature: User
     When I request "/user" be created
     Then the response status code should be 200
       And the following data is returned:
-        | property      | value                 |
+        | property        | value                 |
 #TODO:need to ensure uuid came back but not sure about value...
         | employee_id     | 123                   |
         | first_name      | Shep                  |
@@ -523,3 +523,42 @@ Feature: User
     When I request "/user/123" be updated
     Then the response status code should be 200
       And the profile review date should be past
+
+  Scenario: Add a user with personal email address and no primary email address
+    Given a record does not exist with an employee_id of "123"
+      And the requester is authorized
+      And I provide the following valid data:
+        | property        | value                 |
+        | employee_id     | 123                   |
+        | first_name      | New                   |
+        | last_name       | Guy                   |
+        | username        | new_guy               |
+        | personal_email  | personal@example.com  |
+    When I request "/user" be created
+    Then the response status code should be 200
+      And a record exists with an employee_id of "123"
+      And the following data is returned:
+        | property        | value                 |
+        | employee_id     | 123                   |
+        | email           | personal@example.com  |
+        | active          | yes                   |
+        | locked          | no                    |
+        | personal_email  | personal@example.com  |
+
+  Scenario: Attempt to update email to null
+    Given the requester is authorized
+      And I provide the following valid data:
+        | property        | value                 |
+        | employee_id     | 123                   |
+        | first_name      | Established           |
+        | last_name       | User                  |
+        | username        | established_user      |
+        | email           | primary@example.com   |
+      And I request "/user" be created
+      And the response status code should be 200
+      And I provide the following valid data:
+        | property       | value                  |
+        | email          | null                   |
+        | personal_email | personal@example.org   |
+    When I request "/user/123" be updated
+    Then the response status code should be 422

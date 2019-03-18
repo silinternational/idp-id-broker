@@ -41,6 +41,14 @@ class UserController extends BaseRestController
          */
         $user->refresh();
 
+        Yii::info([
+            'action' => 'user/create',
+            'status' => 'created',
+            'id' => $user->id,
+            'employeeId' => $user->employee_id,
+            'scenario' => $user->scenario,
+        ], 'application');
+
         return $user;
     }
 

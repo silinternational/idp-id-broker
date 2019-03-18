@@ -126,7 +126,7 @@ class Mfa extends MfaBase
         \Yii::warning([
             'action' => 'delete mfa',
             'type' => $this->type,
-            'user' => $this->user->email,
+            'username' => $this->user->username,
             'status' => 'success',
         ]);
 
@@ -167,7 +167,7 @@ class Mfa extends MfaBase
         \Yii::warning([
             'action' => 'mfa auth init',
             'type' => $this->type,
-            'user' => $this->user->email,
+            'username' => $this->user->username,
             'status' => 'success',
         ]);
 
@@ -190,7 +190,7 @@ class Mfa extends MfaBase
             \Yii::warning([
                 'action' => 'verify mfa',
                 'type' => $this->type,
-                'user' => $this->user->email,
+                'username' => $this->user->username,
                 'status' => 'error',
                 'error' => 'too many recent failures'
             ]);
@@ -206,7 +206,7 @@ class Mfa extends MfaBase
                 \Yii::error([
                     'action' => 'update last_used_utc on mfa after verification',
                     'status' => 'error',
-                    'user' => $this->user->email,
+                    'username' => $this->user->username,
                     'mfa_id' => $this->id,
                     'error' => $this->getFirstErrors(),
                 ]);
@@ -216,7 +216,7 @@ class Mfa extends MfaBase
             \Yii::warning([
                 'action' => 'verify mfa',
                 'type' => $this->type,
-                'user' => $this->user->email,
+                'username' => $this->user->username,
                 'status' => 'success',
             ]);
             return true;
@@ -227,7 +227,7 @@ class Mfa extends MfaBase
         \Yii::warning([
             'action' => 'verify mfa',
             'type' => $this->type,
-            'user' => $this->user->email,
+            'username' => $this->user->username,
             'status' => 'error',
             'error' => 'verify mfa failed'
         ]);
@@ -285,7 +285,7 @@ class Mfa extends MfaBase
                 \Yii::error([
                     'action' => 'create mfa',
                     'type' => $type,
-                    'user' => $user->email,
+                    'username' => $user->username,
                     'status' => 'error',
                     'error' => $mfa->getFirstErrors(),
                 ]);
@@ -303,7 +303,7 @@ class Mfa extends MfaBase
                 \Yii::error([
                     'action' => 'update mfa',
                     'type' => $type,
-                    'user' => $user->email,
+                    'username' => $user->username,
                     'status' => 'error',
                     'error' => $mfa->getFirstErrors(),
                 ]);
@@ -314,7 +314,7 @@ class Mfa extends MfaBase
         \Yii::warning([
             'action' => 'create mfa',
             'type' => $type,
-            'user' => $user->email,
+            'username' => $user->username,
             'status' => 'success',
         ]);
 
@@ -396,7 +396,7 @@ class Mfa extends MfaBase
                 'mfa_id' => $this->id,
                 'mfa_type' => $this->type,
                 'status' => 'warning',
-                'user' => $this->user->email,
+                'username' => $this->user->username,
             ]);
             
             /* @var $emailer Emailer */

@@ -219,5 +219,6 @@ return [
             Env::getArrayFromPrefix('METHOD_')
         ),
         'mfaLifetime' => Env::get('MFA_LIFETIME', '+2 hours'),
+        'contingentUserDuration' => Env::get('CONTINGENT_USER_DURATION', '+4 weeks'),
     ],
 ];
