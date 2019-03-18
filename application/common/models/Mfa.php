@@ -111,6 +111,8 @@ class Mfa extends MfaBase
     /**
      * Before deleting, delete backend record too
      * @return bool
+     * @throws \Throwable
+     * @throws \yii\db\StaleObjectException
      */
     public function beforeDelete()
     {
@@ -183,6 +185,10 @@ class Mfa extends MfaBase
     /**
      * @param string|array $value
      * @return bool
+     * @throws ServerErrorHttpException
+     * @throws TooManyRequestsHttpException
+     * @throws \Throwable
+     * @throws \yii\db\StaleObjectException
      */
     public function verify($value): bool
     {
@@ -238,6 +244,7 @@ class Mfa extends MfaBase
     /**
      * @param int $userId
      * @param string $type
+     * @param string|null $label
      * @return array
      * @throws BadRequestHttpException
      * @throws ServerErrorHttpException
@@ -332,6 +339,8 @@ class Mfa extends MfaBase
      * @param string $context A description (for logging, if this fails) of why
      *     we're trying to clear the failed attempts for this MFA record.
      *     Example: 'while deleting mfa record' or 'after successful verification'.
+     * @throws \Throwable
+     * @throws \yii\db\StaleObjectException
      */
     public function clearFailedAttempts($context)
     {
@@ -399,7 +408,7 @@ class Mfa extends MfaBase
                 'username' => $this->user->username,
             ]);
             
-            /* @var $emailer Emailer */
+            /* @var \common\components\Emailer $emailer */
             $emailer = \Yii::$app->emailer;
             $emailer->sendMessageTo(
                 EmailLog::MESSAGE_TYPE_MFA_RATE_LIMIT,
@@ -436,7 +445,7 @@ class Mfa extends MfaBase
 
     /**
      * Remove records that were not verified within the given time frame
-     * @param int $maxAgeHours
+     * @throws \Throwable
      */
     public static function removeOldUnverifiedRecords()
     {
@@ -450,6 +459,7 @@ class Mfa extends MfaBase
          * should be deleted. Calculated relative to now (time of execution).
          */
         $removeOlderThan = MySqlDateTime::relativeTime($mfaLifetime);
+        /** @var Mfa[] $mfas */
         $mfas = self::find()
             ->where(['verified' => 0])
             ->andWhere(['<', 'created_utc', $removeOlderThan])
@@ -486,9 +496,14 @@ class Mfa extends MfaBase
     }
 
 
+    /**
+     * @param User $user
+     * @param string $eventType
+     * @param Mfa $mfa
+     */
     protected static function sendAppropriateMessages($user, $eventType, $mfa)
     {
-        /* @var $emailer Emailer */
+        /* @var \common\components\Emailer $emailer */
         $emailer = \Yii::$app->emailer;
         $user->refresh();
 
