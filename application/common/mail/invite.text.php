@@ -43,7 +43,7 @@ If you have any difficulties completing this task, please contact
 Instructions:
 -------------
 To proceed with establishing your account, please follow the step-by-step
-guidance here: <?= $passwordProfileUrl . '/intro?invite=' . $inviteCode ?>
+guidance here: <?= $passwordProfileUrl . '/profile/intro?invite=' . $inviteCode ?>
 
 Please note that this <?= $idpDisplayName ?> Identity account (username and
 password) is unique and its password is not synchronized with any other
