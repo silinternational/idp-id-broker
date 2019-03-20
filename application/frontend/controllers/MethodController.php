@@ -207,7 +207,11 @@ class MethodController extends BaseRestController
             throw new BadRequestHttpException(\Yii::t('app', 'Method already verified'));
         }
 
-        $method->sendVerification();
+        if ($method->isVerificationExpired()) {
+            $method->restartVerification();
+        } else {
+            $method->sendVerification();
+        }
 
         /*
          * Return empty object
