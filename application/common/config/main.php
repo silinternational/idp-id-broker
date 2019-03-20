@@ -64,7 +64,6 @@ return [
                 'emailSignature' => Env::get('EMAIL_SIGNATURE', ''),
                 'helpCenterUrl' => Env::get('HELP_CENTER_URL'),
                 'idpDisplayName' => $idpDisplayName,
-                'passwordForgotUrl' => Env::get('PASSWORD_FORGOT_URL'),
                 'passwordProfileUrl' => Env::get('PASSWORD_PROFILE_URL'),
                 'supportEmail' => Env::get('SUPPORT_EMAIL'),
                 'supportName' => Env::get('SUPPORT_NAME', 'support'),

@@ -15,7 +15,6 @@
  * @var string $emailSignature
  * @var string $helpCenterUrl
  * @var string $idpDisplayName
- * @var string $passwordForgotUrl
  * @var string $passwordProfileUrl
  * @var string $supportEmail
  * @var string $supportName

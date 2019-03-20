@@ -74,7 +74,6 @@ services:
             MYSQL_USER: appfortests
             MYSQL_PASSWORD: appfortests
             MIGRATE_PW_FROM_LDAP: "true"
-            PASSWORD_FORGOT_URL: https://www.example.com/forgot
             SUPPORT_EMAIL: support@example.com
 
     appfortestsdb:
@@ -153,7 +152,6 @@ services:
             MYSQL_HOST: appfortestsdb
             MYSQL_PASSWORD: appfortests
             MYSQL_USER: appfortests
-            PASSWORD_FORGOT_URL: https://www.example.com/forgot
             PASSWORD_PROFILE_URL: https://www.example.com
             SUPPORT_EMAIL: support@example.com
         command: ./run-tests.sh
