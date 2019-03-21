@@ -28,8 +28,8 @@ use yii\helpers\Html as yHtml;
 
 <p>
     A new <?= yHtml::encode($idpDisplayName) ?> Identity account has been created for you and is ready for you to set
-    your password. Please note this account is not an email account. Instead this account is for use with many
-    corporate websites and applications such as the corporate Wiki and personnel systems.
+    your password. Please note this account is not an email account. Instead this account is for use with
+    corporate applications.
 </p>
 <p>
     After creating your password you'll also be given the opportunity to set up recovery methods

@@ -20,6 +20,7 @@
  * @var string $supportEmail
  * @var string $supportName
  * @var bool   $isMfaEnabled
+ * @var bool   $hasRecoveryMethods
  */
 ?>
 Dear <?= $displayName ?>,
@@ -32,9 +33,11 @@ will not be kept in sync with any other accounts you have.
 
 Your password expires on: <?= $passwordExpiresUtc . PHP_EOL ?>
 
+<?php if ($hasRecoveryMethods == false) : ?>
 Please be sure to configure recovery methods for the potential event that you
 forget your password.  You can reset your password using your primary email
 address, <?= $email ?>, but you can also add other addresses for verification.
+<?php endif; ?>
 
 Instructions to add recovery methods:
 -------------------------------------
@@ -44,6 +47,7 @@ Instructions to add recovery methods:
 4. Check for a new email in the inbox for that address and click the link
    in that email.
 
+<?php if ($isMfaEnabled == false) : ?>
 Enable 2-Step Verification (please)
 ===================================
 2-Step Verification can help keep bad guys out, even if they have your
@@ -66,9 +70,12 @@ Instructions to set up 2-Step Verification:
    computer" setting.
 
 To learn more about 2-Step Verification go to <?= $helpCenterUrl ?>
+<?php endif; ?>
 
+<?php if ($isMfaEnabled == false || $hasRecoveryMethods == false) : ?>
 If you have any difficulties completing this task, please contact
 <?= $supportName ?> at <?= $supportEmail ?>.
+<?php endif; ?>
 
 Thanks,
 <?= $emailSignature ?>

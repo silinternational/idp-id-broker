@@ -387,6 +387,7 @@ class User extends UserBase
             'mfaOptions' => $this->getVerifiedMfaOptions(),
             'numRemainingCodes' => $this->countMfaBackupCodes(),
             'managerEmail' => $this->manager_email,
+            'hasRecoveryMethods' => count($this->getVerifiedMethodOptions()) > 0 ? true : false,
         ];
         if ($this->currentPassword !== null) {
             $attrs['passwordExpiresUtc'] = MySqlDateTime::formatDateForHumans($this->currentPassword->getExpiresOn());

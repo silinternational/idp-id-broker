@@ -21,6 +21,7 @@ use yii\helpers\Html as yHtml;
  * @var string $supportEmail
  * @var string $supportName
  * @var bool   $isMfaEnabled
+ * @var bool   $hasRecoveryMethods
  */
 ?>
 <p>
@@ -36,6 +37,8 @@ use yii\helpers\Html as yHtml;
 <p>
     Your password expires on: <?=yHtml::encode($passwordExpiresUtc)?>
 </p>
+
+<?php if ($hasRecoveryMethods == false) : ?>
 <p>
     Please be sure to configure <strong>recovery methods</strong> for
     the potential event that you forget your password.  You can reset your password
@@ -51,7 +54,9 @@ use yii\helpers\Html as yHtml;
     <li>Enter the email address you wish to use and click the add button</li>
     <li>Check for a new email in the inbox for that address and click the link in that email.</li>
 </ol>
+<?php endif; ?>
 
+<?php if ($isMfaEnabled == false) : ?>
 <p>
     <strong>Enable 2-Step Verification</strong> (please)
 </p>
@@ -77,11 +82,15 @@ use yii\helpers\Html as yHtml;
 <p>
     To learn more about 2-Step Verification go to <?=yHtml::a(yHtml::encode($helpCenterUrl), $helpCenterUrl)?>
 </p>
+<?php endif; ?>
 
+<?php if ($isMfaEnabled == false || $hasRecoveryMethods == false) : ?>
 <p>
     If you have any difficulties completing this task, please contact <?=yHtml::encode($supportName)?> at
     <?=yHtml::encode($supportEmail)?>.
 </p>
+<?php endif; ?>
+
 <p>
     Thanks,
 </p>

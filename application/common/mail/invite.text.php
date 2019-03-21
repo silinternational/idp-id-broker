@@ -26,8 +26,7 @@ Dear <?= $displayName ?>,
 
 A new <?= $idpDisplayName ?> Identity account has been created for you and is
 ready for you to set your password. Please note this account is not an
-email account. Instead this account is for use with many corporate websites
-and applications such as the corporate Wiki and personnel systems.
+email account. Instead this account is for use with corporate applications.
 
 After creating your password you'll also be given the opportunity to set up
 recovery methods in case you ever forget your password. We highly recommended
