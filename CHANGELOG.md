@@ -15,6 +15,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Added ability to restart a password recovery method verification
 - New 'manager' MFA type -- on request, send a backup code to user's manager.
 - Added 'groups' and 'personal_email' fields to User object and database table.
+- Automatically creates a recovery method using `personal_email`, only for new users.
+- Added `profile_review` property on user response, to trigger a review at login.
+- Added new user onboarding flow for users without a primary email address.
 
 ### Changed
 - Changed password reuse error HTTP status code from 422 to 409
@@ -22,11 +25,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Updated Welcome email to remove Insite obsolescense notification
 - /method/{uid}/verify no longer requires `employee_id`
 - Changed dates in API to use ISO-8601 format (e.g. 2019-01-08T12:54:00Z)
-- Default MFA labels are now set according to the type of MFA (e.g. "Smartphone #1")
+- Default MFA labels are now set according to the type of MFA (e.g. "Smartphone")
 - `/mfa/{id}/verify` returns the mfa object
 
 ### Removed
 - Removed spouse_email from user table, model, and API
+- Removed `mfa.nag` property from user response, replaced by `profile_review`
 
 ## [3.5.0] - 2018-07-17
 ### Added
