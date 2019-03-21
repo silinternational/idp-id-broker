@@ -2,6 +2,7 @@
 
 use Behat\Gherkin\Node\TableNode;
 use common\helpers\MySqlDateTime;
+use common\models\EmailLog;
 use common\models\Password;
 use common\models\Method;
 use common\models\Mfa;
@@ -100,6 +101,7 @@ class FeatureContext extends YiiContext
         Mfa::deleteAll();
         Method::deleteAll();
         Invite::deleteAll();
+        EmailLog::deleteAll();
         User::deleteAll();
     }
 

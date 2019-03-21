@@ -50,6 +50,35 @@ class User extends UserBase
             return false;
         }
 
+        // First "disconnect" the user's current password.
+        $this->current_password_id = null;
+        if (! $this->save(false, ['current_password_id'])) {
+            \Yii::error([
+                'action' => 'unset current_password_id before deleting user',
+                'status' => 'error',
+                'error' => $this->getFirstErrors(),
+                'user id' => $this->id,
+            ]);
+            return false;
+        }
+        
+        // Next, delete dependent records:
+        
+        /* @var $passwordsOfUser Password[] */
+        $passwordsOfUser = Password::findAll(['user_id' => $this->id]);
+        foreach ($passwordsOfUser as $password) {
+            if (! $password->delete()) {
+                \Yii::error([
+                    'action' => 'delete password record before deleting user',
+                    'status' => 'error',
+                    'error' => $password->getFirstErrors(),
+                    'password id' => $password->id,
+                    'user id' => $this->id,
+                ]);
+                return false;
+            }
+        }
+        
         foreach ($this->mfas as $mfa) {
             if (! $mfa->delete()) {
                 \Yii::error([
@@ -84,6 +113,22 @@ class User extends UserBase
                     'error' => $invite->getFirstErrors(),
                     'invite_id' => $invite->id,
                     'user_id' => $this->id,
+                ]);
+                return false;
+            }
+        }
+
+        /*
+         * Delete email logs last in case other deletions trigger new emails
+         */
+        foreach ($this->emailLogs as $emailLog) {
+            if (! $emailLog->delete()) {
+                \Yii::error([
+                    'action' => 'delete email log record before deleting user',
+                    'status' => 'error',
+                    'error' => $emailLog->getFirstErrors(),
+                    'email log id' => $emailLog->id,
+                    'user_id' => $emailLog->user_id,
                 ]);
                 return false;
             }
