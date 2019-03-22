@@ -640,7 +640,12 @@ class User extends UserBase
         if ($emailer->shouldSendInviteMessageTo($this, $isNewUser)) {
             $invite = Invite::findOrCreate($this->id);
             $data = ['inviteCode' => $invite->getCode()];
-            if ($this->personal_email) {
+            /*
+             * If both `personal_email` and `this_email` are valid, then this is a normal
+             * invite scenario. Otherwise, there's no need to include the 'cc' because the
+             * `personal_email` will be used for the 'to' address.
+             */
+            if ($this->personal_email && $this->email) {
                 $data['ccAddress'] = $this->personal_email;
             }
             $emailer->sendMessageTo(EmailLog::MESSAGE_TYPE_INVITE, $this, $data);
