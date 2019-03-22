@@ -329,6 +329,16 @@ class Emailer extends Component
      */
     public function sendMessageTo(string $messageType, User $user, array $data = [])
     {
+        if ($user->active === 'no') {
+            \Yii::warning([
+                'action' => 'send message',
+                'status' => 'canceled',
+                'messageType' => $messageType,
+                'username' => $user->username,
+            ]);
+            return;
+        }
+
         $dataForEmail = ArrayHelper::merge(
             $user->getAttributesForEmail(),
             $this->otherDataForEmails,
