@@ -594,6 +594,10 @@ types:
         description: New method matches an already existing verified method
         body:
           type: Error
+      422:
+        description: A model validation error occurred.
+        body:
+          type: Error
       500:
         description: Database or other system error
         body:

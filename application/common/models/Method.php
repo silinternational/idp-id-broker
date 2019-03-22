@@ -9,6 +9,7 @@ use common\helpers\Utils;
 use yii\helpers\ArrayHelper;
 use yii\web\ConflictHttpException;
 use yii\web\ServerErrorHttpException;
+use yii\web\UnprocessableEntityHttpException;
 
 /**
  * Class Method
@@ -309,7 +310,7 @@ class Method extends MethodBase
      * @param string $value
      * @param string $created Date recovery method was created, in MySQL datetime format.
      * @return Method
-     * @throws ServerErrorHttpException
+     * @throws UnprocessableEntityHttpException
      */
     public static function create($userId, $value, $created = '')
     {
@@ -322,8 +323,8 @@ class Method extends MethodBase
         }
 
         if (! $method->save()) {
-            throw new ServerErrorHttpException(
-                sprintf('Unable to save new method'),
+            throw new UnprocessableEntityHttpException(
+                'Validation failed, error: ' . print_r($method->getFirstErrors(), true),
                 1461441851
             );
         }

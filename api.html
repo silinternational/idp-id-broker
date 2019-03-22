@@ -205,7 +205,7 @@
     "verified": true,
     "created": "2017-10-24T20:41:05Z"
 }
-</code></pre></div></div></li></ul></li><li><strong>password</strong>: <em>(object)</em><ul><li><strong>created_utc</strong>: <em>required (string)</em></li><li><strong>expires_on</strong>: <em>required (string)</em></li><li><strong>grace_period_ends_on</strong>: <em>required (string)</em></li></ul></li><li><strong>profilereview</strong>: <em>required (one of yes, no)</em><p>Flag to indicate whether to remind the user to review their mfa options and recovery methods.</p></li></ul><p><strong>Example</strong>:</p><div class="examples"><pre><code>{
+</code></pre></div></div></li></ul></li><li><strong>password</strong>: <em>(object)</em><ul><li><strong>created_utc</strong>: <em>required (string)</em></li><li><strong>expires_on</strong>: <em>required (string)</em></li><li><strong>grace_period_ends_on</strong>: <em>required (string)</em></li></ul></li><li><strong>profile_review</strong>: <em>required (one of yes, no)</em><p>Flag to indicate whether to remind the user to review their mfa options and recovery methods.</p></li></ul><p><strong>Example</strong>:</p><div class="examples"><pre><code>{
   "uuid": "11111111-aaaa-1111-aaaa-111111111111",
   "employee_id": "12345",
   "first_name": "John",
@@ -268,7 +268,7 @@
       }
     ]
   },
-  "profilereview": "yes"
+  "profile_review": "yes"
 }
 </code></pre></div><h2>HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><p>The given credentials were NOT acceptable/valid (i.e. - the authentication failed).</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: object</p><strong>Properties</strong><ul><li><strong>name</strong>: <em>required (string)</em></li><li><strong>message</strong>: <em>required (string)</em></li><li><strong>code</strong>: <em>required (integer)</em></li><li><strong>status</strong>: <em>required (integer)</em></li></ul><p><strong>Example</strong>:</p><div class="examples"><pre><code>{
   "name": "Bad Request",
@@ -320,7 +320,7 @@
     "verified": true,
     "created": "2017-10-24T20:41:05Z"
 }
-</code></pre></div></div></li></ul></li><li><strong>password</strong>: <em>(object)</em><ul><li><strong>created_utc</strong>: <em>required (string)</em></li><li><strong>expires_on</strong>: <em>required (string)</em></li><li><strong>grace_period_ends_on</strong>: <em>required (string)</em></li></ul></li><li><strong>profilereview</strong>: <em>required (one of yes, no)</em><p>Flag to indicate whether to remind the user to review their mfa options and recovery methods.</p></li></ul></div></div><div class="tab-pane" id="user_get_securedby"><h1>Secured by AuthzBearerToken</h1><h3>Headers</h3><ul><li><strong>Authorization</strong>: <em>required (string)</em><p><strong>Example</strong>:</p><div class="examples"><pre><code>Bearer abc123</code></pre></div></li></ul></div></div></div></div></div></div><div class="modal fade" tabindex="0" id="user_post"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_post">post <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent"></span>/user</h4></div><div class="modal-body"><div class="alert alert-info"><p>Create a new user record.</p></div><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>AuthzBearerToken</b></div><ul class="nav nav-tabs"><li class="active"><a href="#user_post_request" data-toggle="tab">Request</a></li><li><a href="#user_post_response" data-toggle="tab">Response</a></li><li><a href="#user_post_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="user_post_request"><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: object</p><strong>Properties</strong><ul><li><strong>employee_id</strong>: <em>required (string)</em></li><li><strong>first_name</strong>: <em>required (string)</em></li><li><strong>last_name</strong>: <em>required (string)</em></li><li><strong>display_name</strong>: <em>(string)</em></li><li><strong>username</strong>: <em>required (string)</em></li><li><strong>email</strong>: <em>required (string)</em></li><li><strong>active</strong>: <em>(one of yes, no)</em></li><li><strong>locked</strong>: <em>(one of yes, no)</em></li><li><strong>manager_email</strong>: <em>(string)</em></li><li><strong>personal_email</strong>: <em>(string)</em></li><li><strong>hide</strong>: <em>required (one of yes, no)</em></li><li><strong>groups</strong>: <em>(string)</em></li></ul><p><strong>Example</strong>:</p><div class="examples"><pre><code>{
+</code></pre></div></div></li></ul></li><li><strong>password</strong>: <em>(object)</em><ul><li><strong>created_utc</strong>: <em>required (string)</em></li><li><strong>expires_on</strong>: <em>required (string)</em></li><li><strong>grace_period_ends_on</strong>: <em>required (string)</em></li></ul></li><li><strong>profile_review</strong>: <em>required (one of yes, no)</em><p>Flag to indicate whether to remind the user to review their mfa options and recovery methods.</p></li></ul></div></div><div class="tab-pane" id="user_get_securedby"><h1>Secured by AuthzBearerToken</h1><h3>Headers</h3><ul><li><strong>Authorization</strong>: <em>required (string)</em><p><strong>Example</strong>:</p><div class="examples"><pre><code>Bearer abc123</code></pre></div></li></ul></div></div></div></div></div></div><div class="modal fade" tabindex="0" id="user_post"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_post">post <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent"></span>/user</h4></div><div class="modal-body"><div class="alert alert-info"><p>Create a new user record.</p></div><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>AuthzBearerToken</b></div><ul class="nav nav-tabs"><li class="active"><a href="#user_post_request" data-toggle="tab">Request</a></li><li><a href="#user_post_response" data-toggle="tab">Response</a></li><li><a href="#user_post_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="user_post_request"><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: object</p><strong>Properties</strong><ul><li><strong>employee_id</strong>: <em>required (string)</em></li><li><strong>first_name</strong>: <em>required (string)</em></li><li><strong>last_name</strong>: <em>required (string)</em></li><li><strong>display_name</strong>: <em>(string)</em></li><li><strong>username</strong>: <em>required (string)</em></li><li><strong>email</strong>: <em>required (string)</em></li><li><strong>active</strong>: <em>(one of yes, no)</em></li><li><strong>locked</strong>: <em>(one of yes, no)</em></li><li><strong>manager_email</strong>: <em>(string)</em></li><li><strong>personal_email</strong>: <em>(string)</em></li><li><strong>hide</strong>: <em>required (one of yes, no)</em></li><li><strong>groups</strong>: <em>(string)</em></li></ul><p><strong>Example</strong>:</p><div class="examples"><pre><code>{
   "employee_id": "12345",
   "first_name": "John",
   "last_name": "Smith",
@@ -360,7 +360,7 @@
     "verified": true,
     "created": "2017-10-24T20:41:05Z"
 }
-</code></pre></div></div></li></ul></li><li><strong>password</strong>: <em>(object)</em><ul><li><strong>created_utc</strong>: <em>required (string)</em></li><li><strong>expires_on</strong>: <em>required (string)</em></li><li><strong>grace_period_ends_on</strong>: <em>required (string)</em></li></ul></li><li><strong>profilereview</strong>: <em>required (one of yes, no)</em><p>Flag to indicate whether to remind the user to review their mfa options and recovery methods.</p></li></ul><p><strong>Example</strong>:</p><div class="examples"><pre><code>{
+</code></pre></div></div></li></ul></li><li><strong>password</strong>: <em>(object)</em><ul><li><strong>created_utc</strong>: <em>required (string)</em></li><li><strong>expires_on</strong>: <em>required (string)</em></li><li><strong>grace_period_ends_on</strong>: <em>required (string)</em></li></ul></li><li><strong>profile_review</strong>: <em>required (one of yes, no)</em><p>Flag to indicate whether to remind the user to review their mfa options and recovery methods.</p></li></ul><p><strong>Example</strong>:</p><div class="examples"><pre><code>{
   "uuid": "11111111-aaaa-1111-aaaa-111111111111",
   "employee_id": "12345",
   "first_name": "John",
@@ -423,7 +423,7 @@
       }
     ]
   },
-  "profilereview": "yes"
+  "profile_review": "yes"
 }
 </code></pre></div><h2>HTTP status code <a href="http://httpstatus.es/422" target="_blank">422</a></h2><p>The given user data does not satisfy some validation rule.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: object</p><strong>Properties</strong><ul><li><strong>name</strong>: <em>required (string)</em></li><li><strong>message</strong>: <em>required (string)</em></li><li><strong>code</strong>: <em>required (integer)</em></li><li><strong>status</strong>: <em>required (integer)</em></li></ul><p><strong>Example</strong>:</p><div class="examples"><pre><code>{
   "name": "Bad Request",
@@ -469,7 +469,7 @@
     "verified": true,
     "created": "2017-10-24T20:41:05Z"
 }
-</code></pre></div></div></li></ul></li><li><strong>password</strong>: <em>(object)</em><ul><li><strong>created_utc</strong>: <em>required (string)</em></li><li><strong>expires_on</strong>: <em>required (string)</em></li><li><strong>grace_period_ends_on</strong>: <em>required (string)</em></li></ul></li><li><strong>profilereview</strong>: <em>required (one of yes, no)</em><p>Flag to indicate whether to remind the user to review their mfa options and recovery methods.</p></li></ul><p><strong>Example</strong>:</p><div class="examples"><pre><code>{
+</code></pre></div></div></li></ul></li><li><strong>password</strong>: <em>(object)</em><ul><li><strong>created_utc</strong>: <em>required (string)</em></li><li><strong>expires_on</strong>: <em>required (string)</em></li><li><strong>grace_period_ends_on</strong>: <em>required (string)</em></li></ul></li><li><strong>profile_review</strong>: <em>required (one of yes, no)</em><p>Flag to indicate whether to remind the user to review their mfa options and recovery methods.</p></li></ul><p><strong>Example</strong>:</p><div class="examples"><pre><code>{
   "uuid": "11111111-aaaa-1111-aaaa-111111111111",
   "employee_id": "12345",
   "first_name": "John",
@@ -532,7 +532,7 @@
       }
     ]
   },
-  "profilereview": "yes"
+  "profile_review": "yes"
 }
 </code></pre></div><h2>HTTP status code <a href="http://httpstatus.es/204" target="_blank">204</a></h2><p>No user record was found with that <code>employee_id</code>.</p></div><div class="tab-pane" id="user__employee_id__get_securedby"><h1>Secured by AuthzBearerToken</h1><h3>Headers</h3><ul><li><strong>Authorization</strong>: <em>required (string)</em><p><strong>Example</strong>:</p><div class="examples"><pre><code>Bearer abc123</code></pre></div></li></ul></div></div></div></div></div></div><div class="modal fade" tabindex="0" id="user__employee_id__put"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_put">put <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent">/user</span>/{employee_id}</h4></div><div class="modal-body"><div class="alert alert-info"><p>Update a user record.</p></div><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>AuthzBearerToken</b></div><ul class="nav nav-tabs"><li class="active"><a href="#user__employee_id__put_request" data-toggle="tab">Request</a></li><li><a href="#user__employee_id__put_response" data-toggle="tab">Response</a></li><li><a href="#user__employee_id__put_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="user__employee_id__put_request"><h3>URI Parameters</h3><ul><li><strong>employee_id</strong>: <em>required (string)</em></li></ul><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: object</p><strong>Properties</strong><ul><li><strong>first_name</strong>: <em>(string)</em></li><li><strong>last_name</strong>: <em>(string)</em></li><li><strong>display_name</strong>: <em>(string)</em></li><li><strong>username</strong>: <em>(string)</em></li><li><strong>email</strong>: <em>(string)</em></li><li><strong>active</strong>: <em>(one of yes, no)</em></li><li><strong>locked</strong>: <em>(one of yes, no)</em></li><li><strong>manager_email</strong>: <em>(string)</em></li><li><strong>personal_email</strong>: <em>(string)</em></li><li><strong>hide</strong>: <em>(one of yes, no)</em></li><li><strong>groups</strong>: <em>(string)</em></li></ul><p><strong>Example</strong>:</p><div class="examples"><pre><code>{
   "active": "no"
@@ -569,7 +569,7 @@
     "verified": true,
     "created": "2017-10-24T20:41:05Z"
 }
-</code></pre></div></div></li></ul></li><li><strong>password</strong>: <em>(object)</em><ul><li><strong>created_utc</strong>: <em>required (string)</em></li><li><strong>expires_on</strong>: <em>required (string)</em></li><li><strong>grace_period_ends_on</strong>: <em>required (string)</em></li></ul></li><li><strong>profilereview</strong>: <em>required (one of yes, no)</em><p>Flag to indicate whether to remind the user to review their mfa options and recovery methods.</p></li></ul><p><strong>Example</strong>:</p><div class="examples"><pre><code>{
+</code></pre></div></div></li></ul></li><li><strong>password</strong>: <em>(object)</em><ul><li><strong>created_utc</strong>: <em>required (string)</em></li><li><strong>expires_on</strong>: <em>required (string)</em></li><li><strong>grace_period_ends_on</strong>: <em>required (string)</em></li></ul></li><li><strong>profile_review</strong>: <em>required (one of yes, no)</em><p>Flag to indicate whether to remind the user to review their mfa options and recovery methods.</p></li></ul><p><strong>Example</strong>:</p><div class="examples"><pre><code>{
   "uuid": "11111111-aaaa-1111-aaaa-111111111111",
   "employee_id": "12345",
   "first_name": "John",
@@ -632,7 +632,7 @@
       }
     ]
   },
-  "profilereview": "yes"
+  "profile_review": "yes"
 }
 </code></pre></div><h2>HTTP status code <a href="http://httpstatus.es/204" target="_blank">204</a></h2><p>No user record was found with that <code>employee_id</code>.</p><h2>HTTP status code <a href="http://httpstatus.es/422" target="_blank">422</a></h2><p>The given user data does not satisfy some validation rule.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: object</p><strong>Properties</strong><ul><li><strong>name</strong>: <em>required (string)</em></li><li><strong>message</strong>: <em>required (string)</em></li><li><strong>code</strong>: <em>required (integer)</em></li><li><strong>status</strong>: <em>required (integer)</em></li></ul><p><strong>Example</strong>:</p><div class="examples"><pre><code>{
   "name": "Bad Request",
@@ -693,7 +693,7 @@
     "verified": true,
     "created": "2017-10-24T20:41:05Z"
 }
-</code></pre></div></div></li></ul></li><li><strong>password</strong>: <em>(object)</em><ul><li><strong>created_utc</strong>: <em>required (string)</em></li><li><strong>expires_on</strong>: <em>required (string)</em></li><li><strong>grace_period_ends_on</strong>: <em>required (string)</em></li></ul></li><li><strong>profilereview</strong>: <em>required (one of yes, no)</em><p>Flag to indicate whether to remind the user to review their mfa options and recovery methods.</p></li></ul><p><strong>Example</strong>:</p><div class="examples"><pre><code>{
+</code></pre></div></div></li></ul></li><li><strong>password</strong>: <em>(object)</em><ul><li><strong>created_utc</strong>: <em>required (string)</em></li><li><strong>expires_on</strong>: <em>required (string)</em></li><li><strong>grace_period_ends_on</strong>: <em>required (string)</em></li></ul></li><li><strong>profile_review</strong>: <em>required (one of yes, no)</em><p>Flag to indicate whether to remind the user to review their mfa options and recovery methods.</p></li></ul><p><strong>Example</strong>:</p><div class="examples"><pre><code>{
   "uuid": "11111111-aaaa-1111-aaaa-111111111111",
   "employee_id": "12345",
   "first_name": "John",
@@ -756,7 +756,7 @@
       }
     ]
   },
-  "profilereview": "yes"
+  "profile_review": "yes"
 }
 </code></pre></div><h2>HTTP status code <a href="http://httpstatus.es/204" target="_blank">204</a></h2><p>No user record was found with that <code>employee_id</code>.</p><h2>HTTP status code <a href="http://httpstatus.es/409" target="_blank">409</a></h2><p>A recently-used password was given.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: object</p><strong>Properties</strong><ul><li><strong>name</strong>: <em>required (string)</em></li><li><strong>message</strong>: <em>required (string)</em></li><li><strong>code</strong>: <em>required (integer)</em></li><li><strong>status</strong>: <em>required (integer)</em></li></ul><p><strong>Examples</strong>:</p><div class="examples"><pre><code>{
   "name": "Bad Request",
@@ -1043,6 +1043,18 @@
   "status": 409
 }
 </code></pre></div><h2>HTTP status code <a href="http://httpstatus.es/409" target="_blank">409</a></h2><p>New method matches an already existing verified method</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: object</p><strong>Properties</strong><ul><li><strong>name</strong>: <em>required (string)</em></li><li><strong>message</strong>: <em>required (string)</em></li><li><strong>code</strong>: <em>required (integer)</em></li><li><strong>status</strong>: <em>required (integer)</em></li></ul><p><strong>Examples</strong>:</p><div class="examples"><pre><code>{
+  "name": "Bad Request",
+  "message": "",
+  "code": 0,
+  "status": 400
+}
+</code></pre><pre><code>{
+  "name": "Conflict",
+  "message": "May not be reused yet.",
+  "code": 1542395933,
+  "status": 409
+}
+</code></pre></div><h2>HTTP status code <a href="http://httpstatus.es/422" target="_blank">422</a></h2><p>A model validation error occurred.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: object</p><strong>Properties</strong><ul><li><strong>name</strong>: <em>required (string)</em></li><li><strong>message</strong>: <em>required (string)</em></li><li><strong>code</strong>: <em>required (integer)</em></li><li><strong>status</strong>: <em>required (integer)</em></li></ul><p><strong>Examples</strong>:</p><div class="examples"><pre><code>{
   "name": "Bad Request",
   "message": "",
   "code": 0,
