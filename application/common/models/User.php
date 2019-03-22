@@ -164,6 +164,7 @@ class User extends UserBase
             'personal_email',
             'hide',
             'groups',
+            'expires_on',
         ];
 
         $scenarios[self::SCENARIO_UPDATE_USER] = [
