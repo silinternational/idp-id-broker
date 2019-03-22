@@ -47,6 +47,7 @@ class UserController extends BaseRestController
             'id' => $user->id,
             'employeeId' => $user->employee_id,
             'scenario' => $user->scenario,
+            'email' => $user->email,
         ], 'application');
 
         return $user;
