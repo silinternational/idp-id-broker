@@ -863,8 +863,13 @@ class User extends UserBase
             $this->review_profile_after = MySqlDateTime::relative('-1 day');
         }
 
+        if ($this->email === '') {
+            $this->email = null;
+        }
+
         if ($this->getOldAttribute('email') !== null && $this->email === null) {
-            $this->addError('email', 'email cannot be updated to null');
+            $this->addError('email', 'email cannot be removed');
+            return false;
         }
 
         return parent::beforeSave($insert);
