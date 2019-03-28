@@ -872,6 +872,10 @@ class User extends UserBase
             return false;
         }
 
+        if (! empty($this->email)) {
+            $this->expires_on = null;
+        }
+
         return parent::beforeSave($insert);
     }
 
@@ -880,11 +884,7 @@ class User extends UserBase
      */
     public function getExpiresOnInitialValue()
     {
-        if ($this->email === null) {
-            return MySqlDateTime::relative(\Yii::$app->params['contingentUserDuration']);
-        }
-
-        return null;
+        return MySqlDateTime::relative(\Yii::$app->params['contingentUserDuration']);
     }
 
     /**
