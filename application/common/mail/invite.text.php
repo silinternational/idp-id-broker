@@ -28,13 +28,6 @@ A new <?= $idpDisplayName ?> Identity account has been created for you and is
 ready for you to set your password. Please note this account is not an
 email account. Instead this account is for use with corporate applications.
 
-After creating your password you'll also be given the opportunity to set up
-recovery methods in case you ever forget your password. We highly recommended
-that you set up at least one or two recovery methods. You can also enhance
-the security of your account by enabling 2-Step Verification which will help
-ensure bad guys cannot get into your account even if they guess your
-password.
-
 If you have any difficulties completing this task, please contact
 <?= $supportName ?> at: <?= $supportEmail . PHP_EOL ?>
 
