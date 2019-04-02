@@ -9,10 +9,10 @@ appfortests: db deps
 bash:
 	docker-compose run --rm cli bash
 
-deps:
+deps: api.html
 	docker-compose run --rm cli composer install
 
-depsupdate:
+depsupdate: api.html
 	docker-compose run --rm cli composer update
 
 db:
@@ -37,12 +37,14 @@ rmldap:
 quicktest:
 	docker-compose run --rm test bash -c "vendor/bin/behat --stop-on-failure --strict --append-snippets"
 
-test: appfortests rmldap ldap ldapload
+test: appfortests rmldap ldap ldapload api.html
 	docker-compose run --rm test
 
 clean:
 	docker-compose kill
 	docker system prune -f
 
-raml2html:
+raml2html: api.html
+
+api.html: api.raml
 	docker-compose run --rm raml2html
