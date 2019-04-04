@@ -198,11 +198,12 @@ class Password extends PasswordBase
 
     /**
      * @param $attribute
+     * @throws ConflictHttpException
      */
     public function checkRecentlyUsed($attribute)
     {
         if ($this->hasAlreadyBeenUsedTooRecently()) {
-            $this->addError($attribute, 'May not be reused yet');
+            throw new ConflictHttpException('May not be reused yet', 1542395933);
         }
     }
 }

@@ -443,10 +443,21 @@ types:
               type: UserResponse
           204:
             description: No user record was found with that `employee_id`.
+          409:
+            description: A recently-used password was given.
+            body:
+              type: Error
+              example: |
+                {
+                  "name": "Conflict",
+                  "message": "May not be reused yet.",
+                  "code": 1542395933,
+                  "status": 409
+                }
           422:
             description: >
               The given password does not meet some requirement (such as if an
-              empty string was given or a recent password was reused).
+              empty string was given).
             body:
               type: Error
           500:
@@ -471,10 +482,21 @@ types:
               description: No user found with given `employee_id`.
               body:
                 type: Error
+            409:
+              description: A recently-used password was given.
+              body:
+                type: Error
+                example: |
+                  {
+                    "name": "Conflict",
+                    "message": "May not be reused yet.",
+                    "code": 1542395933,
+                    "status": 409
+                  }
             422:
               description: >
                 The given password does not meet some requirement (such as if an
-                empty string was given or a recent password was reused).
+                empty string was given).
               body:
                 type: Error
             500:
