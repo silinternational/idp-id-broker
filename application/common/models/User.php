@@ -914,4 +914,19 @@ class User extends UserBase
 
         parent::afterFind();
     }
+
+    public function assessPassword(string $newPassword): bool
+    {
+        $password = new Password();
+
+        $password->user_id = $this->id;
+        $password->password = $newPassword;
+
+        if (! $password->validate()) {
+            $this->addErrors($password->getErrors());
+            return false;
+        }
+
+        return true;
+    }
 }
