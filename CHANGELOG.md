@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Automatically creates a recovery method using `personal_email`, only for new users.
 - Added `profile_review` property on user response, to trigger a review at login.
 - Added new user onboarding flow for users without a primary email address.
+- Added `PUT /user/{employeeID}/password/assess` endpoint to pre-assess a new password.
 
 ### Changed
 - Changed password reuse error HTTP status code from 422 to 409

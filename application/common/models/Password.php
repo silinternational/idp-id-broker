@@ -40,6 +40,9 @@ class Password extends PasswordBase
                 'password', 'string',
             ],
             [
+                'password', 'checkRecentlyUsed',
+            ],
+            [
                 'hash', 'default', 'value' => function () {
                     return password_hash($this->password, PASSWORD_DEFAULT);
                  },
@@ -194,17 +197,13 @@ class Password extends PasswordBase
     }
 
     /**
-     * @param bool $runValidation
-     * @param null $attributeNames
-     * @return bool
+     * @param $attribute
      * @throws ConflictHttpException
      */
-    public function save($runValidation = true, $attributeNames = null)
+    public function checkRecentlyUsed($attribute)
     {
         if ($this->hasAlreadyBeenUsedTooRecently()) {
-            throw new ConflictHttpException('May not be reused yet.', 1542395933);
+            throw new ConflictHttpException('May not be reused yet', 1542395933);
         }
-
-        return parent::save($runValidation, $attributeNames);
     }
 }

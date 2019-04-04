@@ -1,10 +1,11 @@
 <?php
 namespace frontend\controllers;
 
-use common\helpers\MySqlDateTime;
 use common\models\User;
 use frontend\components\BaseRestController;
 use Yii;
+use yii\web\NotFoundHttpException;
+use yii\web\UnprocessableEntityHttpException;
 
 class UserController extends BaseRestController
 {
@@ -89,5 +90,27 @@ class UserController extends BaseRestController
         $this->save($user);
 
         return $user;
+    }
+
+    /**
+     * @param string $employeeId
+     * @throws NotFoundHttpException
+     * @throws UnprocessableEntityHttpException
+     */
+    public function actionAssessPassword(string $employeeId)
+    {
+        $user = User::findOne(['employee_id' => $employeeId]);
+
+        if ($user === null) {
+            throw new NotFoundHttpException('User not found');
+        }
+
+        if ($user->assessPassword(Yii::$app->request->getBodyParam('password'))) {
+            Yii::$app->response->setStatusCode(204);
+            return;
+        } else {
+            $errors = join(', ', $user->getFirstErrors());
+            throw new UnprocessableEntityHttpException($errors);
+        }
     }
 }

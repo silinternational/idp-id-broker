@@ -457,13 +457,52 @@ types:
           422:
             description: >
               The given password does not meet some requirement (such as if an
-              empty string was given or a recent password was reused).
+              empty string was given).
             body:
               type: Error
           500:
             description: A server-side error occurred.
             body:
               type: Error
+      /assess:
+        put:
+          description: Validate a potential new password. Does not save the password.
+          body:
+            properties:
+              password: string
+            example: |
+              {
+                "password": "correcthorsebatterystaple"
+              }
+          responses:
+            204:
+              description: >
+                The `password` is valid for the user with the given `employee_id`.
+            404:
+              description: No user found with given `employee_id`.
+              body:
+                type: Error
+            409:
+              description: A recently-used password was given.
+              body:
+                type: Error
+                example: |
+                  {
+                    "name": "Conflict",
+                    "message": "May not be reused yet.",
+                    "code": 1542395933,
+                    "status": 409
+                  }
+            422:
+              description: >
+                The given password does not meet some requirement (such as if an
+                empty string was given).
+              body:
+                type: Error
+            500:
+              description: A server-side error occurred.
+              body:
+                type: Error
 /mfa:
   post:
     description: Create a new mfa record.

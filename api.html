@@ -770,7 +770,7 @@
   "code": 1542395933,
   "status": 409
 }
-</code></pre></div><h2>HTTP status code <a href="http://httpstatus.es/422" target="_blank">422</a></h2><p>The given password does not meet some requirement (such as if an empty string was given or a recent password was reused).</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: object</p><strong>Properties</strong><ul><li><strong>name</strong>: <em>required (string)</em></li><li><strong>message</strong>: <em>required (string)</em></li><li><strong>code</strong>: <em>required (integer)</em></li><li><strong>status</strong>: <em>required (integer)</em></li></ul><p><strong>Examples</strong>:</p><div class="examples"><pre><code>{
+</code></pre></div><h2>HTTP status code <a href="http://httpstatus.es/422" target="_blank">422</a></h2><p>The given password does not meet some requirement (such as if an empty string was given).</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: object</p><strong>Properties</strong><ul><li><strong>name</strong>: <em>required (string)</em></li><li><strong>message</strong>: <em>required (string)</em></li><li><strong>code</strong>: <em>required (integer)</em></li><li><strong>status</strong>: <em>required (integer)</em></li></ul><p><strong>Examples</strong>:</p><div class="examples"><pre><code>{
   "name": "Bad Request",
   "message": "",
   "code": 0,
@@ -794,7 +794,76 @@
   "code": 1542395933,
   "status": 409
 }
-</code></pre></div></div><div class="tab-pane" id="user__employee_id__password_put_securedby"><h1>Secured by AuthzBearerToken</h1><h3>Headers</h3><ul><li><strong>Authorization</strong>: <em>required (string)</em><p><strong>Example</strong>:</p><div class="examples"><pre><code>Bearer abc123</code></pre></div></li></ul></div></div></div></div></div></div></div></div></div></div><div class="panel panel-default"><div class="panel-heading"><h3 id="mfa" class="panel-title">/mfa</h3></div><div class="panel-body"><div class="panel-group"><div class="panel panel-white resource-modal"><div class="panel-heading"><h4 class="panel-title"><a class="collapsed" data-toggle="collapse" href="#panel_mfa"><span class="parent"></span>/mfa</a> <span class="methods"><a href="#mfa_post"><span class="badge badge_post">post <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a></span></h4></div><div id="panel_mfa" class="panel-collapse collapse"><div class="panel-body"><div class="list-group"><div onclick="window.location.href = '#mfa_post'" class="list-group-item"><span class="badge badge_post">post <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span><div class="method_description"><p>Create a new mfa record.</p></div><div class="clearfix"></div></div></div></div></div><div class="modal fade" tabindex="0" id="mfa_post"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_post">post <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent"></span>/mfa</h4></div><div class="modal-body"><div class="alert alert-info"><p>Create a new mfa record.</p></div><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>AuthzBearerToken</b></div><ul class="nav nav-tabs"><li class="active"><a href="#mfa_post_request" data-toggle="tab">Request</a></li><li><a href="#mfa_post_response" data-toggle="tab">Response</a></li><li><a href="#mfa_post_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="mfa_post_request"><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: object</p><strong>Properties</strong><ul><li><strong>employee_id</strong>: <em>required (string)</em></li><li><strong>type</strong>: <em>required (one of backupcode, totp, u2f, manager)</em></li><li><strong>label</strong>: <em>(string)</em></li></ul><p><strong>Example</strong>:</p><div class="examples"><pre><code>{
+</code></pre></div></div><div class="tab-pane" id="user__employee_id__password_put_securedby"><h1>Secured by AuthzBearerToken</h1><h3>Headers</h3><ul><li><strong>Authorization</strong>: <em>required (string)</em><p><strong>Example</strong>:</p><div class="examples"><pre><code>Bearer abc123</code></pre></div></li></ul></div></div></div></div></div></div></div><div class="panel panel-white resource-modal"><div class="panel-heading"><h4 class="panel-title"><a class="collapsed" data-toggle="collapse" href="#panel_user__employee_id__password_assess"><span class="parent">/user/{employee_id}/password</span>/assess</a> <span class="methods"><a href="#user__employee_id__password_assess_put"><span class="badge badge_put">put <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a></span></h4></div><div id="panel_user__employee_id__password_assess" class="panel-collapse collapse"><div class="panel-body"><div class="list-group"><div onclick="window.location.href = '#user__employee_id__password_assess_put'" class="list-group-item"><span class="badge badge_put">put <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span><div class="method_description"><p>Validate a potential new password. Does not save the password.</p></div><div class="clearfix"></div></div></div></div></div><div class="modal fade" tabindex="0" id="user__employee_id__password_assess_put"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_put">put <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent">/user/{employee_id}/password</span>/assess</h4></div><div class="modal-body"><div class="alert alert-info"><p>Validate a potential new password. Does not save the password.</p></div><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>AuthzBearerToken</b></div><ul class="nav nav-tabs"><li class="active"><a href="#user__employee_id__password_assess_put_request" data-toggle="tab">Request</a></li><li><a href="#user__employee_id__password_assess_put_response" data-toggle="tab">Response</a></li><li><a href="#user__employee_id__password_assess_put_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="user__employee_id__password_assess_put_request"><h3>URI Parameters</h3><ul><li><strong>employee_id</strong>: <em>required (string)</em></li></ul><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: object</p><strong>Properties</strong><ul><li><strong>password</strong>: <em>required (string)</em></li></ul><p><strong>Example</strong>:</p><div class="examples"><pre><code>{
+  "password": "correcthorsebatterystaple"
+}
+</code></pre></div></div><div class="tab-pane" id="user__employee_id__password_assess_put_response"><h2>HTTP status code <a href="http://httpstatus.es/204" target="_blank">204</a></h2><p>The <code>password</code> is valid for the user with the given <code>employee_id</code>.</p><h2>HTTP status code <a href="http://httpstatus.es/404" target="_blank">404</a></h2><p>No user found with given <code>employee_id</code>.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: object</p><strong>Properties</strong><ul><li><strong>name</strong>: <em>required (string)</em></li><li><strong>message</strong>: <em>required (string)</em></li><li><strong>code</strong>: <em>required (integer)</em></li><li><strong>status</strong>: <em>required (integer)</em></li></ul><p><strong>Examples</strong>:</p><div class="examples"><pre><code>{
+  "name": "Bad Request",
+  "message": "",
+  "code": 0,
+  "status": 400
+}
+</code></pre><pre><code>{
+  "name": "Conflict",
+  "message": "May not be reused yet.",
+  "code": 1542395933,
+  "status": 409
+}
+</code></pre></div><h2>HTTP status code <a href="http://httpstatus.es/409" target="_blank">409</a></h2><p>A recently-used password was given.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: object</p><strong>Properties</strong><ul><li><strong>name</strong>: <em>required (string)</em></li><li><strong>message</strong>: <em>required (string)</em></li><li><strong>code</strong>: <em>required (integer)</em></li><li><strong>status</strong>: <em>required (integer)</em></li></ul><p><strong>Examples</strong>:</p><div class="examples"><pre><code>{
+  "name": "Bad Request",
+  "message": "",
+  "code": 0,
+  "status": 400
+}
+</code></pre><pre><code>{
+  "name": "Conflict",
+  "message": "May not be reused yet.",
+  "code": 1542395933,
+  "status": 409
+}
+</code></pre><pre><code>{
+  "name": "Conflict",
+  "message": "May not be reused yet.",
+  "code": 1542395933,
+  "status": 409
+}
+</code></pre></div><h2>HTTP status code <a href="http://httpstatus.es/422" target="_blank">422</a></h2><p>The given password does not meet some requirement (such as if an empty string was given).</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: object</p><strong>Properties</strong><ul><li><strong>name</strong>: <em>required (string)</em></li><li><strong>message</strong>: <em>required (string)</em></li><li><strong>code</strong>: <em>required (integer)</em></li><li><strong>status</strong>: <em>required (integer)</em></li></ul><p><strong>Examples</strong>:</p><div class="examples"><pre><code>{
+  "name": "Bad Request",
+  "message": "",
+  "code": 0,
+  "status": 400
+}
+</code></pre><pre><code>{
+  "name": "Conflict",
+  "message": "May not be reused yet.",
+  "code": 1542395933,
+  "status": 409
+}
+</code></pre><pre><code>{
+  "name": "Conflict",
+  "message": "May not be reused yet.",
+  "code": 1542395933,
+  "status": 409
+}
+</code></pre></div><h2>HTTP status code <a href="http://httpstatus.es/500" target="_blank">500</a></h2><p>A server-side error occurred.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: object</p><strong>Properties</strong><ul><li><strong>name</strong>: <em>required (string)</em></li><li><strong>message</strong>: <em>required (string)</em></li><li><strong>code</strong>: <em>required (integer)</em></li><li><strong>status</strong>: <em>required (integer)</em></li></ul><p><strong>Examples</strong>:</p><div class="examples"><pre><code>{
+  "name": "Bad Request",
+  "message": "",
+  "code": 0,
+  "status": 400
+}
+</code></pre><pre><code>{
+  "name": "Conflict",
+  "message": "May not be reused yet.",
+  "code": 1542395933,
+  "status": 409
+}
+</code></pre><pre><code>{
+  "name": "Conflict",
+  "message": "May not be reused yet.",
+  "code": 1542395933,
+  "status": 409
+}
+</code></pre></div></div><div class="tab-pane" id="user__employee_id__password_assess_put_securedby"><h1>Secured by AuthzBearerToken</h1><h3>Headers</h3><ul><li><strong>Authorization</strong>: <em>required (string)</em><p><strong>Example</strong>:</p><div class="examples"><pre><code>Bearer abc123</code></pre></div></li></ul></div></div></div></div></div></div></div></div></div></div><div class="panel panel-default"><div class="panel-heading"><h3 id="mfa" class="panel-title">/mfa</h3></div><div class="panel-body"><div class="panel-group"><div class="panel panel-white resource-modal"><div class="panel-heading"><h4 class="panel-title"><a class="collapsed" data-toggle="collapse" href="#panel_mfa"><span class="parent"></span>/mfa</a> <span class="methods"><a href="#mfa_post"><span class="badge badge_post">post <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span></a></span></h4></div><div id="panel_mfa" class="panel-collapse collapse"><div class="panel-body"><div class="list-group"><div onclick="window.location.href = '#mfa_post'" class="list-group-item"><span class="badge badge_post">post <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span><div class="method_description"><p>Create a new mfa record.</p></div><div class="clearfix"></div></div></div></div></div><div class="modal fade" tabindex="0" id="mfa_post"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_post">post <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent"></span>/mfa</h4></div><div class="modal-body"><div class="alert alert-info"><p>Create a new mfa record.</p></div><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>AuthzBearerToken</b></div><ul class="nav nav-tabs"><li class="active"><a href="#mfa_post_request" data-toggle="tab">Request</a></li><li><a href="#mfa_post_response" data-toggle="tab">Response</a></li><li><a href="#mfa_post_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="mfa_post_request"><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: object</p><strong>Properties</strong><ul><li><strong>employee_id</strong>: <em>required (string)</em></li><li><strong>type</strong>: <em>required (one of backupcode, totp, u2f, manager)</em></li><li><strong>label</strong>: <em>(string)</em></li></ul><p><strong>Example</strong>:</p><div class="examples"><pre><code>{
   "employee_id": "12345",
   "type": "backupcode"
 }
@@ -825,6 +894,12 @@
   "code": 1542395933,
   "status": 409
 }
+</code></pre><pre><code>{
+  "name": "Conflict",
+  "message": "May not be reused yet.",
+  "code": 1542395933,
+  "status": 409
+}
 </code></pre></div><h2>HTTP status code <a href="http://httpstatus.es/409" target="_blank">409</a></h2><p>An MFA of the requested type already exists. Note that this would only be returned for &#39;totp&#39; or &#39;u2f&#39;. The code types (&#39;backupcode&#39; and &#39;manager&#39;) reuse the existing MFA and create new codes.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: object</p><strong>Properties</strong><ul><li><strong>name</strong>: <em>required (string)</em></li><li><strong>message</strong>: <em>required (string)</em></li><li><strong>code</strong>: <em>required (integer)</em></li><li><strong>status</strong>: <em>required (integer)</em></li></ul><p><strong>Examples</strong>:</p><div class="examples"><pre><code>{
   "name": "Bad Request",
   "message": "",
@@ -837,11 +912,23 @@
   "code": 1542395933,
   "status": 409
 }
+</code></pre><pre><code>{
+  "name": "Conflict",
+  "message": "May not be reused yet.",
+  "code": 1542395933,
+  "status": 409
+}
 </code></pre></div><h2>HTTP status code <a href="http://httpstatus.es/500" target="_blank">500</a></h2><p>The server encountered an error</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: object</p><strong>Properties</strong><ul><li><strong>name</strong>: <em>required (string)</em></li><li><strong>message</strong>: <em>required (string)</em></li><li><strong>code</strong>: <em>required (integer)</em></li><li><strong>status</strong>: <em>required (integer)</em></li></ul><p><strong>Examples</strong>:</p><div class="examples"><pre><code>{
   "name": "Bad Request",
   "message": "",
   "code": 0,
   "status": 400
+}
+</code></pre><pre><code>{
+  "name": "Conflict",
+  "message": "May not be reused yet.",
+  "code": 1542395933,
+  "status": 409
 }
 </code></pre><pre><code>{
   "name": "Conflict",
@@ -891,6 +978,12 @@
   "code": 1542395933,
   "status": 409
 }
+</code></pre><pre><code>{
+  "name": "Conflict",
+  "message": "May not be reused yet.",
+  "code": 1542395933,
+  "status": 409
+}
 </code></pre></div><h2>HTTP status code <a href="http://httpstatus.es/404" target="_blank">404</a></h2><p>MFA record not found or mismatched employee_id</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: object</p><strong>Properties</strong><ul><li><strong>name</strong>: <em>required (string)</em></li><li><strong>message</strong>: <em>required (string)</em></li><li><strong>code</strong>: <em>required (integer)</em></li><li><strong>status</strong>: <em>required (integer)</em></li></ul><p><strong>Examples</strong>:</p><div class="examples"><pre><code>{
   "name": "Bad Request",
   "message": "",
@@ -903,11 +996,23 @@
   "code": 1542395933,
   "status": 409
 }
+</code></pre><pre><code>{
+  "name": "Conflict",
+  "message": "May not be reused yet.",
+  "code": 1542395933,
+  "status": 409
+}
 </code></pre></div><h2>HTTP status code <a href="http://httpstatus.es/500" target="_blank">500</a></h2><p>The server encountered an error</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: object</p><strong>Properties</strong><ul><li><strong>name</strong>: <em>required (string)</em></li><li><strong>message</strong>: <em>required (string)</em></li><li><strong>code</strong>: <em>required (integer)</em></li><li><strong>status</strong>: <em>required (integer)</em></li></ul><p><strong>Examples</strong>:</p><div class="examples"><pre><code>{
   "name": "Bad Request",
   "message": "",
   "code": 0,
   "status": 400
+}
+</code></pre><pre><code>{
+  "name": "Conflict",
+  "message": "May not be reused yet.",
+  "code": 1542395933,
+  "status": 409
 }
 </code></pre><pre><code>{
   "name": "Conflict",
@@ -930,6 +1035,12 @@
   "code": 1542395933,
   "status": 409
 }
+</code></pre><pre><code>{
+  "name": "Conflict",
+  "message": "May not be reused yet.",
+  "code": 1542395933,
+  "status": 409
+}
 </code></pre></div><h2>HTTP status code <a href="http://httpstatus.es/404" target="_blank">404</a></h2><p>The MFA record was not found</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: object</p><strong>Properties</strong><ul><li><strong>name</strong>: <em>required (string)</em></li><li><strong>message</strong>: <em>required (string)</em></li><li><strong>code</strong>: <em>required (integer)</em></li><li><strong>status</strong>: <em>required (integer)</em></li></ul><p><strong>Examples</strong>:</p><div class="examples"><pre><code>{
   "name": "Bad Request",
   "message": "",
@@ -942,11 +1053,23 @@
   "code": 1542395933,
   "status": 409
 }
+</code></pre><pre><code>{
+  "name": "Conflict",
+  "message": "May not be reused yet.",
+  "code": 1542395933,
+  "status": 409
+}
 </code></pre></div><h2>HTTP status code <a href="http://httpstatus.es/500" target="_blank">500</a></h2><p>Unable to delete the MFA record</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: object</p><strong>Properties</strong><ul><li><strong>name</strong>: <em>required (string)</em></li><li><strong>message</strong>: <em>required (string)</em></li><li><strong>code</strong>: <em>required (integer)</em></li><li><strong>status</strong>: <em>required (integer)</em></li></ul><p><strong>Examples</strong>:</p><div class="examples"><pre><code>{
   "name": "Bad Request",
   "message": "",
   "code": 0,
   "status": 400
+}
+</code></pre><pre><code>{
+  "name": "Conflict",
+  "message": "May not be reused yet.",
+  "code": 1542395933,
+  "status": 409
 }
 </code></pre><pre><code>{
   "name": "Conflict",
@@ -996,6 +1119,12 @@
   "code": 1542395933,
   "status": 409
 }
+</code></pre><pre><code>{
+  "name": "Conflict",
+  "message": "May not be reused yet.",
+  "code": 1542395933,
+  "status": 409
+}
 </code></pre></div><h2>HTTP status code <a href="http://httpstatus.es/404" target="_blank">404</a></h2><p>No MFA record found with that <code>id</code> and <code>employee_id</code>.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: object</p><strong>Properties</strong><ul><li><strong>name</strong>: <em>required (string)</em></li><li><strong>message</strong>: <em>required (string)</em></li><li><strong>code</strong>: <em>required (integer)</em></li><li><strong>status</strong>: <em>required (integer)</em></li></ul><p><strong>Examples</strong>:</p><div class="examples"><pre><code>{
   "name": "Bad Request",
   "message": "",
@@ -1008,11 +1137,23 @@
   "code": 1542395933,
   "status": 409
 }
+</code></pre><pre><code>{
+  "name": "Conflict",
+  "message": "May not be reused yet.",
+  "code": 1542395933,
+  "status": 409
+}
 </code></pre></div><h2>HTTP status code <a href="http://httpstatus.es/429" target="_blank">429</a></h2><p>Too many failed attempts for this MFA record recently.</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: object</p><strong>Properties</strong><ul><li><strong>name</strong>: <em>required (string)</em></li><li><strong>message</strong>: <em>required (string)</em></li><li><strong>code</strong>: <em>required (integer)</em></li><li><strong>status</strong>: <em>required (integer)</em></li></ul><p><strong>Examples</strong>:</p><div class="examples"><pre><code>{
   "name": "Bad Request",
   "message": "",
   "code": 0,
   "status": 400
+}
+</code></pre><pre><code>{
+  "name": "Conflict",
+  "message": "May not be reused yet.",
+  "code": 1542395933,
+  "status": 409
 }
 </code></pre><pre><code>{
   "name": "Conflict",
@@ -1042,11 +1183,23 @@
   "code": 1542395933,
   "status": 409
 }
+</code></pre><pre><code>{
+  "name": "Conflict",
+  "message": "May not be reused yet.",
+  "code": 1542395933,
+  "status": 409
+}
 </code></pre></div><h2>HTTP status code <a href="http://httpstatus.es/409" target="_blank">409</a></h2><p>New method matches an already existing verified method</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: object</p><strong>Properties</strong><ul><li><strong>name</strong>: <em>required (string)</em></li><li><strong>message</strong>: <em>required (string)</em></li><li><strong>code</strong>: <em>required (integer)</em></li><li><strong>status</strong>: <em>required (integer)</em></li></ul><p><strong>Examples</strong>:</p><div class="examples"><pre><code>{
   "name": "Bad Request",
   "message": "",
   "code": 0,
   "status": 400
+}
+</code></pre><pre><code>{
+  "name": "Conflict",
+  "message": "May not be reused yet.",
+  "code": 1542395933,
+  "status": 409
 }
 </code></pre><pre><code>{
   "name": "Conflict",
@@ -1066,11 +1219,23 @@
   "code": 1542395933,
   "status": 409
 }
+</code></pre><pre><code>{
+  "name": "Conflict",
+  "message": "May not be reused yet.",
+  "code": 1542395933,
+  "status": 409
+}
 </code></pre></div><h2>HTTP status code <a href="http://httpstatus.es/500" target="_blank">500</a></h2><p>Database or other system error</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: object</p><strong>Properties</strong><ul><li><strong>name</strong>: <em>required (string)</em></li><li><strong>message</strong>: <em>required (string)</em></li><li><strong>code</strong>: <em>required (integer)</em></li><li><strong>status</strong>: <em>required (integer)</em></li></ul><p><strong>Examples</strong>:</p><div class="examples"><pre><code>{
   "name": "Bad Request",
   "message": "",
   "code": 0,
   "status": 400
+}
+</code></pre><pre><code>{
+  "name": "Conflict",
+  "message": "May not be reused yet.",
+  "code": 1542395933,
+  "status": 409
 }
 </code></pre><pre><code>{
   "name": "Conflict",
@@ -1099,6 +1264,12 @@
   "code": 1542395933,
   "status": 409
 }
+</code></pre><pre><code>{
+  "name": "Conflict",
+  "message": "May not be reused yet.",
+  "code": 1542395933,
+  "status": 409
+}
 </code></pre></div></div><div class="tab-pane" id="method__uid__get_securedby"><h1>Secured by AuthzBearerToken</h1><h3>Headers</h3><ul><li><strong>Authorization</strong>: <em>required (string)</em><p><strong>Example</strong>:</p><div class="examples"><pre><code>Bearer abc123</code></pre></div></li></ul></div></div></div></div></div></div><div class="modal fade" tabindex="0" id="method__uid__delete"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_delete">delete <span class="glyphicon glyphicon-lock" title="Authentication required"></span></span> <span class="parent">/method</span>/{uid}</h4></div><div class="modal-body"><div class="alert alert-info"><p>Delete a specific recovery method.</p></div><div class="alert alert-warning"><span class="glyphicon glyphicon-lock" title="Authentication required"></span> Secured by <b>AuthzBearerToken</b></div><ul class="nav nav-tabs"><li class="active"><a href="#method__uid__delete_request" data-toggle="tab">Request</a></li><li><a href="#method__uid__delete_response" data-toggle="tab">Response</a></li><li><a href="#method__uid__delete_securedby" data-toggle="tab">Security</a></li></ul><div class="tab-content"><div class="tab-pane active" id="method__uid__delete_request"><h3>URI Parameters</h3><ul><li><strong>uid</strong>: <em>required (string)</em></li></ul><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: object</p><strong>Properties</strong><ul><li><strong>employee_id</strong>: <em>required (string)</em></li></ul><p><strong>Example</strong>:</p><div class="examples"><pre><code>{
   "employee_id": "12345"
 }
@@ -1114,11 +1285,23 @@
   "code": 1542395933,
   "status": 409
 }
+</code></pre><pre><code>{
+  "name": "Conflict",
+  "message": "May not be reused yet.",
+  "code": 1542395933,
+  "status": 409
+}
 </code></pre></div><h2>HTTP status code <a href="http://httpstatus.es/500" target="_blank">500</a></h2><p>Delete failed</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: object</p><strong>Properties</strong><ul><li><strong>name</strong>: <em>required (string)</em></li><li><strong>message</strong>: <em>required (string)</em></li><li><strong>code</strong>: <em>required (integer)</em></li><li><strong>status</strong>: <em>required (integer)</em></li></ul><p><strong>Examples</strong>:</p><div class="examples"><pre><code>{
   "name": "Bad Request",
   "message": "",
   "code": 0,
   "status": 400
+}
+</code></pre><pre><code>{
+  "name": "Conflict",
+  "message": "May not be reused yet.",
+  "code": 1542395933,
+  "status": 409
 }
 </code></pre><pre><code>{
   "name": "Conflict",
@@ -1147,11 +1330,23 @@
   "code": 1542395933,
   "status": 409
 }
+</code></pre><pre><code>{
+  "name": "Conflict",
+  "message": "May not be reused yet.",
+  "code": 1542395933,
+  "status": 409
+}
 </code></pre></div><h2>HTTP status code <a href="http://httpstatus.es/410" target="_blank">410</a></h2><p>Expired verification code</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: object</p><strong>Properties</strong><ul><li><strong>name</strong>: <em>required (string)</em></li><li><strong>message</strong>: <em>required (string)</em></li><li><strong>code</strong>: <em>required (integer)</em></li><li><strong>status</strong>: <em>required (integer)</em></li></ul><p><strong>Examples</strong>:</p><div class="examples"><pre><code>{
   "name": "Bad Request",
   "message": "",
   "code": 0,
   "status": 400
+}
+</code></pre><pre><code>{
+  "name": "Conflict",
+  "message": "May not be reused yet.",
+  "code": 1542395933,
+  "status": 409
 }
 </code></pre><pre><code>{
   "name": "Conflict",
@@ -1171,11 +1366,23 @@
   "code": 1542395933,
   "status": 409
 }
+</code></pre><pre><code>{
+  "name": "Conflict",
+  "message": "May not be reused yet.",
+  "code": 1542395933,
+  "status": 409
+}
 </code></pre></div><h2>HTTP status code <a href="http://httpstatus.es/500" target="_blank">500</a></h2><p>Database or other system error</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: object</p><strong>Properties</strong><ul><li><strong>name</strong>: <em>required (string)</em></li><li><strong>message</strong>: <em>required (string)</em></li><li><strong>code</strong>: <em>required (integer)</em></li><li><strong>status</strong>: <em>required (integer)</em></li></ul><p><strong>Examples</strong>:</p><div class="examples"><pre><code>{
   "name": "Bad Request",
   "message": "",
   "code": 0,
   "status": 400
+}
+</code></pre><pre><code>{
+  "name": "Conflict",
+  "message": "May not be reused yet.",
+  "code": 1542395933,
+  "status": 409
 }
 </code></pre><pre><code>{
   "name": "Conflict",
@@ -1198,11 +1405,23 @@
   "code": 1542395933,
   "status": 409
 }
+</code></pre><pre><code>{
+  "name": "Conflict",
+  "message": "May not be reused yet.",
+  "code": 1542395933,
+  "status": 409
+}
 </code></pre></div><h2>HTTP status code <a href="http://httpstatus.es/404" target="_blank">404</a></h2><p>User not found or method not found</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: object</p><strong>Properties</strong><ul><li><strong>name</strong>: <em>required (string)</em></li><li><strong>message</strong>: <em>required (string)</em></li><li><strong>code</strong>: <em>required (integer)</em></li><li><strong>status</strong>: <em>required (integer)</em></li></ul><p><strong>Examples</strong>:</p><div class="examples"><pre><code>{
   "name": "Bad Request",
   "message": "",
   "code": 0,
   "status": 400
+}
+</code></pre><pre><code>{
+  "name": "Conflict",
+  "message": "May not be reused yet.",
+  "code": 1542395933,
+  "status": 409
 }
 </code></pre><pre><code>{
   "name": "Conflict",
