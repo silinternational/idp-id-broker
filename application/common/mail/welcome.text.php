@@ -25,21 +25,15 @@
 ?>
 Dear <?= $displayName ?>,
 
-<p>
-    Thank you for setting your <?= $idpDisplayName ?> identity
-    account password. Below is some important information about this account
-    that you may want to keep for future reference.
-</p>
+Thank you for setting your <?= $idpDisplayName ?> identity
+account password. Below is some important information about this account
+that you may want to keep for future reference.
 
-<ul>
-
-    <li><strong>Username:</strong><?= $username ?></li>
-    <li><strong>To update profile, go to:</strong><?= $passwordProfileUrl ?></li>
-    <li><strong>If you forget your password, go to:</strong><?= $passwordProfileUrl  . '/password/forgot'?></li>
-    <li><strong>Help & FAQs:</strong><?= $helpCenterUrl ?></li>
-    <li><strong>Contact Support:</strong><?= $supportEmail ?></li>
-
-</ul>
+- Username: <?= $username ?>
+- To update profile, go to: <?= $passwordProfileUrl ?>
+- If you forget your password, go to: <?= $passwordProfileUrl  . '/password/forgot' ?>
+- Help & FAQs: <?= $helpCenterUrl ?>
+- Contact Support: <?= $supportEmail ?>
 
 Thanks,
 <?= $emailSignature ?>
