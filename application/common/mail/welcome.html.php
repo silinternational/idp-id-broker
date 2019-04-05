@@ -23,6 +23,8 @@ use yii\helpers\Html as yHtml;
  * @var bool   $isMfaEnabled
  * @var bool   $hasRecoveryMethods
  */
+
+ $forgotUrl = $passwordProfileUrl . '/password/forgot';
 ?>
 <p>
     Dear <?=yHtml::encode($displayName)?>,
@@ -35,14 +37,28 @@ use yii\helpers\Html as yHtml;
 
 <ul>
 
-    <li><strong>Username:</strong><?=yHtml::encode($username)?></li>
-    <li><strong>To update profile, go to:</strong><?=yHtml::encode($passwordProfileUrl)?></li>
+    <li>
+        <strong>Username:</strong> <?=yHtml::encode($username)?>
+    </li>
+
+    <li>
+        <strong>To update profile, go to:</strong>
+        <?=yHtml::a(yHtml::encode($passwordProfileUrl), $passwordProfileUrl)?>
+    </li>
+
     <li>
         <strong>If you forget your password, go to:</strong>
-        <?=yHtml::encode($passwordProfileUrl) . '/password/forgot'?>
+        <?=yHtml::a(yHtml::encode($forgotUrl), $forgotUrl)?>
     </li>
-    <li><strong>Help & FAQs:</strong><?=yHtml::encode($helpCenterUrl)?></li>
-    <li><strong>Contact Support:</strong><?=yHtml::encode($supportEmail)?></li>
+
+    <li>
+        <strong>Help & FAQs:</strong>
+        <?=yHtml::a(yHtml::encode($helpCenterUrl), $helpCenterUrl)?>
+    </li>
+    
+    <li>
+        <strong>Contact Support:</strong><?=yHtml::encode($supportEmail)?>
+    </li>
 
 </ul>
 
