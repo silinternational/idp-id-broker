@@ -35,7 +35,6 @@ class MfaBackupcode extends MfaBackupcodeBase
         $codeStartsWithZero = (substr($code, 0, 1) === '0');
 
         $backupCodes = MfaBackupcode::findAll(['mfa_id' => $mfaId]);
-        $startCount = count($backupCodes);
         foreach ($backupCodes as $backupCode) {
             $foundMatch = false;
 
@@ -61,14 +60,6 @@ class MfaBackupcode extends MfaBackupcodeBase
                     throw new ServerErrorHttpException("Unable to delete code after use", 1506692863);
                 }
 
-                /* @var $emailer Emailer */
-                $emailer = \Yii::$app->emailer;
-                if ($emailer->shouldSendRefreshBackupCodesMessage($startCount - 1)) {
-                    $mfa = Mfa::findOne($mfaId);
-                    $user = $mfa->user;
-                    $emailer->sendMessageTo(EmailLog::MESSAGE_TYPE_REFRESH_BACKUP_CODES, $user);
-                }
-
                 return true;
             }
         }
@@ -77,7 +68,7 @@ class MfaBackupcode extends MfaBackupcodeBase
     }
 
     /**
-     * Clear out previous backup codes and generate new ones
+     * Generate new backup codes
      * @param int $mfaId
      * @param int $howMany
      * @return array
@@ -85,13 +76,10 @@ class MfaBackupcode extends MfaBackupcodeBase
      */
     public static function createBackupCodes(int $mfaId, int $howMany = 10): array
     {
-        // Delete any existing codes
-        self::deleteCodesForMfaId($mfaId);
-
         // Generate and store new codes
         $clearTextCodes = [];
         for ($i = 0; $i < $howMany; $i++) {
-            $code = substr(random_int(100000000, 200000000),1);
+            $code = substr(random_int(100000000, 200000000), 1);
             $clearTextCodes[] = $code;
             self::insertBackupCode($mfaId, $code);
         }
@@ -117,7 +105,10 @@ class MfaBackupcode extends MfaBackupcodeBase
                 'status' => 'error',
                 'error' => $code->getFirstErrors(),
             ]);
-            throw new ServerErrorHttpException("Unable to save new backup code, error: " . print_r($code->getFirstErrors(), true), 1506692503);
+            throw new ServerErrorHttpException(
+                "Unable to save new backup code, error: " . print_r($code->getFirstErrors(), true),
+                1506692503
+            );
         }
     }
 
@@ -148,4 +139,19 @@ class MfaBackupcode extends MfaBackupcodeBase
         return true;
     }
 
+    /**
+     * @param int $mfaId
+     */
+    public static function sendRefreshCodesMessage(int $mfaId): void
+    {
+        $numCodesRemaining = MfaBackupcode::find()->where(['mfa_id' => $mfaId])->count();
+
+        /* @var $emailer Emailer */
+        $emailer = \Yii::$app->emailer;
+        if ($emailer->shouldSendRefreshBackupCodesMessage($numCodesRemaining)) {
+            $mfa = Mfa::findOne($mfaId);
+            $user = $mfa->user;
+            $emailer->sendMessageTo(EmailLog::MESSAGE_TYPE_REFRESH_BACKUP_CODES, $user);
+        }
+    }
 }

@@ -117,6 +117,10 @@ class MfaBackendU2f extends Component implements MfaBackendInterface
             throw new NotFoundHttpException("MFA record for given ID not found");
         }
 
-        return $this->client->u2fDelete($mfa->external_uuid);
+        if (is_string($mfa->external_uuid)) {
+            return $this->client->u2fDelete($mfa->external_uuid);
+        }
+
+        return true;
     }
 }

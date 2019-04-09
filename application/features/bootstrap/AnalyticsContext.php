@@ -1,16 +1,13 @@
 <?php
 namespace Sil\SilIdBroker\Behat\Context;
 
-use Behat\Behat\Tester\Exception\PendingException;
-use Behat\Gherkin\Node\TableNode;
-use common\helpers\MySqlDateTime;
+use common\models\EmailLog;
 use common\models\Mfa;
 use common\models\MfaBackupcode;
 use common\models\User;
 use common\models\Password;
 use Sil\SilIdBroker\Behat\Context\YiiContext;
 use Webmozart\Assert\Assert;
-use yii\helpers\Json;
 
 class AnalyticsContext extends YiiContext
 {
@@ -73,6 +70,7 @@ class AnalyticsContext extends YiiContext
     {
         MfaBackupcode::deleteAll();
         Mfa::deleteAll();
+        EmailLog::deleteAll();
         User::deleteAll();
     }
 

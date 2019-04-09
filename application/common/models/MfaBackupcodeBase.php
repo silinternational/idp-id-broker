@@ -7,8 +7,8 @@ use Yii;
 /**
  * This is the model class for table "mfa_backupcode".
  *
- * @property integer $id
- * @property integer $mfa_id
+ * @property int $id
+ * @property int $mfa_id
  * @property string $value
  * @property string $created_utc
  * @property string $expires_utc
@@ -18,7 +18,7 @@ use Yii;
 class MfaBackupcodeBase extends \yii\db\ActiveRecord
 {
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public static function tableName()
     {
@@ -26,7 +26,7 @@ class MfaBackupcodeBase extends \yii\db\ActiveRecord
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function rules()
     {
@@ -40,7 +40,7 @@ class MfaBackupcodeBase extends \yii\db\ActiveRecord
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function attributeLabels()
     {

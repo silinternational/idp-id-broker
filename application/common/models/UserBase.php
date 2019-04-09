@@ -7,7 +7,7 @@ use Yii;
 /**
  * This is the model class for table "user".
  *
- * @property integer $id
+ * @property int $id
  * @property string $uuid
  * @property string $employee_id
  * @property string $first_name
@@ -15,25 +15,30 @@ use Yii;
  * @property string $display_name
  * @property string $username
  * @property string $email
- * @property integer $current_password_id
+ * @property int $current_password_id
  * @property string $active
  * @property string $locked
  * @property string $last_changed_utc
  * @property string $last_synced_utc
  * @property string $require_mfa
- * @property string $nag_for_mfa_after
  * @property string $last_login_utc
  * @property string $manager_email
- * @property string $spouse_email
+ * @property string $hide
+ * @property string $groups
+ * @property string $personal_email
+ * @property string $review_profile_after
+ * @property string $expires_on
  *
  * @property EmailLog[] $emailLogs
+ * @property Invite[] $invites
+ * @property Method[] $methods
  * @property Mfa[] $mfas
  * @property Password $currentPassword
  */
 class UserBase extends \yii\db\ActiveRecord
 {
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public static function tableName()
     {
@@ -41,17 +46,17 @@ class UserBase extends \yii\db\ActiveRecord
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function rules()
     {
         return [
-            [['uuid', 'employee_id', 'first_name', 'last_name', 'username', 'email', 'active', 'locked', 'last_changed_utc', 'last_synced_utc', 'nag_for_mfa_after'], 'required'],
+            [['uuid', 'employee_id', 'first_name', 'last_name', 'username', 'active', 'locked', 'last_changed_utc', 'last_synced_utc', 'review_profile_after'], 'required'],
             [['current_password_id'], 'integer'],
-            [['active', 'locked', 'require_mfa'], 'string'],
-            [['last_changed_utc', 'last_synced_utc', 'nag_for_mfa_after', 'last_login_utc'], 'safe'],
+            [['active', 'locked', 'require_mfa', 'hide'], 'string'],
+            [['last_changed_utc', 'last_synced_utc', 'last_login_utc', 'review_profile_after', 'expires_on'], 'safe'],
             [['uuid'], 'string', 'max' => 64],
-            [['employee_id', 'first_name', 'last_name', 'display_name', 'username', 'email', 'manager_email', 'spouse_email'], 'string', 'max' => 255],
+            [['employee_id', 'first_name', 'last_name', 'display_name', 'username', 'email', 'manager_email', 'groups', 'personal_email'], 'string', 'max' => 255],
             [['employee_id'], 'unique'],
             [['username'], 'unique'],
             [['email'], 'unique'],
@@ -60,7 +65,7 @@ class UserBase extends \yii\db\ActiveRecord
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function attributeLabels()
     {
@@ -79,10 +84,13 @@ class UserBase extends \yii\db\ActiveRecord
             'last_changed_utc' => Yii::t('app', 'Last Changed Utc'),
             'last_synced_utc' => Yii::t('app', 'Last Synced Utc'),
             'require_mfa' => Yii::t('app', 'Require Mfa'),
-            'nag_for_mfa_after' => Yii::t('app', 'Nag For Mfa After'),
             'last_login_utc' => Yii::t('app', 'Last Login Utc'),
             'manager_email' => Yii::t('app', 'Manager Email'),
-            'spouse_email' => Yii::t('app', 'Spouse Email'),
+            'hide' => Yii::t('app', 'Hide'),
+            'groups' => Yii::t('app', 'Groups'),
+            'personal_email' => Yii::t('app', 'Personal Email'),
+            'review_profile_after' => Yii::t('app', 'Review Profile After'),
+            'expires_on' => Yii::t('app', 'Expires On'),
         ];
     }
 
@@ -92,6 +100,22 @@ class UserBase extends \yii\db\ActiveRecord
     public function getEmailLogs()
     {
         return $this->hasMany(EmailLog::className(), ['user_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getInvites()
+    {
+        return $this->hasMany(Invite::className(), ['user_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getMethods()
+    {
+        return $this->hasMany(Method::className(), ['user_id' => 'id']);
     }
 
     /**

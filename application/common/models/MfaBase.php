@@ -7,12 +7,12 @@ use Yii;
 /**
  * This is the model class for table "mfa".
  *
- * @property integer $id
- * @property integer $user_id
+ * @property int $id
+ * @property int $user_id
  * @property string $type
  * @property string $external_uuid
  * @property string $label
- * @property integer $verified
+ * @property int $verified
  * @property string $created_utc
  * @property string $last_used_utc
  *
@@ -23,7 +23,7 @@ use Yii;
 class MfaBase extends \yii\db\ActiveRecord
 {
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public static function tableName()
     {
@@ -31,7 +31,7 @@ class MfaBase extends \yii\db\ActiveRecord
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function rules()
     {
@@ -46,7 +46,7 @@ class MfaBase extends \yii\db\ActiveRecord
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function attributeLabels()
     {

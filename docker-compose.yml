@@ -49,7 +49,7 @@ services:
         volumes_from:
             - data
         ports:
-            - "8082:80"
+            - "80"
         depends_on:
             - appfortestsdb
         environment:
@@ -74,7 +74,6 @@ services:
             MYSQL_USER: appfortests
             MYSQL_PASSWORD: appfortests
             MIGRATE_PW_FROM_LDAP: "true"
-            PASSWORD_FORGOT_URL: https://www.example.com/forgot
             SUPPORT_EMAIL: support@example.com
 
     appfortestsdb:
@@ -88,7 +87,7 @@ services:
             MYSQL_PASSWORD: appfortests
 
     cli:
-        image: silintl/php7:latest
+        image: silintl/php7:7.2
         volumes_from:
             - data
         working_dir: /data
@@ -125,7 +124,7 @@ services:
         command: bash -c "sleep 10 && /data/load_ldap.sh"
 
     test:
-        image: silintl/php7:latest
+        image: silintl/php7:7.2
         volumes_from:
             - data
         working_dir: /data
@@ -135,6 +134,7 @@ services:
             TEST_SERVER_HOSTNAME: appfortests
             API_ACCESS_KEYS: api-test-NOTASECRET
             APP_ENV: test
+            EMAILER_CLASS: \Sil\SilIdBroker\Behat\Context\fakes\FakeEmailer
             EMAIL_SERVICE_accessToken: dummy
             EMAIL_SERVICE_assertValidIp: "false"
             EMAIL_SERVICE_baseUrl: dummy
@@ -152,8 +152,7 @@ services:
             MYSQL_HOST: appfortestsdb
             MYSQL_PASSWORD: appfortests
             MYSQL_USER: appfortests
-            PASSWORD_FORGOT_URL: https://www.example.com/forgot
-            PASSWORD_PROFILE_URL: https://www.example.com/profile
+            PASSWORD_PROFILE_URL: https://www.example.com
             SUPPORT_EMAIL: support@example.com
         command: ./run-tests.sh
         # running isolated tests
@@ -172,6 +171,13 @@ services:
             PMA_HOST: db
             PMA_USER: user
             PMA_PASSWORD: pass
+
+    raml2html:
+        image: mattjtodd/raml2html
+        volumes:
+            - ./api.raml:/api.raml
+            - ./api.html:/api.html
+        command: -i api.raml -o api.html
 
 networks:
     default:

@@ -191,11 +191,11 @@ Feature: Email
 
   Scenario Outline: When to send mfa disabled emails (after one has been added or deleted)
     Given we are configured <sendMfaDisabledEml> mfa disabled emails
-    And no mfas exist
-    And a user already exists
-    And a verified u2f mfa option <u2fExistsOrNot>
-    And a totp mfa option <totpExistsOrNot>
-    And the latest mfa event type was <mfaEventType>
+      And no mfas exist
+      And a user already exists
+      And a verified u2f mfa option <u2fExistsOrNot>
+      And a totp mfa option <totpExistsOrNot>
+      And the latest mfa event type was <mfaEventType>
     When I check if a mfa disabled email should be sent
     Then I see that a mfa disabled email <shouldOrNot> be sent
 
@@ -234,9 +234,9 @@ Feature: Email
 
   Scenario: When to send a mfa disabled email after an unverified u2f mfa option has been deleted.
     Given we are configured to send mfa disabled emails
-    And no mfas exist
-    And a user already exists
-    And an unverified u2f mfa option was just deleted
+      And no mfas exist
+      And a user already exists
+      And an unverified u2f mfa option was just deleted
     When I check if a mfa disabled email should be sent
     Then I see that a mfa disabled email should not be sent
 
@@ -289,3 +289,31 @@ Feature: Email
     When I send delayed mfa related emails
     Then I see that the first user has received a lost-security-key email
       And I see that the second user has received a get-backup-codes email
+
+  Scenario: Send a recovery method verify email upon creation of the object
+    Given a user already exists
+      And no methods exist
+      And I remove records of any emails that have been sent
+    When I create a new recovery method
+    Then a Method Verify email is sent to that method
+
+  Scenario: Resend a recovery method verify email for an existing object
+    Given a user already exists
+      And an unverified method exists
+      And I remove records of any emails that have been sent
+    When I request that the verify email is resent
+    Then a Method Verify email is sent to that method
+
+  Scenario: Send a manager rescue code email after creation of manager mfa
+    Given a user already exists
+      And no mfas exist
+    When I request a new manager mfa
+     Then a "mfa-manager-help" email should have been sent to them
+      And a Manager Rescue email is sent to the manager
+
+  Scenario: Copy a user's personal email address on invite email message
+    Given a specific user does NOT exist
+      And I remove records of any emails that have been sent
+     When that user is created with a personal email address
+     Then an "invite" email should have been sent to them
+      And that email should have been copied to the personal email address

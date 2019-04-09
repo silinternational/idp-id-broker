@@ -7,22 +7,22 @@ class MySqlDateTime
     const MYSQL_DATE_FORMAT     = 'Y-m-d';
     const HUMAN_DATE_FORMAT     = 'F jS, Y'; // November 27th, 2017
 
-    public static function now()
+    public static function now(): string
     {
         return gmdate(self::MYSQL_DATETIME_FORMAT);
     }
 
-    public static function today()
+    public static function today(): string
     {
         return gmdate(self::MYSQL_DATE_FORMAT);
     }
 
-    public static function formatDate(int $timestamp)
+    public static function formatDate(int $timestamp): string
     {
         return gmdate(self::MYSQL_DATE_FORMAT, $timestamp);
     }
 
-    public static function formatDateTime(int $timestamp)
+    public static function formatDateTime(int $timestamp): string
     {
         return gmdate(self::MYSQL_DATETIME_FORMAT, $timestamp);
     }
@@ -30,9 +30,9 @@ class MySqlDateTime
     /**
      * Get a relative date based on given string
      * @param string $difference
-     * @return false|string
+     * @return string
      */
-    public static function relative(string $difference = '+30 days')
+    public static function relative(string $difference = '+30 days'): string
     {
         return self::formatDate(strtotime($difference));
     }
@@ -40,9 +40,9 @@ class MySqlDateTime
     /**
      * Get a relative date-time based on given string
      * @param string $difference
-     * @return false|string
+     * @return string
      */
-    public static function relativeTime(string $difference = '+30 minutes')
+    public static function relativeTime(string $difference = '+30 minutes'): string
     {
         return self::formatDateTime(strtotime($difference));
     }
@@ -54,7 +54,7 @@ class MySqlDateTime
      */
     public static function formatDateForHumans(string $timestamp = null)
     {
-        if ( ! is_numeric($timestamp)) {
+        if (! is_numeric($timestamp)) {
             $timestamp = strtotime($timestamp);
         }
 
@@ -74,5 +74,25 @@ class MySqlDateTime
         $recentDate = self::relative($dtInterval);
 
         return strtotime($dbDate) >= strtotime($recentDate);
+    }
+
+    /**
+     * Compare a date or datetime in MySQL format (yyyy-mm-dd or yyyy-mm-dd hh:mm::ss)
+     * to an epoch time as returned from time().
+     * Returns true if $eventTime is the same day or before $now.
+     *
+     * @param string $eventTime
+     * @param int $now
+     * @return bool
+     * @throws \Exception
+     */
+    public static function isBefore(string $eventTime, int $now)
+    {
+        $eventTimeEpoch = strtotime($eventTime);
+        if ($eventTimeEpoch === false) {
+            throw new \Exception('could not interpret time string');
+        }
+
+        return ! ($eventTimeEpoch > $now);
     }
 }

@@ -1,9 +1,10 @@
-#%RAML 0.8
-title: ID Broker API
+#%RAML 1.0
+title: ID Broker
+version: 4
 protocols: [ HTTPS ]
 mediaType: application/json
 securitySchemes:
-  - AuthzBearerToken:
+  AuthzBearerToken:
       type: x-{other}
       describedBy:
         headers:
@@ -12,441 +13,336 @@ securitySchemes:
             example: Bearer abc123
 securedBy: [ AuthzBearerToken ]
 
-schemas:
-  - Authentication: |
-      {
-        "$schema": "http://json-schema.org/draft-03/schema",
-        "properties": {
-          "username": {
-            "required": true,
-            "type": "string"
-          },
-          "password": {
-            "required": true,
-            "type": "string"
-          }
-        },
-        "type": "object"
-      }
-  - Error: |
-      {
-        "$schema": "http://json-schema.org/draft-03/schema",
-        "properties": {
-          "name": {
-            "required": true,
-            "type": "string"
-          },
-          "message": {
-            "required": true,
-            "type": "string"
-          },
-          "code": {
-            "required": true,
-            "type": "integer"
-          },
-          "status": {
-            "required": true,
-            "type": "integer"
-          }
-        },
-        "type": "object"
-      }
-  - ReturnedUser: |
-      {
-        "$schema": "http://json-schema.org/draft-03/schema",
-        "properties": {
-          "uuid": {
-            "required": false,
-            "type": "string"
-          },
-          "employee_id": {
-            "required": false,
-            "type": "string"
-          },
-          "first_name": {
-            "required": false,
-            "type": "string"
-          },
-          "last_name": {
-            "required": false,
-            "type": "string"
-          },
-          "display_name": {
-            "required": false,
-            "type": "string"
-          },
-          "username": {
-            "required": false,
-            "type": "string"
-          },
-          "email": {
-            "required": false,
-            "type": "string"
-          },
-          "active": {
-            "required": false,
-            "type": "string",
-            "enum": ["yes", "no"]
-          },
-          "locked": {
-            "required": false,
-            "type": "string",
-            "enum": ["yes", "no"]
-          },
-          "last_login_utc": {
-            "required": false,
-            "type": "string"
-          },
-          "manager_email": {
-            "required": false,
-            "type": "string"
-          },
-          "mfa": {
-            "required": true,
-            "type": "object",
-            "properties": {
-              "prompt": {
-                "required": true,
-                "type": "string",
-                "enum": ["yes","no"]
-              },
-              "nag": {
-                "required": true,
-                "type": "string",
-                "enum": ["yes","no"]
-              },
-              "options": {
-                "required": true,
-                "type": "array"
-              }
-            }
-          },
-          "password": {
-            "required": false,
-            "type": "object",
-            "properties": {
-              "created_utc": {
-                "required": true,
-                "type": "string"
-              },
-              "expires_on": {
-                "required": true,
-                "type": "string"
-              },
-              "grace_period_ends_on": {
-                "required": true,
-                "type": "string"
-              }
-            }
-          },
-          "spouse_email": {
-            "required": false,
-            "type": "string"
-          }
-        },
-        "type": "object"
-      }
-  - UserCreation: |
-      {
-        "$schema": "http://json-schema.org/draft-03/schema",
-        "properties": {
-          "employee_id": {
-            "required": true,
-            "type": "string"
-          },
-          "first_name": {
-            "required": true,
-            "type": "string"
-          },
-          "last_name": {
-            "required": true,
-            "type": "string"
-          },
-          "display_name": {
-            "required": false,
-            "type": "string"
-          },
-          "username": {
-            "required": true,
-            "type": "string"
-          },
-          "email": {
-            "required": true,
-            "type": "string"
-          },
-          "active": {
-            "required": false,
-            "type": "string",
-            "enum": ["yes", "no"]
-          },
-          "locked": {
-            "required": false,
-            "type": "string",
-            "enum": ["yes", "no"]
-          },
-          "manager_email": {
-            "required": false,
-            "type": "string"
-          },
-          "spouse_email": {
-            "required": false,
-            "type": "string"
-          }
-        },
-        "type": "object"
-      }
-  - UserList: |
-      {
-        "$schema": "http://json-schema.org/draft-03/schema",
-        "items": {
-          "properties": {
-            "uuid": {
-              "required": false,
-              "type": "string"
-            },
-            "employee_id": {
-              "required": false,
-              "type": "string"
-            },
-            "first_name": {
-              "required": false,
-              "type": "string"
-            },
-            "last_name": {
-              "required": false,
-              "type": "string"
-            },
-            "display_name": {
-              "required": false,
-              "type": "string"
-            },
-            "username": {
-              "required": false,
-              "type": "string"
-            },
-            "email": {
-              "required": false,
-              "type": "string"
-            },
-            "active": {
-              "required": false,
-              "type": "string",
-              "enum": ["yes", "no"]
-            },
-            "locked": {
-              "required": false,
-              "type": "string",
-              "enum": ["yes", "no"]
-            },
-            "manager_email": {
-              "required": false,
-              "type": "string"
-            },
-            "password": {
-              "required": false,
-              "type": "object",
-              "properties": {
-                "created_utc": {
-                  "required": true,
-                  "type": "string"
-                },
-                "expires_on": {
-                  "required": true,
-                  "type": "string"
-                },
-                "grace_period_ends_on": {
-                  "required": true,
-                  "type": "string"
-                }
-              }
-            },
-            "spouse_email": {
-              "required": false,
-              "type": "string"
-            }
-          },
-          "type": "object"
-        },
-        "type": "array"
-      }
-  - UserUpdate: |
-      {
-        "$schema": "http://json-schema.org/draft-03/schema",
-        "properties": {
-          "first_name": {
-            "required": false,
-            "type": "string"
-          },
-          "last_name": {
-            "required": false,
-            "type": "string"
-          },
-          "display_name": {
-            "required": false,
-            "type": "string"
-          },
-          "username": {
-            "required": false,
-            "type": "string"
-          },
-          "email": {
-            "required": false,
-            "type": "string"
-          },
-          "active": {
-            "required": false,
-            "type": "string",
-            "enum": ["yes", "no"]
-          },
-          "locked": {
-            "required": false,
-            "type": "string",
-            "enum": ["yes", "no"]
-          },
-          "manager_email": {
-            "required": false,
-            "type": "string"
-          },
-          "spouse_email": {
-            "required": false,
-            "type": "string"
-          }
-        },
-        "type": "object"
-      }
-  - MfaCreation: |
+types:
+  Authentication:
+    type: object
+    properties:
+      username?: string
+      password?: string
+      invite?: string
+    examples:
+      password: |
         {
-          "$schema": "http://json-schema.org/draft-03/schema",
-          "properties": {
-            "employee_id": {
-              "required": true,
-              "type": "string"
-            },
-            "type": {
-              "required": true,
-              "type": "string",
-              "enum": ["backupcode", "totp", "u2f"]
-            },
-            "label": {
-              "required": false,
-              "type": "string"
-            }
-          },
-          "type": "object"
+          "username": "john_smith",
+          "password": "correcthorsebatterystaple"
         }
-  - MfaCreationResponse: |
+      invite: |
+        {
+          "invite": "726fa32e-015d-46fb-ba5c-a579b4a4dcbf"
+        }
+  Error:
+    type: object
+    properties:
+      name: string
+      message: string
+      code: integer
+      status: integer
+    example: |
       {
-        "$schema": "http://json-schema.org/draft-03/schema",
-        "properties": {
-          "id": {
-            "required": true,
-            "type": "integer"
-          },
-          "data": {
-            "required": true,
-            "type": "object"
-          }
-        },
-        "type": "object"
+        "name": "Bad Request",
+        "message": "",
+        "code": 0,
+        "status": 400
       }
-
+  UserResponse:
+    description: >
+      Information on user record. Password is not included if a password
+      has not been assigned to the user. Method options are included only
+      if `method.review` is 'yes' and only in response to `POST /authentication`,
+      otherwise it will be an empty list.
+    type: object
+    properties:
+      uuid?: string
+      employee_id?: string
+      first_name?: string
+      last_name?: string
+      display_name?: string
+      username?: string
+      email?: string
+      active?:
+        enum: [ yes, no ]
+      locked?:
+        enum: [ yes, no ]
+      last_login_utc?: string
+      manager_email?: string
+      personal_email?: string
+      hide:
+        enum: [ yes, no ]
+      groups: string[]
+      mfa:
+        type: object
+        properties:
+          prompt:
+            enum: [ yes, no ]
+          options: MfaResponse[]
+      method:
+        type: object
+        properties:
+          options: MethodResponse[]
+      password?:
+        type: object
+        properties:
+          created_utc: string
+          expires_on: string
+          grace_period_ends_on: string
+      profile_review:
+        enum: [ yes, no ]
+        description: >
+          Flag to indicate whether to remind the user to review their mfa options and
+          recovery methods.
+    example: |
+      {
+        "uuid": "11111111-aaaa-1111-aaaa-111111111111",
+        "employee_id": "12345",
+        "first_name": "John",
+        "last_name": "Smith",
+        "display_name": "John Smith",
+        "username": "john_smith",
+        "email": "john_smith@example.com",
+        "active": "yes",
+        "locked": "no",
+        "last_login_utc": "2017-05-24T14:04:51Z",
+        "hide": "no",
+        "groups": [],
+        "mfa": {
+          "prompt": "yes",
+          "options": [
+            {
+              "id": 123,
+              "type": "totp",
+              "label": "Google Authenticator",
+              "created_utc": "2017-10-24T20:40:47Z",
+              "last_used_utc": null,
+              "data": {
+                "count": 10
+              }
+            },
+            {
+              "id": 234,
+              "type": "u2f",
+              "label": "Blue YubiKey",
+              "created_utc": "2017-10-24T20:40:47Z",
+              "last_used_utc": null,
+              "data": {
+                "count": 10
+            }
+            },
+            {
+              "id": 345,
+              "type": "backupcode",
+              "label": "2SV #1",
+              "created_utc": "2017-10-24T20:40:47Z",
+              "last_used_utc": null,
+              "data": {
+                  "count": 10
+              }
+            }
+          ]
+        },
+        "password": {
+          "created_utc":"2017-05-24T14:04:51Z",
+          "expires_on":"2018-05-24T23:59:59Z",
+          "grace_period_ends_on":"2018-06-23T23:59:59Z"
+        },
+        "method": {
+          "options": [
+            {
+              "id": "0YrSiNp2P6sfkleepNNvFYMQWuLfssve",
+              "value": "email@example.org",
+              "verified": true,
+              "created": "2017-10-24T20:40:47Z"
+            }
+          ]
+        },
+        "profile_review": "yes"
+      }
+  UserCreation:
+    type: object
+    properties:
+      employee_id: string
+      first_name: string
+      last_name: string
+      display_name?: string
+      username: string
+      email: string
+      active?:
+        enum: [ yes, no ]
+      locked?:
+        enum: [ yes, no ]
+      manager_email?: string
+      personal_email?: string
+      hide:
+        enum: [ yes, no ]
+      groups?: string
+    example: |
+      {
+        "employee_id": "12345",
+        "first_name": "John",
+        "last_name": "Smith",
+        "username": "john_smith",
+        "email": "john_smith@example.com",
+        "hide": "no"
+      }
+  UserUpdate:
+    type: object
+    properties:
+      first_name?: string
+      last_name?: string
+      display_name?: string
+      username?: string
+      email?: string
+      active?:
+        enum: [ yes, no ]
+      locked?:
+        enum: [ yes, no ]
+      manager_email?: string
+      personal_email?: string
+      hide?:
+        enum: [ yes, no ]
+      groups?: string
+    example: |
+      {
+        "active": "no"
+      }
+  MfaCreation:
+    type: object
+    properties:
+      employee_id: string
+      type:
+        enum: [ backupcode, totp, u2f, manager ]
+      label?: string
+    example: |
+      {
+        "employee_id": "12345",
+        "type": "backupcode"
+      }
+  MfaCreationResponse:
+    type: object
+    properties:
+      id: integer
+      data: string[]
+    example: |
+      {
+        "id": 3,
+        "data": [
+          "51231235",
+          "74475261",
+          "72412792",
+          "23221473",
+          "30936163",
+          "09641891",
+          "99517242",
+          "08751652",
+          "32842734",
+          "25937677"
+        ]
+      }
+  MfaResponse:
+    type: object
+    properties:
+      id: integer
+      type:
+        enum: [ backupcode, totp, u2f ]
+      label: string
+      created_utc: string
+      last_used_utc: string?
+      data:
+        type: object|array
+    examples:
+      backupcode: |
+        {
+            "id": 7,
+            "type": "backupcode",
+            "label": "2SV #1",
+            "created_utc": "2017-10-24T20:40:47Z",
+            "last_used_utc": null,
+            "data": {
+                "count": 10
+            }
+        }
+      u2f: |
+        {
+            "id": 8,
+            "type": "u2f",
+            "label": "2SV #2",
+            "created_utc": "2017-10-24T20:40:57Z",
+            "last_used_utc": null,
+            "data": []
+        }
+      totp: |
+        {
+            "id": 9,
+            "type": "totp",
+            "label": "2SV #3",
+            "created_utc": "2017-10-24T20:41:05Z",
+            "last_used_utc": null,
+            "data": []
+        }
+  Method:
+    type: object
+    properties:
+      employee_id: string
+      value: string
+    example: |
+      {
+        "employee_id": "12345",
+        "value": "email@example.org"
+      }
+  MethodResponse:
+    description:
+    type: object
+    properties:
+      id: string
+      value: string
+      verified: boolean
+      created: string
+    example: |
+      {
+          "id": "0YrSiNp2P6sfkleepNNvFYMQWuLfssve",
+          "value": "email@example.org",
+          "verified": true,
+          "created": "2017-10-24T20:41:05Z"
+      }
 /authentication:
   post:
     body:
-      application/json:
-        schema: Authentication
-        example: |
-          {
-            "username": "john_smith",
-            "password": "correcthorsebatterystaple"
-          }
+      type: Authentication
     responses:
       200:
-        description: |
+        description: >
           The given credentials were acceptable/valid (i.e. - the
           authentication succeeded). The body of the response will have the
           attributes of the authenticated User.
         body:
-          application/json:
-            schema: ReturnedUser
-            example: |
-              {
-                "uuid": "11111111-aaaa-1111-aaaa-111111111111",
-                "employee_id": "12345",
-                "first_name": "John",
-                "last_name": "Smith",
-                "display_name": "John Smith",
-                "username": "john_smith",
-                "email": "john_smith@example.com",
-                "active": "yes",
-                "locked": "no",
-                "last_login_utc": "2017-05-24 14:04:51 UTC",
-                "mfa": {
-                  "prompt": "yes",
-                  "nag": "no",
-                  "options": [
-                     {
-                       "id": 123,
-                       "type": "totp"
-                     },
-                     {
-                       "id": 234,
-                       "type": "u2f",
-                       "label": "Blue YubiKey"
-                     },
-                     {
-                       "id": 345,
-                       "type": "backupcode"
-                     },
-                   ]
-                },
-                "password": {
-                  "created_utc":"2017-05-24 14:04:51 UTC",
-                  "expires_on":"2018-05-24 23:59:59 UTC",
-                  "grace_period_ends_on":"2018-06-23 23:59:59 UTC"
-                }
-              }
+          type: UserResponse
       400:
-        description: |
+        description: >
           The given credentials were NOT acceptable/valid (i.e. - the
           authentication failed).
         body:
-          application/json:
-            schema: Error
-            example: |
-              {
-                "name": "Bad Request",
-                "message": "",
-                "code": 0,
-                "status": 400
-              }
+          type: Error
+      410:
+        description: >
+          The invite has expired. A new code has been generated and emailed
+          to the user.
+        body:
+          type: Error
       500:
         description: A server-side error occurred.
         body:
-          application/json:
-            schema: Error
-            example: |
-              {
-                "name": "Internal Server Error",
-                "message": "Some error message.",
-                "code": 0,
-                "status": 500
-              }
-
+          type: Error
 /user:
   get:
     description: Get a list of the existing users.
     queryParameters:
-      fields:
-        description: A comma-delimited list of fields to include for each user.
-        required: false
+      fields?:
         type: string
+        description: A comma-delimited list of fields to include for each user.
         default: "fields=uuid,employee_id,first_name,last_name,display_name,username,email,active,locked,password"
         example: "fields=employee_id,active"
-      username:
-        description: Search user by username.
-        required: false
+      username?:
         type: string
+        description: Search user by username.
         example: "username=john_smith"
       email:
         description: Search user by email.
@@ -455,474 +351,386 @@ schemas:
         example: "email=john_smith@example.com"
     responses:
       200:
-          body:
-            application/json:
-              schema: UserList
-              example: |
-                [
-                  {
-                    "uuid": "11111111-aaaa-1111-aaaa-111111111111",
-                    "employee_id": "12345",
-                    "first_name": "John",
-                    "last_name": "Smith",
-                    "display_name": "John Smith",
-                    "username": "john_smith",
-                    "email": "john_smith@example.com",
-                    "active": "yes",
-                    "locked": "no",
-                    "last_login_utc": "2017-05-24 14:04:51 UTC",
-                    "mfa": {
-                      "prompt": "yes",
-                      "nag": "no",
-                      "options": [
-                         {
-                           "id": 123,
-                           "type": "totp"
-                         },
-                         {
-                           "id": 234,
-                           "type": "u2f"
-                         },
-                         {
-                           "id": 345,
-                           "type": "backupcode"
-                         },
-                       ]
-                    },
-                    "password": {
-                      "created_utc":"2017-05-24 14:04:51",
-                      "expires_on":"2018-05-24",
-                      "grace_period_ends_on":"2018-06-23"
-                    }
-                  },
-                  {
-                    "uuid": "22222222-bbbb-2222-bbbb-222222222222",
-                    "employee_id": "54321",
-                    "first_name": "Jane",
-                    "last_name": "Smith",
-                    "display_name": "Jane Smith",
-                    "username": "jane_smith",
-                    "email": "jane_smith@example.com",
-                    "active": "yes",
-                    "locked": "no",
-                    "last_login_utc": "2017-05-24 14:04:51 UTC",
-                    "mfa": {
-                      "prompt": "yes",
-                      "nag": "no",
-                      "options": [
-                         {
-                           "id": 123,
-                           "type": "totp"
-                         },
-                         {
-                           "id": 234,
-                           "type": "u2f"
-                         },
-                         {
-                           "id": 345,
-                           "type": "backupcode"
-                         },
-                       ]
-                    }
-                  }
-                ]
+        body:
+          type: UserResponse[]
   post:
     description: Create a new user record.
     body:
-      application/json:
-        schema: UserCreation
-        example: |
-          {
-            "employee_id": "12345",
-            "first_name": "John",
-            "last_name": "Smith",
-            "username": "john_smith",
-            "email": "john_smith@example.com"
-          }
+      type: UserCreation
     responses:
       200:
         description: The new user record was created.
         body:
-          application/json:
-            schema: ReturnedUser
-            example: |
-              {
-                "uuid": "11111111-aaaa-1111-aaaa-111111111111",
-                "employee_id": "12345",
-                "first_name": "John",
-                "last_name": "Smith",
-                "display_name": "John Smith",
-                "username": "john_smith",
-                "email": "john_smith@example.com",
-                "active": "yes",
-                "locked": "no",
-                "mfa": {
-                  "prompt": "no",
-                  "nag": "yes",
-                  "options": []
-                }
-              }
+          type: UserResponse
       422:
         description: The given user data does not satisfy some validation rule.
         body:
-          application/json:
-            schema: Error
-            example: |
-              {
-                "name": "Unprocessable entity",
-                "message": "Employee ID cannot be blank.",
-                "code": 0,
-                "status": 422
-              }
+          type: Error
       500:
         description: A server-side error occurred.
         body:
-          application/json:
-            schema: Error
-            example: |
-              {
-                "name": "Internal Server Error",
-                "message": "Some error message.",
-                "code": 0,
-                "status": 500
-              }
-
+          type: Error
   /{employee_id}:
     get:
       description: Get information about a specific user.
       responses:
         200:
-          description: |
+          description: >
             The corresponding user record (matching on the `employee_id` URL
             parameter).
           body:
-            application/json:
-              schema: ReturnedUser
-              example: |
-                {
-                  "uuid": "11111111-aaaa-1111-aaaa-111111111111",
-                  "employee_id": "12345",
-                  "first_name": "John",
-                  "last_name": "Smith",
-                  "display_name": "John Smith",
-                  "username": "john_smith",
-                  "email": "john_smith@example.com",
-                  "active": "yes",
-                  "locked": "no",
-                  "password": {
-                    "created_utc":"2017-05-24 14:04:51 UTC",
-                    "expires_on":"2018-05-24 23:59:59 UTC",
-                    "grace_period_ends_on":"2018-06-23 23:59:59 UTC"
-                  }
-                }
+            type: UserResponse
         204:
           description: No user record was found with that `employee_id`.
     put:
       description: Update a user record.
       body:
-        application/json:
-          schema: UserUpdate
-          example: |
-            {
-              "active": "no"
-            }
+        type: UserUpdate
       responses:
         200:
-          description: |
+          description: >
             The corresponding user record (matching on the `employee_id` URL
             parameter) was updated to match the given data.
           body:
-            application/json:
-              schema: ReturnedUser
-              example: |
-                {
-                  "uuid": "11111111-aaaa-1111-aaaa-111111111111",
-                  "employee_id": "12345",
-                  "first_name": "John",
-                  "last_name": "Smith",
-                  "display_name": "John Smith",
-                  "username": "john_smith",
-                  "email": "john_smith@example.com",
-                  "active": "no",
-                  "locked": "no",
-                  "password": {
-                    "created_utc":"2017-05-24 14:04:51 UTC",
-                    "expires_on":"2018-05-24 23:59:59 UTC",
-                    "grace_period_ends_on":"2018-06-23 23:59:59 UTC"
-                  }
-                }
+            type: UserResponse
         204:
           description: No user record was found with that `employee_id`.
         422:
           description: The given user data does not satisfy some validation rule.
           body:
-            application/json:
-              schema: Error
-              example: |
-                {
-                  "name": "Unprocessable entity",
-                  "message": "Employee ID cannot be blank.",
-                  "code": 0,
-                  "status": 422
-                }
+            type: Error
         500:
           description: A server-side error occurred.
           body:
-            application/json:
-              schema: Error
-              example: |
-                {
-                  "name": "Internal Server Error",
-                  "message": "Some error message.",
-                  "code": 0,
-                  "status": 500
-                }
+            type: Error
     /mfa:
       get:
         description: Get a list of configured MFA devices for user
         responses:
           200:
             body:
-              application/json:
-                example: |
-                  [
-                      {
-                          "id": 7,
-                          "type": "backupcode",
-                          "label": "2SV #1",
-                          "created_utc": "2017-10-24T20:40:47+00:00",
-                          "last_used_utc": null,
-                          "data": {
-                              "count": 10
-                          }
-                      },
-                      {
-                          "id": 8,
-                          "type": "u2f",
-                          "label": "2SV #2",
-                          "created_utc": "2017-10-24T20:40:57+00:00",
-                          "last_used_utc": null,
-                          "data": []
-                      },
-                      {
-                          "id": 9,
-                          "type": "totp",
-                          "label": "2SV #3",
-                          "created_utc": "2017-10-24T20:41:05+00:00",
-                          "last_used_utc": null,
-                          "data": []
-                      }
-                  ]
+              type: MfaResponse[]
+          400:
+            description: User not found for given `employee_id`
+            body:
+              type: Error
+    /method:
+      get:
+        description: Get a list of verified and unverified recovery methods for user
+        responses:
+          400:
+            description: User not found for given `employee_id`
+            body:
+              type: Error
+          200:
+            body:
+              type: MethodResponse[]
     /password:
       put:
         description: Set the password for a User.
         body:
-          application/json:
-            schema:  |
-              {
-                "$schema": "http://json-schema.org/draft-03/schema",
-                "properties": {
-                  "password": {
-                    "required": true,
-                    "type": "string"
-                  }
-                },
-                "type": "object"
-              }
+          properties:
+            password: string
+          example: |
+            {
+              "password": "correcthorsebatterystaple"
+            }
+        responses:
+          200:
+            description: >
+              The password for the user with that `employee_id` was successfully updated.
+            body:
+              type: UserResponse
+          204:
+            description: No user record was found with that `employee_id`.
+          409:
+            description: A recently-used password was given.
+            body:
+              type: Error
+              example: |
+                {
+                  "name": "Conflict",
+                  "message": "May not be reused yet.",
+                  "code": 1542395933,
+                  "status": 409
+                }
+          422:
+            description: >
+              The given password does not meet some requirement (such as if an
+              empty string was given).
+            body:
+              type: Error
+          500:
+            description: A server-side error occurred.
+            body:
+              type: Error
+      /assess:
+        put:
+          description: Validate a potential new password. Does not save the password.
+          body:
+            properties:
+              password: string
             example: |
               {
                 "password": "correcthorsebatterystaple"
               }
-        responses:
-          200:
-            description: |
-              The password for the user with that `employee_id` was successfully updated.
-            body:
-              application/json:
-                schema: ReturnedUser
+          responses:
+            204:
+              description: >
+                The `password` is valid for the user with the given `employee_id`.
+            404:
+              description: No user found with given `employee_id`.
+              body:
+                type: Error
+            409:
+              description: A recently-used password was given.
+              body:
+                type: Error
                 example: |
                   {
-                    "uuid": "11111111-aaaa-1111-aaaa-111111111111",
-                    "employee_id": "12345",
-                    "first_name": "John",
-                    "last_name": "Smith",
-                    "display_name": "John Smith",
-                    "username": "john_smith",
-                    "email": "john_smith@example.com",
-                    "active": "yes",
-                    "locked": "no",
-                    "password": {
-                      "created_utc":"2017-05-24 14:04:51 UTC",
-                      "expires_on":"2018-05-24 23:59:59 UTC",
-                      "grace_period_ends_on":"2018-06-23 23:59:59 UTC"
-                    }
+                    "name": "Conflict",
+                    "message": "May not be reused yet.",
+                    "code": 1542395933,
+                    "status": 409
                   }
-          204:
-            description: No user record was found with that `employee_id`.
-          422:
-            description: |
-              The given password does not meet some requirement (such as if an
-              empty string was given or a recent password was reused).
-            body:
-              application/json:
-                schema: Error
-                example: |
-                  {
-                    "name": "Unprocessable Entity",
-                    "message": "Some error message.",
-                    "code": 0,
-                    "status": 422
-                  }
-          500:
-            description: A server-side error occurred.
-            body:
-              application/json:
-                schema: Error
-                example: |
-                  {
-                    "name": "Internal Server Error",
-                    "message": "Some error message.",
-                    "code": 0,
-                    "status": 500
-                  }
-  /expiring:
-    get:
-      description: Get a list of the active users whose password is expiring on a given date.
-      queryParameters:
-        grace_period_ends_on:
-          required: false
-          type: string
-          example: "grace_period_ends_on=2017-06-14"
-        expires_on:
-          required: false
-          type: string
-          example: "expires_on=2017-06-14"
-      responses:
-        200:
-            body:
-              application/json:
-                schema: UserList
-                example: |
-                  [
-                    {
-                      "uuid": "11111111-aaaa-1111-aaaa-111111111111",
-                      "employee_id": "12345",
-                      "first_name": "John",
-                      "last_name": "Smith",
-                      "display_name": "John Smith",
-                      "username": "john_smith",
-                      "email": "john_smith@example.com",
-                      "active": "yes",
-                      "locked": "no",
-                      "password": {
-                        "created_utc":"2017-05-24 14:04:51 UTC",
-                        "expires_on":"2017-05-44 23:59:59 UTC",
-                        "grace_period_ends_on":"2017-06-14 23:59:59 UTC"
-                      }
-                    }
-                  ]
-  /first-password:
-    get:
-      description: Get a list of the active users whose first password was created on a given date.
-      queryParameters:
-        created_on:
-          required: false
-          type: string
-          default: "created_on=<today's date>"
-          example: "created_on=2017-06-14"
-      responses:
-        200:
-            body:
-              application/json:
-                schema: UserList
-                example: |
-                  [
-                    {
-                      "uuid": "11111111-aaaa-1111-aaaa-111111111111",
-                      "employee_id": "12345",
-                      "first_name": "John",
-                      "last_name": "Smith",
-                      "display_name": "John Smith",
-                      "username": "john_smith",
-                      "email": "john_smith@example.com",
-                      "active": "yes",
-                      "locked": "no",
-                      "password": {
-                        "created_utc":"2017-06-14 14:04:51 UTC",
-                        "expires_on":"2018-05-44 23:59:59 UTC",
-                        "grace_period_ends_on":"2018-06-14 23:59:59 UTC"
-                      }
-                    }
-                  ]
+            422:
+              description: >
+                The given password does not meet some requirement (such as if an
+                empty string was given).
+              body:
+                type: Error
+            500:
+              description: A server-side error occurred.
+              body:
+                type: Error
 /mfa:
   post:
     description: Create a new mfa record.
     body:
-      application/json:
-        schema: MfaCreation
-        example: |
-          {
-            "employee_id": "12345",
-            "type": "backupcode"
-          }
+      type: MfaCreation
     responses:
       200:
         description: The new mfa record was created.
         body:
-          application/json:
-            schema: MfaCreationResponse
-            example: |
-              {
-                "id": 3,
-                "data": [
-                  "51231235",
-                  "74475261",
-                  "72412792",
-                  "23221473",
-                  "30936163",
-                  "09641891",
-                  "99517242",
-                  "08751652",
-                  "32842734",
-                  "25937677"
-                ]
-              }
+          type: MfaCreationResponse
       400:
         description: The given mfa data does not satisfy some validation rule.
+        body:
+          type: Error
+      409:
+        description: >
+          An MFA of the requested type already exists. Note that this would only
+          be returned for 'totp' or 'u2f'. The code types ('backupcode' and
+          'manager') reuse the existing MFA and create new codes.
+        body:
+          type: Error
       500:
         description: The server encountered an error
+        body:
+          type: Error
   /{id}:
+    put:
+      description: Update an MFA label
+      body:
+        properties:
+          employee_id: string
+          label: string
+        example: |
+          {
+            "employee_id": "12345",
+            "label": "My blue USB key"
+          }
+      responses:
+        200:
+          body:
+            type: MfaResponse
+        400:
+          description: Missing or invalid employee_id
+          body:
+            type: Error
+        404:
+          description: MFA record not found or mismatched employee_id
+          body:
+            type: Error
+        500:
+          description: The server encountered an error
+          body:
+            type: Error
     delete:
       description: Delete an MFA configuration
       body:
-        application/json:
-          example: |
-            {
-              "employee_id": "12345"
-            }
+        properties:
+          employee_id: string
+        example: |
+          {
+            "employee_id": "12345"
+          }
       responses:
         204:
+          description: Successful deletion of record
+        400:
+          description: >
+            `employee_id` was not provided or it did not match an employee record
+          body:
+            type: Error
         404:
+          description: The MFA record was not found
+          body:
+            type: Error
         500:
+          description: Unable to delete the MFA record
+          body:
+            type: Error
     /verify:
       post:
         description: Verify the value provided for this MFA device.
         body:
-          application/json:
-            example: |
-              {
-                "employee_id": "12345",
-                "value": "01234987"
-              }
+          properties:
+            employee_id: string
+            value: string
+          example: |
+            {
+              "employee_id": "12345",
+              "value": "01234987"
+            }
         responses:
-          204:
+          200:
             description: Value provided passed verification
+            body:
+              type: MfaResponse
           400:
-            description: |
+            description: >
               Value provided failed verification or was unacceptable for some
               other reason (such as an invalid `employee_id`).
+            body:
+              type: Error
           404:
             description: No MFA record found with that `id` and `employee_id`.
+            body:
+              type: Error
           429:
-            description: |
+            description: >
               Too many failed attempts for this MFA record recently.
+            body:
+              type: Error
+/method:
+  post:
+    description: >
+      Create a new recovery method and send verification email. At this point,
+      all methods are email, so 'value' is always an email address.
+    body:
+      type: Method
+    responses:
+      200:
+        description: Recovery method created and email sent.
+        body:
+          type: MethodResponse
+      400:
+        description: Missing parameter
+        body:
+          type: Error
+      409:
+        description: New method matches an already existing verified method
+        body:
+          type: Error
+      422:
+        description: A model validation error occurred.
+        body:
+          type: Error
+      500:
+        description: Database or other system error
+        body:
+          type: Error
+  /{uid}:
+    get:
+      description: Retrieve a specific, verified recovery method.
+      body:
+        properties:
+          employee_id: string
+        example: |
+          {
+            "employee_id": "12345"
+          }
+      responses:
+        200:
+          description: Recovery method found
+          body:
+            type: MethodResponse
+        404:
+          description: User not found or method not found
+          body:
+            type: Error
+    delete:
+      description: Delete a specific recovery method.
+      body:
+        properties:
+          employee_id: string
+        example: |
+          {
+            "employee_id": "12345"
+          }
+      responses:
+        204:
+          description: Recovery method found and deleted
+        404:
+          description: User not found or method not found
+          body:
+            type: Error
+        500:
+          description: Delete failed
+          body:
+            type: Error
+    /verify:
+      put:
+        description: Verify the recovery method by a matching code.
+        body:
+          properties:
+            code: string
+          example: |
+            {
+              "code": "987654"
+            }
+        responses:
+          200:
+            description: Provided code matches original code
+            body:
+              type: MethodResponse
+          400:
+            description: Missing or invalid code
+          404:
+            description: User not found or method not found
+            body:
+              type: Error
+          410:
+            description: Expired verification code
+            body:
+              type: Error
+          429:
+            description: Too many verification attempts
+            body:
+              type: Error
+          500:
+            description: Database or other system error
+            body:
+              type: Error
+    /resend:
+      put:
+        description: Resend the method verification email
+        body:
+          properties:
+            employee_id: string
+          example: |
+            {
+              "employee_id": "12345"
+            }
+        responses:
+          204:
+            description: Method found and email sent
+          400:
+            description: Method already verified
+            body:
+              type: Error
+          404:
+            description: User not found or method not found
+            body:
+              type: Error
