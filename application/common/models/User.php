@@ -548,9 +548,11 @@ class User extends UserBase
     {
         $mfas = [];
         foreach ($this->mfas as $mfaOption) {
-            if ($mfaOption->verified === 1 && $mfaOption->type !== Mfa::TYPE_MANAGER) {
-                $mfaOption->scenario = $this->scenario;
-                $mfas[] = $mfaOption;
+            if ($mfaOption->verified === 1) {
+                if ($this->scenario == self::SCENARIO_AUTHENTICATE || $mfaOption->type !== Mfa::TYPE_MANAGER) {
+                    $mfaOption->scenario = $this->scenario;
+                    $mfas[] = $mfaOption;
+                }
             }
         }
         return $mfas;
