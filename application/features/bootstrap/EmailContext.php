@@ -140,7 +140,7 @@ class EmailContext extends YiiContext
         }
         $user = new User($properties);
         $user->scenario = User::SCENARIO_NEW_USER;
-        if ( ! $user->save()) {
+        if (! $user->save()) {
             throw new \Exception(
                 \json_encode($user->getFirstErrors(), JSON_PRETTY_PRINT)
             );
@@ -154,8 +154,7 @@ class EmailContext extends YiiContext
         $lastUsedDaysAgo=null,
         $user=null,
         $verified=1
-    )
-    {
+    ) {
         if ($user ===null) {
             $user = $this->tempUser;
         }
@@ -174,7 +173,8 @@ class EmailContext extends YiiContext
         $user->refresh();
     }
 
-    protected function createTempMfa($type, $verified) {
+    protected function createTempMfa($type, $verified)
+    {
         $user = $this->tempUser;
         $mfa = new Mfa();
         $mfa->user_id = $user->id;
@@ -184,7 +184,8 @@ class EmailContext extends YiiContext
         return $mfa;
     }
 
-    protected function deleteMfaOfType($type) {
+    protected function deleteMfaOfType($type)
+    {
         foreach ($this->tempUser->mfas as $mfaOption) {
             if ($mfaOption->type === $type) {
                 Assert::true($mfaOption->delete(), 'Could not delete the ' . $type . ' mfa option for the test user.');
@@ -288,7 +289,6 @@ class EmailContext extends YiiContext
     {
         $this->tempUser2 = $this->createNewUser();
         $this->createMfa(Mfa::TYPE_TOTP, null, $this->tempUser2);
-
     }
 
     /**
@@ -320,7 +320,6 @@ class EmailContext extends YiiContext
      */
     public function anEmailHasBeenSentToThatUser(string $messageType)
     {
-
         $emailLog = new EmailLog([
             'user_id' => $this->tempUser->id,
             'message_type' => $messageType,
@@ -671,7 +670,8 @@ class EmailContext extends YiiContext
     /**
      * @Given the latest mfa event type was :arg1
      */
-    public function theLatestMfaEventTypeWas($eventType) {
+    public function theLatestMfaEventTypeWas($eventType)
+    {
         $this->mfaEventType = $eventType;
     }
 
@@ -1008,7 +1008,7 @@ class EmailContext extends YiiContext
      */
     public function iRequestANewManagerMfa()
     {
-        Mfa::create( $this->tempUser->id, Mfa::TYPE_MANAGER, 'label');
+        Mfa::create($this->tempUser->id, Mfa::TYPE_MANAGER, 'label');
     }
 
     /**

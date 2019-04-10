@@ -45,7 +45,7 @@ class Password extends PasswordBase
             [
                 'hash', 'default', 'value' => function () {
                     return password_hash($this->password, PASSWORD_DEFAULT);
-                 },
+                },
             ],
             [
                 'hash', $this->isHashable(),
@@ -110,7 +110,7 @@ class Password extends PasswordBase
 
     private function expires(): Closure
     {
-        return function() {
+        return function () {
             $lifespan = Yii::$app->params['passwordLifespan'];
 
             return MySqlDateTime::formatDate(strtotime($lifespan, strtotime($this->created_utc)));
@@ -119,7 +119,7 @@ class Password extends PasswordBase
 
     private function gracePeriodEnds(): Closure
     {
-        return function() {
+        return function () {
             $gracePeriod = Yii::$app->params['passwordExpirationGracePeriod'];
 
             return MySqlDateTime::formatDate(strtotime($gracePeriod, strtotime($this->expires_on)));
