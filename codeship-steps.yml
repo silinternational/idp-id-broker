@@ -1,3 +1,7 @@
+- name: check_psr2
+  service: app
+  command: /data/check-psr2.sh
+
 - name: ldapload
   service: ldapload
   command: /data/load_ldap.sh
