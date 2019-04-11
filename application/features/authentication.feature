@@ -177,12 +177,13 @@ Feature: Authentication
     When I request "/authentication" be created
     Then the response status code should be 200
 
-  Scenario Outline: Check profile review flag on user resource in response to authenticate call
+  Scenario Outline: Check "nag" flags on user resource in response to authenticate call
     Given there is a "shep_clark" user with a review_profile_after in the <tense>
+      And there is a "shep_clark" user with a review_profile_after in the <tense>
       And I provide the following valid data:
-      | property  | value       |
-      | username  | shep_clark  |
-      | password  | govols!!!   |
+        | property  | value       |
+        | username  | shep_clark  |
+        | password  | govols!!!   |
     When I request "/authentication" be created
     Then the following data is returned:
       | property       | value      |
@@ -190,24 +191,35 @@ Feature: Authentication
       | profile_review | <yesorno>  |
 
     Examples:
-      | tense    | yesorno  |
-      | past     | yes      |
-      | present  | yes      |
-      | future   | no       |
 
-  Scenario: Check profile review flag after an authenticate call
-    Given there is a "shep_clark" user with a review_profile_after in the past
+
+  Scenario Outline: Check profile review flag on user resource in response to authenticate call
+    Given there is a "shep_clark" user in the database
+      And that user has a review_profile_after in the <reviewTense>
+      And that user has a nag_for_mfa_after in the <mfaTense>
+      And that user has a nag_for_method_after in the <methodTense>
       And I provide the following valid data:
-        | property  | value       |
-        | username  | shep_clark  |
-        | password  | govols!!!   |
-      And I request "/authentication" be created
-    When I request "/user/123" be retrieved
-    Then the response status code should be 200
-      And the following data is returned:
-        | property       | value      |
-        | username       | shep_clark |
-        | profile_review | no         |
+      | property  | value       |
+      | username  | shep_clark  |
+      | password  | govols!!!   |
+    When I request "/authentication" be created
+    Then the following data is returned:
+      | property       | value        |
+      | employee_id    | 123          |
+      | profile_review | <review>     |
+      | mfa.add        | <mfaAdd>     |
+      | method.add     | <methodAdd>  |
+
+    Examples:
+      | mfaTense | methodTense | reviewTense | mfaAdd | methodAdd | review |
+      | past     | past        | past        | yes    | no        | no     |
+      | past     | past        | future      | yes    | no        | no     |
+      | past     | future      | past        | yes    | no        | no     |
+      | past     | future      | future      | yes    | no        | no     |
+      | future   | past        | past        | no     | yes       | no     |
+      | future   | past        | future      | no     | yes       | no     |
+      | future   | future      | past        | no     | no        | yes    |
+      | future   | future      | future      | no     | no        | no     |
 
   Scenario: Correct invite code for an account with no password in the db
     Given the user "shep_clark" has no password in the database

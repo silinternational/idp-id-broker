@@ -74,10 +74,17 @@ types:
         properties:
           prompt:
             enum: [ yes, no ]
+            description: Flag to indicate that the user must be prompted to provide an mfa before login
+          add:
+            enum: [ yes, no ]
+            description: Flag to indicate whether to remind the sure to add an MFA option
           options: MfaResponse[]
       method:
         type: object
         properties:
+          add:
+            enum: [ yes, no ]
+            description: Flag to indicate whether to remind the sure to add a recovery method
           options: MethodResponse[]
       password?:
         type: object
@@ -106,6 +113,7 @@ types:
         "groups": [],
         "mfa": {
           "prompt": "yes",
+          "nag": "no",
           "options": [
             {
               "id": 123,
@@ -145,6 +153,7 @@ types:
           "grace_period_ends_on":"2018-06-23T23:59:59Z"
         },
         "method": {
+          "nag": "no",
           "options": [
             {
               "id": "0YrSiNp2P6sfkleepNNvFYMQWuLfssve",

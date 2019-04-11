@@ -606,24 +606,6 @@ class FeatureContext extends YiiContext
     }
 
     /**
-     * @Given there is a :username user with a review_profile_after in the :tense
-     */
-    public function thereIsAUserWithAReviewProfileAfterInThePast($username, $tense)
-    {
-        $user = User::findOne(['username' => $username]);
-
-        $relativeTimes = [
-            'past' => '-1 day',
-            'present' => '+0 day',
-            'future' => '+1 day',
-        ];
-
-        $user->review_profile_after = MySqlDateTime::relative($relativeTimes[$tense]);
-        $user->scenario = User::SCENARIO_UPDATE_USER;
-        Assert::true($user->save());
-    }
-
-    /**
      * @Then the profile review date should be past
      */
     public function theProfileReviewDateShouldBePast()
@@ -641,5 +623,28 @@ class FeatureContext extends YiiContext
         $user->expires_on = '2000-01-01';
         $user->scenario = User::SCENARIO_UPDATE_USER;
         Assert::true($user->save());
+    }
+
+    /**
+     * @Given there is a :username user in the database
+     */
+    public function thereIsAUserInTheDatabase($username)
+    {
+        $this->userFromDb = User::findOne(['username' => $username]);
+    }
+
+    /**
+     * @Given that user has a :field in the :tense
+     */
+    public function thatUserHasAFieldInTheTense($field, $tense)
+    {
+        $relativeTimes = [
+            'past' => '-1 day',
+            'future' => '+1 day',
+        ];
+
+        $this->userFromDb->$field = MySqlDateTime::relative($relativeTimes[$tense]);
+        $this->userFromDb->scenario = User::SCENARIO_UPDATE_USER;
+        Assert::true($this->userFromDb->save());
     }
 }

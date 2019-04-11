@@ -216,4 +216,71 @@ class UnitTestsContext extends YiiContext
     {
         $this->iReceiveACodeThatIsNotExpired();
     }
+
+    /**
+     * @Given the nag dates are in the past
+     */
+    public function theNagDatesAreInThePast()
+    {
+        $this->tempUser->review_profile_after = MySqlDateTime::relative('-1 day');
+        $this->tempUser->nag_for_method_after = MySqlDateTime::relative('-1 day');
+        $this->tempUser->nag_for_mfa_after = MySqlDateTime::relative('-1 day');
+    }
+
+    /**
+     * @When I request the nag state
+     */
+    public function iRequestTheNagState()
+    {
+        $this->nagState = $this->tempUser->getNagState();
+    }
+
+    /**
+     * @Then I see that the nag state is :state
+     */
+    public function iSeeThatTheNagStateIs($state)
+    {
+        Assert::eq($this->nagState, $state);
+    }
+
+    /**
+     * @Then I update the nag dates
+     */
+    public function iUpdateTheNagDates()
+    {
+        $this->tempUser->updateProfileReviewDates();
+    }
+    /**
+     * @Given there is a user in the database
+     */
+    public function thereIsAUserInTheDatabase()
+    {
+        $this->tempUser = $this->createNewUserInDatabase('method_tester');
+    }
+
+    /**
+     * @Given /^that user has (\d+) (verified|unverified) methods?$/i
+     */
+    public function thatUserHasVerifiedMethods($n, $verifiedOrUnverified)
+    {
+        for ($i = 0; $i < $n; $i++) {
+            $this->createMethod(
+                $verifiedOrUnverified . $i . '@example.org',
+                $verifiedOrUnverified == 'verified' ? 1 : 0
+            );
+        }
+    }
+
+    /**
+     * @Given /^that user has (\d+) (verified|unverified) mfas?/i
+     */
+    public function thatUserHasVerifiedMfas($n, $verifiedOrUnverified)
+    {
+        for ($i = 0; $i < $n; $i++) {
+            $this->createMfa(
+                'totp',
+                $verifiedOrUnverified == 'verified' ? 1 : 0
+            );
+        }
+    }
 }
