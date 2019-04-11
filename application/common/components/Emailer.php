@@ -12,25 +12,33 @@ use Sil\Psr3Adapters\Psr3Yii2Logger;
 use yii\base\Component;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Inflector;
-use yii\web\ServerErrorHttpException;
 use yii\db\Query;
 
 class Emailer extends Component
 {
-    const SUBJECT_INVITE_DEFAULT = 'Your new %s Identity account';
-    const SUBJECT_MFA_RATE_LIMIT_DEFAULT = 'Too many 2-Step Verification attempts on your %s Identity account';
-    const SUBJECT_PASSWORD_CHANGED_DEFAULT = 'Your %s Identity account password has been changed';
-    const SUBJECT_WELCOME_DEFAULT = 'Welcome to your new %s Identity account';
+    const SUBJ_INVITE = 'Your new {idpDisplayName} Identity account';
+    const SUBJ_MFA_RATE_LIMIT = 'Too many 2-Step Verification attempts on your {idpDisplayName} Identity account';
+    const SUBJ_PASSWORD_CHANGED = 'Your {idpDisplayName} Identity account password has been changed';
+    const SUBJ_WELCOME = 'Important information about your {idpDisplayName} identity account';
 
-    const SUBJECT_GET_BACKUP_CODES_DEFAULT = 'Get printable codes for your %s account';
-    const SUBJECT_REFRESH_BACKUP_CODES_DEFAULT = 'Get a new set of printable codes for your %s account';
-    const SUBJECT_LOST_SECURITY_KEY_DEFAULT = 'Have you lost the security key you use with your %s account';
+    const SUBJ_GET_BACKUP_CODES = 'Get printable codes for your {idpDisplayName} account';
+    const SUBJ_REFRESH_BACKUP_CODES = 'Get a new set of printable codes for your {idpDisplayName} account';
+    const SUBJ_LOST_SECURITY_KEY = 'Have you lost the security key you use with your {idpDisplayName} account?';
 
-    const SUBJECT_MFA_OPTION_ADDED_DEFAULT = 'A 2-Step Verification option was added to your %s account';
-    const SUBJECT_MFA_OPTION_REMOVED_DEFAULT = 'A 2-Step Verification option was removed from your %s account';
-    const SUBJECT_MFA_ENABLED_DEFAULT = '2-Step Verification was enabled on your %s account';
-    const SUBJECT_MFA_DISABLED_DEFAULT = '2-Step Verification was disabled on your %s account';
+    const SUBJ_MFA_OPTION_ADDED = 'A 2-Step Verification option was added to your {idpDisplayName} account';
+    const SUBJ_MFA_OPTION_REMOVED = 'A 2-Step Verification option was removed from your {idpDisplayName} account';
+    const SUBJ_MFA_ENABLED = '2-Step Verification was enabled on your {idpDisplayName} account';
+    const SUBJ_MFA_DISABLED = '2-Step Verification was disabled on your {idpDisplayName} account';
+    const SUBJ_MFA_MANAGER = '{displayName} has sent you a login code for their {idpDisplayName} account';
+    const SUBJ_MFA_MANAGER_HELP = 'An access code for your {idpDisplayName} account has been sent to your manager';
 
+    const SUBJ_METHOD_VERIFY = 'Please verify your new password recovery method';
+
+    const PROP_SUBJECT = 'subject';
+    const PROP_TO_ADDRESS = 'to_address';
+    const PROP_CC_ADDRESS = 'cc_address';
+    const PROP_HTML_BODY = 'html_body';
+    const PROP_TEXT_BODY = 'text_body';
 
     /**
      * The configuration for the email-service client.
@@ -94,6 +102,10 @@ class Emailer extends Component
     public $subjectForMfaOptionRemoved;
     public $subjectForMfaEnabled;
     public $subjectForMfaDisabled;
+    public $subjectForMfaManager;
+    public $subjectForMfaManagerHelp;
+
+    public $subjectForMethodVerify;
 
     /* The number of days of not using a security key after which we email the user */
     public $lostSecurityKeyEmailDays;
@@ -137,7 +149,7 @@ class Emailer extends Component
             }
         }
     }
-    
+
     /**
      * Use the email service to send an email.
      *
@@ -145,19 +157,28 @@ class Emailer extends Component
      * @param string $subject The subject.
      * @param string $htmlBody The email body (as HTML).
      * @param string $textBody The email body (as plain text).
+     * @param string $ccAddress Optional. Email address to include as 'cc'.
+     * @throws \Sil\EmailService\Client\EmailServiceClientException
      */
     protected function email(
         string $toAddress,
         string $subject,
         string $htmlBody,
-        string $textBody
+        string $textBody,
+        string $ccAddress = ''
     ) {
-        $this->getEmailServiceClient()->email([
-            'to_address' => $toAddress,
-            'subject' => $subject,
-            'html_body' => $htmlBody,
-            'text_body' => $textBody,
-        ]);
+        $properties = [
+            self::PROP_TO_ADDRESS => $toAddress,
+            self::PROP_SUBJECT => $subject,
+            self::PROP_HTML_BODY => $htmlBody,
+            self::PROP_TEXT_BODY => $textBody,
+        ];
+
+        if ($ccAddress) {
+            $properties[self::PROP_CC_ADDRESS] = $ccAddress;
+        }
+
+        $this->getEmailServiceClient()->email($properties);
     }
     
     /**
@@ -190,16 +211,35 @@ class Emailer extends Component
     {
         return $this->getEmailServiceClient()->getSiteStatus();
     }
-    
-    protected function getSubjectForMessage(string $messageType)
+
+    /**
+     * Return the subject line for the given $messageType, after substituting
+     * $data properties by key into tokens surrounded by {}.
+     * @param string $messageType
+     * @param array $data properties to insert into subject text
+     * @return string
+     */
+    protected function getSubjectForMessage(string $messageType, array $data): string
     {
-        if ( ! empty($this->subjects[$messageType]) && strpos($this->subjects[$messageType], '%') !== false) {
-            return sprintf($this->subjects[$messageType], $this->otherDataForEmails['idpDisplayName'] ?? '');
+        $subject = $this->subjects[$messageType] ?? '';
+
+        foreach ($data as $key => $value) {
+            if (is_scalar($value)) {
+                $subject = str_replace('{' . $key . '}', $value, $subject);
+            }
         }
-        return $this->subjects[$messageType] ?? null;
+
+        return $subject;
     }
-    
-    protected function getViewForMessage(string $messageType, string $format)
+
+    /**
+     * Retrieve the view identifier for the given message type and format. The view is read from a
+     * file in common/mail: e.g. mfa-disabled.html.php
+     * @param string $messageType Message type -- should be defined in EmailLog getMessageTypes().
+     * @param string $format Message format -- must be either 'text' or 'html'
+     * @return string
+     */
+    protected function getViewForMessage(string $messageType, string $format): string
     {
         if ( ! self::isValidFormat($format)) {
             throw new \InvalidArgumentException(sprintf(
@@ -225,19 +265,23 @@ class Emailer extends Component
             $this->logger = new Psr3Yii2Logger();
         }
 
-        $this->subjectForInvite = $this->subjectForInvite ?? self::SUBJECT_INVITE_DEFAULT;
-        $this->subjectForMfaRateLimit = $this->subjectForMfaRateLimit ?? self::SUBJECT_MFA_RATE_LIMIT_DEFAULT;
-        $this->subjectForPasswordChanged = $this->subjectForPasswordChanged ?? self::SUBJECT_PASSWORD_CHANGED_DEFAULT;
-        $this->subjectForWelcome = $this->subjectForWelcome ?? self::SUBJECT_WELCOME_DEFAULT;
+        $this->subjectForInvite = $this->subjectForInvite ?? self::SUBJ_INVITE;
+        $this->subjectForMfaRateLimit = $this->subjectForMfaRateLimit ?? self::SUBJ_MFA_RATE_LIMIT;
+        $this->subjectForPasswordChanged = $this->subjectForPasswordChanged ?? self::SUBJ_PASSWORD_CHANGED;
+        $this->subjectForWelcome = $this->subjectForWelcome ?? self::SUBJ_WELCOME;
 
-        $this->subjectForGetBackupCodes = $this->subjectForGetBackupCodes ?? self::SUBJECT_GET_BACKUP_CODES_DEFAULT;
-        $this->subjectForRefreshBackupCodes = $this->subjectForRefreshBackupCodes ?? self::SUBJECT_REFRESH_BACKUP_CODES_DEFAULT;
-        $this->subjectForLostSecurityKey = $this->subjectForLostSecurityKey ?? self::SUBJECT_LOST_SECURITY_KEY_DEFAULT;
+        $this->subjectForGetBackupCodes = $this->subjectForGetBackupCodes ?? self::SUBJ_GET_BACKUP_CODES;
+        $this->subjectForRefreshBackupCodes = $this->subjectForRefreshBackupCodes ?? self::SUBJ_REFRESH_BACKUP_CODES;
+        $this->subjectForLostSecurityKey = $this->subjectForLostSecurityKey ?? self::SUBJ_LOST_SECURITY_KEY;
 
-        $this->subjectForMfaOptionAdded = $this->subjectForMfaOptionAdded ?? self::SUBJECT_MFA_OPTION_ADDED_DEFAULT;
-        $this->subjectForMfaOptionRemoved = $this->subjectForMfaOptionRemoved ?? self::SUBJECT_MFA_OPTION_REMOVED_DEFAULT;
-        $this->subjectForMfaEnabled = $this->subjectForMfaEnabled ?? self::SUBJECT_MFA_ENABLED_DEFAULT;
-        $this->subjectForMfaDisabled = $this->subjectForMfaDisabled ?? self::SUBJECT_MFA_DISABLED_DEFAULT;
+        $this->subjectForMfaOptionAdded = $this->subjectForMfaOptionAdded ?? self::SUBJ_MFA_OPTION_ADDED;
+        $this->subjectForMfaOptionRemoved = $this->subjectForMfaOptionRemoved ?? self::SUBJ_MFA_OPTION_REMOVED;
+        $this->subjectForMfaEnabled = $this->subjectForMfaEnabled ?? self::SUBJ_MFA_ENABLED;
+        $this->subjectForMfaDisabled = $this->subjectForMfaDisabled ?? self::SUBJ_MFA_DISABLED;
+        $this->subjectForMfaManager = $this->subjectForMfaManager ?? self::SUBJ_MFA_MANAGER;
+        $this->subjectForMfaManagerHelp = $this->subjectForMfaManagerHelp ?? self::SUBJ_MFA_MANAGER_HELP;
+
+        $this->subjectForMethodVerify = $this->subjectForMethodVerify ?? self::SUBJ_METHOD_VERIFY;
 
         $this->subjects = [
             EmailLog::MESSAGE_TYPE_INVITE => $this->subjectForInvite,
@@ -251,6 +295,9 @@ class Emailer extends Component
             EmailLog::MESSAGE_TYPE_MFA_OPTION_REMOVED => $this->subjectForMfaOptionRemoved,
             EmailLog::MESSAGE_TYPE_MFA_ENABLED => $this->subjectForMfaEnabled,
             EmailLog::MESSAGE_TYPE_MFA_DISABLED => $this->subjectForMfaDisabled,
+            EmailLog::MESSAGE_TYPE_METHOD_VERIFY => $this->subjectForMethodVerify,
+            EmailLog::MESSAGE_TYPE_MFA_MANAGER => $this->subjectForMfaManager,
+            EmailLog::MESSAGE_TYPE_MFA_MANAGER_HELP => $this->subjectForMfaManagerHelp,
         ];
         
         $this->assertConfigIsValid();
@@ -277,22 +324,36 @@ class Emailer extends Component
      * @param string $messageType The message type. Must be one of the
      *     EmailLog::MESSAGE_TYPE_* values.
      * @param User $user The intended recipient.
+     * @param string[] $data  Data fields for email template. Include key 'toAddress' to override
+     *     sending to primary address in User object.
      */
-    public function sendMessageTo(string $messageType, User $user)
+    public function sendMessageTo(string $messageType, User $user, array $data = [])
     {
+        if ($user->active === 'no') {
+            \Yii::warning([
+                'action' => 'send message',
+                'status' => 'canceled',
+                'messageType' => $messageType,
+                'username' => $user->username,
+            ]);
+            return;
+        }
+
         $dataForEmail = ArrayHelper::merge(
             $user->getAttributesForEmail(),
-            $this->otherDataForEmails
+            $this->otherDataForEmails,
+            $data
         );
         
         $htmlView = $this->getViewForMessage($messageType, 'html');
         $textView = $this->getViewForMessage($messageType, 'text');
         
         $this->email(
-            $user->email,
-            $this->getSubjectForMessage($messageType),
+            $data['toAddress'] ?? $user->getEmailAddress(),
+            $this->getSubjectForMessage($messageType, $dataForEmail),
             \Yii::$app->view->render($htmlView, $dataForEmail),
-            \Yii::$app->view->render($textView, $dataForEmail)
+            \Yii::$app->view->render($textView, $dataForEmail),
+            $data['ccAddress'] ?? ''
         );
         
         EmailLog::logMessage($messageType, $user->id);
@@ -318,6 +379,29 @@ class Emailer extends Component
         }
     }
 
+    /**
+     * Iterates over all users and sends method verify emails as appropriate
+     */
+    public function sendMethodVerifyEmails()
+    {
+        $query = (new Query)->from('user');
+
+        // iterate over one user at a time.
+        foreach ($query->each() as $userData) {
+            $user = User::findOne($userData['id']);
+
+            $methods = $user->getUnverifiedMethods();
+            foreach ($methods as $method) {
+                $data = [
+                    'toAddress' => $method->value,
+                    'code' => $method->verification_code,
+                    'uid' => $method->uid,
+                ];
+
+                $this->sendMessageTo(EmailLog::MESSAGE_TYPE_METHOD_VERIFY, $user, $data);
+            }
+        }
+    }
 
     /**
      *
@@ -445,7 +529,7 @@ class Emailer extends Component
                 }
 
             // If one of the other MFA options has been used recently, remember it.
-            } else if ($lastOtherUseDate === null && ! empty($mfaOption->last_used_utc)) {
+            } elseif ($lastOtherUseDate === null && ! empty($mfaOption->last_used_utc)) {
                 $dateIsRecent = MySqlDateTime::dateIsRecent($mfaOption->last_used_utc, $recentDays);
                 $lastOtherUseDate = $dateIsRecent ? $mfaOption->last_used_utc : null;
             }

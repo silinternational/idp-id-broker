@@ -128,7 +128,7 @@ Feature: Authentication
 #TODO: need test(s) for expired passwords
 
   Scenario Outline: Attempt to act upon an authentication in an undefined way
-      And the user store is empty
+    Given the user store is empty
     When I request "/authentication" be <action>
     Then the response status code should be 404
       And the property message should contain ""
@@ -177,6 +177,110 @@ Feature: Authentication
     When I request "/authentication" be created
     Then the response status code should be 200
 
-#    TODO: attempt to authenticate a user who doesn't have a password yet, expect 400 (ensure timing attack protection is enforced)
+  Scenario Outline: Check profile review flag on user resource in response to authenticate call
+    Given there is a "shep_clark" user with a review_profile_after in the <tense>
+      And I provide the following valid data:
+      | property  | value       |
+      | username  | shep_clark  |
+      | password  | govols!!!   |
+    When I request "/authentication" be created
+    Then the following data is returned:
+      | property       | value      |
+      | employee_id    | 123        |
+      | profile_review | <yesorno>  |
+
+    Examples:
+      | tense    | yesorno  |
+      | past     | yes      |
+      | present  | yes      |
+      | future   | no       |
+
+  Scenario: Check profile review flag after an authenticate call
+    Given there is a "shep_clark" user with a review_profile_after in the past
+      And I provide the following valid data:
+        | property  | value       |
+        | username  | shep_clark  |
+        | password  | govols!!!   |
+      And I request "/authentication" be created
+    When I request "/user/123" be retrieved
+    Then the response status code should be 200
+      And the following data is returned:
+        | property       | value      |
+        | username       | shep_clark |
+        | profile_review | no         |
+
+  Scenario: Correct invite code for an account with no password in the db
+    Given the user "shep_clark" has no password in the database
+      And the user "shep_clark" has a non-expired invite code "xyz123"
+      And I provide the following valid data:
+        | property  | value       |
+        | invite    | xyz123      |
+    When I request "/authentication" be created
+    Then the response status code should be 200
+
+  Scenario: Correct invite code for an account with a password in the db
+    Given the user "shep_clark" has a non-expired invite code "xyz123"
+      And I provide the following valid data:
+        | property  | value       |
+        | invite    | xyz123      |
+    When I request "/authentication" be created
+    Then the response status code should be 400
+
+  Scenario: Correct but expired invite code for an account with no password in the db
+    Given the user "shep_clark" has no password in the database
+      And the user "shep_clark" has an expired invite code "xyz123"
+      And I provide the following valid data:
+        | property  | value       |
+        | invite    | xyz123      |
+    When I request "/authentication" be created
+    Then the response status code should be 410
+
+  Scenario: Incorrect invite code for an account with no password in the db
+    Given the user "shep_clark" has no password in the database
+      And the user "shep_clark" has a non-expired invite code "xyz123"
+      And I provide the following valid data:
+        | property  | value       |
+        | invite    | abc123      |
+    When I request "/authentication" be created
+    Then the response status code should be 400
+
+# TODO: attempt to authenticate a user who doesn't have a password yet, expect 400 (ensure timing attack protection is enforced)
 # TODO: need test for check that a user's password is good all the way until midnight of the expiration/grace period dates
 # TODO: need test to allow username or email address to be used for authentication
+
+  Scenario: Authenticate a "contingent" user with an invite code
+    Given I provide the following valid data:
+        | property        | value                 |
+        | employee_id     | 456                   |
+        | first_name      | New                   |
+        | last_name       | Guy                   |
+        | username        | new_guy               |
+        | email           | null                  |
+        | personal_email  | personal@example.com  |
+      And I request "/user" be created
+      And the response status code should be 200
+      And the user "new_guy" has a non-expired invite code "xyz123"
+      And I provide the following valid data:
+        | property  | value       |
+        | invite    | xyz123      |
+    When I request "/authentication" be created
+    Then the response status code should be 200
+
+  Scenario: Attempt to authenticate an expired "contingent" user with an invite code
+    Given I provide the following valid data:
+        | property        | value                 |
+        | employee_id     | 456                   |
+        | first_name      | New                   |
+        | last_name       | Guy                   |
+        | username        | new_guy               |
+        | email           | null                  |
+        | personal_email  | personal@example.com  |
+      And I request "/user" be created
+      And the response status code should be 200
+      And the user "new_guy" has a non-expired invite code "xyz123"
+      And the user record for "new_guy" has expired
+      And I provide the following valid data:
+        | property  | value       |
+        | invite    | xyz123      |
+    When I request "/authentication" be created
+    Then the response status code should be 400

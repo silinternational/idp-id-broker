@@ -5,7 +5,9 @@ namespace common\models;
 use Closure;
 use common\components\Emailer;
 use common\helpers\MySqlDateTime;
+use common\helpers\Utils;
 use common\ldap\Ldap;
+use common\models\Method;
 use Exception;
 use Ramsey\Uuid\Uuid;
 use Yii;
@@ -20,7 +22,9 @@ class User extends UserBase
     const SCENARIO_UPDATE_USER     = 'update_user';
     const SCENARIO_UPDATE_PASSWORD = 'update_password';
     const SCENARIO_AUTHENTICATE    = 'authenticate';
+    const SCENARIO_INVITE          = 'invite';
 
+    /** @var string */
     public $password;
 
     /** @var Ldap */
@@ -32,7 +36,11 @@ class User extends UserBase
     public function afterSave($insert, $changedAttributes)
     {
         parent::afterSave($insert, $changedAttributes);
-        
+
+        if (array_key_exists('personal_email', $changedAttributes) && $this->personal_email !== $this->email) {
+            $this->updateRecoveryMethods($insert, $changedAttributes['personal_email']);
+        }
+
         $this->sendAppropriateMessages($insert, $changedAttributes);
     }
     
@@ -42,6 +50,35 @@ class User extends UserBase
             return false;
         }
 
+        // First "disconnect" the user's current password.
+        $this->current_password_id = null;
+        if (! $this->save(false, ['current_password_id'])) {
+            \Yii::error([
+                'action' => 'unset current_password_id before deleting user',
+                'status' => 'error',
+                'error' => $this->getFirstErrors(),
+                'user id' => $this->id,
+            ]);
+            return false;
+        }
+        
+        // Next, delete dependent records:
+        
+        /* @var $passwordsOfUser Password[] */
+        $passwordsOfUser = Password::findAll(['user_id' => $this->id]);
+        foreach ($passwordsOfUser as $password) {
+            if (! $password->delete()) {
+                \Yii::error([
+                    'action' => 'delete password record before deleting user',
+                    'status' => 'error',
+                    'error' => $password->getFirstErrors(),
+                    'password id' => $password->id,
+                    'user id' => $this->id,
+                ]);
+                return false;
+            }
+        }
+        
         foreach ($this->mfas as $mfa) {
             if (! $mfa->delete()) {
                 \Yii::error([
@@ -54,7 +91,49 @@ class User extends UserBase
                 return false;
             }
         }
-        
+
+        foreach ($this->methods as $method) {
+            if (! $method->delete()) {
+                \Yii::error([
+                    'action' => 'delete method record before deleting user',
+                    'status' => 'error',
+                    'error' => $method->getFirstErrors(),
+                    'mfa_id' => $method->id,
+                    'user_id' => $this->id,
+                ]);
+                return false;
+            }
+        }
+
+        foreach ($this->invites as $invite) {
+            if (! $invite->delete()) {
+                \Yii::error([
+                    'action' => 'delete invite record before deleting user',
+                    'status' => 'error',
+                    'error' => $invite->getFirstErrors(),
+                    'invite_id' => $invite->id,
+                    'user_id' => $this->id,
+                ]);
+                return false;
+            }
+        }
+
+        /*
+         * Delete email logs last in case other deletions trigger new emails
+         */
+        foreach ($this->emailLogs as $emailLog) {
+            if (! $emailLog->delete()) {
+                \Yii::error([
+                    'action' => 'delete email log record before deleting user',
+                    'status' => 'error',
+                    'error' => $emailLog->getFirstErrors(),
+                    'email log id' => $emailLog->id,
+                    'user_id' => $emailLog->user_id,
+                ]);
+                return false;
+            }
+        }
+
         return true;
     }
     
@@ -81,8 +160,11 @@ class User extends UserBase
             'locked',
             'manager_email',
             'require_mfa',
-            'nag_for_mfa_after',
-            'spouse_email',
+            'review_profile_after',
+            'personal_email',
+            'hide',
+            'groups',
+            'expires_on',
         ];
 
         $scenarios[self::SCENARIO_UPDATE_USER] = [
@@ -95,12 +177,16 @@ class User extends UserBase
             'locked',
             'manager_email',
             'require_mfa',
-            'spouse_email',
+            'personal_email',
+            'hide',
+            'groups',
         ];
 
         $scenarios[self::SCENARIO_UPDATE_PASSWORD] = ['password'];
 
         $scenarios[self::SCENARIO_AUTHENTICATE] = ['username', 'password', '!active', '!locked'];
+
+        $scenarios[self::SCENARIO_INVITE] = ['!active', '!locked'];
 
         return $scenarios;
     }
@@ -121,10 +207,12 @@ class User extends UserBase
                 'require_mfa', 'default', 'value' => 'no', 'on' => self::SCENARIO_NEW_USER
             ],
             [
-                'nag_for_mfa_after', 'default', 'value' => MySqlDateTime::today(),
+                'review_profile_after',
+                'default',
+                'value' => MySqlDateTime::relative(\Yii::$app->params['profileReviewInterval']),
             ],
             [
-                ['active', 'locked', 'require_mfa'], 'in', 'range' => ['yes', 'no'],
+                ['active', 'locked', 'require_mfa', 'hide'], 'in', 'range' => ['yes', 'no'],
             ],
             [
                 'email', 'email',
@@ -150,18 +238,28 @@ class User extends UserBase
             ],
             [
                 'active', 'compare', 'compareValue' => 'yes',
-                'on' => self::SCENARIO_AUTHENTICATE,
+                'on' => [self::SCENARIO_AUTHENTICATE, self::SCENARIO_INVITE],
             ],
             [
                 'locked', 'compare', 'compareValue' => 'no',
-                'on' => self::SCENARIO_AUTHENTICATE,
+                'on' => [self::SCENARIO_AUTHENTICATE, self::SCENARIO_INVITE],
             ],
             [
-                ['manager_email', 'spouse_email'], 'email',
+                ['manager_email', 'personal_email'], 'email',
             ],
             [
                 ['last_synced_utc', 'last_changed_utc'],
                 'default', 'value' => MySqlDateTime::now(),
+            ],
+            [
+                'expires_on',
+                'default',
+                'value' => $this->getExpiresOnInitialValue(),
+            ],
+            [
+                'email', 'required', 'when' => function ($model) {
+                    return $model->personal_email === null;
+                }
             ],
         ], parent::rules());
     }
@@ -269,6 +367,7 @@ class User extends UserBase
      *       the User's "employee_id" will have a key of "employeeId".
      *
      * @return array
+     * @throws Exception
      */
     public function getAttributesForEmail()
     {
@@ -278,7 +377,7 @@ class User extends UserBase
             'lastName' => $this->last_name,
             'displayName' => $this->getDisplayName(),
             'username' => $this->username,
-            'email' => $this->email,
+            'email' => $this->getEmailAddress(),
             'active' => $this->active,
             'locked' => $this->locked,
             'lastChangedUtc' => MySqlDateTime::formatDateForHumans($this->last_changed_utc),
@@ -288,6 +387,8 @@ class User extends UserBase
             'isMfaEnabled' => count($this->mfas) > 0 ? true : false,
             'mfaOptions' => $this->getVerifiedMfaOptions(),
             'numRemainingCodes' => $this->countMfaBackupCodes(),
+            'managerEmail' => $this->manager_email,
+            'hasRecoveryMethods' => count($this->getVerifiedMethodOptions()) > 0 ? true : false,
         ];
         if ($this->currentPassword !== null) {
             $attrs['passwordExpiresUtc'] = MySqlDateTime::formatDateForHumans($this->currentPassword->getExpiresOn());
@@ -367,19 +468,37 @@ class User extends UserBase
             'employee_id',
             'first_name',
             'last_name',
-            'display_name' => function ($model) {
+            'display_name' => function (self $model) {
                 return $model->getDisplayName();
             },
             'username',
-            'email',
+            'email' => function (self $model) {
+                return $model->getEmailAddress();
+            },
             'active',
             'locked',
-            'last_login_utc',
+            'last_login_utc' => function (self $model) {
+                return Utils::getIso8601($model->last_login_utc);
+            },
             'manager_email',
-            'mfa' => function ($model) {
+            'personal_email',
+            'hide',
+            'groups' => function (self $model) {
+                if (empty($model->groups)) {
+                    return [];
+                } else {
+                    return explode(',', $model->groups);
+                }
+            },
+            'mfa' => function (self $model) {
                 return $model->getMfaFields();
             },
-            'spouse_email',
+            'method' => function (self $model) {
+                return $model->getMethodFields();
+            },
+            'profile_review' => function (self $model) {
+                return $model->isTimeForReview() ? 'yes' : 'no';
+            }
         ];
 
         if ($this->current_password_id !== null) {
@@ -401,30 +520,78 @@ class User extends UserBase
     {
         return $this->display_name ?? "$this->first_name $this->last_name";
     }
-    
+
+    /**
+     * Based on current time, determine whether to present a profile review to
+     * the user.
+     */
+    public function isTimeForReview()
+    {
+        return MySqlDateTime::isBefore($this->review_profile_after, time());
+    }
+
     /**
      * @return array MFA related properties
      */
     public function getMfaFields()
     {
-        $promptForMfa = $this->isPromptForMfa() ? 'yes' : 'no';
         return [
-            'prompt'  => $promptForMfa,
-            'nag'     => ($promptForMfa == 'no' && strtotime($this->nag_for_mfa_after) < time()) ? 'yes' : 'no',
+            'prompt'  => $this->isPromptForMfa() ? 'yes' : 'no',
             'options' => $this->getVerifiedMfaOptions(),
         ];
     }
 
+    /**
+     * @return Mfa[]
+     */
     public function getVerifiedMfaOptions()
     {
         $mfas = [];
         foreach ($this->mfas as $mfaOption) {
             if ($mfaOption->verified === 1) {
-                $mfaOption->scenario = $this->scenario;
-                $mfas[] = $mfaOption;
+                if ($this->scenario == self::SCENARIO_AUTHENTICATE || $mfaOption->type !== Mfa::TYPE_MANAGER) {
+                    $mfaOption->scenario = $this->scenario;
+                    $mfas[] = $mfaOption;
+                }
             }
         }
         return $mfas;
+    }
+
+    /**
+     * @return Method[]
+     */
+    public function getVerifiedMethodOptions()
+    {
+        return array_filter($this->methods, function ($method) {
+            return $method->verified === 1;
+        });
+    }
+
+    /**
+     * @return Method[]
+     */
+    public function getUnverifiedMethods()
+    {
+        return array_filter($this->methods, function ($method) {
+            return $method->verified === 0;
+        });
+    }
+
+    /**
+     * Return method-related properties to include in /user responses
+     *
+     * @return array method-related properties
+     * @throws \Exception
+     */
+    public function getMethodFields()
+    {
+        return [
+            'options' =>
+                $this->isTimeForReview() && $this->scenario == self::SCENARIO_AUTHENTICATE
+                    ? $this->methods
+                    : [],
+        ];
     }
 
     /*
@@ -461,14 +628,29 @@ class User extends UserBase
 
         return parent::save($runValidation, $attributeNames);
     }
-    
+
+    /**
+     * @param bool $isNewUser
+     * @param array $changedAttributes
+     * @throws Exception
+     */
     protected function sendAppropriateMessages($isNewUser, $changedAttributes)
     {
         /* @var $emailer Emailer */
         $emailer = \Yii::$app->emailer;
         
         if ($emailer->shouldSendInviteMessageTo($this, $isNewUser)) {
-            $emailer->sendMessageTo(EmailLog::MESSAGE_TYPE_INVITE, $this);
+            $invite = Invite::findOrCreate($this->id);
+            $data = ['inviteCode' => $invite->getCode()];
+            /*
+             * If both `personal_email` and `this_email` are valid, then this is a normal
+             * invite scenario. Otherwise, there's no need to include the 'cc' because the
+             * `personal_email` will be used for the 'to' address.
+             */
+            if ($this->personal_email && $this->email) {
+                $data['ccAddress'] = $this->personal_email;
+            }
+            $emailer->sendMessageTo(EmailLog::MESSAGE_TYPE_INVITE, $this, $data);
         }
         
         if ($emailer->shouldSendPasswordChangedMessageTo($this, $changedAttributes)) {
@@ -478,7 +660,6 @@ class User extends UserBase
         if ($emailer->shouldSendWelcomeMessageTo($this, $changedAttributes)) {
             $emailer->sendMessageTo(EmailLog::MESSAGE_TYPE_WELCOME, $this);
         }
-
     }
 
     private function updatePassword(): bool
@@ -486,7 +667,6 @@ class User extends UserBase
         $transaction = ActiveRecord::getDb()->beginTransaction();
 
         try {
-
             if (! $this->savePassword()) {
                 return false;
             }
@@ -527,59 +707,6 @@ class User extends UserBase
         return true;
     }
 
-    /**
-     * @param $criteria array Criteria to be used for filtering users based upon their password
-     *                        expiration, e.g., ['grace_period_ends_on' => '2018-07-16', 'expires_on' => '2018-06-17'].
-     * @return array Users matching given criteria
-     */
-    public static function getExpiringUsers($criteria): array
-    {
-        if (empty($criteria)) {
-            return [];
-        }
-
-        $users = User::find()->joinWith('currentPassword')
-                             ->where(['active' => 'yes']);
-
-        foreach ($criteria as $name => $value) {
-            switch ($name) {
-                case 'expires_on':
-                case 'grace_period_ends_on':
-                    $users->andWhere(["password.$name" => $value]);
-                    break;
-                default:
-                    // if no criteria names match, this will ensure an empty result is returned
-                    $users->where('0=1');
-            }
-        }
-
-        return $users->all();
-    }
-
-    public static function getUsersWithFirstPasswords($createdOn): array
-    {
-        //  find the earliest password for each user, if it matches the provided date, then return
-        //  that user's info:
-        //        SELECT *
-        //        FROM user
-        //        WHERE id in (
-        //          SELECT user_id
-        //	        FROM password
-        //	        GROUP BY user_id
-        //	        HAVING DATE(MIN(created_utc)) = "2017-06-07"
-        //        )
-        $oldestPasswords = Password::find()->select('user_id')
-                                           ->groupBy('user_id')
-                                           ->having(['=', "DATE(MIN(created_utc))", $createdOn]);
-
-        $users = User::find()->where([
-                                'active' => 'yes',
-                                'id' => $oldestPasswords
-                               ]);
-
-        return $users->all();
-    }
-
     /*
      * @return integer Count of active users with a password
      */
@@ -607,7 +734,7 @@ class User extends UserBase
      * @param string|null $mfaType
      * @return ActiveQuery of active Users with a (certain type of) verified Mfa option
      */
-    public static function getQueryOfUsersWithMfa($mfaType=null)
+    public static function getQueryOfUsersWithMfa($mfaType = null)
     {
         $criteria = ['verified' => 1];
         if ($mfaType !== null) {
@@ -644,7 +771,7 @@ class User extends UserBase
             return 0;
         }
 
-        return $mfaCount/$userCount;
+        return $mfaCount / $userCount;
     }
 
     public static function search($params): ActiveDataProvider
@@ -698,4 +825,110 @@ class User extends UserBase
         return false;
     }
 
+    /**
+     * Update the profile review date
+     */
+    public function updateProfileReviewDate()
+    {
+        $this->review_profile_after = MySqlDateTime::relative(\Yii::$app->params['profileReviewInterval']);
+    }
+
+    /**
+     * Add personal email to recovery methods table. On insert ($insert == true) the personal
+     * email address is added to the list of recovery methods.
+     * @param bool $insert
+     * @throws \yii\web\ConflictHttpException
+     * @throws \yii\web\ServerErrorHttpException
+     */
+    public function updateRecoveryMethods(bool $insert)
+    {
+        if ($this->personal_email === null || $insert == false) {
+            return;
+        }
+
+        \Yii::warning([
+            'action' => 'adding personal email',
+            'status' => 'notice',
+            'employee_id' => $this->employee_id,
+            'email' => $this->personal_email,
+        ]);
+
+        Method::findOrCreate($this->id, $this->personal_email, MySqlDateTime::now());
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function beforeSave($insert)
+    {
+        if ($insert == false && $this->personal_email !== $this->getOldAttribute('personal_email')) {
+            $this->review_profile_after = MySqlDateTime::relative('-1 day');
+        }
+
+        if ($this->email === '') {
+            $this->email = null;
+        }
+
+        if ($this->getOldAttribute('email') !== null && $this->email === null) {
+            $this->addError('email', 'email cannot be removed');
+            return false;
+        }
+
+        if (! empty($this->email)) {
+            $this->expires_on = null;
+        }
+
+        return parent::beforeSave($insert);
+    }
+
+    /**
+     * @return string:null
+     */
+    public function getExpiresOnInitialValue()
+    {
+        return MySqlDateTime::relative(\Yii::$app->params['contingentUserDuration']);
+    }
+
+    /**
+     * @return string
+     */
+    public function getEmailAddress(): string
+    {
+        return $this->email ?? $this->personal_email ?? '';
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function afterFind()
+    {
+        if ($this->expires_on !== null && MySqlDateTime::isBefore($this->expires_on, time())) {
+            $this->active = 'no';
+
+            Yii::warning([
+                'event' => 'onAfterFind',
+                'status' => 'user is expired',
+                'employeeId' => $this->employee_id,
+                'scenario' => $this->scenario,
+                'expires_on' => $this->expires_on
+            ], 'application');
+        }
+
+        parent::afterFind();
+    }
+
+    public function assessPassword(string $newPassword): bool
+    {
+        $password = new Password();
+
+        $password->user_id = $this->id;
+        $password->password = $newPassword;
+
+        if (! $password->validate()) {
+            $this->addErrors($password->getErrors());
+            return false;
+        }
+
+        return true;
+    }
 }

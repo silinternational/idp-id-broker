@@ -17,7 +17,6 @@ use yii\helpers\Html as yHtml;
  * @var string $emailSignature
  * @var string $helpCenterUrl
  * @var string $idpDisplayName
- * @var string $passwordForgotUrl
  * @var string $passwordProfileUrl
  * @var string $supportEmail
  * @var string $supportName
@@ -40,14 +39,16 @@ use yii\helpers\Html as yHtml;
     If you need to remove the Security Key from your Identity account:
 </p>
 <ol>
-    <li>Go to <?= yHtml::encode($passwordProfileUrl) ?></li>
+    <li>Go to <?=yHtml::a(yHtml::encode($passwordProfileUrl), $passwordProfileUrl)?>.</li>
     <li>Log in if needed</li>
-    <li>Under the 2-Step Verification section, click DISABLE next to the Security Key option</li>
+    <li>Under the 2-Step Verification section, click "I LOST MY KEY" next to the Security Key option</li>
 </ol>
 
 <p>
     If you have any difficulties completing this task, please contact <?= yHtml::encode($supportName) ?> at
     <?= yHtml::encode($supportEmail) ?>.
 </p>
+
+<p>Thanks,</p>
 
 <p><i><?= yHtml::encode($emailSignature) ?></i></p>

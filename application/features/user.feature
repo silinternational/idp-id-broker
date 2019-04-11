@@ -3,33 +3,39 @@ Feature: User
   As an authorized requester
   I need to be able to manage user information
 
+  Background:
+    Given the user store is empty
+
   Scenario: Create a new user
     Given a record does not exist with an employee_id of "123"
       And the requester is authorized
       And I provide the following valid data:
-        | property      | value                 |
-        | employee_id   | 123                   |
-        | first_name    | Shep                  |
-        | last_name     | Clark                 |
-        | display_name  | Shep Clark            |
-        | username      | shep_clark            |
-        | email         | shep_clark@example.org|
-        | manager_email | boss_man@example.org  |
-        | require_mfa   | yes                   |
+        | property        | value                 |
+        | employee_id     | 123                   |
+        | first_name      | Shep                  |
+        | last_name       | Clark                 |
+        | display_name    | Shep Clark            |
+        | username        | shep_clark            |
+        | email           | shep_clark@example.org|
+        | manager_email   | boss_man@example.org  |
+        | require_mfa     | yes                   |
+        | hide            | yes                   |
     When I request "/user" be created
     Then the response status code should be 200
       And the following data is returned:
-        | property      | value                 |
+        | property        | value                 |
 #TODO:need to ensure uuid came back but not sure about value...
-        | employee_id   | 123                   |
-        | first_name    | Shep                  |
-        | last_name     | Clark                 |
-        | display_name  | Shep Clark            |
-        | username      | shep_clark            |
-        | email         | shep_clark@example.org|
-        | active        | yes                   |
-        | locked        | no                    |
-        | manager_email | boss_man@example.org  |
+        | employee_id     | 123                   |
+        | first_name      | Shep                  |
+        | last_name       | Clark                 |
+        | display_name    | Shep Clark            |
+        | username        | shep_clark            |
+        | email           | shep_clark@example.org|
+        | active          | yes                   |
+        | locked          | no                    |
+        | manager_email   | boss_man@example.org  |
+        | hide            | yes                   |
+        | profile_review  | no                    |
       And the following data is not returned:
         | property                |
         | current_password_id     |
@@ -47,7 +53,9 @@ Feature: User
         | locked              | no                    |
         | manager_email       | boss_man@example.org  |
         | require_mfa         | yes                   |
-        | spouse_email        | NULL                  |
+        | personal_email      | NULL                  |
+        | hide                | yes                   |
+        | groups              | NULL                  |
       And last_changed_utc should be stored as now UTC
       And last_synced_utc should be stored as now UTC
 
@@ -73,13 +81,14 @@ Feature: User
     Given a record does not exist with an employee_id of "123"
       And the requester is authorized
       And I provide the following valid data:
-        | property     | value                 |
-        | employee_id  | 123                   |
-        | first_name   | Shep                  |
-        | last_name    | Clark                 |
-        | display_name | Shep Clark            |
-        | username     | shep_clark            |
-        | email        | shep_clark@example.org|
+        | property        | value                 |
+        | employee_id     | 123                   |
+        | first_name      | Shep                  |
+        | last_name       | Clark                 |
+        | display_name    | Shep Clark            |
+        | username        | shep_clark            |
+        | email           | shep_clark@example.org|
+        | hide            | yes                   |
       And I request "/user" be created
       And the response status code should be 200
       And a record exists with an employee_id of "123"
@@ -94,6 +103,7 @@ Feature: User
         | active              | yes                   |
         | locked              | no                    |
         | require_mfa         | no                    |
+        | hide                | yes                   |
       And I change the <property> to <value>
     When I request "/user/123" be updated
     Then the response status code should be 200
@@ -102,19 +112,22 @@ Feature: User
       And last_synced_utc should be stored as now UTC
 
     Examples:
-      | property     | value              |
-      | first_name   | FIRST              |
-      | last_name    | LAST               |
-      | display_name | DISPLAY            |
-      | username     | USER               |
-      | email        | chg@example.org    |
-      | active       | no                 |
-      | active       | yes                |
-      | locked       | no                 |
-      | locked       | yes                |
-      | spouse_email | spouse@example.org |
-      | require_mfa  | no                 |
-      | require_mfa  | yes                |
+      | property        | value              |
+      | first_name      | FIRST              |
+      | last_name       | LAST               |
+      | display_name    | DISPLAY            |
+      | username        | USER               |
+      | email           | chg@example.org    |
+      | active          | no                 |
+      | active          | yes                |
+      | locked          | no                 |
+      | locked          | yes                |
+      | personal_email  | my@example.org     |
+      | require_mfa     | no                 |
+      | require_mfa     | yes                |
+      | hide            | no                 |
+      | hide            | yes                |
+      | groups          | mensa,hackers      |
 
 #TODO: consider creating a new security.feature file for all these security-related tests.
 #TODO: need to think through tests for API_ACCESS_KEYS config, i.e., need tests for ApiConsumer
@@ -291,32 +304,33 @@ Feature: User
       | display_name | Display Name |
       | username     | Username     |
       | email        | Email        |
+      | groups       | Groups       |
 
   Scenario Outline: Attempt to create a new user while providing an invalid value for an optional property
     Given the requester is authorized
-    And the user store is empty
-    And I provide the following valid data:
-      | property     | value                 |
-      | employee_id  | 456                   |
-      | first_name   | John                  |
-      | last_name    | Smith                 |
-      | display_name | John Smith            |
-      | username     | john_smith            |
-      | email        | john_smith@example.org|
-    But I provide an invalid <property> of <value>
+      And the user store is empty
+      And I provide the following valid data:
+        | property     | value                 |
+        | employee_id  | 456                   |
+        | first_name   | John                  |
+        | last_name    | Smith                 |
+        | display_name | John Smith            |
+        | username     | john_smith            |
+        | email        | john_smith@example.org|
+      But I provide an invalid <property> of <value>
     When I request "/user" be created
     Then the response status code should be 422
-    And the property message should contain "<contents>"
-    And the user store is still empty
+      And the property message should contain "<contents>"
+      And the user store is still empty
 
     Examples:
       | property      | value           | contents      |
-      | spouse_email  | true            | Spouse Email  |
-      | spouse_email  | 123             | Spouse Email  |
-      | spouse_email  | invalid.address | Spouse Email  |
       | manager_email | true            | Manager Email |
       | manager_email | 123             | Manager Email |
       | manager_email | invalid.address | Manager Email |
+      | personal_email| true            | Personal Email|
+      | personal_email| 123             | Personal Email|
+      | personal_email| invalid.address | Personal Email|
 
   Scenario: Attempt to create a new user with a username that already exists
     Given the requester is authorized
@@ -394,6 +408,12 @@ Feature: User
     Then the response status code should be 200
       And I should receive 2 users
 
+  Scenario: Get list of verified methods for a user
+    Given A user with 1 verified method, 1 unverified method, 0 verified mfas, and 0 unverified mfas
+    When I request a list of verified methods
+    Then I see a list containing 1 method
+
+
 #TODO: get a user with/without a match
 #TODO: get a user with invalid id
 #TODO: act upon a user/{id} in an undefined authz and !authz
@@ -412,3 +432,133 @@ Feature: User
 
 #TODO: make sure display_name is built up from first + last when not supplied.
 
+  Scenario: Add a user with personal email address, expect a recovery method to be added.
+    Given a record does not exist with an employee_id of "123"
+    And the requester is authorized
+    And I provide the following valid data:
+      | property        | value                 |
+      | employee_id     | 123                   |
+      | first_name      | Shep                  |
+      | last_name       | Clark                 |
+      | username        | shep_clark            |
+      | email           | shep_clark@example.org|
+      | personal_email  | my@example.com        |
+    When I request "/user" be created
+    Then the response status code should be 200
+     And a record exists with an employee_id of "123"
+     And a method record exists with a value of "my@example.com"
+     And the method record is marked as verified
+
+  Scenario: Add a user with personal email address same as primary, expect a recovery method NOT to be added.
+    Given a record does not exist with an employee_id of "123"
+    And the requester is authorized
+    And I provide the following valid data:
+      | property        | value                 |
+      | employee_id     | 123                   |
+      | first_name      | Shep                  |
+      | last_name       | Clark                 |
+      | username        | shep_clark            |
+      | email           | shep_clark@example.org|
+      | personal_email  | shep_clark@example.org|
+    When I request "/user" be created
+    Then the response status code should be 200
+    And a record exists with an employee_id of "123"
+    And a method record does not exist with a value of "shep_clark@example.org"
+
+  Scenario: Update a user with a personal email address, expect a recovery method NOT to be added.
+    Given a record does not exist with an employee_id of "123"
+      And the requester is authorized
+      And I provide the following valid data:
+        | property        | value                 |
+        | employee_id     | 123                   |
+        | first_name      | Shep                  |
+        | last_name       | Clark                 |
+        | username        | shep_clark            |
+        | email           | shep_clark@example.org|
+      And I request "/user" be created
+      And the response status code should be 200
+      And a record exists with an employee_id of "123"
+      And I change the personal_email to my@example.com
+    When I request "/user/123" be updated
+    Then the response status code should be 200
+      And a record exists with a personal_email of my@example.com
+      And a method record does not exist with a value of "my@example.com"
+
+  Scenario: Update a user to change the personal email address, expect recovery methods to be unchanged
+    Given a record does not exist with an employee_id of "123"
+      And the requester is authorized
+      And I provide the following valid data:
+        | property        | value                 |
+        | employee_id     | 123                   |
+        | first_name      | Shep                  |
+        | last_name       | Clark                 |
+        | username        | shep_clark            |
+        | email           | shep_clark@example.org|
+        | personal_email  | old@example.com       |
+      And I request "/user" be created
+      And the response status code should be 200
+      And a record exists with an employee_id of "123"
+      And I change the personal_email to new@example.com
+    When I request "/user/123" be updated
+    Then the response status code should be 200
+      And a record exists with a personal_email of new@example.com
+      And a method record exists with a value of "old@example.com"
+      And a method record does not exist with a value of "new@example.com"
+
+  Scenario: Update a user to change the personal email address, expect review date to be past
+    Given a record does not exist with an employee_id of "123"
+      And the requester is authorized
+      And I provide the following valid data:
+        | property        | value                 |
+        | employee_id     | 123                   |
+        | first_name      | Shep                  |
+        | last_name       | Clark                 |
+        | username        | shep_clark            |
+        | email           | shep_clark@example.org|
+        | personal_email  | old@example.com       |
+      And I request "/user" be created
+      And the response status code should be 200
+      And a record exists with an employee_id of "123"
+      And I change the personal_email to new@example.com
+    When I request "/user/123" be updated
+    Then the response status code should be 200
+      And the profile review date should be past
+
+  Scenario: Add a user with personal email address and no primary email address
+    Given a record does not exist with an employee_id of "123"
+      And the requester is authorized
+      And I provide the following valid data:
+        | property        | value                 |
+        | employee_id     | 123                   |
+        | first_name      | New                   |
+        | last_name       | Guy                   |
+        | username        | new_guy               |
+        | personal_email  | personal@example.com  |
+    When I request "/user" be created
+    Then the response status code should be 200
+      And a record exists with an employee_id of "123"
+      And the following data is returned:
+        | property        | value                 |
+        | employee_id     | 123                   |
+        | email           | personal@example.com  |
+        | active          | yes                   |
+        | locked          | no                    |
+        | personal_email  | personal@example.com  |
+
+  Scenario: Attempt to update email to null
+    Given the requester is authorized
+      And I provide the following valid data:
+        | property        | value                 |
+        | employee_id     | 123                   |
+        | first_name      | Established           |
+        | last_name       | User                  |
+        | username        | established_user      |
+        | email           | primary@example.com   |
+      And I request "/user" be created
+      And the response status code should be 200
+      And I provide the following valid data:
+        | property       | value                  |
+        | email          | null                   |
+        | personal_email | personal@example.org   |
+    When I request "/user/123" be updated
+    Then the response status code should be 422

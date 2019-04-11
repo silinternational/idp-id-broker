@@ -1,10 +1,11 @@
 <?php
 namespace frontend\controllers;
 
-use common\helpers\MySqlDateTime;
 use common\models\User;
 use frontend\components\BaseRestController;
 use Yii;
+use yii\web\NotFoundHttpException;
+use yii\web\UnprocessableEntityHttpException;
 
 class UserController extends BaseRestController
 {
@@ -35,6 +36,20 @@ class UserController extends BaseRestController
         $user->attributes = Yii::$app->request->getBodyParams();
 
         $this->save($user);
+
+        /*
+         * Refresh user model to retrieve database default values
+         */
+        $user->refresh();
+
+        Yii::info([
+            'action' => 'user/create',
+            'status' => 'created',
+            'id' => $user->id,
+            'employeeId' => $user->employee_id,
+            'scenario' => $user->scenario,
+            'email' => $user->email,
+        ], 'application');
 
         return $user;
     }
@@ -77,15 +92,25 @@ class UserController extends BaseRestController
         return $user;
     }
 
-    public function actionExpiring(): array
+    /**
+     * @param string $employeeId
+     * @throws NotFoundHttpException
+     * @throws UnprocessableEntityHttpException
+     */
+    public function actionAssessPassword(string $employeeId)
     {
-        return User::getExpiringUsers(Yii::$app->request->queryParams);
-    }
+        $user = User::findOne(['employee_id' => $employeeId]);
 
-    public function actionFirstPassword(): array
-    {
-        $createdOn = Yii::$app->request->queryParams['created_on'] ?? MySqlDateTime::today();
+        if ($user === null) {
+            throw new NotFoundHttpException('User not found');
+        }
 
-        return User::getUsersWithFirstPasswords($createdOn);
+        if ($user->assessPassword(Yii::$app->request->getBodyParam('password'))) {
+            Yii::$app->response->setStatusCode(204);
+            return;
+        } else {
+            $errors = join(', ', $user->getFirstErrors());
+            throw new UnprocessableEntityHttpException($errors);
+        }
     }
 }

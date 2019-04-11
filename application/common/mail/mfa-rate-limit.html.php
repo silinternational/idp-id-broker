@@ -17,7 +17,6 @@ use yii\helpers\Html as yHtml;
  * @var string $emailSignature
  * @var string $helpCenterUrl
  * @var string $idpDisplayName
- * @var string $passwordForgotUrl
  * @var string $passwordProfileUrl
  * @var string $supportEmail
  * @var string $supportName
@@ -39,6 +38,9 @@ use yii\helpers\Html as yHtml;
 <p>
     If you continue to have problems accessing your account, please contact 
     <?= yHtml::encode($supportName) ?> at <?= yHtml::encode($supportEmail) ?>.
+</p>
+<p>
+    Thanks,
 </p>
 <p>
     <i><?= yHtml::encode($emailSignature) ?></i>
