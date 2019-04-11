@@ -23,6 +23,9 @@ use yii\helpers\Html as yHtml;
  * @var bool   $isMfaEnabled
  * @var string $inviteCode
  */
+
+$inviteLink = $passwordProfileUrl . '/profile/intro?invite=' . $inviteCode;
+
 ?>
 <p>Dear <?= yHtml::encode($displayName) ?>,</p>
 
@@ -40,7 +43,7 @@ use yii\helpers\Html as yHtml;
 <p><b>Instructions:</b></p>
 <p>
     To proceed with establishing your account, please follow the step-by-step guidance
-    <?= yHtml::a('here', $passwordProfileUrl . '/profile/intro?invite=' . $inviteCode) ?>.
+    here: <?= yHtml::a(yHtml::encode($inviteLink), $inviteLink) ?>
 </p>
 
 <p>

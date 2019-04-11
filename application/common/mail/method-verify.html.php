@@ -13,6 +13,9 @@ use yii\helpers\Html as yHtml;
  * @var string $emailSignature  Email signature. Provided by environment variable EMAIL_SIGNATURE.
  * @var string $passwordProfileUrl  URL of password manager. Provided by environment variable PASSWORD_PROFILE_URL.
  */
+
+$verifyLink = $passwordProfileUrl . '/password/recovery/' . $uid . '/verify/' . $code;
+
 ?>
 <p>Dear <?= yHtml::encode($displayName) ?>,</p>
 
@@ -20,7 +23,7 @@ use yii\helpers\Html as yHtml;
     Someone recently requested to add this email address, <?= yHtml::encode($toAddress); ?>,
     as a method for verifying themselves should they need to reset their
     <?= yHtml::encode($idpDisplayName); ?> account password. If this was you, you may click
-    <?= yHtml::a('here', $passwordProfileUrl . '/password/recovery/' . $uid . '/verify/' . $code) ?>
+    <?= yHtml::a(yHtml::encode($verifyLink), $verifyLink) ?>
     to add it to your account.
 </p>
 <p>
@@ -30,7 +33,8 @@ use yii\helpers\Html as yHtml;
 </p>
 <p>
     To maintain security, please don't forward this email to anyone.
-    See our <?= yHtml::a('Help Center', $helpCenterUrl) ?> for more security tips.
+    See our Help Center at <?= yHtml::a(yHtml::encode($helpCenterUrl), $helpCenterUrl) ?> for more security
+    tips.
 </p>
 <p>
     Thanks,
