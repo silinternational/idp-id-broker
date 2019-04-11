@@ -50,4 +50,4 @@ The API is described by (api.raml), and an auto-generated `api.html` created by
 `raml2html`. To regenerate the HTML file, run `make raml2html`. To view the
 rendered HTML file on Github, prepend the Github URL with 
 `https://htmlpreview.github.com/?`.
-[Example](https://htmlpreview.github.com/?https://github.com/silinternational/idp-id-broker/blob/develop-4.0/api.html)
+[Example](https://htmlpreview.github.com/?https://github.com/silinternational/idp-id-broker/blob/master/api.html)

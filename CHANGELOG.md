@@ -5,6 +5,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+
+## [4.0.0] - 2019-04-11
 ### Added
 - Added recovery method and MFA review flags to user resource returned from
   `/authentication` and `/user` endpoints
@@ -94,7 +96,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 - Initial version of ID Broker.
 
-[Unreleased]: https://github.com/silinternational/idp-id-broker/compare/3.5.0...HEAD
+[Unreleased]: https://github.com/silinternational/idp-id-broker/compare/4.0.0...HEAD
+[4.0.0]: https://github.com/silinternational/idp-id-broker/compare/3.5.0...4.0.0
 [3.5.0]: https://github.com/silinternational/idp-id-broker/compare/3.4.2...3.5.0
 [3.4.2]: https://github.com/silinternational/idp-id-broker/compare/3.4.1...3.4.2
 [3.4.1]: https://github.com/silinternational/idp-id-broker/compare/3.4.0...3.4.1
