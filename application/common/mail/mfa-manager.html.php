@@ -30,7 +30,8 @@ use yii\helpers\Html as yHtml;
 </p>
 <p>
     To maintain security, please don't forward this email to anyone.
-    See our <?= yHtml::a('Help Center', $helpCenterUrl) ?> for more security tips.
+    See our Help Center at <?= yHtml::a(yHtml::encode($helpCenterUrl), $helpCenterUrl) ?> for more security
+    tips.
 </p>
 <p>
     Thanks,

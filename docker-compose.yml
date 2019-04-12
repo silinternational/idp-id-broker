@@ -88,9 +88,13 @@ services:
 
     cli:
         image: silintl/php7:7.2
+        volumes:
+            - ${COMPOSER_CACHE_DIR}:/composer
         volumes_from:
             - data
         working_dir: /data
+        environment:
+            COMPOSER_CACHE_DIR: /composer
         env_file:
             - ./local.env
         command: ["true"]
