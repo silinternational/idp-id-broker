@@ -550,7 +550,7 @@ class User extends UserBase
      */
     public function isTimeToNagToAddMfa(int $now): bool
     {
-        return MySqlDateTime::isBefore($this->nag_for_mfa_after, $now)
+        return MySqlDateTime::isAfter($now, $this->nag_for_mfa_after)
             && (count($this->getVerifiedMfaOptions()) === 0);
     }
 
@@ -563,7 +563,7 @@ class User extends UserBase
      */
     public function isTimeToNagToAddMethod(int $now): bool
     {
-        return MySqlDateTime::isBefore($this->nag_for_method_after, $now)
+        return MySqlDateTime::isAfter($now, $this->nag_for_method_after)
             && (count($this->getVerifiedMethodOptions()) === 0);
     }
 
@@ -576,7 +576,7 @@ class User extends UserBase
      */
     public function isTimeForReview(int $now)
     {
-        return MySqlDateTime::isBefore($this->review_profile_after, $now);
+        return MySqlDateTime::isAfter($now, $this->review_profile_after);
     }
 
     /**
