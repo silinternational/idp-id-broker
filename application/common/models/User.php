@@ -665,7 +665,8 @@ class User extends UserBase
      */
     public function getMethodFields()
     {
-        $shouldProvideMethodOptions = self::NAG_PROFILE_REVIEW && $this->scenario == self::SCENARIO_AUTHENTICATE;
+        $shouldProvideMethodOptions = $this->getNagState() === self::NAG_PROFILE_REVIEW
+            && $this->scenario == self::SCENARIO_AUTHENTICATE;
 
         return [
             'add' => $this->getNagState() == self::NAG_ADD_METHOD ? 'yes' : 'no',
