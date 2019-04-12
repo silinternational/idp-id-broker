@@ -1038,14 +1038,7 @@ class User extends UserBase
         }
 
         if ($this->nag_for_mfa_after === '0000-00-00') {
-            /*
-             * nag_for_mfa_after was repurposed in a recent migration as review_profile_after
-             */
-            if ($needToSave) {
-                $this->nag_for_mfa_after = MySqlDateTime::relative(\Yii::$app->params['mfaAddInterval']);
-            } else {
-                $this->nag_for_mfa_after = $this->review_profile_after;
-            }
+            $this->nag_for_mfa_after = MySqlDateTime::relative(\Yii::$app->params['mfaAddInterval']);
             $needToSave = true;
         }
 
