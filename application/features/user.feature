@@ -409,7 +409,9 @@ Feature: User
       And I should receive 2 users
 
   Scenario: Get list of verified methods for a user
-    Given A user with 1 verified method, 1 unverified method, 0 verified mfas, and 0 unverified mfas
+    Given there is a user in the database
+      And that user has 1 verified method
+      And that user has 1 unverified method
     When I request a list of verified methods
     Then I see a list containing 1 method
 

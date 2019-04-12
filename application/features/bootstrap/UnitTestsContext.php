@@ -99,30 +99,6 @@ class UnitTestsContext extends YiiContext
     }
 
     /**
-     * @Given A user with :verMeth verified method(s), :unverMeth unverified method(s), :verMfa verified mfa(s), and :unverMfa unverified mfa(s)
-     */
-    public function aUserWithVerifiedMethodsVerifiedMfas($verMeth, $unverMeth, $verMfa, $unverMfa)
-    {
-        $this->tempUser = $this->createNewUserInDatabase('method_tester');
-
-        for ($i = 0; $i < $verMeth; $i++) {
-            $this->createMethod('verified' . $i . '@example.org', 1);
-        }
-
-        for ($i = 0; $i < $unverMeth; $i++) {
-            $this->createMethod('unverified' . $i . '@example.org', 0);
-        }
-
-        for ($i = 0; $i < $verMfa; $i++) {
-            $this->createMfa('totp', 1);
-        }
-
-        for ($i = 0; $i < $unverMfa; $i++) {
-            $this->createMfa('totp', 0);
-        }
-    }
-
-    /**
      * @When I request a list of verified methods
      */
     public function iRequestAListOfVerifiedMethods()

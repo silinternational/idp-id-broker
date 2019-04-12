@@ -177,22 +177,6 @@ Feature: Authentication
     When I request "/authentication" be created
     Then the response status code should be 200
 
-  Scenario Outline: Check "nag" flags on user resource in response to authenticate call
-    Given there is a "shep_clark" user with a review_profile_after in the <tense>
-      And there is a "shep_clark" user with a review_profile_after in the <tense>
-      And I provide the following valid data:
-        | property  | value       |
-        | username  | shep_clark  |
-        | password  | govols!!!   |
-    When I request "/authentication" be created
-    Then the following data is returned:
-      | property       | value      |
-      | employee_id    | 123        |
-      | profile_review | <yesorno>  |
-
-    Examples:
-
-
   Scenario Outline: Check profile review flag on user resource in response to authenticate call
     Given there is a "shep_clark" user in the database
       And that user has a review_profile_after in the <reviewTense>
