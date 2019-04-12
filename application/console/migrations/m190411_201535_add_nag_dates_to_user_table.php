@@ -12,8 +12,8 @@ class m190411_201535_add_nag_dates_to_user_table extends Migration
      */
     public function safeUp()
     {
-        $this->addColumn('user', 'nag_for_mfa_after', 'date not null');
-        $this->addColumn('user', 'nag_for_method_after', 'date not null');
+        $this->addColumn('{{user}}', 'nag_for_mfa_after', 'date not null');
+        $this->addColumn('{{user}}', 'nag_for_method_after', 'date not null');
     }
 
     /**
