@@ -99,30 +99,6 @@ class UnitTestsContext extends YiiContext
     }
 
     /**
-     * @Given A user with :verMeth verified method(s), :unverMeth unverified method(s), :verMfa verified mfa(s), and :unverMfa unverified mfa(s)
-     */
-    public function aUserWithVerifiedMethodsVerifiedMfas($verMeth, $unverMeth, $verMfa, $unverMfa)
-    {
-        $this->tempUser = $this->createNewUserInDatabase('method_tester');
-
-        for ($i = 0; $i < $verMeth; $i++) {
-            $this->createMethod('verified' . $i . '@example.org', 1);
-        }
-
-        for ($i = 0; $i < $unverMeth; $i++) {
-            $this->createMethod('unverified' . $i . '@example.org', 0);
-        }
-
-        for ($i = 0; $i < $verMfa; $i++) {
-            $this->createMfa('totp', 1);
-        }
-
-        for ($i = 0; $i < $unverMfa; $i++) {
-            $this->createMfa('totp', 0);
-        }
-    }
-
-    /**
      * @When I request a list of verified methods
      */
     public function iRequestAListOfVerifiedMethods()
@@ -215,5 +191,65 @@ class UnitTestsContext extends YiiContext
     public function theNewCodeIsNotExpired()
     {
         $this->iReceiveACodeThatIsNotExpired();
+    }
+
+    /**
+     * @Given the nag dates are in the past
+     */
+    public function theNagDatesAreInThePast()
+    {
+        $this->tempUser->review_profile_after = MySqlDateTime::relative('-1 day');
+        $this->tempUser->nag_for_method_after = MySqlDateTime::relative('-1 day');
+        $this->tempUser->nag_for_mfa_after = MySqlDateTime::relative('-1 day');
+    }
+
+    /**
+     * @When I request the nag state
+     */
+    public function iRequestTheNagState()
+    {
+        $this->nagState = $this->tempUser->getNagState();
+    }
+
+    /**
+     * @Then I see that the nag state is :state
+     */
+    public function iSeeThatTheNagStateIs($state)
+    {
+        Assert::eq($this->nagState, $state);
+    }
+
+    /**
+     * @Given there is a user in the database
+     */
+    public function thereIsAUserInTheDatabase()
+    {
+        $this->tempUser = $this->createNewUserInDatabase('method_tester');
+    }
+
+    /**
+     * @Given /^that user has (\d+) (verified|unverified) methods?$/i
+     */
+    public function thatUserHasVerifiedMethods($n, $verifiedOrUnverified)
+    {
+        for ($i = 0; $i < $n; $i++) {
+            $this->createMethod(
+                $verifiedOrUnverified . $i . '@example.org',
+                $verifiedOrUnverified == 'verified' ? 1 : 0
+            );
+        }
+    }
+
+    /**
+     * @Given /^that user has (\d+) (verified|unverified) mfas?/i
+     */
+    public function thatUserHasVerifiedMfas($n, $verifiedOrUnverified)
+    {
+        for ($i = 0; $i < $n; $i++) {
+            $this->createMfa(
+                'totp',
+                $verifiedOrUnverified == 'verified' ? 1 : 0
+            );
+        }
     }
 }

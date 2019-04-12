@@ -196,6 +196,8 @@ return [
         'authorizedTokens'              => Env::getArray('API_ACCESS_KEYS'),
         'idpName'                       => $idpName,
         'idpDisplayName'                => $idpDisplayName,
+        'mfaAddInterval'                => Env::get('MFA_ADD_INTERVAL', '+30 days'),
+        'methodAddInterval'             => Env::get('METHOD_ADD_INTERVAL', '+6 months'),
         'profileReviewInterval'         => Env::get('PROFILE_REVIEW_INTERVAL', '+6 months'),
         'migratePasswordsFromLdap'      => Env::get('MIGRATE_PW_FROM_LDAP', false),
         'passwordReuseLimit'            => Env::get('PASSWORD_REUSE_LIMIT', 10),

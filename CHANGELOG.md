@@ -5,6 +5,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+- Re-added mfa nag, as 'add' property on `mfa` object in UserResponse
+- Added recovery method nag, as 'add' property on `method` object in UserResponse
 
 ## [4.0.1] - 2019-04-12
 ### Changed

@@ -95,4 +95,17 @@ class MySqlDateTime
 
         return ! ($eventTimeEpoch > $now);
     }
+
+    /**
+     * Essentially an alias for `isBefore` to improve code readability
+     *
+     * @param int $now
+     * @param string $eventTime
+     * @return bool
+     * @throws \Exception
+     */
+    public static function isAfter(int $now, string $eventTime)
+    {
+        return self::isBefore($eventTime, $now);
+    }
 }
