@@ -1004,6 +1004,8 @@ class User extends UserBase
             ], 'application');
         }
 
+        $this->setEmptyNagDates();
+
         parent::afterFind();
     }
 
@@ -1020,5 +1022,48 @@ class User extends UserBase
         }
 
         return true;
+    }
+
+    /**
+     * Set dates that are empty. These are records that existed before the migration added these
+     * columns in the database. Once all records are updated, this function can be removed.
+     */
+    protected function setEmptyNagDates(): void
+    {
+        $needToSave = false;
+
+        if ($this->review_profile_after === '0000-00-00') {
+            $this->review_profile_after = MySqlDateTime::relative(\Yii::$app->params['profileReviewInterval']);
+            $needToSave = true;
+        }
+
+        if ($this->nag_for_mfa_after === '0000-00-00') {
+            /*
+             * nag_for_mfa_after was repurposed in a recent migration as review_profile_after
+             */
+            if ($needToSave) {
+                $this->nag_for_mfa_after = MySqlDateTime::relative(\Yii::$app->params['mfaAddInterval']);
+            } else {
+                $this->nag_for_mfa_after = $this->review_profile_after;
+            }
+            $needToSave = true;
+        }
+
+        if ($this->nag_for_method_after === '0000-00-00') {
+            $this->nag_for_method_after = MySqlDateTime::relative(\Yii::$app->params['methodAddInterval']);
+            $needToSave = true;
+        }
+
+        if ($needToSave) {
+            $this->scenario = self::SCENARIO_UPDATE_USER;
+            if (! $this->save()) {
+                Yii::warning([
+                    'event' => 'setEmptyNagDates',
+                    'status' => 'save failed',
+                    'employeeId' => $this->employee_id,
+                    'scenario' => $this->scenario,
+                ], 'application');
+            }
+        }
     }
 }
