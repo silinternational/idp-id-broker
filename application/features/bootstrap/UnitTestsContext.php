@@ -244,13 +244,6 @@ class UnitTestsContext extends YiiContext
     }
 
     /**
-     * @Then I update the nag dates
-     */
-    public function iUpdateTheNagDates()
-    {
-        $this->tempUser->updateProfileReviewDates();
-    }
-    /**
      * @Given there is a user in the database
      */
     public function thereIsAUserInTheDatabase()

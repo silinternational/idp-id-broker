@@ -921,12 +921,6 @@ class User extends UserBase
                 $this->review_profile_after = MySqlDateTime::relative(\Yii::$app->params['profileReviewInterval']);
                 break;
         }
-        $this->resetNagState();
-    }
-
-    public function resetNagState(): void
-    {
-        $this->nagState = null;
     }
 
     /**
