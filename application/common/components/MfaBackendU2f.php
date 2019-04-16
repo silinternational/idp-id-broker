@@ -92,7 +92,7 @@ class MfaBackendU2f extends Component implements MfaBackendInterface
         } else {
             if ($this->client->u2fValidateRegistration($mfa->external_uuid, $value)) {
                 $mfa->verified = 1;
-                if ( ! $mfa->save()) {
+                if (! $mfa->save()) {
                     throw new ServerErrorHttpException(
                         "Unable to save U2F record after verification. Error: " . print_r($mfa->getFirstErrors(), true)
                     );

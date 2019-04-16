@@ -64,7 +64,7 @@ class EmailLog extends EmailLogBase
             'message_type' => $messageType,
         ]);
         
-        if ( ! $emailLog->save()) {
+        if (! $emailLog->save()) {
             $errorMessage = sprintf(
                 'Failed to log %s email to User %s: %s',
                 var_export($messageType, true),

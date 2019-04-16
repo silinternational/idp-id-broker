@@ -6,8 +6,8 @@ class m170928_174802_add_mfa_tables extends Migration
 {
     public function safeUp()
     {
-        $this->addColumn('{{user}}','require_mfa',"enum('no','yes')");
-        $this->addColumn('{{user}}','nag_for_mfa_after','date not null');
+        $this->addColumn('{{user}}', 'require_mfa', "enum('no','yes')");
+        $this->addColumn('{{user}}', 'nag_for_mfa_after', 'date not null');
 
         $this->createTable(
             '{{mfa}}',
@@ -23,8 +23,15 @@ class m170928_174802_add_mfa_tables extends Migration
             ],
             "ENGINE=InnoDB DEFAULT CHARSET=utf8"
         );
-        $this->addForeignKey('fk_mfa_user_id', '{{mfa}}', 'user_id',
-            '{{user}}', 'id', 'NO ACTION', 'NO ACTION');
+        $this->addForeignKey(
+            'fk_mfa_user_id',
+            '{{mfa}}',
+            'user_id',
+            '{{user}}',
+            'id',
+            'NO ACTION',
+            'NO ACTION'
+        );
 
         $this->createTable(
             '{{mfa_backupcode}}',
@@ -37,16 +44,22 @@ class m170928_174802_add_mfa_tables extends Migration
             ],
             "ENGINE=InnoDB DEFAULT CHARSET=utf8"
         );
-        $this->addForeignKey('fk_mfa_backupcode_mfa_id', '{{mfa_backupcode}}', 'mfa_id',
-            '{{mfa}}', 'id', 'NO ACTION', 'NO ACTION');
+        $this->addForeignKey(
+            'fk_mfa_backupcode_mfa_id',
+            '{{mfa_backupcode}}',
+            'mfa_id',
+            '{{mfa}}',
+            'id',
+            'NO ACTION',
+            'NO ACTION'
+        );
     }
 
     public function safeDown()
     {
-        $this->dropColumn('{{user}}','require_mfa');
-        $this->dropColumn('{{user}}','nag_for_mfa_after');
+        $this->dropColumn('{{user}}', 'require_mfa');
+        $this->dropColumn('{{user}}', 'nag_for_mfa_after');
         $this->dropTable('{{mfa_backupcode}}');
         $this->dropTable('{{mfa}}');
     }
-
 }

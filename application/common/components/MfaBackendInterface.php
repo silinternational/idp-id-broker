@@ -1,7 +1,8 @@
 <?php
 namespace common\components;
 
-interface MfaBackendInterface {
+interface MfaBackendInterface
+{
 
     /**
      * Initialize a new MFA backend registration
@@ -31,5 +32,4 @@ interface MfaBackendInterface {
      * @return bool
      */
     public function delete(int $mfaId): bool;
-
 }

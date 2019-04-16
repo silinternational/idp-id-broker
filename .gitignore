@@ -12,3 +12,6 @@ auth.json
 
 vendor/
 *.aes
+
+# PHP-CS-Fixer cache file.
+.php_cs.cache

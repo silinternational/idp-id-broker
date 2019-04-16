@@ -69,7 +69,7 @@ class Authentication
         /* @var $user User */
         $user = $invite->user;
 
-        if($user->current_password_id !== null) {
+        if ($user->current_password_id !== null) {
             $this->errors['invite'] = ['Invitation invalid. User has a password.'];
             return;
         }
@@ -97,14 +97,13 @@ class Authentication
     protected function validateUser(User $user)
     {
         if ($user->validate()) {
-
             $this->authenticatedUser = clone $user;
 
             $user->last_login_utc = MySqlDateTime::now();
 
             $user->updateProfileReviewDates();
 
-            if ( ! $user->save() ){
+            if (! $user->save()) {
                 \Yii::error([
                     'action' => 'save last_login_utc and nag dates for user after authentication',
                     'status' => 'error',
