@@ -2,7 +2,7 @@
 
 # Try to install composer dev dependencies
 cd /data
-composer install --no-interaction --no-scripts
+composer install --no-interaction --no-scripts --no-progress
 
 # Check the code against PSR-2.
 vendor/bin/php-cs-fixer fix -v --dry-run --stop-on-violation --using-cache=no .
