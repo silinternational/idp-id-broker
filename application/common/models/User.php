@@ -25,8 +25,8 @@ class User extends UserBase
     /** @var string */
     public $password;
 
-    /** @var string */
-    protected $nagState;
+    /** @var NagState */
+    protected $nagState = null;
 
     /**
      * {@inheritdoc}
