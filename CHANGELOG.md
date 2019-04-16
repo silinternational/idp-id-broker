@@ -5,6 +5,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+### Removed
+- Removed LDAP password migration
 
 ## [4.1.0] - 2019-04-15
 - Re-added mfa nag, as 'add' property on `mfa` object in UserResponse

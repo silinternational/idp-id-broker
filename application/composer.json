@@ -3,7 +3,6 @@
   "minimum-stability": "stable",
   "require": {
     "php": ">=7.2",
-    "adldap2/adldap2": "^6.1",
     "fillup/fake-bower-assets": "2.0.9",
     "roave/security-advisories": "dev-master",
     "silinternational/email-service-php-client": "^2.0.0",
