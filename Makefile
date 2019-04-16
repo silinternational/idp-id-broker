@@ -24,20 +24,10 @@ tables: db
 basemodels: db tables
 	docker-compose run --rm cli whenavail db 3306 100 ./rebuildbasemodels.sh
 
-ldap:
-	docker-compose up -d ldap
-
-ldapload: ldap
-	docker-compose run --rm ldapload
-
-rmldap:
-	docker-compose kill ldap
-	docker-compose rm -f ldap
-
 quicktest:
 	docker-compose run --rm test bash -c "vendor/bin/behat --stop-on-failure --strict --append-snippets"
 
-test: appfortests rmldap ldap ldapload api.html
+test: appfortests api.html
 	docker-compose run --rm test
 
 clean:

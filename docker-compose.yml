@@ -27,12 +27,6 @@ services:
         environment:
             EMAILER_CLASS: \Sil\SilIdBroker\Behat\Context\fakes\FakeEmailer
             EMAIL_SIGNATURE: Dummy Signature for Development
-            LDAP_BASE_DN: dc=acme,dc=org
-            LDAP_ADMIN_USERNAME: cn=Manager,dc=acme,dc=org
-            LDAP_ADMIN_PASSWORD: admin
-            LDAP_DOMAIN_CONTROLLERS: ldap
-            LDAP_USE_SSL: "false"
-            LDAP_USE_TLS: "false"
 
     cron:
         build: ./
@@ -61,19 +55,11 @@ services:
             EMAIL_SIGNATURE: Dummy Signature for Tests
             EMAILER_CLASS: \Sil\SilIdBroker\Behat\Context\fakes\FakeEmailer
             IDP_NAME: test
-            LDAP_BASE_DN: dc=acme,dc=org
-            LDAP_ADMIN_USERNAME: cn=Manager,dc=acme,dc=org
-            LDAP_ADMIN_PASSWORD: admin
-            LDAP_DOMAIN_CONTROLLERS: ldap
-            LDAP_USE_SSL: "false"
-            LDAP_USE_TLS: "false"
-            MIGRATE_PW_FROM_LDAP: "true"
             MYSQL_ROOT_PASSWORD: r00tp@ss!
             MYSQL_HOST: appfortestsdb
             MYSQL_DATABASE: appfortests
             MYSQL_USER: appfortests
             MYSQL_PASSWORD: appfortests
-            MIGRATE_PW_FROM_LDAP: "true"
             SUPPORT_EMAIL: support@example.com
 
     appfortestsdb:
@@ -99,34 +85,6 @@ services:
             - ./local.env
         command: ["true"]
 
-    ldap:
-        build:
-            context: ./development/ldap
-            dockerfile: Dockerfile
-        ports:
-            - "389"
-        env_file:
-            - ./local.env
-        working_dir: /data
-        environment:
-            DEBUG_LEVEL: 320
-
-    ldapload:
-        build:
-            context: ./development/ldap
-            dockerfile: Dockerfile
-        working_dir: /data
-        env_file:
-            - ./local.env
-        environment:
-            DEBUG_LEVEL: 320
-        links:
-            - ldap
-        volumes:
-            - ./development/ldap/fakepeople.ldif:/root/fakepeople.ldif
-            - ./development/ldap/fakerep.ldif:/root/fakerep.ldif
-        command: bash -c "sleep 10 && /data/load_ldap.sh"
-
     test:
         image: silintl/php7:7.2
         volumes_from:
@@ -146,12 +104,6 @@ services:
             HELP_CENTER_URL: https://www.example.com/help
             IDP_DISPLAY_NAME: Test
             IDP_NAME: test
-            LDAP_BASE_DN: dc=acme,dc=org
-            LDAP_ADMIN_USERNAME: cn=Manager,dc=acme,dc=org
-            LDAP_ADMIN_PASSWORD: admin
-            LDAP_DOMAIN_CONTROLLERS: ldap
-            LDAP_USE_SSL: "false"
-            LDAP_USE_TLS: "false"
             MYSQL_DATABASE: appfortests
             MYSQL_HOST: appfortestsdb
             MYSQL_PASSWORD: appfortests

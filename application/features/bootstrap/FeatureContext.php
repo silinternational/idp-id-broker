@@ -463,18 +463,6 @@ class FeatureContext extends YiiContext
     }
 
     /**
-     * @Given there is a(n) :username user in the ldap with a password of :password
-     */
-    public function thereIsAnUserInTheLdapWithAPasswordOf($username, $password)
-    {
-        $isCorrect = Yii::$app->ldap->isPasswordCorrectForUser(
-            $username,
-            $password
-        );
-        Assert::true($isCorrect);
-    }
-
-    /**
      * @Given the user :username has no password in the database
      */
     public function theUserHasNoPasswordInTheDatabase($username)

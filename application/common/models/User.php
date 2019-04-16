@@ -6,7 +6,6 @@ use Closure;
 use common\components\Emailer;
 use common\helpers\MySqlDateTime;
 use common\helpers\Utils;
-use common\ldap\Ldap;
 use common\models\Method;
 use Exception;
 use Ramsey\Uuid\Uuid;
@@ -31,9 +30,6 @@ class User extends UserBase
 
     /** @var string */
     public $password;
-
-    /** @var Ldap */
-    private $ldap;
 
     /** @var string */
     protected $nagState;
@@ -145,11 +141,6 @@ class User extends UserBase
         return true;
     }
     
-    public function setLdap(Ldap $ldap)
-    {
-        $this->ldap = $ldap;
-    }
-
     public function scenarios(): array
     {
         $scenarios = parent::scenarios();
@@ -287,86 +278,11 @@ class User extends UserBase
     private function validatePassword(): Closure
     {
         return function ($attributeName) {
-
-            if ($this->current_password_id === null) {
-                $this->attemptPasswordMigration();
-            }
-
             $currentPassword = $this->currentPassword ?? new Password();
             if (! password_verify($this->password, $currentPassword->hash)) {
                 $this->addError($attributeName, 'Incorrect password.');
             }
         };
-    }
-
-    protected function attemptPasswordMigration()
-    {
-        try {
-            if ($this->ldap === null) {
-
-                // If no LDAP was provided, simply skip password migration.
-                return;
-            }
-
-            if (empty($this->username)) {
-                $this->addError(
-                    'username',
-                    'No username given for checking against ldap.'
-                );
-                return;
-            }
-
-            if (empty($this->password)) {
-                $this->addError(
-                    'password',
-                    'No password given for checking against ldap.'
-                );
-                return;
-            }
-
-            $user = User::findByUsername($this->username);
-            if ($user === null) {
-                $this->addError('username', sprintf(
-                    'No user found with that username (%s) when trying to check '
-                    . 'password against ldap.',
-                    var_export($this->username, true)
-                ));
-                return;
-            }
-
-            if ($this->ldap->isPasswordCorrectForUser($this->username, $this->password)) {
-
-                /* Try to save the password, but let the user proceed even if
-                 * we can't (since we know the password is correct).  */
-                $user->scenario = User::SCENARIO_UPDATE_PASSWORD;
-                $user->password = $this->password;
-                $savedPassword = $user->updatePassword();
-                if ( ! $savedPassword) {
-
-                    /**
-                     * @todo If adding errors here causes a problem (because I think
-                     * it will cause the `validate()` call to return false... right?)
-                     * then find some other way to record/report what happened. We
-                     * may be able to use Yii::warn(...), but we'll have to update
-                     * the LdapContext Behat test file accordingly, since it gets
-                     * the errors and reports them (to help the developer debug).
-                     */
-                    $this->addError('password', sprintf(
-                        'Confirmed given password for %s against LDAP, but '
-                        . 'failed to save password hash to database: %s',
-                        var_export($this->username, true),
-                        json_encode($user->getFirstErrors())
-                    ));
-                } else {
-                    $this->refresh();
-                }
-            }
-        } catch (Exception $e) {
-            $this->addError('password', sprintf(
-                'Unexpected error while attempting to migrate password: %s',
-                $e->getMessage()
-            ));
-        }
     }
 
     public static function findByUsername(string $username)
