@@ -6,7 +6,6 @@ use Closure;
 use common\components\Emailer;
 use common\helpers\MySqlDateTime;
 use common\helpers\Utils;
-use common\models\Method;
 use Exception;
 use Ramsey\Uuid\Uuid;
 use Yii;
@@ -22,11 +21,6 @@ class User extends UserBase
     const SCENARIO_UPDATE_PASSWORD = 'update_password';
     const SCENARIO_AUTHENTICATE    = 'authenticate';
     const SCENARIO_INVITE          = 'invite';
-
-    const NAG_NONE           = 'none';
-    const NAG_ADD_MFA        = 'add_mfa';
-    const NAG_ADD_METHOD     = 'add_method';
-    const NAG_PROFILE_REVIEW = 'profile_review';
 
     /** @var string */
     public $password;
@@ -433,7 +427,7 @@ class User extends UserBase
                 return $model->getMethodFields();
             },
             'profile_review' => function (self $model) {
-                return $model->getNagState() == self::NAG_PROFILE_REVIEW ? 'yes' : 'no';
+                return $model->getNagState() == NagState::NAG_PROFILE_REVIEW ? 'yes' : 'no';
             }
         ];
 
@@ -502,25 +496,17 @@ class User extends UserBase
      */
     public function getNagState()
     {
-        /*
-         * Don't recalculate in case the date has changed since the last calculation.
-         */
-        if ($this->nagState !== null) {
-            return $this->nagState;
+        if ($this->nagState === null) {
+            $this->nagState = new NagState(
+                $this->nag_for_mfa_after,
+                $this->nag_for_method_after,
+                $this->review_profile_after,
+                count($this->getVerifiedMfaOptions()),
+                count($this->getVerifiedMethodOptions())
+            );
         }
-        $possibleNags = [
-            self::NAG_ADD_MFA => 'isTimeToNagToAddMfa',
-            self::NAG_ADD_METHOD => 'isTimeToNagToAddMethod',
-            self::NAG_PROFILE_REVIEW => 'isTimeForReview',
-        ];
-        $now = time();
-        foreach ($possibleNags as $nagType => $isTime) {
-            if ($this->$isTime($now)) {
-                $this->nagState = $nagType;
-                return $this->nagState;
-            }
-        }
-        return self::NAG_NONE;
+
+        return $this->nagState->getState();
     }
 
 
@@ -531,7 +517,7 @@ class User extends UserBase
     {
         return [
             'prompt'  => $this->isPromptForMfa() ? 'yes' : 'no',
-            'add'     => $this->getNagState() == self::NAG_ADD_MFA ? 'yes' : 'no',
+            'add'     => $this->getNagState() == NagState::NAG_ADD_MFA ? 'yes' : 'no',
             'options' => $this->getVerifiedMfaOptions(),
         ];
     }
@@ -581,11 +567,11 @@ class User extends UserBase
      */
     public function getMethodFields()
     {
-        $shouldProvideMethodOptions = $this->getNagState() === self::NAG_PROFILE_REVIEW
+        $shouldProvideMethodOptions = $this->getNagState() === NagState::NAG_PROFILE_REVIEW
             && $this->scenario == self::SCENARIO_AUTHENTICATE;
 
         return [
-            'add' => $this->getNagState() == self::NAG_ADD_METHOD ? 'yes' : 'no',
+            'add' => $this->getNagState() == NagState::NAG_ADD_METHOD ? 'yes' : 'no',
             'options' => $shouldProvideMethodOptions ? $this->methods : [],
         ];
     }
@@ -827,13 +813,13 @@ class User extends UserBase
     public function updateProfileReviewDates()
     {
         switch ($this->getNagState()) {
-            case self::NAG_ADD_MFA:
+            case NagState::NAG_ADD_MFA:
                 $this->nag_for_mfa_after = MySqlDateTime::relative(\Yii::$app->params['mfaAddInterval']);
                 break;
-            case self::NAG_ADD_METHOD:
+            case NagState::NAG_ADD_METHOD:
                 $this->nag_for_method_after = MySqlDateTime::relative(\Yii::$app->params['methodAddInterval']);
                 break;
-            case self::NAG_PROFILE_REVIEW:
+            case NagState::NAG_PROFILE_REVIEW:
                 $this->review_profile_after = MySqlDateTime::relative(\Yii::$app->params['profileReviewInterval']);
                 break;
         }
