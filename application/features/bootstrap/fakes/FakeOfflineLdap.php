@@ -14,7 +14,7 @@ class FakeOfflineLdap extends Ldap
     }
     /**
      * Connect to the LDAP (if not yet connected).
-     * 
+     *
      * NOTE: This WILL fail (and throw an exception).
      *
      * @throws LdapConnectionException

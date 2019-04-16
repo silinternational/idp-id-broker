@@ -27,10 +27,10 @@ class m181025_155801_create_method_table extends Migration
             ],
             "ENGINE=InnoDB DEFAULT CHARSET=utf8"
         );
-        $this->addForeignKey('fk_method_user_id','{{method}}','user_id','{{user}}','id','NO ACTION','NO ACTION');
-        $this->createIndex('uq_method_uid','{{method}}','uid',true);
-        $this->createIndex('uq_method_user_type_value','{{method}}',['user_id','value'],true);
-        $this->createIndex('uq_method_verification_code','{{method}}','verification_code',true);
+        $this->addForeignKey('fk_method_user_id', '{{method}}', 'user_id', '{{user}}', 'id', 'NO ACTION', 'NO ACTION');
+        $this->createIndex('uq_method_uid', '{{method}}', 'uid', true);
+        $this->createIndex('uq_method_user_type_value', '{{method}}', ['user_id','value'], true);
+        $this->createIndex('uq_method_verification_code', '{{method}}', 'verification_code', true);
     }
 
     /**

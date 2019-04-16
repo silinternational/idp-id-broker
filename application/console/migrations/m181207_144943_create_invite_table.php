@@ -24,8 +24,15 @@ class m181207_144943_create_invite_table extends Migration
             "ENGINE=InnoDB DEFAULT CHARSET=utf8"
         );
 
-        $this->addForeignKey('fk_invite_user_id', '{{invite}}', 'user_id',
-            '{{user}}', 'id', 'NO ACTION', 'NO ACTION');
+        $this->addForeignKey(
+            'fk_invite_user_id',
+            '{{invite}}',
+            'user_id',
+            '{{user}}',
+            'id',
+            'NO ACTION',
+            'NO ACTION'
+        );
     }
 
     /**

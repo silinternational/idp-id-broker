@@ -75,7 +75,7 @@ class MfaBackendTotp extends Component implements MfaBackendInterface
      * @throws NotFoundHttpException
      * @throws ServerErrorHttpException
      */
-    public function verify(int $mfaId,  $value): bool
+    public function verify(int $mfaId, $value): bool
     {
         $mfa = Mfa::findOne(['id' => $mfaId]);
         if ($mfa == null) {
@@ -85,7 +85,7 @@ class MfaBackendTotp extends Component implements MfaBackendInterface
         if ($this->client->validateTotp($mfa->external_uuid, $value)) {
             if ($mfa->verified !== 1) {
                 $mfa->verified = 1;
-                if ( ! $mfa->save()) {
+                if (! $mfa->save()) {
                     throw new ServerErrorHttpException();
                 }
             }

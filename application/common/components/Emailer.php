@@ -131,7 +131,7 @@ class Emailer extends Component
         ];
         
         foreach ($requiredParams as $param) {
-            if ( ! isset($this->emailServiceConfig[$param])) {
+            if (! isset($this->emailServiceConfig[$param])) {
                 throw new InvalidArgumentException(
                     'Missing email service configuration for ' . $param,
                     1502311757
@@ -187,7 +187,6 @@ class Emailer extends Component
     protected function getEmailServiceClient()
     {
         if ($this->emailServiceClient === null) {
-            
             $this->emailServiceClient = new EmailServiceClient(
                 $this->emailServiceConfig['baseUrl'],
                 $this->emailServiceConfig['accessToken'],
@@ -241,7 +240,7 @@ class Emailer extends Component
      */
     protected function getViewForMessage(string $messageType, string $format): string
     {
-        if ( ! self::isValidFormat($format)) {
+        if (! self::isValidFormat($format)) {
             throw new \InvalidArgumentException(sprintf(
                 "The email format must be 'html' or 'text', not %s.",
                 var_export($format, true)
@@ -413,7 +412,6 @@ class Emailer extends Component
      */
     public function hasReceivedMessageRecently($userId, string $messageType)
     {
-
         $latestEmail = EmailLog::find()->where(['user_id' => $userId, 'message_type' =>$messageType])
             ->orderBy('sent_utc DESC')->one();
         if (empty($latestEmail)) {
@@ -504,7 +502,7 @@ class Emailer extends Component
      */
     public function shouldSendLostSecurityKeyMessageTo($user)
     {
-        if ( ! $this->sendLostSecurityKeyEmails) {
+        if (! $this->sendLostSecurityKeyEmails) {
             return false;
         }
 
@@ -524,11 +522,11 @@ class Emailer extends Component
             // If this is a U2F and it was used recently, don't send an email.
             if ($mfaOption->type === Mfa::TYPE_U2F) {
                 $hasU2fOption = true;
-                if ( ! empty($mfaOption->last_used_utc) && MySqlDateTime::dateIsRecent($mfaOption->last_used_utc, $recentDays)) {
+                if (! empty($mfaOption->last_used_utc) && MySqlDateTime::dateIsRecent($mfaOption->last_used_utc, $recentDays)) {
                     return false;
                 }
 
-            // If one of the other MFA options has been used recently, remember it.
+                // If one of the other MFA options has been used recently, remember it.
             } elseif ($lastOtherUseDate === null && ! empty($mfaOption->last_used_utc)) {
                 $dateIsRecent = MySqlDateTime::dateIsRecent($mfaOption->last_used_utc, $recentDays);
                 $lastOtherUseDate = $dateIsRecent ? $mfaOption->last_used_utc : null;
@@ -536,7 +534,7 @@ class Emailer extends Component
         }
 
         // If they don't even have a u2f option, don't send an email
-        if ( ! $hasU2fOption) {
+        if (! $hasU2fOption) {
             return false;
         }
 

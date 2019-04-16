@@ -61,7 +61,7 @@ class MfaRateLimitContext extends YiiContext
         Assert::isArray($validBackupCodes);
         
         do {
-            $backupCode = substr(random_int(100000000, 200000000),1);
+            $backupCode = substr(random_int(100000000, 200000000), 1);
         } while (in_array($backupCode, $validBackupCodes));
         
         Assert::false(in_array($backupCode, $validBackupCodes));

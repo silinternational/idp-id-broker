@@ -75,11 +75,11 @@ class m170203_210542_create_initial_tables extends Migration
 
     private function createForeignKeys()
     {
-        $this->addForeignKey('fk_user_to_current_password','{{user}}','current_password_id','{{password}}','id','CASCADE');
+        $this->addForeignKey('fk_user_to_current_password', '{{user}}', 'current_password_id', '{{password}}', 'id', 'CASCADE');
     }
 
     private function dropForeignKeys()
     {
-        $this->dropForeignKey('fk_user_to_current_password','{{user}}');
+        $this->dropForeignKey('fk_user_to_current_password', '{{user}}');
     }
 }

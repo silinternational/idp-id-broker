@@ -57,8 +57,8 @@ use yii\helpers\Html as yHtml;
 </ol>
 
 <?php
-if ( ! $isMfaEnabled) {
-?>
+if (! $isMfaEnabled) {
+    ?>
 <p>
     <strong>Enable 2-Step Verification</strong> (please)
 </p>

@@ -281,7 +281,6 @@ class User extends UserBase
     private function validatePassword(): Closure
     {
         return function ($attributeName) {
-
             if ($this->current_password_id === null) {
                 $this->attemptPasswordMigration();
             }
@@ -335,7 +334,7 @@ class User extends UserBase
                 $user->scenario = User::SCENARIO_UPDATE_PASSWORD;
                 $user->password = $this->password;
                 $savedPassword = $user->updatePassword();
-                if ( ! $savedPassword) {
+                if (! $savedPassword) {
 
                     /**
                      * @todo If adding errors here causes a problem (because I think

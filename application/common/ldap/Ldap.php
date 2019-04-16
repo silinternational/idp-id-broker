@@ -147,13 +147,13 @@ class Ldap extends Component
     
     /**
      * Determine whether the specified user exists in the LDAP.
-     * 
+     *
      * @param string $userCn The CN attribute value to match against.
      * @return bool Whether the user exists.
      */
     public function userExists($userCn)
     {
         $ldapUser = $this->getUserByCn($userCn);
-        return (( ! empty($ldapUser)) && $ldapUser->exists);
+        return ((! empty($ldapUser)) && $ldapUser->exists);
     }
 }
