@@ -28,7 +28,7 @@ class AnalyticsContext extends YiiContext
 
 
 
-    protected function createNewUser($makeActive=True, $requireMfa=False)
+    protected function createNewUser($makeActive=true, $requireMfa=false)
     {
         $employeeId = uniqid();
         $user = new User([
@@ -43,7 +43,7 @@ class AnalyticsContext extends YiiContext
 
 
         $user->scenario = User::SCENARIO_NEW_USER;
-        if ( ! $user->save()) {
+        if (! $user->save()) {
             throw new \Exception(
                 \json_encode($user->getFirstErrors(), JSON_PRETTY_PRINT)
             );

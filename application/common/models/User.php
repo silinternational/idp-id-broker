@@ -6,8 +6,6 @@ use Closure;
 use common\components\Emailer;
 use common\helpers\MySqlDateTime;
 use common\helpers\Utils;
-use common\ldap\Ldap;
-use common\models\Method;
 use Exception;
 use Ramsey\Uuid\Uuid;
 use Yii;
@@ -27,8 +25,8 @@ class User extends UserBase
     /** @var string */
     public $password;
 
-    /** @var Ldap */
-    private $ldap;
+    /** @var NagState */
+    protected $nagState = null;
 
     /**
      * {@inheritdoc}
@@ -137,11 +135,6 @@ class User extends UserBase
         return true;
     }
     
-    public function setLdap(Ldap $ldap)
-    {
-        $this->ldap = $ldap;
-    }
-
     public function scenarios(): array
     {
         $scenarios = parent::scenarios();
@@ -160,6 +153,8 @@ class User extends UserBase
             'locked',
             'manager_email',
             'require_mfa',
+            'nag_for_mfa_after',
+            'nag_for_method_after',
             'review_profile_after',
             'personal_email',
             'hide',
@@ -205,6 +200,16 @@ class User extends UserBase
             ],
             [
                 'require_mfa', 'default', 'value' => 'no', 'on' => self::SCENARIO_NEW_USER
+            ],
+            [
+                'nag_for_mfa_after',
+                'default',
+                'value' => MySqlDateTime::relative(\Yii::$app->params['mfaAddInterval']),
+            ],
+            [
+                'nag_for_method_after',
+                'default',
+                'value' => MySqlDateTime::relative(\Yii::$app->params['methodAddInterval']),
             ],
             [
                 'review_profile_after',
@@ -267,86 +272,11 @@ class User extends UserBase
     private function validatePassword(): Closure
     {
         return function ($attributeName) {
-
-            if ($this->current_password_id === null) {
-                $this->attemptPasswordMigration();
-            }
-
             $currentPassword = $this->currentPassword ?? new Password();
             if (! password_verify($this->password, $currentPassword->hash)) {
                 $this->addError($attributeName, 'Incorrect password.');
             }
         };
-    }
-
-    protected function attemptPasswordMigration()
-    {
-        try {
-            if ($this->ldap === null) {
-
-                // If no LDAP was provided, simply skip password migration.
-                return;
-            }
-
-            if (empty($this->username)) {
-                $this->addError(
-                    'username',
-                    'No username given for checking against ldap.'
-                );
-                return;
-            }
-
-            if (empty($this->password)) {
-                $this->addError(
-                    'password',
-                    'No password given for checking against ldap.'
-                );
-                return;
-            }
-
-            $user = User::findByUsername($this->username);
-            if ($user === null) {
-                $this->addError('username', sprintf(
-                    'No user found with that username (%s) when trying to check '
-                    . 'password against ldap.',
-                    var_export($this->username, true)
-                ));
-                return;
-            }
-
-            if ($this->ldap->isPasswordCorrectForUser($this->username, $this->password)) {
-
-                /* Try to save the password, but let the user proceed even if
-                 * we can't (since we know the password is correct).  */
-                $user->scenario = User::SCENARIO_UPDATE_PASSWORD;
-                $user->password = $this->password;
-                $savedPassword = $user->updatePassword();
-                if ( ! $savedPassword) {
-
-                    /**
-                     * @todo If adding errors here causes a problem (because I think
-                     * it will cause the `validate()` call to return false... right?)
-                     * then find some other way to record/report what happened. We
-                     * may be able to use Yii::warn(...), but we'll have to update
-                     * the LdapContext Behat test file accordingly, since it gets
-                     * the errors and reports them (to help the developer debug).
-                     */
-                    $this->addError('password', sprintf(
-                        'Confirmed given password for %s against LDAP, but '
-                        . 'failed to save password hash to database: %s',
-                        var_export($this->username, true),
-                        json_encode($user->getFirstErrors())
-                    ));
-                } else {
-                    $this->refresh();
-                }
-            }
-        } catch (Exception $e) {
-            $this->addError('password', sprintf(
-                'Unexpected error while attempting to migrate password: %s',
-                $e->getMessage()
-            ));
-        }
     }
 
     public static function findByUsername(string $username)
@@ -497,7 +427,7 @@ class User extends UserBase
                 return $model->getMethodFields();
             },
             'profile_review' => function (self $model) {
-                return $model->isTimeForReview() ? 'yes' : 'no';
+                return $model->getNagState() == NagState::NAG_PROFILE_REVIEW ? 'yes' : 'no';
             }
         ];
 
@@ -522,13 +452,25 @@ class User extends UserBase
     }
 
     /**
-     * Based on current time, determine whether to present a profile review to
-     * the user.
+     * Based on current time and presence of MFA and Method options,
+     * determine which "nag" to present to the user.
+     *
      */
-    public function isTimeForReview()
+    public function getNagState()
     {
-        return MySqlDateTime::isBefore($this->review_profile_after, time());
+        if ($this->nagState === null) {
+            $this->nagState = new NagState(
+                $this->nag_for_mfa_after,
+                $this->nag_for_method_after,
+                $this->review_profile_after,
+                count($this->getVerifiedMfaOptions()),
+                count($this->getVerifiedMethodOptions())
+            );
+        }
+
+        return $this->nagState->getState();
     }
+
 
     /**
      * @return array MFA related properties
@@ -537,6 +479,7 @@ class User extends UserBase
     {
         return [
             'prompt'  => $this->isPromptForMfa() ? 'yes' : 'no',
+            'add'     => $this->getNagState() == NagState::NAG_ADD_MFA ? 'yes' : 'no',
             'options' => $this->getVerifiedMfaOptions(),
         ];
     }
@@ -586,11 +529,12 @@ class User extends UserBase
      */
     public function getMethodFields()
     {
+        $shouldProvideMethodOptions = $this->getNagState() === NagState::NAG_PROFILE_REVIEW
+            && $this->scenario == self::SCENARIO_AUTHENTICATE;
+
         return [
-            'options' =>
-                $this->isTimeForReview() && $this->scenario == self::SCENARIO_AUTHENTICATE
-                    ? $this->methods
-                    : [],
+            'add' => $this->getNagState() == NagState::NAG_ADD_METHOD ? 'yes' : 'no',
+            'options' => $shouldProvideMethodOptions ? $this->methods : [],
         ];
     }
 
@@ -826,11 +770,21 @@ class User extends UserBase
     }
 
     /**
-     * Update the profile review date
+     * Update the date field that corresponds to the current nag state
      */
-    public function updateProfileReviewDate()
+    public function updateProfileReviewDates()
     {
-        $this->review_profile_after = MySqlDateTime::relative(\Yii::$app->params['profileReviewInterval']);
+        switch ($this->getNagState()) {
+            case NagState::NAG_ADD_MFA:
+                $this->nag_for_mfa_after = MySqlDateTime::relative(\Yii::$app->params['mfaAddInterval']);
+                break;
+            case NagState::NAG_ADD_METHOD:
+                $this->nag_for_method_after = MySqlDateTime::relative(\Yii::$app->params['methodAddInterval']);
+                break;
+            case NagState::NAG_PROFILE_REVIEW:
+                $this->review_profile_after = MySqlDateTime::relative(\Yii::$app->params['profileReviewInterval']);
+                break;
+        }
     }
 
     /**
@@ -914,6 +868,8 @@ class User extends UserBase
             ], 'application');
         }
 
+        $this->setEmptyNagDates();
+
         parent::afterFind();
     }
 
@@ -930,5 +886,41 @@ class User extends UserBase
         }
 
         return true;
+    }
+
+    /**
+     * Set dates that are empty. These are records that existed before the migration added these
+     * columns in the database. Once all records are updated, this function can be removed.
+     */
+    protected function setEmptyNagDates(): void
+    {
+        $needToSave = false;
+
+        if ($this->review_profile_after === '0000-00-00') {
+            $this->review_profile_after = MySqlDateTime::relative(\Yii::$app->params['profileReviewInterval']);
+            $needToSave = true;
+        }
+
+        if ($this->nag_for_mfa_after === '0000-00-00') {
+            $this->nag_for_mfa_after = MySqlDateTime::relative(\Yii::$app->params['mfaAddInterval']);
+            $needToSave = true;
+        }
+
+        if ($this->nag_for_method_after === '0000-00-00') {
+            $this->nag_for_method_after = MySqlDateTime::relative(\Yii::$app->params['methodAddInterval']);
+            $needToSave = true;
+        }
+
+        if ($needToSave) {
+            $this->scenario = self::SCENARIO_UPDATE_USER;
+            if (! $this->save()) {
+                Yii::warning([
+                    'event' => 'setEmptyNagDates',
+                    'status' => 'save failed',
+                    'employeeId' => $this->employee_id,
+                    'scenario' => $this->scenario,
+                ], 'application');
+            }
+        }
     }
 }

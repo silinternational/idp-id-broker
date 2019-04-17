@@ -5,7 +5,6 @@ use common\components\MfaBackendBackupcode;
 use common\components\MfaBackendManager;
 use common\components\MfaBackendTotp;
 use common\components\MfaBackendU2f;
-use common\ldap\Ldap;
 use Sil\JsonLog\target\JsonSyslogTarget;
 use Sil\JsonLog\target\EmailServiceTarget;
 use Sil\PhpEnv\Env;
@@ -103,18 +102,6 @@ return [
 
             'emailRepeatDelayDays' => Env::get('EMAIL_REPEAT_DELAY_DAYS', 31),
         ],
-        'ldap' => [
-            'class' => Ldap::class,
-            'acct_suffix' => Env::get('LDAP_ACCT_SUFFIX'),
-            'domain_controllers' => explode('|', Env::get('LDAP_DOMAIN_CONTROLLERS')),
-            'base_dn' => Env::get('LDAP_BASE_DN'),
-            'admin_username' => Env::get('LDAP_ADMIN_USERNAME'),
-            'admin_password' => Env::get('LDAP_ADMIN_PASSWORD'),
-            'use_ssl' => Env::get('LDAP_USE_SSL', true),
-            'use_tls' => Env::get('LDAP_USE_TLS', true),
-            'timeout' => Env::get('LDAP_TIMEOUT', 5),
-            'logger' => new Psr3Yii2Logger(),
-        ],
         'backupcode' => [
             'class' => MfaBackendBackupcode::class,
             'numBackupCodes' => $mfaNumBackupCodes,
@@ -196,8 +183,9 @@ return [
         'authorizedTokens'              => Env::getArray('API_ACCESS_KEYS'),
         'idpName'                       => $idpName,
         'idpDisplayName'                => $idpDisplayName,
+        'mfaAddInterval'                => Env::get('MFA_ADD_INTERVAL', '+30 days'),
+        'methodAddInterval'             => Env::get('METHOD_ADD_INTERVAL', '+6 months'),
         'profileReviewInterval'         => Env::get('PROFILE_REVIEW_INTERVAL', '+6 months'),
-        'migratePasswordsFromLdap'      => Env::get('MIGRATE_PW_FROM_LDAP', false),
         'passwordReuseLimit'            => Env::get('PASSWORD_REUSE_LIMIT', 10),
         'passwordLifespan'              => Env::get('PASSWORD_LIFESPAN', '+1 year'),
         'passwordMfaLifespanExtension'  => Env::get('PASSWORD_MFA_LIFESPAN_EXTENSION', '+4 years'),

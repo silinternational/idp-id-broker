@@ -13,7 +13,7 @@ Dear <?= $displayName ?>,
 
 You have requested assistance in accessing your <?= $idpDisplayName ?> account. An email
 containing an access code has been sent to your manager at <?= $managerEmail ?>.
-This access code can be used in place of your other 2-Factor Authentication
+This access code can be used in place of your other 2-Step Verification
 options. Please contact your manager to obtain this access code from them.
 
 If you did not request this code, it could be a sign someone else has

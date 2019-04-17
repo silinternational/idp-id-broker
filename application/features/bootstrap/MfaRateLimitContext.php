@@ -7,7 +7,6 @@ use common\models\EmailLog;
 use common\models\Mfa;
 use common\models\MfaFailedAttempt;
 use common\models\User;
-use Sil\SilIdBroker\Behat\Context\fakes\FakeOfflineLdap;
 use Webmozart\Assert\Assert;
 use Yii;
 use yii\web\TooManyRequestsHttpException;
@@ -61,7 +60,7 @@ class MfaRateLimitContext extends YiiContext
         Assert::isArray($validBackupCodes);
         
         do {
-            $backupCode = substr(random_int(100000000, 200000000),1);
+            $backupCode = substr(random_int(100000000, 200000000), 1);
         } while (in_array($backupCode, $validBackupCodes));
         
         Assert::false(in_array($backupCode, $validBackupCodes));

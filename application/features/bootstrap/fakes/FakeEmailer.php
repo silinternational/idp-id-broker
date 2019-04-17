@@ -14,7 +14,6 @@ class FakeEmailer extends Emailer
     protected function getEmailServiceClient()
     {
         if ($this->emailServiceClient === null) {
-            
             $this->emailServiceClient = new FakeEmailServiceClient(
                 $this->emailServiceConfig['baseUrl'],
                 $this->emailServiceConfig['accessToken'],
@@ -50,7 +49,6 @@ class FakeEmailer extends Emailer
         return array_filter(
             $fakeEmailsSent,
             function ($fakeEmail) use ($fakeEmailer, $messageType, $emailAddress, $user) {
-                
                 $subject = $fakeEmail[Emailer::PROP_SUBJECT] ?? '';
                 $toAddress = $fakeEmail[Emailer::PROP_TO_ADDRESS] ?? '';
                 

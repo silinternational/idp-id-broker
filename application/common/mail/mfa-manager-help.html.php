@@ -15,7 +15,7 @@ use yii\helpers\Html as yHtml;
 <p>
     You have requested assistance in accessing your <?= yHtml::encode($idpDisplayName) ?> account. An email
     containing an access code has been sent to your manager at <?= yHtml::encode($managerEmail) ?>.
-    This access code can be used in place of your other 2-Factor Authentication options. Please contact
+    This access code can be used in place of your other 2-Step Verification options. Please contact
     your manager to obtain this access code from them.
 </p>
 <p>

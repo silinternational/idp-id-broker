@@ -7,7 +7,6 @@ use yii\db\Migration;
  */
 class m171211_130001_add_several_mfa_email_log_types extends Migration
 {
-
     public function safeUp()
     {
         $this->alterColumn(

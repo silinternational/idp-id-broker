@@ -6,6 +6,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [4.1.0] - 2019-04-17
+### Removed
+- Removed LDAP password migration
+
+### Added
+- Re-added mfa nag, as 'add' property on `mfa` object in UserResponse
+- Added recovery method nag, as 'add' property on `method` object in UserResponse
+
 ## [4.0.1] - 2019-04-12
 ### Changed
 - Updated email templates to make links show the actual link target
@@ -100,7 +108,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 - Initial version of ID Broker.
 
-[Unreleased]: https://github.com/silinternational/idp-id-broker/compare/4.0.1...HEAD
+[Unreleased]: https://github.com/silinternational/idp-id-broker/compare/4.1.0...HEAD
+[4.1.0]: https://github.com/silinternational/idp-id-broker/compare/4.0.1...4.1.0
 [4.0.1]: https://github.com/silinternational/idp-id-broker/compare/4.0.0...4.0.1
 [4.0.0]: https://github.com/silinternational/idp-id-broker/compare/3.5.0...4.0.0
 [3.5.0]: https://github.com/silinternational/idp-id-broker/compare/3.4.2...3.5.0

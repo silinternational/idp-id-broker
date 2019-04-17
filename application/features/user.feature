@@ -409,7 +409,9 @@ Feature: User
       And I should receive 2 users
 
   Scenario: Get list of verified methods for a user
-    Given A user with 1 verified method, 1 unverified method, 0 verified mfas, and 0 unverified mfas
+    Given there is a user in the database
+      And that user has 1 verified method
+      And that user has 1 unverified method
     When I request a list of verified methods
     Then I see a list containing 1 method
 
@@ -562,3 +564,32 @@ Feature: User
         | personal_email | personal@example.org   |
     When I request "/user/123" be updated
     Then the response status code should be 422
+
+  Scenario Outline: Check "nag" state when user has or doesn't have methods and mfas
+    Given there is a user in the database
+      And that user has <verifiedMethods> verified methods
+      And that user has <unverifiedMethods> unverified methods
+      And that user has <verifiedMfas> verified mfas
+      And that user has <unverifiedMfas> unverified mfas
+      And the nag dates are in the past
+    When I request the nag state
+    Then I see that the nag state is <state>
+
+    Examples:
+      | verifiedMethods | unverifiedMethods | verifiedMfas | unverifiedMfas | state          |
+      | 0               | 0                 | 0            | 0              | add_mfa        |
+      | 0               | 0                 | 0            | 1              | add_mfa        |
+      | 0               | 0                 | 1            | 0              | add_method     |
+      | 0               | 0                 | 1            | 1              | add_method     |
+      | 0               | 1                 | 0            | 0              | add_mfa        |
+      | 0               | 1                 | 0            | 1              | add_mfa        |
+      | 0               | 1                 | 1            | 0              | add_method     |
+      | 0               | 1                 | 1            | 1              | add_method     |
+      | 1               | 0                 | 0            | 0              | add_mfa        |
+      | 1               | 0                 | 0            | 1              | add_mfa        |
+      | 1               | 0                 | 1            | 0              | profile_review |
+      | 1               | 0                 | 1            | 1              | profile_review |
+      | 1               | 1                 | 0            | 0              | add_mfa        |
+      | 1               | 1                 | 0            | 1              | add_mfa        |
+      | 1               | 1                 | 1            | 0              | profile_review |
+      | 1               | 1                 | 1            | 1              | profile_review |

@@ -3,7 +3,6 @@ namespace common\models;
 
 use common\components\Emailer;
 use common\helpers\MySqlDateTime;
-use common\ldap\Ldap;
 use yii\web\HttpException;
 
 /**
@@ -19,19 +18,15 @@ class Authentication
      *
      * @param string $username The username to try.
      * @param string $password The password to try.
-     * @param Ldap|null $ldap (Optional:) The LDAP to use for lazy-loading
-     *     passwords not yet stored in our local database. Defaults to null,
-     *     meaning passwords will not be migrated.
      * @param string $invite New user invite code. If not blank, username and password are ignored.
      */
     public function __construct(
         string $username,
         string $password,
-        $ldap = null,
         string $invite = ''
     ) {
         if (empty($invite)) {
-            $this->authenticateByPassword($username, $password, $ldap);
+            $this->authenticateByPassword($username, $password);
         } else {
             $this->authenticateByInvite($invite);
         }
@@ -42,11 +37,8 @@ class Authentication
      *
      * @param string $username The username to try.
      * @param string $password The password to try.
-     * @param Ldap|null $ldap (Optional:) The LDAP to use for lazy-loading
-     *     passwords not yet stored in our local database. Defaults to null,
-     *     meaning passwords will not be migrated.
      */
-    protected function authenticateByPassword(string $username, string $password, $ldap)
+    protected function authenticateByPassword(string $username, string $password)
     {
         /* @var $user User */
         $user = User::findByUsername($username) ??
@@ -55,10 +47,6 @@ class Authentication
 
         $user->scenario = User::SCENARIO_AUTHENTICATE;
         $user->password = $password;
-
-        if ($ldap instanceof Ldap) {
-            $user->setLdap($ldap);
-        }
 
         $this->validateUser($user);
     }
@@ -81,7 +69,7 @@ class Authentication
         /* @var $user User */
         $user = $invite->user;
 
-        if($user->current_password_id !== null) {
+        if ($user->current_password_id !== null) {
             $this->errors['invite'] = ['Invitation invalid. User has a password.'];
             return;
         }
@@ -109,14 +97,13 @@ class Authentication
     protected function validateUser(User $user)
     {
         if ($user->validate()) {
-
             $this->authenticatedUser = clone $user;
 
             $user->last_login_utc = MySqlDateTime::now();
 
-            $user->updateProfileReviewDate();
+            $user->updateProfileReviewDates();
 
-            if ( ! $user->save() ){
+            if (! $user->save()) {
                 \Yii::error([
                     'action' => 'save last_login_utc and nag dates for user after authentication',
                     'status' => 'error',
