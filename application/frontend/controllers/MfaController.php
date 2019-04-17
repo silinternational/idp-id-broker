@@ -191,7 +191,7 @@ class MfaController extends BaseRestController
             return $mfa;
         }
 
-        $mfa->label = $label;
+        $mfa->setLabel($label);
 
         if ($mfa->update() === false) {
             \Yii::error([

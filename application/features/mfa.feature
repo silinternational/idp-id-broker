@@ -80,6 +80,20 @@ Feature: MFA
         | property  | value          |
         | label     | A New Label    |
 
+  Scenario: Update an MFA label with an empty string
+    Given the user has a verified "backupcode" MFA
+    And I provide the following valid data:
+      | property    | value        |
+      | employee_id | 123          |
+      | label       |              |
+    When I update the MFA
+    Then the response status code should be 200
+    And the property label should contain "Printable Codes"
+    And an MFA record exists for an employee_id of "123"
+    And the following MFA data should be stored:
+      | property  | value           |
+      | label     | Printable Codes |
+
   Scenario: Verify a backupcode MFA code
     Given the user has a verified "backupcode" MFA
     When I request to verify one of the codes

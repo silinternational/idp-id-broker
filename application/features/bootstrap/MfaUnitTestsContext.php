@@ -8,6 +8,8 @@ use Webmozart\Assert\Assert;
 
 class MfaUnitTestsContext extends UnitTestsContext
 {
+    protected $label;
+
     /**
      * @Given I have a user with a backup codes mfa option
      */
