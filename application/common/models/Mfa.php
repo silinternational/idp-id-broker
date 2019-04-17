@@ -37,6 +37,9 @@ class Mfa extends MfaBase
             [
                 'verified', 'default', 'value' => 0,
             ],
+            [
+                'label', 'default', 'value' => $this->setLabel(null),
+            ]
         ], parent::rules());
     }
 
@@ -553,11 +556,11 @@ class Mfa extends MfaBase
      * is a string, simply assign it to the `label` property.
      * @param mixed $label
      */
-    protected function setLabel($label)
+    public function setLabel($label)
     {
-        if (is_string($label)) {
+        if (is_string($label) && ! empty($label)) {
             $this->label = $label;
-        } elseif ($label === null) {
+        } else {
             $this->label = $this->getReadableType();
         }
     }

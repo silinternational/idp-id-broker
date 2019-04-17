@@ -8,6 +8,8 @@ use Webmozart\Assert\Assert;
 
 class MfaUnitTestsContext extends UnitTestsContext
 {
+    protected $label;
+
     /**
      * @Given I have a user with a backup codes mfa option
      */
@@ -192,5 +194,37 @@ class MfaUnitTestsContext extends UnitTestsContext
     public function iSeeThatTheMfaOptionIsNotNewlyVerified()
     {
         Assert::false($this->mfaIsNewlyVerified);
+    }
+
+    /**
+     * @Given I have a user with no mfa options
+     */
+    public function iHaveAUserWithNoMfaOptions()
+    {
+        $this->tempUser = $this->createNewUserInDatabase('mfa_tester');
+    }
+
+    /**
+     * @Given I give the user a new set of backup codes
+     */
+    public function iGiveTheUserANewSetOfBackupCodes()
+    {
+        $this->createMfa(Mfa::TYPE_BACKUPCODE);
+    }
+
+    /**
+     * @When I check the mfa label
+     */
+    public function iCheckTheMfaLabel()
+    {
+        $this->label = $this->mfa->label;
+    }
+
+    /**
+     * @Then I see that the label is not empty
+     */
+    public function iSeeThatTheLabelIsNotEmpty()
+    {
+        Assert::notEmpty($this->label, 'label is not empty, found "' . $this->label . '"');
     }
 }

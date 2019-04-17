@@ -44,3 +44,9 @@ Feature: Unit Tests for the Mfa model
       And the totp mfa option has just been verified
     When I check if the mfa option is newly verified
     Then I see that the mfa option is newly verified
+
+  Scenario: Check that the default label is not empty
+    Given I have a user with no mfa options
+      And I give the user a new set of backup codes
+    When I check the mfa label
+    Then I see that the label is not empty
