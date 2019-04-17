@@ -37,9 +37,6 @@ class Mfa extends MfaBase
             [
                 'verified', 'default', 'value' => 0,
             ],
-            [
-                'label', 'default', 'value' => $this->setLabel(null),
-            ]
         ], parent::rules());
     }
 
