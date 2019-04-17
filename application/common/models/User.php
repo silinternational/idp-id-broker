@@ -452,44 +452,6 @@ class User extends UserBase
     }
 
     /**
-     * Based on provided time, determine whether to present a reminder to add
-     * an MFA option.
-     * @param int $now
-     * @return bool
-     * @throws Exception
-     */
-    public function isTimeToNagToAddMfa(int $now): bool
-    {
-        return MySqlDateTime::isAfter($now, $this->nag_for_mfa_after)
-            && (count($this->getVerifiedMfaOptions()) === 0);
-    }
-
-    /**
-     * Based on provided time, determine whether to present a reminder to add
-     * a recovery method option.
-     * @param int $now
-     * @return bool
-     * @throws Exception
-     */
-    public function isTimeToNagToAddMethod(int $now): bool
-    {
-        return MySqlDateTime::isAfter($now, $this->nag_for_method_after)
-            && (count($this->getVerifiedMethodOptions()) === 0);
-    }
-
-    /**
-     * Based on current time, determine whether to present a profile review to
-     * the user.
-     * @param int $now
-     * @return bool
-     * @throws Exception
-     */
-    public function isTimeForReview(int $now)
-    {
-        return MySqlDateTime::isAfter($now, $this->review_profile_after);
-    }
-
-    /**
      * Based on current time and presence of MFA and Method options,
      * determine which "nag" to present to the user.
      *

@@ -86,7 +86,7 @@ class NagState
      */
     private function isTimeToNagToAddMfa(int $now): bool
     {
-        return $this->numberOfVerifiedMfas === 0 && MySqlDateTime::isBefore($this->nagForMfaAfter, $now);
+        return $this->numberOfVerifiedMfas === 0 && MySqlDateTime::isAfter($now, $this->nagForMfaAfter);
     }
 
     /**
@@ -99,7 +99,7 @@ class NagState
      */
     private function isTimeToNagToAddMethod(int $now): bool
     {
-        return $this->numberOfVerifiedMethods === 0 && MySqlDateTime::isBefore($this->nagForMethodAfter, $now);
+        return $this->numberOfVerifiedMethods === 0 && MySqlDateTime::isAfter($now, $this->nagForMethodAfter);
     }
 
     /**
@@ -112,6 +112,6 @@ class NagState
      */
     private function isTimeForReview(int $now)
     {
-        return MySqlDateTime::isBefore($this->reviewProfileAfter, $now);
+        return MySqlDateTime::isAfter($now, $this->reviewProfileAfter);
     }
 }
