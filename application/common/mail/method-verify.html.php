@@ -14,7 +14,7 @@ use yii\helpers\Html as yHtml;
  * @var string $passwordProfileUrl  URL of password manager. Provided by environment variable PASSWORD_PROFILE_URL.
  */
 
-$verifyLink = $passwordProfileUrl . '/password/recovery/' . $uid . '/verify/' . $code;
+$verifyLink = $passwordProfileUrl . '/#/password/recovery/' . $uid . '/verify/' . $code;
 
 ?>
 <p>Dear <?= yHtml::encode($displayName) ?>,</p>

@@ -20,7 +20,7 @@ as a method for verifying themselves should they need to reset their
 <?= $idpDisplayName ?> account password. If this was you, you may go to the
 following address to add it to your account:
 
-<?= $passwordProfileUrl . '/password/recovery/' . $uid . '/verify/' . $code . PHP_EOL ?>
+<?= $passwordProfileUrl . '/#/password/recovery/' . $uid . '/verify/' . $code . PHP_EOL ?>
 
 If you did not do this, it could be a sign someone else has compromised your
 account. Please contact <?= $supportName ?> at <?= $supportEmail ?> as soon
