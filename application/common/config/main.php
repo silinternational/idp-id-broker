@@ -44,6 +44,14 @@ $emailServiceConfig = Env::getArrayFromPrefix('EMAIL_SERVICE_');
 // Re-retrieve the validIpRanges as an array.
 $emailServiceConfig['validIpRanges'] = Env::getArray('EMAIL_SERVICE_validIpRanges');
 
+$passwordProfileUrl = Env::get('PASSWORD_PROFILE_URL');
+
+// This logic is temporary in order to shift from one definition to another. After the
+// transition, this code can be eliminated. Before: www.domain.com/#  After: www.domain.com
+if (substr($passwordProfileUrl, -2) == '/#') {
+    $passwordProfileUrl = rtrim($passwordProfileUrl, '/#');
+}
+
 return [
     'id' => 'app-common',
     'bootstrap' => ['log'],
@@ -63,7 +71,7 @@ return [
                 'emailSignature' => Env::get('EMAIL_SIGNATURE', ''),
                 'helpCenterUrl' => Env::get('HELP_CENTER_URL'),
                 'idpDisplayName' => $idpDisplayName,
-                'passwordProfileUrl' => Env::get('PASSWORD_PROFILE_URL'),
+                'passwordProfileUrl' => $passwordProfileUrl . '/#',
                 'supportEmail' => Env::get('SUPPORT_EMAIL'),
                 'supportName' => Env::get('SUPPORT_NAME', 'support'),
             ],

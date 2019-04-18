@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [4.1.1] - 2019-04-18
+### Fixed
+- Fixed bad recovery method verify link in email sent by cron task
+
 ## [4.1.0] - 2019-04-17
 ### Removed
 - Removed LDAP password migration
