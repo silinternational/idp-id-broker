@@ -109,6 +109,6 @@ class CronController extends Controller
     {
         /* @var $emailer Emailer */
         $emailer = \Yii::$app->emailer;
-        $emailer->sendMethodVerifyEmails();
+        $emailer->sendMethodReminderEmails();
     }
 }

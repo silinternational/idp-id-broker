@@ -3,6 +3,7 @@ namespace common\components;
 
 use common\helpers\MySqlDateTime;
 use common\models\EmailLog;
+use common\models\Method;
 use common\models\Mfa;
 use common\models\User;
 use InvalidArgumentException;
@@ -33,6 +34,7 @@ class Emailer extends Component
     const SUBJ_MFA_MANAGER_HELP = 'An access code for your {idpDisplayName} account has been sent to your manager';
 
     const SUBJ_METHOD_VERIFY = 'Please verify your new password recovery method';
+    const SUBJ_METHOD_REMINDER = 'REMINDER: Please verify your new password recovery method';
 
     const PROP_SUBJECT = 'subject';
     const PROP_TO_ADDRESS = 'to_address';
@@ -80,7 +82,9 @@ class Emailer extends Component
     public $sendMfaOptionRemovedEmails = true;
     public $sendMfaEnabledEmails = true;
     public $sendMfaDisabledEmails = true;
-    
+
+    public $sendMethodReminderEmails = true;
+
     /**
      * The list of subjects, keyed on message type. This is initialized during
      * the `init()` call during construction.
@@ -106,6 +110,7 @@ class Emailer extends Component
     public $subjectForMfaManagerHelp;
 
     public $subjectForMethodVerify;
+    public $subjectForMethodReminder;
 
     /* The number of days of not using a security key after which we email the user */
     public $lostSecurityKeyEmailDays;
@@ -281,6 +286,7 @@ class Emailer extends Component
         $this->subjectForMfaManagerHelp = $this->subjectForMfaManagerHelp ?? self::SUBJ_MFA_MANAGER_HELP;
 
         $this->subjectForMethodVerify = $this->subjectForMethodVerify ?? self::SUBJ_METHOD_VERIFY;
+        $this->subjectForMethodReminder = $this->subjectForMethodReminder ?? self::SUBJ_METHOD_REMINDER;
 
         $this->subjects = [
             EmailLog::MESSAGE_TYPE_INVITE => $this->subjectForInvite,
@@ -295,6 +301,7 @@ class Emailer extends Component
             EmailLog::MESSAGE_TYPE_MFA_ENABLED => $this->subjectForMfaEnabled,
             EmailLog::MESSAGE_TYPE_MFA_DISABLED => $this->subjectForMfaDisabled,
             EmailLog::MESSAGE_TYPE_METHOD_VERIFY => $this->subjectForMethodVerify,
+            EmailLog::MESSAGE_TYPE_METHOD_REMINDER => $this->subjectForMethodReminder,
             EmailLog::MESSAGE_TYPE_MFA_MANAGER => $this->subjectForMfaManager,
             EmailLog::MESSAGE_TYPE_MFA_MANAGER_HELP => $this->subjectForMfaManagerHelp,
         ];
@@ -374,30 +381,6 @@ class Emailer extends Component
             }
             if ($this->shouldSendLostSecurityKeyMessageTo($user)) {
                 $this->sendMessageTo(EmailLog::MESSAGE_TYPE_LOST_SECURITY_KEY, $user);
-            }
-        }
-    }
-
-    /**
-     * Iterates over all users and sends method verify emails as appropriate
-     */
-    public function sendMethodVerifyEmails()
-    {
-        $query = (new Query)->from('user');
-
-        // iterate over one user at a time.
-        foreach ($query->each() as $userData) {
-            $user = User::findOne($userData['id']);
-
-            $methods = $user->getUnverifiedMethods();
-            foreach ($methods as $method) {
-                $data = [
-                    'toAddress' => $method->value,
-                    'code' => $method->verification_code,
-                    'uid' => $method->uid,
-                ];
-
-                $this->sendMessageTo(EmailLog::MESSAGE_TYPE_METHOD_VERIFY, $user, $data);
             }
         }
     }
@@ -622,5 +605,37 @@ class Emailer extends Component
                 $this->otherDataForEmails[$keyForEmail] = '(MISSING)';
             }
         }
+    }
+
+    /**
+     * Iterates over all unverified methods sends reminder emails to the user as appropriate
+     */
+    public function sendMethodReminderEmails()
+    {
+        if (! $this->sendMethodReminderEmails) {
+            return;
+        }
+
+        $numEmailsSent = 0;
+        $methods = Method::findAll(['verified' => 0]);
+        foreach ($methods as $method) {
+            $user = $method->user;
+            if (! MySqlDateTime::dateIsRecent($method->created, 3) &&
+                ! $this->hasReceivedMessageRecently($user->id, EmailLog::MESSAGE_TYPE_METHOD_REMINDER)
+            ) {
+                $this->sendMessageTo(
+                    EmailLog::MESSAGE_TYPE_METHOD_REMINDER,
+                    $user,
+                    [ 'alternateAddress' => $method->value ]
+                );
+                $numEmailsSent++;
+            }
+        }
+
+        $this->logger->info([
+            'action' => 'send method reminders',
+            'status' => 'finished',
+            'number_sent' => $numEmailsSent,
+        ]);
     }
 }
