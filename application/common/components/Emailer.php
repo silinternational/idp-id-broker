@@ -350,18 +350,19 @@ class Emailer extends Component
             $this->otherDataForEmails,
             $data
         );
-        
+
         $htmlView = $this->getViewForMessage($messageType, 'html');
+        $htmlBody = \Yii::$app->view->render($htmlView, $dataForEmail);
+
         $textView = $this->getViewForMessage($messageType, 'text');
-        
-        $this->email(
-            $data['toAddress'] ?? $user->getEmailAddress(),
-            $this->getSubjectForMessage($messageType, $dataForEmail),
-            \Yii::$app->view->render($htmlView, $dataForEmail),
-            \Yii::$app->view->render($textView, $dataForEmail),
-            $data['ccAddress'] ?? ''
-        );
-        
+        $textBody = \Yii::$app->view->render($textView, $dataForEmail);
+
+        $toAddress = $data['toAddress'] ?? $user->getEmailAddress();
+        $ccAddress = $data['ccAddress'] ?? '';
+        $subject = $this->getSubjectForMessage($messageType, $dataForEmail);
+
+        $this->email($toAddress, $subject, $htmlBody, $textBody, $ccAddress);
+
         EmailLog::logMessage($messageType, $user->id);
     }
 
