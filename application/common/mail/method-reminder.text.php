@@ -18,10 +18,10 @@ as an alternate method for verifying your identity should you ever need to reset
 <?= $idpDisplayName ?> account password. Please open the inbox for
 that account and click the link in the verification email we sent earlier. If you cannot
 find that email, you can generate a new one at your profile page here:
-<?= $passwordProfileUrl ?>
+<?= $passwordProfileUrl . PHP_EOL ?>
 
 If you have any questions, you can visit our Help Center at
-<?= $helpCenterUrl ?>
+<?= $helpCenterUrl . PHP_EOL ?>
 
 Thanks,
 <?= $emailSignature ?>
