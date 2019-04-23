@@ -615,7 +615,7 @@ class Emailer extends Component
     }
 
     /**
-     * Iterates over all unverified methods sends reminder emails to the user as appropriate
+     * Iterates over all unverified methods and sends reminder emails to the user as appropriate
      */
     public function sendMethodReminderEmails()
     {
