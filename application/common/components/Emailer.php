@@ -35,6 +35,8 @@ class Emailer extends Component
 
     const SUBJ_METHOD_VERIFY = 'Please verify your new password recovery method';
     const SUBJ_METHOD_REMINDER = 'REMINDER: Please verify your new password recovery method';
+    const SUBJ_METHOD_PURGED = 'An unverified password recovery method has been removed from your {idpDisplayName}'
+        . ' account';
 
     const PROP_SUBJECT = 'subject';
     const PROP_TO_ADDRESS = 'to_address';
@@ -84,6 +86,7 @@ class Emailer extends Component
     public $sendMfaDisabledEmails = true;
 
     public $sendMethodReminderEmails = true;
+    public $sendMethodPurgedEmails = true;
 
     /**
      * The list of subjects, keyed on message type. This is initialized during
@@ -111,6 +114,7 @@ class Emailer extends Component
 
     public $subjectForMethodVerify;
     public $subjectForMethodReminder;
+    public $subjectForMethodPurged;
 
     /* The number of days of not using a security key after which we email the user */
     public $lostSecurityKeyEmailDays;
@@ -287,6 +291,7 @@ class Emailer extends Component
 
         $this->subjectForMethodVerify = $this->subjectForMethodVerify ?? self::SUBJ_METHOD_VERIFY;
         $this->subjectForMethodReminder = $this->subjectForMethodReminder ?? self::SUBJ_METHOD_REMINDER;
+        $this->subjectForMethodPurged = $this->subjectForMethodPurged ?? self::SUBJ_METHOD_PURGED;
 
         $this->subjects = [
             EmailLog::MESSAGE_TYPE_INVITE => $this->subjectForInvite,
@@ -302,6 +307,7 @@ class Emailer extends Component
             EmailLog::MESSAGE_TYPE_MFA_DISABLED => $this->subjectForMfaDisabled,
             EmailLog::MESSAGE_TYPE_METHOD_VERIFY => $this->subjectForMethodVerify,
             EmailLog::MESSAGE_TYPE_METHOD_REMINDER => $this->subjectForMethodReminder,
+            EmailLog::MESSAGE_TYPE_METHOD_PURGED => $this->subjectForMethodPurged,
             EmailLog::MESSAGE_TYPE_MFA_MANAGER => $this->subjectForMfaManager,
             EmailLog::MESSAGE_TYPE_MFA_MANAGER_HELP => $this->subjectForMfaManagerHelp,
         ];

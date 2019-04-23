@@ -25,6 +25,7 @@ class EmailLog extends EmailLogBase
     const MESSAGE_TYPE_MFA_DISABLED = 'mfa-disabled';
     const MESSAGE_TYPE_METHOD_VERIFY = 'method-verify';
     const MESSAGE_TYPE_METHOD_REMINDER = 'method-reminder';
+    const MESSAGE_TYPE_METHOD_PURGED = 'method-purged';
     const MESSAGE_TYPE_MFA_MANAGER = 'mfa-manager';
     const MESSAGE_TYPE_MFA_MANAGER_HELP = 'mfa-manager-help';
 
@@ -54,6 +55,7 @@ class EmailLog extends EmailLogBase
             self::MESSAGE_TYPE_MFA_DISABLED,
             self::MESSAGE_TYPE_METHOD_VERIFY,
             self::MESSAGE_TYPE_METHOD_REMINDER,
+            self::MESSAGE_TYPE_METHOD_PURGED,
             self::MESSAGE_TYPE_MFA_MANAGER,
             self::MESSAGE_TYPE_MFA_MANAGER_HELP,
         ];

@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 ### Added
 - Added recovery method reminder email, replacing daily method verify emails
+- Send an email notice when an unverified recovery email is purged
 
 ## [4.1.1] - 2019-04-18
 ### Fixed

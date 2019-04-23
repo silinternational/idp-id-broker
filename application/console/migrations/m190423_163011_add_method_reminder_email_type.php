@@ -18,7 +18,7 @@ class m190423_163011_add_method_reminder_email_type extends Migration
             "enum('invite','welcome','mfa-rate-limit','password-changed','get-backup-codes'," .
             "'refresh-backup-codes','lost-security-key','mfa-option-added','mfa-option-removed'," .
             "'mfa-enabled','mfa-disabled','method-verify','mfa-manager','mfa-manager-help'," .
-            "'method-reminder') NULL"
+            "'method-reminder','method-purged') NULL"
         );
     }
 

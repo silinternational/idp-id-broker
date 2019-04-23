@@ -90,6 +90,7 @@ return [
             'sendMfaEnabledEmails' => Env::get('SEND_MFA_ENABLED_EMAILS', true),
             'sendMfaDisabledEmails' => Env::get('SEND_MFA_DISABLED_EMAILS', true),
             'sendMethodReminderEmails' => Env::get('SEND_METHOD_REMINDER_EMAILS', true),
+            'sendMethodPurgedEmails' => Env::get('SEND_METHOD_PURGED_EMAILS', true),
 
             'subjectForInvite' => Env::get('SUBJECT_FOR_INVITE'),
             'subjectForMfaRateLimit' => Env::get('SUBJECT_FOR_MFA_RATE_LIMIT'),
@@ -106,6 +107,7 @@ return [
             'subjectForMfaManagerHelp' => Env::get('SUBJECT_FOR_MFA_MANAGER_HELP'),
             'subjectForMethodVerify' => Env::get('SUBJECT_FOR_METHOD_VERIFY'),
             'subjectForMethodReminder' => Env::get('SUBJECT_FOR_METHOD_REMINDER'),
+            'subjectForMethodPurged' => Env::get('SUBJECT_FOR_METHOD_PURGED'),
 
             'lostSecurityKeyEmailDays' => Env::get('LOST_SECURITY_KEY_EMAIL_DAYS', 62),
             'minimumBackupCodesBeforeNag' => Env::get('MINIMUM_BACKUP_CODES_BEFORE_NAG', 4),
