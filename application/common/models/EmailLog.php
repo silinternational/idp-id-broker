@@ -28,6 +28,8 @@ class EmailLog extends EmailLogBase
     const MESSAGE_TYPE_METHOD_PURGED = 'method-purged';
     const MESSAGE_TYPE_MFA_MANAGER = 'mfa-manager';
     const MESSAGE_TYPE_MFA_MANAGER_HELP = 'mfa-manager-help';
+    const MESSAGE_TYPE_PASSWORD_EXPIRING = 'password-expiring';
+    const MESSAGE_TYPE_PASSWORD_EXPIRED = 'password-expired';
 
     /**
      * @inheritdoc
@@ -58,6 +60,8 @@ class EmailLog extends EmailLogBase
             self::MESSAGE_TYPE_METHOD_PURGED,
             self::MESSAGE_TYPE_MFA_MANAGER,
             self::MESSAGE_TYPE_MFA_MANAGER_HELP,
+            self::MESSAGE_TYPE_PASSWORD_EXPIRING,
+            self::MESSAGE_TYPE_PASSWORD_EXPIRED,
         ];
     }
     

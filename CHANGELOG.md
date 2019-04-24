@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 - Added recovery method reminder email, replacing daily method verify emails
 - Send an email notice when an unverified recovery email is purged
+- Send email notices when user's password is about to expire or has expired
 
 ## [4.1.1] - 2019-04-18
 ### Fixed
