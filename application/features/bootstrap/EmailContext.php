@@ -1023,4 +1023,51 @@ class EmailContext extends YiiContext
         );
         Assert::eq($matchingFakeEmails[0]['cc_address'], $this->tempUser->personal_email);
     }
+
+    /**
+     * @Given /^we are configured (NOT to|to) send recovery method reminder emails$/
+     */
+    public function weAreConfiguredToSendRecoveryMethodReminderEmails($sendOrNot)
+    {
+        $this->fakeEmailer->sendMethodReminderEmails = ($sendOrNot === 'to');
+    }
+
+    /**
+     * @Given a recovery method was created :n days ago
+     */
+    public function aRecoveryMethodWasCreatedDaysAgo($n)
+    {
+        $method = Method::findOrCreate($this->tempUser->id, 'email@example.com');
+        $method->created = MySqlDateTime::relative('-' . $n . ' days');
+        $method->save();
+
+        $this->testMethod = $method;
+
+        Assert::true($method->save(), "Could not create new method.");
+    }
+
+    /**
+     * @When I send recovery method reminder emails
+     */
+    public function iSendRecoveryMethodReminderEmails()
+    {
+        $this->fakeEmailer->sendMethodReminderEmails();
+    }
+
+    /**
+     * @Then /^I see that a recovery method reminder (has|has NOT) been sent$/
+     */
+    public function iSeeThatARecoveryMethodReminderHasNotBeenSent($hasOrHasNot)
+    {
+        $hasBeenSent = $this->fakeEmailer->hasReceivedMessageRecently(
+            $this->tempUser->id,
+            EmailLog::MESSAGE_TYPE_METHOD_REMINDER
+        );
+
+        if ($hasOrHasNot === 'has') {
+            Assert::true($hasBeenSent);
+        } else {
+            Assert::false($hasBeenSent);
+        }
+    }
 }

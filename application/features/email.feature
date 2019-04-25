@@ -317,3 +317,24 @@ Feature: Email
      When that user is created with a personal email address
      Then an "invite" email should have been sent to them
       And that email should have been copied to the personal email address
+
+  Scenario Outline:  When to send recovery method reminder email
+    Given we are configured <toSendOrNot> recovery method reminder emails
+      And I remove records of any emails that have been sent
+      And a user already exists
+      And no methods exist
+      And a recovery method was created <number> days ago
+      And a "method-reminder" email <hasOrHasNot> been sent to that user
+    When I send recovery method reminder emails
+    Then a "method-reminder" email <shouldOrNot> have been sent to them
+
+    Examples:
+      | toSendOrNot  | number | hasOrHasNot  | shouldOrNot    |
+      | to send      | 3      | has NOT      | should NOT     |
+      | to send      | 4      | has NOT      | should         |
+      | to send      | 5      | has NOT      | should         |
+      | to send      | 3      | has          | should NOT     |
+      | to send      | 4      | has          | should NOT     |
+      | to send      | 5      | has          | should NOT     |
+      | NOT to send  | 5      | has NOT      | should NOT     |
+

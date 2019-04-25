@@ -19,13 +19,13 @@ services:
         volumes_from:
             - data
         ports:
-            - "8090:80"
+            - "51140:80"
         depends_on:
             - db
         env_file:
             - ./local.env
         environment:
-            EMAILER_CLASS: \Sil\SilIdBroker\Behat\Context\fakes\FakeEmailer
+#            EMAILER_CLASS: \Sil\SilIdBroker\Behat\Context\fakes\FakeEmailer
             EMAIL_SIGNATURE: Dummy Signature for Development
 
     cron:
@@ -118,7 +118,7 @@ services:
     phpmyadmin:
         image: phpmyadmin/phpmyadmin
         ports:
-            - "8091:80"
+            - "51141:80"
         depends_on:
             - db
         env_file:
