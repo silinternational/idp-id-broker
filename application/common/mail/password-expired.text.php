@@ -31,8 +31,8 @@ The password for your <?= $idpDisplayName ?> Identity account has expired.
 Please go to <?= $passwordForgotUrl ?> to begin the password
 reset process.
 
-Password changed on: <?= yHtml::encode($lastChangedUtc) . PHP_EOL ?>
-Password expires on: <?= yHtml::encode($passwordExpiresUtc) . PHP_EOL ?>
+Password changed on: <?= $lastChangedUtc . PHP_EOL ?>
+Password expires on: <?= $passwordExpiresUtc . PHP_EOL ?>
 
 <?php if (! $isMfaEnabled) : ?>
 If you enable 2-Step Verification, your password expiration will be extended
