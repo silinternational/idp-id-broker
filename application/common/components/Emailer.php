@@ -676,7 +676,7 @@ class Emailer extends Component
             /** @var Password $userPassword */
             $userPassword = $user->currentPassword;
             if ($userPassword
-                && strtotime($userPassword->getExpiresOn()) < strtotime('+14 days')
+                && strtotime($userPassword->getExpiresOn()) < strtotime('+15 days')
                 && ! $this->hasReceivedMessageRecently($user->id, EmailLog::MESSAGE_TYPE_PASSWORD_EXPIRING)
             ) {
                 $this->sendMessageTo(EmailLog::MESSAGE_TYPE_PASSWORD_EXPIRING, $user);
