@@ -1070,4 +1070,74 @@ class EmailContext extends YiiContext
             Assert::false($hasBeenSent);
         }
     }
+
+    /**
+     * @Given /^we are configured (NOT to|to) send password expiring emails$/
+     */
+    public function weAreConfiguredToSendPasswordExpiringEmails($sendOrNot)
+    {
+        $this->fakeEmailer->sendPasswordExpiringEmails = ($sendOrNot === 'to');
+    }
+
+    /**
+     * @When I send password expiring emails
+     */
+    public function iSendPasswordExpiringEmails()
+    {
+        $this->fakeEmailer->sendPasswordExpiringEmails();
+    }
+
+    /**
+     * @Given that user has a password that expires in :n days
+     */
+    public function thatUserHasAPasswordThatExpiresInDays($n)
+    {
+        $this->setPasswordForUser(
+            $this->tempUser,
+            base64_encode(random_bytes(33)) // Random password
+        );
+        $this->tempUser->refresh();
+        Assert::notNull($this->tempUser->current_password_id);
+
+        $currentPassword = $this->tempUser->currentPassword;
+        $currentPassword->password = base64_encode(random_bytes(33)); // Needed to pass validation
+        $currentPassword->expires_on = MySqlDateTime::relative('+' . $n . ' days');
+        Assert::true(
+            $currentPassword->save(),
+            'Failed to save updated password expiration date. '
+            . join(', ', $currentPassword->getFirstErrors())
+        );
+    }
+
+    /**
+     * @Given /^we are configured (NOT to|to) send password expired emails$/
+     */
+    public function weAreConfiguredToSendPasswordExpiredEmails($sendOrNot)
+    {
+        $this->fakeEmailer->sendPasswordExpiredEmails = ($sendOrNot === 'to');
+    }
+
+    /**
+     * @When I send password expired emails
+     */
+    public function iSendPasswordExpiredEmails()
+    {
+        $this->fakeEmailer->sendPasswordExpiredEmails();
+    }
+
+    /**
+     * @Given /^that user has a password that expires (yesterday|today|tomorrow)/
+     */
+    public function thatUserHasAPasswordThatExpires($day)
+    {
+        if ($day == 'yesterday') {
+            $this->thatUserHasAPasswordThatExpiresInDays(-1);
+        } elseif ($day == 'today') {
+            $this->thatUserHasAPasswordThatExpiresInDays(0);
+        } elseif ($day == 'tomorrow') {
+            $this->thatUserHasAPasswordThatExpiresInDays(1);
+        } else {
+            Assert::false(true, 'Invalid tense provided in scenario.');
+        }
+    }
 }

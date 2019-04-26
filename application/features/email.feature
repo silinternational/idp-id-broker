@@ -338,3 +338,40 @@ Feature: Email
       | to send      | 5      | has          | should NOT     |
       | NOT to send  | 5      | has NOT      | should NOT     |
 
+  Scenario Outline:  When to send password expiring notice email
+    Given we are configured <toSendOrNot> password expiring emails
+      And I remove records of any emails that have been sent
+      And a user already exists
+      And that user has a password that expires in <number> days
+      And a "password-expiring" email <hasOrHasNot> been sent to that user
+    When I send password expiring emails
+    Then a "password-expiring" email <shouldOrNot> have been sent to them
+
+    Examples:
+      | toSendOrNot  | number  | hasOrHasNot  | shouldOrNot    |
+      | to send      | 13      | has NOT      | should         |
+      | to send      | 14      | has NOT      | should         |
+      | to send      | 15      | has NOT      | should NOT     |
+      | to send      | 13      | has          | should NOT     |
+      | to send      | 14      | has          | should NOT     |
+      | to send      | 15      | has          | should NOT     |
+      | NOT to send  | 15      | has NOT      | should NOT     |
+
+  Scenario Outline:  When to send password expired notice email
+    Given we are configured <toSendOrNot> password expired emails
+      And I remove records of any emails that have been sent
+      And a user already exists
+      And that user has a password that expires <day>
+      And a "password-expired" email <hasOrHasNot> been sent to that user
+    When I send password expired emails
+    Then a "password-expired" email <shouldOrNot> have been sent to them
+
+    Examples:
+      | toSendOrNot  | day        | hasOrHasNot  | shouldOrNot    |
+      | to send      | tomorrow   | has NOT      | should NOT     |
+      | to send      | today      | has NOT      | should NOT     |
+      | to send      | yesterday  | has NOT      | should         |
+      | to send      | tomorrow   | has          | should NOT     |
+      | to send      | today      | has          | should NOT     |
+      | to send      | yesterday  | has          | should NOT     |
+      | NOT to send  | yesterday  | has NOT      | should NOT     |
