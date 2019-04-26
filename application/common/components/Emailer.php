@@ -675,8 +675,9 @@ class Emailer extends Component
         foreach ($users as $user) {
             /** @var Password $userPassword */
             $userPassword = $user->currentPassword;
-            if (strtotime($userPassword->getExpiresOn()) < strtotime('+14 days') &&
-                ! $this->hasReceivedMessageRecently($user->id, EmailLog::MESSAGE_TYPE_PASSWORD_EXPIRING)
+            if ($userPassword
+                && strtotime($userPassword->getExpiresOn()) < strtotime('+14 days')
+                && ! $this->hasReceivedMessageRecently($user->id, EmailLog::MESSAGE_TYPE_PASSWORD_EXPIRING)
             ) {
                 $this->sendMessageTo(EmailLog::MESSAGE_TYPE_PASSWORD_EXPIRING, $user);
                 $numEmailsSent++;
@@ -704,8 +705,9 @@ class Emailer extends Component
         foreach ($users as $user) {
             /** @var Password $userPassword */
             $userPassword = $user->currentPassword;
-            if (strtotime($userPassword->getExpiresOn()) < time() &&
-                ! $this->hasReceivedMessageRecently($user->id, EmailLog::MESSAGE_TYPE_PASSWORD_EXPIRED)
+            if ($userPassword
+                && strtotime($userPassword->getExpiresOn()) < time()
+                && ! $this->hasReceivedMessageRecently($user->id, EmailLog::MESSAGE_TYPE_PASSWORD_EXPIRED)
             ) {
                 $this->sendMessageTo(EmailLog::MESSAGE_TYPE_PASSWORD_EXPIRED, $user);
                 $numEmailsSent++;
