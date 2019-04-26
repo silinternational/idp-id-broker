@@ -21,7 +21,7 @@ class Emailer extends Component
     const SUBJ_INVITE = 'Your new {idpDisplayName} Identity account';
     const SUBJ_MFA_RATE_LIMIT = 'Too many 2-Step Verification attempts on your {idpDisplayName} Identity account';
     const SUBJ_PASSWORD_CHANGED = 'Your {idpDisplayName} Identity account password has been changed';
-    const SUBJ_WELCOME = 'Important information about your {idpDisplayName} identity account';
+    const SUBJ_WELCOME = 'Important information about your {idpDisplayName} Identity account';
 
     const SUBJ_GET_BACKUP_CODES = 'Get printable codes for your {idpDisplayName} account';
     const SUBJ_REFRESH_BACKUP_CODES = 'Get a new set of printable codes for your {idpDisplayName} account';
