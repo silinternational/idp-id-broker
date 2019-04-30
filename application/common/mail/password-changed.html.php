@@ -41,7 +41,7 @@ use yii\helpers\Html as yHtml;
 </p>
 <p>
     If you have not already done so, it is highly recommended that you configure
-    recovery methods for the potential event that you forget your password. You
+    <strong>recovery methods</strong> for the potential event that you forget your password. You
     can reset your password using your primary email address, <?=yHtml::encode($email)?>,
     but you can also add other addresses for verification.
 </p>

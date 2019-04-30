@@ -121,4 +121,12 @@ class CronController extends Controller
         $emailer = \Yii::$app->emailer;
         $emailer->sendMethodReminderEmails();
     }
+
+    public function actionSendPasswordExpiryEmails()
+    {
+        /* @var $emailer Emailer */
+        $emailer = \Yii::$app->emailer;
+        $emailer->sendPasswordExpiringEmails();
+        $emailer->sendPasswordExpiredEmails();
+    }
 }
