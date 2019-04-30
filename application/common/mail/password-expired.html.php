@@ -36,7 +36,7 @@ $passwordForgotUrl = $passwordProfileUrl . '/password/forgot';
     the password reset process.
 </p>
 <p>
-    Password changed on: <?=yHtml::encode($lastChangedUtc)?><br>
+    Password last changed on: <?=yHtml::encode($lastChangedUtc)?><br>
     Password expires on: <?=yHtml::encode($passwordExpiresUtc)?>
 </p>
 <?php if (! $isMfaEnabled) : ?>
