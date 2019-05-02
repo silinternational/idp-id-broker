@@ -923,4 +923,36 @@ class User extends UserBase
             }
         }
     }
+
+    /**
+     * Remove all manager codes for this user
+     * @throws \Exception
+     */
+    public function removeManagerCodes()
+    {
+        $mfa = Mfa::findOne(['user_id' => $this->id, 'type' => Mfa::TYPE_MANAGER]);
+        if ($mfa === null) {
+            return;
+        }
+
+        foreach ($mfa->mfaBackupcodes as $code) {
+            if ($code->delete() === false) {
+                \Yii::error([
+                    'action' => 'remove all manager codes',
+                    'status' => 'error',
+                    'error' => $code->getFirstErrors(),
+                ]);
+                throw new \Exception("Unable to delete manager code", 1556810506);
+            }
+        }
+
+        if ($mfa->delete() === false) {
+            \Yii::error([
+                'action' => 'remove manager mfa',
+                'status' => 'error',
+                'error' => $mfa->getFirstErrors(),
+            ]);
+            throw new \Exception("Unable to delete manager mfa", 1556810507);
+        }
+    }
 }

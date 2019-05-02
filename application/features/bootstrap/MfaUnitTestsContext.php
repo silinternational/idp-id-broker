@@ -3,12 +3,13 @@ namespace Sil\SilIdBroker\Behat\Context;
 
 use common\models\Mfa;
 use common\models\MfaBackupcode;
-use common\models\User;
 use Webmozart\Assert\Assert;
 
 class MfaUnitTestsContext extends UnitTestsContext
 {
     protected $label;
+
+    protected $inputBackupCode;
 
     /**
      * @Given I have a user with a backup codes mfa option
@@ -194,5 +195,35 @@ class MfaUnitTestsContext extends UnitTestsContext
     public function iSeeThatTheMfaOptionIsNotNewlyVerified()
     {
         Assert::false($this->mfaIsNewlyVerified);
+    }
+
+    /**
+     * @Given that user also has a manager rescue mfa option
+     */
+    public function thatUserAlsoHasAManagerRescueMfaOption()
+    {
+        $code = 'manager';
+        $this->createMfa(Mfa::TYPE_MANAGER);
+        MfaBackupcode::insertBackupCode($this->mfaId, $code);
+    }
+
+    /**
+     * @When I verify a backup code
+     */
+    public function iVerifyABackupCode()
+    {
+        $code = 'backup';
+        $mfa = Mfa::findOne(['user_id' => $this->tempUser->id, 'type' => Mfa::TYPE_BACKUPCODE]);
+        MfaBackupcode::insertBackupCode($mfa->id, $code);
+        Assert::true($mfa->verify($code));
+    }
+
+    /**
+     * @Then I see that the user no longer has a manager rescue mfa option
+     */
+    public function iSeeThatTheUserNoLongerHasAManagerRescueMfaOption()
+    {
+        $mfa = Mfa::findOne(['user_id' => $this->tempUser->id, 'type' => Mfa::TYPE_MANAGER]);
+        Assert::null($mfa);
     }
 }

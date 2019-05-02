@@ -2,9 +2,11 @@
 namespace Sil\SilIdBroker\Behat\Context;
 
 use common\helpers\MySqlDateTime;
+use common\models\EmailLog;
 use common\models\Invite;
 use common\models\Method;
 use common\models\Mfa;
+use common\models\MfaBackupcode;
 use common\models\User;
 use Webmozart\Assert\Assert;
 
@@ -38,6 +40,19 @@ class UnitTestsContext extends YiiContext
 
     /** @var Invite */
     protected $inviteCode;
+
+    /**
+     * @afterScenario @database
+     */
+    public function purgeDatabase()
+    {
+        MfaBackupcode::deleteAll();
+        Mfa::deleteAll();
+        Invite::deleteAll();
+        EmailLog::deleteAll();
+        Method::deleteAll();
+        User::deleteAll();
+    }
 
     /**
      * Create a new user in the database with the given username (and other

@@ -27,8 +27,6 @@ class MfaBackendManager extends Component implements MfaBackendInterface
 
         $mfa->setVerified();
 
-        MfaBackupcode::deleteCodesForMfaId($mfa->id);
-
         $codes = MfaBackupcode::createBackupCodes($mfa->id, 1);
         $this->sendManagerEmail($mfa, $codes[0]);
 
@@ -83,10 +81,6 @@ class MfaBackendManager extends Component implements MfaBackendInterface
         $mfa = Mfa::findOne(['id' => $mfaId]);
         if ($mfa === null) {
             throw new \Exception("MFA record not found", 1547074716);
-        }
-
-        if (count($mfa->mfaBackupcodes) == 0) {
-            $mfa->delete();
         }
 
         return true;
