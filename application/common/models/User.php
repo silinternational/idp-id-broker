@@ -930,7 +930,7 @@ class User extends UserBase
      */
     public function removeManagerCodes()
     {
-        $mfa = Mfa::findOne(['type' => Mfa::TYPE_MANAGER]);
+        $mfa = Mfa::findOne(['user_id' => $this->id, 'type' => Mfa::TYPE_MANAGER]);
         if ($mfa === null) {
             return;
         }
