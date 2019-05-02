@@ -206,6 +206,7 @@ return [
         'passwordLifespan'              => Env::get('PASSWORD_LIFESPAN', '+1 year'),
         'passwordMfaLifespanExtension'  => Env::get('PASSWORD_MFA_LIFESPAN_EXTENSION', '+4 years'),
         'passwordExpirationGracePeriod' => Env::get('PASSWORD_EXPIRATION_GRACE_PERIOD', '+30 days'),
+        'passwordGracePeriodExtension'  => '+7 days',
         'inviteLifespan'                => Env::get('INVITE_LIFESPAN', '+1 month'),
         'inviteGracePeriod'             => Env::get('INVITE_GRACE_PERIOD', '+3 months'),
         'googleAnalytics'               => [

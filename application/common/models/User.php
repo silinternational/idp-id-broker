@@ -955,4 +955,33 @@ class User extends UserBase
             throw new \Exception("Unable to delete manager mfa", 1556810507);
         }
     }
+
+    /**
+     * Extend grace period if password is past or nearly past the grace period. Intended to
+     * be used in a situation where removal of the last MFA option has caused an immediate expiration
+     * of the user's password.
+     */
+    public function extendGracePeriodIfNeeded()
+    {
+        if ($this->currentPassword !== null) {
+            $gracePeriodEnds = strtotime($this->currentPassword->getGracePeriodEndsOn());
+
+            $nowPlusExtension = strtotime(\Yii::$app->params['passwordGracePeriodExtension']);
+
+            /*
+             * If grace period has ended or will end in the near future, bump it out to allow
+             * time for the user to change their password.
+             */
+            if ($gracePeriodEnds < $nowPlusExtension) {
+                $this->currentPassword->extendGracePeriod();
+
+                \Yii::warning([
+                    'action' => 'extend grace period',
+                    'status' => 'success',
+                    'username' => $this->username,
+                    'grace_period_ends_on' => $this->currentPassword->grace_period_ends_on,
+                ]);
+            }
+        }
+    }
 }

@@ -136,6 +136,8 @@ class Mfa extends MfaBase
             self::EVENT_TYPE_DELETE,
             $this
         );
+
+        $this->user->extendGracePeriodIfNeeded();
     }
 
     /**
