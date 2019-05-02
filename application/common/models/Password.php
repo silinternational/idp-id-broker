@@ -220,7 +220,7 @@ class Password extends PasswordBase
 
         $this->scenario = self::SCENARIO_UPDATE_METADATA;
 
-        if (!$this->save()) {
+        if (! $this->save()) {
             \Yii::error('Failed to save grace period. ' . join(', ', $this->getFirstErrors()));
         }
     }
