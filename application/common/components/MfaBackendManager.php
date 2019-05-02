@@ -27,8 +27,6 @@ class MfaBackendManager extends Component implements MfaBackendInterface
 
         $mfa->setVerified();
 
-        MfaBackupcode::deleteCodesForMfaId($mfa->id);
-
         $codes = MfaBackupcode::createBackupCodes($mfa->id, 1);
         $this->sendManagerEmail($mfa, $codes[0]);
 
