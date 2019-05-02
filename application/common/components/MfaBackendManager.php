@@ -85,10 +85,6 @@ class MfaBackendManager extends Component implements MfaBackendInterface
             throw new \Exception("MFA record not found", 1547074716);
         }
 
-        if (count($mfa->mfaBackupcodes) == 0) {
-            $mfa->delete();
-        }
-
         return true;
     }
 

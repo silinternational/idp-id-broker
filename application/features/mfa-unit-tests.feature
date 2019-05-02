@@ -1,3 +1,4 @@
+@database
 Feature: Unit Tests for the Mfa model
 
   Scenario Outline: Validate backup codes that may or may not have leading zeros
@@ -44,3 +45,9 @@ Feature: Unit Tests for the Mfa model
       And the totp mfa option has just been verified
     When I check if the mfa option is newly verified
     Then I see that the mfa option is newly verified
+
+  Scenario: Remove all manager codes for a user when an mfa is verified
+    Given I have a user with a backup codes mfa option
+      And that user also has a manager rescue mfa option
+    When I verify a backup code
+    Then I see that the user no longer has a manager rescue mfa option

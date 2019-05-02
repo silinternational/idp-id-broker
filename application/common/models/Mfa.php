@@ -224,6 +224,9 @@ class Mfa extends MfaBase
                 'username' => $this->user->username,
                 'status' => 'success',
             ]);
+
+            $this->user->removeManagerCodes();
+
             return true;
         }
 
