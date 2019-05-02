@@ -963,25 +963,31 @@ class User extends UserBase
      */
     public function extendGracePeriodIfNeeded()
     {
-        if ($this->currentPassword !== null) {
-            $gracePeriodEnds = strtotime($this->currentPassword->getGracePeriodEndsOn());
+        if (count($this->getVerifiedMfaOptions()) > 0) {
+            return;
+        }
 
-            $nowPlusExtension = strtotime(\Yii::$app->params['passwordGracePeriodExtension']);
+        if ($this->currentPassword === null) {
+            return;
+        }
 
-            /*
-             * If grace period has ended or will end in the near future, bump it out to allow
-             * time for the user to change their password.
-             */
-            if ($gracePeriodEnds < $nowPlusExtension) {
-                $this->currentPassword->extendGracePeriod();
+        $gracePeriodEnds = strtotime($this->currentPassword->getGracePeriodEndsOn());
 
-                \Yii::warning([
-                    'action' => 'extend grace period',
-                    'status' => 'success',
-                    'username' => $this->username,
-                    'grace_period_ends_on' => $this->currentPassword->grace_period_ends_on,
-                ]);
-            }
+        $nowPlusExtension = strtotime(\Yii::$app->params['passwordGracePeriodExtension']);
+
+        /*
+         * If grace period has ended or will end in the near future, bump it out to allow
+         * time for the user to change their password.
+         */
+        if ($gracePeriodEnds < $nowPlusExtension) {
+            $this->currentPassword->extendGracePeriod();
+
+            \Yii::warning([
+                'action' => 'extend grace period',
+                'status' => 'success',
+                'username' => $this->username,
+                'grace_period_ends_on' => $this->currentPassword->grace_period_ends_on,
+            ]);
         }
     }
 }
