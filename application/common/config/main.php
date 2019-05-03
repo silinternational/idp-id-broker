@@ -46,12 +46,6 @@ $emailServiceConfig['validIpRanges'] = Env::getArray('EMAIL_SERVICE_validIpRange
 
 $passwordProfileUrl = Env::get('PASSWORD_PROFILE_URL');
 
-// This logic is temporary in order to shift from one definition to another. After the
-// transition, this code can be eliminated. Before: www.domain.com/#  After: www.domain.com
-if (substr($passwordProfileUrl, -2) == '/#') {
-    $passwordProfileUrl = rtrim($passwordProfileUrl, '/#');
-}
-
 return [
     'id' => 'app-common',
     'bootstrap' => ['log'],
