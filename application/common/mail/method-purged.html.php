@@ -18,10 +18,10 @@ use yii\helpers\Html as yHtml;
 
 <p>
     You recently requested to add an email address, <?= yHtml::encode($alternateAddress); ?>,
-    as an alternate method for verifying your identity should you ever need to reset your
-    <?= yHtml::encode($idpDisplayName); ?> account password. Because it was not verified before
+    as an alternate method for verifying your Identity should you ever need to reset your
+    <?= yHtml::encode($idpDisplayName); ?> Identity account password. Because it was not verified before
     its expiration time, it has been removed from your <?= yHtml::encode($idpDisplayName); ?>
-    account.
+    Identity account.
 </p>
 <p>
 <?php if ($numberVerified === 0) : ?>

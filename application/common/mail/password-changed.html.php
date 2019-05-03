@@ -27,7 +27,7 @@ use yii\helpers\Html as yHtml;
     Dear <?=yHtml::encode($displayName)?>,
 </p>
 <p>
-    The password for your <?=yHtml::encode($idpDisplayName)?> account has been changed. If you did not make this change
+    The password for your <?=yHtml::encode($idpDisplayName)?> Identity account has been changed. If you did not make this change
     please contact <?=yHtml::encode($supportName)?> at <?=yHtml::encode($supportEmail)?> immediately to let us know.
 </p>
 <p>

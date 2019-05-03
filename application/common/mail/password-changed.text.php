@@ -24,7 +24,7 @@
 ?>
 Dear <?= $displayName ?>,
 
-The password for your <?= $idpDisplayName ?> account has been changed. If you
+The password for your <?= $idpDisplayName ?> Identity account has been changed. If you
 did not make this change please contact <?= $supportName ?> at
 <?= $supportEmail ?> immediately to let us know.
 

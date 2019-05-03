@@ -17,8 +17,8 @@ use yii\helpers\Html as yHtml;
 
 <p>
     You recently requested to add an email address, <?= yHtml::encode($alternateAddress); ?>,
-    as an alternate method for verifying your identity should you ever need to reset your
-    <?= yHtml::encode($idpDisplayName); ?> account password. Please open the inbox for
+    as an alternate method for verifying your Identity should you ever need to reset your
+    <?= yHtml::encode($idpDisplayName); ?> Identity account password. Please open the inbox for
     that account and click the link in the verification email we sent earlier. If you cannot
     find that email, you can generate a new one at your profile page here:
     <?= yHtml::a(yHtml::encode($passwordProfileUrl), $passwordProfileUrl) ?>

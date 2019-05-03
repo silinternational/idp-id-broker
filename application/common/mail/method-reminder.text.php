@@ -14,8 +14,8 @@
 Dear <?= $displayName ?>,
 
 You recently requested to add an email address, <?= $alternateAddress ?>,
-as an alternate method for verifying your identity should you ever need to reset your
-<?= $idpDisplayName ?> account password. Please open the inbox for
+as an alternate method for verifying your Identity should you ever need to reset your
+<?= $idpDisplayName ?> Identity account password. Please open the inbox for
 that account and click the link in the verification email we sent earlier. If you cannot
 find that email, you can generate a new one at your profile page here:
 <?= $passwordProfileUrl . PHP_EOL ?>

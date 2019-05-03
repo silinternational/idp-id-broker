@@ -13,7 +13,7 @@
 Hello,
 
 <?= $displayName ?> has requested your assistance in accessing their
-<?= $idpDisplayName ?> account. This email contains a backup code they need
+<?= $idpDisplayName ?> Identity account. This email contains a backup code they need
 to proceed with login. Please contact them directly to ensure that you are
 only providing the following backup code to them and not to someone else.
 

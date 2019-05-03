@@ -15,9 +15,9 @@
 Dear <?= $displayName ?>,
 
 You recently requested to add an email address, <?= $alternateAddress ?>,
-as an alternate method for verifying your identity should you ever need to reset your
-<?= $idpDisplayName ?> account password. Because it was not verified before
-its expiration time, it has been removed from your <?= $idpDisplayName ?> account.
+as an alternate method for verifying your Identity should you ever need to reset your
+<?= $idpDisplayName ?> Identity account password. Because it was not verified before
+its expiration time, it has been removed from your <?= $idpDisplayName ?> Identity account.
 
 <?php if ($numberVerified === 0) : ?>
 Please go to your profile page at

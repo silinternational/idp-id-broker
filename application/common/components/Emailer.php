@@ -23,21 +23,24 @@ class Emailer extends Component
     const SUBJ_PASSWORD_CHANGED = 'Your {idpDisplayName} Identity account password has been changed';
     const SUBJ_WELCOME = 'Important information about your {idpDisplayName} Identity account';
 
-    const SUBJ_GET_BACKUP_CODES = 'Get printable codes for your {idpDisplayName} account';
-    const SUBJ_REFRESH_BACKUP_CODES = 'Get a new set of printable codes for your {idpDisplayName} account';
-    const SUBJ_LOST_SECURITY_KEY = 'Have you lost the security key you use with your {idpDisplayName} account?';
+    const SUBJ_GET_BACKUP_CODES = 'Get printable codes for your {idpDisplayName} Identity account';
+    const SUBJ_REFRESH_BACKUP_CODES = 'Get a new set of printable codes for your {idpDisplayName} Identity account';
+    const SUBJ_LOST_SECURITY_KEY = 'Have you lost the security key you use with your {idpDisplayName}'
+        . ' Identity account?';
 
-    const SUBJ_MFA_OPTION_ADDED = 'A 2-Step Verification option was added to your {idpDisplayName} account';
-    const SUBJ_MFA_OPTION_REMOVED = 'A 2-Step Verification option was removed from your {idpDisplayName} account';
-    const SUBJ_MFA_ENABLED = '2-Step Verification was enabled on your {idpDisplayName} account';
-    const SUBJ_MFA_DISABLED = '2-Step Verification was disabled on your {idpDisplayName} account';
-    const SUBJ_MFA_MANAGER = '{displayName} has sent you a login code for their {idpDisplayName} account';
-    const SUBJ_MFA_MANAGER_HELP = 'An access code for your {idpDisplayName} account has been sent to your manager';
+    const SUBJ_MFA_OPTION_ADDED = 'A 2-Step Verification option was added to your {idpDisplayName} Identity account';
+    const SUBJ_MFA_OPTION_REMOVED = 'A 2-Step Verification option was removed from your {idpDisplayName}'
+        . ' Identity account';
+    const SUBJ_MFA_ENABLED = '2-Step Verification was enabled on your {idpDisplayName} Identity account';
+    const SUBJ_MFA_DISABLED = '2-Step Verification was disabled on your {idpDisplayName} Identity account';
+    const SUBJ_MFA_MANAGER = '{displayName} has sent you a login code for their {idpDisplayName} Identity account';
+    const SUBJ_MFA_MANAGER_HELP = 'An access code for your {idpDisplayName} Identity account has been sent to'
+        . ' your manager';
 
     const SUBJ_METHOD_VERIFY = 'Please verify your new password recovery method';
     const SUBJ_METHOD_REMINDER = 'REMINDER: Please verify your new password recovery method';
     const SUBJ_METHOD_PURGED = 'An unverified password recovery method has been removed from your {idpDisplayName}'
-        . ' account';
+        . ' Identity account';
 
     const SUBJ_PASSWORD_EXPIRING = 'The password for your {idpDisplayName} Identity account is about to expire';
     const SUBJ_PASSWORD_EXPIRED = 'The password for your {idpDisplayName} Identity account has expired';
