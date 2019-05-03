@@ -5,10 +5,14 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+
+## [4.2.0] - 2019-05-03
 ### Added
 - Added recovery method reminder email, replacing daily method verify emails
 - Send an email notice when an unverified recovery email is purged
 - Send email notices when user's password is about to expire or has expired
+- Allow more than one manager 2sv code, and delete all codes when any 2sv is used
+- Extend password grace period if password expires because of user disabling 2sv 
 
 ## [4.1.1] - 2019-04-18
 ### Fixed
@@ -116,7 +120,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 - Initial version of ID Broker.
 
-[Unreleased]: https://github.com/silinternational/idp-id-broker/compare/4.1.0...HEAD
+[Unreleased]: https://github.com/silinternational/idp-id-broker/compare/4.2.0...HEAD
+[4.2.0]: https://github.com/silinternational/idp-id-broker/compare/4.1.1...4.2.0
 [4.1.0]: https://github.com/silinternational/idp-id-broker/compare/4.0.1...4.1.0
 [4.0.1]: https://github.com/silinternational/idp-id-broker/compare/4.0.0...4.0.1
 [4.0.0]: https://github.com/silinternational/idp-id-broker/compare/3.5.0...4.0.0
