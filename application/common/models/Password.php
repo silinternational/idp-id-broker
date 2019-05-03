@@ -19,6 +19,8 @@ use yii\web\ConflictHttpException;
  */
 class Password extends PasswordBase
 {
+    const SCENARIO_UPDATE_METADATA = 'update_metadata';
+
     public $password;
 
     public function rules(): array
@@ -34,7 +36,7 @@ class Password extends PasswordBase
                 'grace_period_ends_on', 'default', 'value' => MySqlDateTime::today(),
             ],
             [
-                'password', 'required',
+                'password', 'required', 'on' => self::SCENARIO_DEFAULT
             ],
             [
                 'password', 'string',
@@ -163,7 +165,7 @@ class Password extends PasswordBase
     protected function getMfaExtendedDate($date)
     {
         $dateIso = $date . 'T23:59:59Z';
-        if (count($this->user->mfas) > 0) {
+        if (count($this->user->getVerifiedMfaOptions()) > 0) {
             $extended = strtotime(\Yii::$app->params['passwordMfaLifespanExtension'], strtotime($dateIso));
             return Utils::getIso8601($extended);
         }
@@ -205,5 +207,36 @@ class Password extends PasswordBase
         if ($this->hasAlreadyBeenUsedTooRecently()) {
             throw new ConflictHttpException('May not be reused yet', 1542395933);
         }
+    }
+
+    /**
+     * Extend grace period to a point in the near future.
+     */
+    public function extendGracePeriod()
+    {
+        $newGracePeriodEnd = strtotime(\Yii::$app->params['passwordGracePeriodExtension']);
+
+        $this->grace_period_ends_on = MySqlDateTime::formatDate($newGracePeriodEnd);
+
+        $this->scenario = self::SCENARIO_UPDATE_METADATA;
+
+        if (! $this->save()) {
+            \Yii::error('Failed to save grace period. ' . join(', ', $this->getFirstErrors()));
+        }
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function scenarios(): array
+    {
+        $scenarios = parent::scenarios();
+
+        $scenarios[self::SCENARIO_UPDATE_METADATA] = [
+            'expires_on',
+            'grace_period_ends_on',
+        ];
+
+        return $scenarios;
     }
 }
