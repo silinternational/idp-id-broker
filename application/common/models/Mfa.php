@@ -136,6 +136,8 @@ class Mfa extends MfaBase
             self::EVENT_TYPE_DELETE,
             $this
         );
+
+        $this->user->extendGracePeriodIfNeeded();
     }
 
     /**
@@ -224,6 +226,9 @@ class Mfa extends MfaBase
                 'username' => $this->user->username,
                 'status' => 'success',
             ]);
+
+            $this->user->removeManagerCodes();
+
             return true;
         }
 

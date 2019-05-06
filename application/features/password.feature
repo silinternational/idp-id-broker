@@ -40,3 +40,4 @@ Feature: Password
 #  Scenario: ensure password_hash and last_changed date are the only things that change even when passed all attributes available on the table.
 # TODO: need to test the expiration date calculation
 # TODO: need to test the reuse limit
+# TODO: need to test grace period and grace period extension

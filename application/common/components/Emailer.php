@@ -3,7 +3,9 @@ namespace common\components;
 
 use common\helpers\MySqlDateTime;
 use common\models\EmailLog;
+use common\models\Method;
 use common\models\Mfa;
+use common\models\Password;
 use common\models\User;
 use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
@@ -19,20 +21,29 @@ class Emailer extends Component
     const SUBJ_INVITE = 'Your new {idpDisplayName} Identity account';
     const SUBJ_MFA_RATE_LIMIT = 'Too many 2-Step Verification attempts on your {idpDisplayName} Identity account';
     const SUBJ_PASSWORD_CHANGED = 'Your {idpDisplayName} Identity account password has been changed';
-    const SUBJ_WELCOME = 'Important information about your {idpDisplayName} identity account';
+    const SUBJ_WELCOME = 'Important information about your {idpDisplayName} Identity account';
 
-    const SUBJ_GET_BACKUP_CODES = 'Get printable codes for your {idpDisplayName} account';
-    const SUBJ_REFRESH_BACKUP_CODES = 'Get a new set of printable codes for your {idpDisplayName} account';
-    const SUBJ_LOST_SECURITY_KEY = 'Have you lost the security key you use with your {idpDisplayName} account?';
+    const SUBJ_GET_BACKUP_CODES = 'Get printable codes for your {idpDisplayName} Identity account';
+    const SUBJ_REFRESH_BACKUP_CODES = 'Get a new set of printable codes for your {idpDisplayName} Identity account';
+    const SUBJ_LOST_SECURITY_KEY = 'Have you lost the security key you use with your {idpDisplayName}'
+        . ' Identity account?';
 
-    const SUBJ_MFA_OPTION_ADDED = 'A 2-Step Verification option was added to your {idpDisplayName} account';
-    const SUBJ_MFA_OPTION_REMOVED = 'A 2-Step Verification option was removed from your {idpDisplayName} account';
-    const SUBJ_MFA_ENABLED = '2-Step Verification was enabled on your {idpDisplayName} account';
-    const SUBJ_MFA_DISABLED = '2-Step Verification was disabled on your {idpDisplayName} account';
-    const SUBJ_MFA_MANAGER = '{displayName} has sent you a login code for their {idpDisplayName} account';
-    const SUBJ_MFA_MANAGER_HELP = 'An access code for your {idpDisplayName} account has been sent to your manager';
+    const SUBJ_MFA_OPTION_ADDED = 'A 2-Step Verification option was added to your {idpDisplayName} Identity account';
+    const SUBJ_MFA_OPTION_REMOVED = 'A 2-Step Verification option was removed from your {idpDisplayName}'
+        . ' Identity account';
+    const SUBJ_MFA_ENABLED = '2-Step Verification was enabled on your {idpDisplayName} Identity account';
+    const SUBJ_MFA_DISABLED = '2-Step Verification was disabled on your {idpDisplayName} Identity account';
+    const SUBJ_MFA_MANAGER = '{displayName} has sent you a login code for their {idpDisplayName} Identity account';
+    const SUBJ_MFA_MANAGER_HELP = 'An access code for your {idpDisplayName} Identity account has been sent to'
+        . ' your manager';
 
     const SUBJ_METHOD_VERIFY = 'Please verify your new password recovery method';
+    const SUBJ_METHOD_REMINDER = 'REMINDER: Please verify your new password recovery method';
+    const SUBJ_METHOD_PURGED = 'An unverified password recovery method has been removed from your {idpDisplayName}'
+        . ' Identity account';
+
+    const SUBJ_PASSWORD_EXPIRING = 'The password for your {idpDisplayName} Identity account is about to expire';
+    const SUBJ_PASSWORD_EXPIRED = 'The password for your {idpDisplayName} Identity account has expired';
 
     const PROP_SUBJECT = 'subject';
     const PROP_TO_ADDRESS = 'to_address';
@@ -80,7 +91,13 @@ class Emailer extends Component
     public $sendMfaOptionRemovedEmails = true;
     public $sendMfaEnabledEmails = true;
     public $sendMfaDisabledEmails = true;
-    
+
+    public $sendMethodReminderEmails = true;
+    public $sendMethodPurgedEmails = true;
+
+    public $sendPasswordExpiringEmails = true;
+    public $sendPasswordExpiredEmails = true;
+
     /**
      * The list of subjects, keyed on message type. This is initialized during
      * the `init()` call during construction.
@@ -106,6 +123,11 @@ class Emailer extends Component
     public $subjectForMfaManagerHelp;
 
     public $subjectForMethodVerify;
+    public $subjectForMethodReminder;
+    public $subjectForMethodPurged;
+
+    public $subjectForPasswordExpiring;
+    public $subjectForPasswordExpired;
 
     /* The number of days of not using a security key after which we email the user */
     public $lostSecurityKeyEmailDays;
@@ -281,6 +303,11 @@ class Emailer extends Component
         $this->subjectForMfaManagerHelp = $this->subjectForMfaManagerHelp ?? self::SUBJ_MFA_MANAGER_HELP;
 
         $this->subjectForMethodVerify = $this->subjectForMethodVerify ?? self::SUBJ_METHOD_VERIFY;
+        $this->subjectForMethodReminder = $this->subjectForMethodReminder ?? self::SUBJ_METHOD_REMINDER;
+        $this->subjectForMethodPurged = $this->subjectForMethodPurged ?? self::SUBJ_METHOD_PURGED;
+
+        $this->subjectForPasswordExpiring = $this->subjectForPasswordExpiring ?? self::SUBJ_PASSWORD_EXPIRING;
+        $this->subjectForPasswordExpired = $this->subjectForPasswordExpired ?? self::SUBJ_PASSWORD_EXPIRED;
 
         $this->subjects = [
             EmailLog::MESSAGE_TYPE_INVITE => $this->subjectForInvite,
@@ -295,8 +322,12 @@ class Emailer extends Component
             EmailLog::MESSAGE_TYPE_MFA_ENABLED => $this->subjectForMfaEnabled,
             EmailLog::MESSAGE_TYPE_MFA_DISABLED => $this->subjectForMfaDisabled,
             EmailLog::MESSAGE_TYPE_METHOD_VERIFY => $this->subjectForMethodVerify,
+            EmailLog::MESSAGE_TYPE_METHOD_REMINDER => $this->subjectForMethodReminder,
+            EmailLog::MESSAGE_TYPE_METHOD_PURGED => $this->subjectForMethodPurged,
             EmailLog::MESSAGE_TYPE_MFA_MANAGER => $this->subjectForMfaManager,
             EmailLog::MESSAGE_TYPE_MFA_MANAGER_HELP => $this->subjectForMfaManagerHelp,
+            EmailLog::MESSAGE_TYPE_PASSWORD_EXPIRING => $this->subjectForPasswordExpiring,
+            EmailLog::MESSAGE_TYPE_PASSWORD_EXPIRED => $this->subjectForPasswordExpired,
         ];
         
         $this->assertConfigIsValid();
@@ -343,18 +374,19 @@ class Emailer extends Component
             $this->otherDataForEmails,
             $data
         );
-        
+
         $htmlView = $this->getViewForMessage($messageType, 'html');
+        $htmlBody = \Yii::$app->view->render($htmlView, $dataForEmail);
+
         $textView = $this->getViewForMessage($messageType, 'text');
-        
-        $this->email(
-            $data['toAddress'] ?? $user->getEmailAddress(),
-            $this->getSubjectForMessage($messageType, $dataForEmail),
-            \Yii::$app->view->render($htmlView, $dataForEmail),
-            \Yii::$app->view->render($textView, $dataForEmail),
-            $data['ccAddress'] ?? ''
-        );
-        
+        $textBody = \Yii::$app->view->render($textView, $dataForEmail);
+
+        $toAddress = $data['toAddress'] ?? $user->getEmailAddress();
+        $ccAddress = $data['ccAddress'] ?? '';
+        $subject = $this->getSubjectForMessage($messageType, $dataForEmail);
+
+        $this->email($toAddress, $subject, $htmlBody, $textBody, $ccAddress);
+
         EmailLog::logMessage($messageType, $user->id);
     }
 
@@ -374,30 +406,6 @@ class Emailer extends Component
             }
             if ($this->shouldSendLostSecurityKeyMessageTo($user)) {
                 $this->sendMessageTo(EmailLog::MESSAGE_TYPE_LOST_SECURITY_KEY, $user);
-            }
-        }
-    }
-
-    /**
-     * Iterates over all users and sends method verify emails as appropriate
-     */
-    public function sendMethodVerifyEmails()
-    {
-        $query = (new Query)->from('user');
-
-        // iterate over one user at a time.
-        foreach ($query->each() as $userData) {
-            $user = User::findOne($userData['id']);
-
-            $methods = $user->getUnverifiedMethods();
-            foreach ($methods as $method) {
-                $data = [
-                    'toAddress' => $method->value,
-                    'code' => $method->verification_code,
-                    'uid' => $method->uid,
-                ];
-
-                $this->sendMessageTo(EmailLog::MESSAGE_TYPE_METHOD_VERIFY, $user, $data);
             }
         }
     }
@@ -622,5 +630,97 @@ class Emailer extends Component
                 $this->otherDataForEmails[$keyForEmail] = '(MISSING)';
             }
         }
+    }
+
+    /**
+     * Iterates over all unverified methods and sends reminder emails to the user as appropriate
+     */
+    public function sendMethodReminderEmails()
+    {
+        if (! $this->sendMethodReminderEmails) {
+            return;
+        }
+
+        $numEmailsSent = 0;
+        $methods = Method::findAll(['verified' => 0]);
+        foreach ($methods as $method) {
+            $user = $method->user;
+            if (! MySqlDateTime::dateIsRecent($method->created, 3) &&
+                ! $this->hasReceivedMessageRecently($user->id, EmailLog::MESSAGE_TYPE_METHOD_REMINDER)
+            ) {
+                $this->sendMessageTo(
+                    EmailLog::MESSAGE_TYPE_METHOD_REMINDER,
+                    $user,
+                    [ 'alternateAddress' => $method->value ]
+                );
+                $numEmailsSent++;
+            }
+        }
+
+        $this->logger->info([
+            'action' => 'send method reminders',
+            'status' => 'finished',
+            'number_sent' => $numEmailsSent,
+        ]);
+    }
+
+    /**
+     * Iterates over all active users and sends email alert warning of impending password expiration
+     */
+    public function sendPasswordExpiringEmails()
+    {
+        if (! $this->sendPasswordExpiringEmails) {
+            return;
+        }
+
+        $numEmailsSent = 0;
+        $users = User::findAll(['active' => 'yes', 'locked' => 'no', ]);
+        foreach ($users as $user) {
+            /** @var Password $userPassword */
+            $userPassword = $user->currentPassword;
+            if ($userPassword
+                && strtotime($userPassword->getExpiresOn()) < strtotime('+15 days')
+                && ! $this->hasReceivedMessageRecently($user->id, EmailLog::MESSAGE_TYPE_PASSWORD_EXPIRING)
+            ) {
+                $this->sendMessageTo(EmailLog::MESSAGE_TYPE_PASSWORD_EXPIRING, $user);
+                $numEmailsSent++;
+            }
+        }
+
+        $this->logger->info([
+            'action' => 'send password expiring notices',
+            'status' => 'finished',
+            'number_sent' => $numEmailsSent,
+        ]);
+    }
+
+    /**
+     * Iterates over all active users and sends email alert warning of expired passwords
+     */
+    public function sendPasswordExpiredEmails()
+    {
+        if (! $this->sendPasswordExpiredEmails) {
+            return;
+        }
+
+        $numEmailsSent = 0;
+        $users = User::findAll(['active' => 'yes', 'locked' => 'no', ]);
+        foreach ($users as $user) {
+            /** @var Password $userPassword */
+            $userPassword = $user->currentPassword;
+            if ($userPassword
+                && strtotime($userPassword->getExpiresOn()) < time()
+                && ! $this->hasReceivedMessageRecently($user->id, EmailLog::MESSAGE_TYPE_PASSWORD_EXPIRED)
+            ) {
+                $this->sendMessageTo(EmailLog::MESSAGE_TYPE_PASSWORD_EXPIRED, $user);
+                $numEmailsSent++;
+            }
+        }
+
+        $this->logger->info([
+            'action' => 'send password expired notices',
+            'status' => 'finished',
+            'number_sent' => $numEmailsSent,
+        ]);
     }
 }

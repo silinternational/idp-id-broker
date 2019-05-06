@@ -27,7 +27,7 @@ use yii\helpers\Html as yHtml;
     Dear <?=yHtml::encode($displayName)?>,
 </p>
 <p>
-    The password for your <?=yHtml::encode($idpDisplayName)?> account has been changed. If you did not make this change
+    The password for your <?=yHtml::encode($idpDisplayName)?> Identity account has been changed. If you did not make this change
     please contact <?=yHtml::encode($supportName)?> at <?=yHtml::encode($supportEmail)?> immediately to let us know.
 </p>
 <p>
@@ -41,7 +41,7 @@ use yii\helpers\Html as yHtml;
 </p>
 <p>
     If you have not already done so, it is highly recommended that you configure
-    recovery methods for the potential event that you forget your password. You
+    <strong>recovery methods</strong> for the potential event that you forget your password. You
     can reset your password using your primary email address, <?=yHtml::encode($email)?>,
     but you can also add other addresses for verification.
 </p>
@@ -78,8 +78,7 @@ if (! $isMfaEnabled) {
     <li>Go to <?=yHtml::a(yHtml::encode($passwordProfileUrl), $passwordProfileUrl)?></li>
     <li>Under 2-Step Verification, set up the options that suit you best (USB Security Key, Smartphone App, and/or
         Printable Codes)</li>
-    <li>Log out and log in again to see how it works and to have it remember your computer for 30 days. Note that
-        logging out will undo the "Remember this computer" setting.</li>
+    <li>Log out and log in again to see how it works and to have it remember your computer for 30 days.</li>
 </ol>
 <p>
     To learn more about 2-Step Verification go to <?=yHtml::a(yHtml::encode($helpCenterUrl), $helpCenterUrl)?>

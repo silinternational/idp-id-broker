@@ -1023,4 +1023,121 @@ class EmailContext extends YiiContext
         );
         Assert::eq($matchingFakeEmails[0]['cc_address'], $this->tempUser->personal_email);
     }
+
+    /**
+     * @Given /^we are configured (NOT to|to) send recovery method reminder emails$/
+     */
+    public function weAreConfiguredToSendRecoveryMethodReminderEmails($sendOrNot)
+    {
+        $this->fakeEmailer->sendMethodReminderEmails = ($sendOrNot === 'to');
+    }
+
+    /**
+     * @Given a recovery method was created :n days ago
+     */
+    public function aRecoveryMethodWasCreatedDaysAgo($n)
+    {
+        $method = Method::findOrCreate($this->tempUser->id, 'email@example.com');
+        $method->created = MySqlDateTime::relative('-' . $n . ' days');
+        $method->save();
+
+        $this->testMethod = $method;
+
+        Assert::true($method->save(), "Could not create new method.");
+    }
+
+    /**
+     * @When I send recovery method reminder emails
+     */
+    public function iSendRecoveryMethodReminderEmails()
+    {
+        $this->fakeEmailer->sendMethodReminderEmails();
+    }
+
+    /**
+     * @Then /^I see that a recovery method reminder (has|has NOT) been sent$/
+     */
+    public function iSeeThatARecoveryMethodReminderHasNotBeenSent($hasOrHasNot)
+    {
+        $hasBeenSent = $this->fakeEmailer->hasReceivedMessageRecently(
+            $this->tempUser->id,
+            EmailLog::MESSAGE_TYPE_METHOD_REMINDER
+        );
+
+        if ($hasOrHasNot === 'has') {
+            Assert::true($hasBeenSent);
+        } else {
+            Assert::false($hasBeenSent);
+        }
+    }
+
+    /**
+     * @Given /^we are configured (NOT to|to) send password expiring emails$/
+     */
+    public function weAreConfiguredToSendPasswordExpiringEmails($sendOrNot)
+    {
+        $this->fakeEmailer->sendPasswordExpiringEmails = ($sendOrNot === 'to');
+    }
+
+    /**
+     * @When I send password expiring emails
+     */
+    public function iSendPasswordExpiringEmails()
+    {
+        $this->fakeEmailer->sendPasswordExpiringEmails();
+    }
+
+    /**
+     * @Given that user has a password that expires in :n days
+     */
+    public function thatUserHasAPasswordThatExpiresInDays($n)
+    {
+        $this->setPasswordForUser(
+            $this->tempUser,
+            base64_encode(random_bytes(33)) // Random password
+        );
+        $this->tempUser->refresh();
+        Assert::notNull($this->tempUser->current_password_id);
+
+        $currentPassword = $this->tempUser->currentPassword;
+        $currentPassword->password = base64_encode(random_bytes(33)); // Needed to pass validation
+        $currentPassword->expires_on = MySqlDateTime::relative('+' . $n . ' days');
+        Assert::true(
+            $currentPassword->save(),
+            'Failed to save updated password expiration date. '
+            . join(', ', $currentPassword->getFirstErrors())
+        );
+    }
+
+    /**
+     * @Given /^we are configured (NOT to|to) send password expired emails$/
+     */
+    public function weAreConfiguredToSendPasswordExpiredEmails($sendOrNot)
+    {
+        $this->fakeEmailer->sendPasswordExpiredEmails = ($sendOrNot === 'to');
+    }
+
+    /**
+     * @When I send password expired emails
+     */
+    public function iSendPasswordExpiredEmails()
+    {
+        $this->fakeEmailer->sendPasswordExpiredEmails();
+    }
+
+    /**
+     * @Given /^that user has a password that expires (yesterday|today|tomorrow)/
+     */
+    public function thatUserHasAPasswordThatExpires($day)
+    {
+        if ($day == 'yesterday') {
+            $this->thatUserHasAPasswordThatExpiresInDays(-1);
+        } elseif ($day == 'today') {
+            $this->thatUserHasAPasswordThatExpiresInDays(0);
+        } elseif ($day == 'tomorrow') {
+            $this->thatUserHasAPasswordThatExpiresInDays(1);
+        } else {
+            Assert::false(true, 'Invalid tense provided in scenario.');
+        }
+    }
 }

@@ -166,9 +166,11 @@ class Method extends MethodBase
             ->all();
 
         $numDeleted = 0;
+        /** @var Method $method */
         foreach ($methods as $method) {
             try {
                 if ($method->delete() !== false) {
+                    $method->sendPurgedEmail();
                     $numDeleted += 1;
                 }
             } catch (\Exception $e) {
@@ -330,5 +332,23 @@ class Method extends MethodBase
         }
 
         return $method;
+    }
+
+    /**
+     * Send a notification email message informing the user that a recovery message was purged
+     */
+    public function sendPurgedEmail()
+    {
+        /* @var $emailer Emailer */
+        $emailer = \Yii::$app->emailer;
+
+        $emailer->sendMessageTo(
+            EmailLog::MESSAGE_TYPE_METHOD_PURGED,
+            $this->user,
+            [
+                'alternateAddress' => $this->value,
+                'numberVerified' => count($this->user->getVerifiedMethodOptions()),
+            ]
+        );
     }
 }

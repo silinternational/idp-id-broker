@@ -25,7 +25,7 @@
 ?>
 Dear <?= $displayName ?>,
 
-Thank you for setting your <?= $idpDisplayName ?> identity
+Thank you for setting your <?= $idpDisplayName ?> Identity
 account password. Below is some important information about this account
 that you may want to keep for future reference.
 

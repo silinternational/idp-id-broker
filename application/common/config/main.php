@@ -46,12 +46,6 @@ $emailServiceConfig['validIpRanges'] = Env::getArray('EMAIL_SERVICE_validIpRange
 
 $passwordProfileUrl = Env::get('PASSWORD_PROFILE_URL');
 
-// This logic is temporary in order to shift from one definition to another. After the
-// transition, this code can be eliminated. Before: www.domain.com/#  After: www.domain.com
-if (substr($passwordProfileUrl, -2) == '/#') {
-    $passwordProfileUrl = rtrim($passwordProfileUrl, '/#');
-}
-
 return [
     'id' => 'app-common',
     'bootstrap' => ['log'],
@@ -89,6 +83,10 @@ return [
             'sendMfaOptionRemovedEmails' => Env::get('SEND_MFA_OPTION_REMOVED_EMAILS', true),
             'sendMfaEnabledEmails' => Env::get('SEND_MFA_ENABLED_EMAILS', true),
             'sendMfaDisabledEmails' => Env::get('SEND_MFA_DISABLED_EMAILS', true),
+            'sendMethodReminderEmails' => Env::get('SEND_METHOD_REMINDER_EMAILS', true),
+            'sendMethodPurgedEmails' => Env::get('SEND_METHOD_PURGED_EMAILS', true),
+            'sendPasswordExpiringEmails' => Env::get('SEND_PASSWORD_EXPIRING_EMAILS', true),
+            'sendPasswordExpiredEmails' => Env::get('SEND_PASSWORD_EXPIRED_EMAILS', true),
 
             'subjectForInvite' => Env::get('SUBJECT_FOR_INVITE'),
             'subjectForMfaRateLimit' => Env::get('SUBJECT_FOR_MFA_RATE_LIMIT'),
@@ -104,6 +102,10 @@ return [
             'subjectForMfaManager' => Env::get('SUBJECT_FOR_MFA_MANAGER'),
             'subjectForMfaManagerHelp' => Env::get('SUBJECT_FOR_MFA_MANAGER_HELP'),
             'subjectForMethodVerify' => Env::get('SUBJECT_FOR_METHOD_VERIFY'),
+            'subjectForMethodReminder' => Env::get('SUBJECT_FOR_METHOD_REMINDER'),
+            'subjectForMethodPurged' => Env::get('SUBJECT_FOR_METHOD_PURGED'),
+            'subjectForPasswordExpiring' => Env::get('SUBJECT_FOR_PASSWORD_EXPIRING'),
+            'subjectForPasswordExpired' => Env::get('SUBJECT_FOR_PASSWORD_EXPIRED'),
 
             'lostSecurityKeyEmailDays' => Env::get('LOST_SECURITY_KEY_EMAIL_DAYS', 62),
             'minimumBackupCodesBeforeNag' => Env::get('MINIMUM_BACKUP_CODES_BEFORE_NAG', 4),
@@ -198,6 +200,7 @@ return [
         'passwordLifespan'              => Env::get('PASSWORD_LIFESPAN', '+1 year'),
         'passwordMfaLifespanExtension'  => Env::get('PASSWORD_MFA_LIFESPAN_EXTENSION', '+4 years'),
         'passwordExpirationGracePeriod' => Env::get('PASSWORD_EXPIRATION_GRACE_PERIOD', '+30 days'),
+        'passwordGracePeriodExtension'  => '+7 days',
         'inviteLifespan'                => Env::get('INVITE_LIFESPAN', '+1 month'),
         'inviteGracePeriod'             => Env::get('INVITE_GRACE_PERIOD', '+3 months'),
         'googleAnalytics'               => [
@@ -206,7 +209,7 @@ return [
         ],
         'method' => ArrayHelper::merge(
             [
-                'lifetime' => '+1 day',
+                'lifetime' => '+5 days',
                 'gracePeriod' => '+15 days',
                 'codeLength' => 6,
                 'maxAttempts' => 10,

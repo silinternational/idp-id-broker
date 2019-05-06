@@ -30,7 +30,7 @@ use yii\helpers\Html as yHtml;
     Dear <?=yHtml::encode($displayName)?>,
 </p>
 <p>
-    Thank you for setting your <?=yHtml::encode($idpDisplayName)?> identity
+    Thank you for setting your <?=yHtml::encode($idpDisplayName)?> Identity
     account password. Below is some important information about this account
     that you may want to keep for future reference.
 </p>
@@ -57,7 +57,7 @@ use yii\helpers\Html as yHtml;
     </li>
     
     <li>
-        <strong>Contact Support:</strong><?=yHtml::encode($supportEmail)?>
+        <strong>Contact Support:</strong> <?=yHtml::encode($supportEmail)?>
     </li>
 
 </ul>

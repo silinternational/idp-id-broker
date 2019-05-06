@@ -24,7 +24,7 @@
 ?>
 Dear <?= $displayName ?>,
 
-The password for your <?= $idpDisplayName ?> account has been changed. If you
+The password for your <?= $idpDisplayName ?> Identity account has been changed. If you
 did not make this change please contact <?= $supportName ?> at
 <?= $supportEmail ?> immediately to let us know.
 
@@ -71,8 +71,7 @@ Instructions to set up 2-Step Verification:
 2. Under 2-Step Verification, set up the options that suit you best (USB
    Security Key, Smartphone App, and/or Printable Codes)
 3. Log out and log in again to see how it works and to have it remember your
-   computer for 30 days. Note that logging out will undo the "Remember this
-   computer" setting.
+   computer for 30 days.
 
 To learn more about 2-Step Verification go to <?= $helpCenterUrl ?>
 

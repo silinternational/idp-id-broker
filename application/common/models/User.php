@@ -923,4 +923,71 @@ class User extends UserBase
             }
         }
     }
+
+    /**
+     * Remove all manager codes for this user
+     * @throws \Exception
+     */
+    public function removeManagerCodes()
+    {
+        $mfa = Mfa::findOne(['user_id' => $this->id, 'type' => Mfa::TYPE_MANAGER]);
+        if ($mfa === null) {
+            return;
+        }
+
+        foreach ($mfa->mfaBackupcodes as $code) {
+            if ($code->delete() === false) {
+                \Yii::error([
+                    'action' => 'remove all manager codes',
+                    'status' => 'error',
+                    'error' => $code->getFirstErrors(),
+                ]);
+                throw new \Exception("Unable to delete manager code", 1556810506);
+            }
+        }
+
+        if ($mfa->delete() === false) {
+            \Yii::error([
+                'action' => 'remove manager mfa',
+                'status' => 'error',
+                'error' => $mfa->getFirstErrors(),
+            ]);
+            throw new \Exception("Unable to delete manager mfa", 1556810507);
+        }
+    }
+
+    /**
+     * Extend grace period if password is past or nearly past the grace period. Intended to
+     * be used in a situation where removal of the last MFA option has caused an immediate expiration
+     * of the user's password.
+     */
+    public function extendGracePeriodIfNeeded()
+    {
+        if (count($this->getVerifiedMfaOptions()) > 0) {
+            return;
+        }
+
+        if ($this->currentPassword === null) {
+            return;
+        }
+
+        $gracePeriodEnds = strtotime($this->currentPassword->getGracePeriodEndsOn());
+
+        $nowPlusExtension = strtotime(\Yii::$app->params['passwordGracePeriodExtension']);
+
+        /*
+         * If grace period has ended or will end in the near future, bump it out to allow
+         * time for the user to change their password.
+         */
+        if ($gracePeriodEnds < $nowPlusExtension) {
+            $this->currentPassword->extendGracePeriod();
+
+            \Yii::warning([
+                'action' => 'extend grace period',
+                'status' => 'success',
+                'username' => $this->username,
+                'grace_period_ends_on' => $this->currentPassword->grace_period_ends_on,
+            ]);
+        }
+    }
 }
