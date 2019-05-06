@@ -594,7 +594,7 @@ class User extends UserBase
             if ($this->personal_email && $this->email) {
                 $data['ccAddress'] = $this->personal_email;
             }
-            $emailer->sendMessageTo(EmailLog::MESSAGE_TYPE_INVITE, $this, $data);
+            $emailer->sendMessageTo(EmailLog::MESSAGE_TYPE_INVITE, $this, $data, 3600);
         }
         
         if ($emailer->shouldSendPasswordChangedMessageTo($this, $changedAttributes)) {

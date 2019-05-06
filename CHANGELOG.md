@@ -5,6 +5,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+- Delay invite emails by 1 hour to allow time for a new email account to be created.
 
 ## [4.2.0] - 2019-05-06
 ### Added
