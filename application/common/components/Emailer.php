@@ -50,6 +50,7 @@ class Emailer extends Component
     const PROP_CC_ADDRESS = 'cc_address';
     const PROP_HTML_BODY = 'html_body';
     const PROP_TEXT_BODY = 'text_body';
+    const PROP_DELAY_SECONDS = 'delay_seconds';
 
     /**
      * The configuration for the email-service client.
@@ -180,6 +181,7 @@ class Emailer extends Component
      * @param string $htmlBody The email body (as HTML).
      * @param string $textBody The email body (as plain text).
      * @param string $ccAddress Optional. Email address to include as 'cc'.
+     * @param string $delaySeconds Number of seconds to delay sending the email. Default = no delay.
      * @throws \Sil\EmailService\Client\EmailServiceClientException
      */
     protected function email(
@@ -187,13 +189,15 @@ class Emailer extends Component
         string $subject,
         string $htmlBody,
         string $textBody,
-        string $ccAddress = ''
+        string $ccAddress = '',
+        int $delaySeconds = 0
     ) {
         $properties = [
             self::PROP_TO_ADDRESS => $toAddress,
             self::PROP_SUBJECT => $subject,
             self::PROP_HTML_BODY => $htmlBody,
             self::PROP_TEXT_BODY => $textBody,
+            self::PROP_DELAY_SECONDS => $delaySeconds,
         ];
 
         if ($ccAddress) {
@@ -356,8 +360,9 @@ class Emailer extends Component
      * @param User $user The intended recipient.
      * @param string[] $data  Data fields for email template. Include key 'toAddress' to override
      *     sending to primary address in User object.
+     * @param int $delaySeconds Number of seconds to delay sending the email. Default = no delay.
      */
-    public function sendMessageTo(string $messageType, User $user, array $data = [])
+    public function sendMessageTo(string $messageType, User $user, array $data = [], int $delaySeconds = 0)
     {
         if ($user->active === 'no') {
             \Yii::warning([
@@ -385,7 +390,7 @@ class Emailer extends Component
         $ccAddress = $data['ccAddress'] ?? '';
         $subject = $this->getSubjectForMessage($messageType, $dataForEmail);
 
-        $this->email($toAddress, $subject, $htmlBody, $textBody, $ccAddress);
+        $this->email($toAddress, $subject, $htmlBody, $textBody, $ccAddress, $delaySeconds);
 
         EmailLog::logMessage($messageType, $user->id);
     }
