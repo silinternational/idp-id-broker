@@ -91,7 +91,6 @@ types:
         properties:
           created_utc: string
           expires_on: string
-          grace_period_ends_on: string
       profile_review:
         enum: [ yes, no ]
         description: >
@@ -131,9 +130,7 @@ types:
               "label": "Blue YubiKey",
               "created_utc": "2017-10-24T20:40:47Z",
               "last_used_utc": null,
-              "data": {
-                "count": 10
-            }
+              "data": []
             },
             {
               "id": 345,
@@ -141,16 +138,13 @@ types:
               "label": "2SV #1",
               "created_utc": "2017-10-24T20:40:47Z",
               "last_used_utc": null,
-              "data": {
-                  "count": 10
-              }
+              "data": []
             }
           ]
         },
         "password": {
           "created_utc":"2017-05-24T14:04:51Z",
           "expires_on":"2018-05-24T23:59:59Z",
-          "grace_period_ends_on":"2018-06-23T23:59:59Z"
         },
         "method": {
           "add": "no",

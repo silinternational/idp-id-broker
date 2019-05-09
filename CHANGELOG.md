@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [4.2.1] - 2019-05-09
+### Changed
+- Delay invite emails by 1 hour to allow time for a new email account to be created.
+### Removed
+- Removed `grace_period_ends_on` from API
+
 ## [4.2.0] - 2019-05-06
 ### Added
 - Added recovery method reminder email, replacing daily method verify emails
@@ -120,7 +126,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 - Initial version of ID Broker.
 
-[Unreleased]: https://github.com/silinternational/idp-id-broker/compare/4.2.0...HEAD
+[Unreleased]: https://github.com/silinternational/idp-id-broker/compare/4.2.1...HEAD
+[4.2.1]: https://github.com/silinternational/idp-id-broker/compare/4.2.0...4.2.1
 [4.2.0]: https://github.com/silinternational/idp-id-broker/compare/4.1.1...4.2.0
 [4.1.0]: https://github.com/silinternational/idp-id-broker/compare/4.0.1...4.1.0
 [4.0.1]: https://github.com/silinternational/idp-id-broker/compare/4.0.0...4.0.1
