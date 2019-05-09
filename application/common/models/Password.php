@@ -140,9 +140,6 @@ class Password extends PasswordBase
             'expires_on' => function (Password $model) {
                 return $model->getExpiresOn();
             },
-            'grace_period_ends_on' => function ($model) {
-                return $model->getGracePeriodEndsOn();
-            },
         ];
 
         return $fields;

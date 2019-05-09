@@ -5,7 +5,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+### Changed
 - Delay invite emails by 1 hour to allow time for a new email account to be created.
+### Removed
+- Removed `graced_period_ends_on` from API
 
 ## [4.2.0] - 2019-05-06
 ### Added
