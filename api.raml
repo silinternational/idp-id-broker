@@ -352,6 +352,13 @@ types:
         required: false
         type: string
         example: "email=john_smith@example.com"
+      search:
+        description: |
+          Partial text search across multiple fields: 'employee_id', 'first_name',
+          'last_name', 'display_name', 'username', 'email', and 'personal_email'
+        required: false
+        type: string
+        example: "search=@example.com"
     responses:
       200:
         body:

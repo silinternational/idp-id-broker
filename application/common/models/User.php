@@ -12,6 +12,8 @@ use Yii;
 use yii\behaviors\AttributeBehavior;
 use yii\data\ActiveDataProvider;
 use yii\db\ActiveRecord;
+use yii\db\conditions\LikeCondition;
+use yii\db\conditions\OrCondition;
 use yii\helpers\ArrayHelper;
 
 class User extends UserBase
@@ -727,6 +729,17 @@ class User extends UserBase
                 case 'username':
                 case 'email':
                     $query->andWhere([$name => $value]);
+                    break;
+                case 'search':
+                    $query->andWhere(new OrCondition([
+                        new LikeCondition('employee_id', 'LIKE', $value),
+                        new LikeCondition('first_name', 'LIKE', $value),
+                        new LikeCondition('last_name', 'LIKE', $value),
+                        new LikeCondition('display_name', 'LIKE', $value),
+                        new LikeCondition('username', 'LIKE', $value),
+                        new LikeCondition('email', 'LIKE', $value),
+                        new LikeCondition('personal_email', 'LIKE', $value),
+                    ]));
                     break;
                 case 'fields':
                     break;
