@@ -22,6 +22,7 @@ class FeatureContext extends YiiContext
 {
     private $reqHeaders = [];
     private $reqBody = [];
+    private $queryParams = [];
 
     /** @var Response */
     private $response;
@@ -634,5 +635,56 @@ class FeatureContext extends YiiContext
         $this->userFromDb->$field = MySqlDateTime::relative($relativeTimes[$tense]);
         $this->userFromDb->scenario = User::SCENARIO_UPDATE_USER;
         Assert::true($this->userFromDb->save());
+    }
+
+    /**
+     * @Given I create the following users:
+     */
+    public function iCreateTheFollowingUsers(TableNode $data)
+    {
+        $dataArray = $data->getColumnsHash();
+        foreach ($dataArray as $row) {
+            $this->reqBody = $row;
+            $this->iRequestTheResourceBe('/user', 'created');
+        }
+    }
+    /**
+     * @Given I provide a(n) :field query property of :value
+     */
+    public function iProvideAFieldQueryPropertyOfValue($field, $value)
+    {
+        $this->queryParams[$field] = $value;
+    }
+
+    /**
+     * @When I search by :field
+     */
+    public function iSearchByField($field)
+    {
+        $request = '/user?' . $field . '=' . $this->queryParams[$field];
+        $this->iRequestTheResourceBe($request, 'retrieved');
+    }
+
+    /**
+     * @Then user :employeeId is returned
+     */
+    public function userIsReturned($employeeId)
+    {
+        $found = false;
+        foreach ($this->resBody as $user) {
+            if ($user['employee_id'] == $employeeId) {
+                $found = true;
+                break;
+            }
+        }
+        Assert::true($found, 'user ' . $employeeId . ' was not returned');
+    }
+
+    /**
+     * @Then no users are returned
+     */
+    public function noUsersAreReturned()
+    {
+        Assert::eq(count($this->resBody), 0, 'response is not empty');
     }
 }
