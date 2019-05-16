@@ -22,9 +22,9 @@ $verifyLink = $passwordProfileUrl . '/password/recovery/' . $uid . '/verify/' . 
 <p>
     Someone recently requested to add this email address, <?= yHtml::encode($toAddress); ?>,
     as a method for verifying themselves should they need to reset their
-    <?= yHtml::encode($idpDisplayName); ?> Identity account password. If this was you, you may click
+    <?= yHtml::encode($idpDisplayName); ?> Identity account password. If this was you, please click
     <?= yHtml::a(yHtml::encode($verifyLink), $verifyLink) ?>
-    to add it to your account.
+    to verify this email address.
 </p>
 <p>
     If you did not do this, it could be a sign someone else has compromised your account.

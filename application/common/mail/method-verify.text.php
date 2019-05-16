@@ -17,8 +17,8 @@ Dear <?= $displayName ?>,
 
 Someone recently requested to add this email address, <?= $toAddress ?>,
 as a method for verifying themselves should they need to reset their
-<?= $idpDisplayName ?> Identity account password. If this was you, you may go to the
-following address to add it to your account:
+<?= $idpDisplayName ?> Identity account password. If this was you, please go to the
+following address to verify this email address:
 
 <?= $passwordProfileUrl . '/password/recovery/' . $uid . '/verify/' . $code . PHP_EOL ?>
 
