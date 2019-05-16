@@ -22,9 +22,9 @@ following address to verify this email address:
 
 <?= $passwordProfileUrl . '/password/recovery/' . $uid . '/verify/' . $code . PHP_EOL ?>
 
-If you did not do this, it could be a sign someone else has compromised your
-account. Please contact <?= $supportName ?> at <?= $supportEmail ?> as soon
-as possible to report the incident.
+If you did not request adding this email address to your account please delete this email
+and contact <?= $supportName ?> at <?= $supportEmail ?> as soon as possible to report the
+incident.
 
 To maintain security, please don't forward this email to anyone. See
 our Help Center at <?= $helpCenterUrl ?> for more security tips.
