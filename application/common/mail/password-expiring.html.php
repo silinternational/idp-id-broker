@@ -29,8 +29,8 @@ use yii\helpers\Html as yHtml;
 <p>
     The password for your <?=yHtml::encode($idpDisplayName)?> Identity account is about to
     expire. Please go to your account profile at
-    <?=yHtml::a(yHtml::encode($passwordProfileUrl), $passwordProfileUrl)?> and login, if
-    necessary, to change your password.
+    <?=yHtml::a(yHtml::encode($passwordProfileUrl), $passwordProfileUrl)?> and login to
+    change your password.
 </p>
 <p>
     Password changed on: <?=yHtml::encode($lastChangedUtc)?><br>

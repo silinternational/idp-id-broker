@@ -26,7 +26,7 @@ Dear <?= $displayName ?>,
 
 The password for your <?= $idpDisplayName ?> Identity account is about to
 expire. Please go to your account profile at <?= $passwordProfileUrl . PHP_EOL ?>
-and login, if necessary, to change your password.
+and login to change your password.
 
 Password changed on: <?= $lastChangedUtc . PHP_EOL ?>
 Password expires on: <?= $passwordExpiresUtc . PHP_EOL ?>
