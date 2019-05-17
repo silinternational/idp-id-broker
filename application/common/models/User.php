@@ -414,7 +414,7 @@ class User extends UserBase
             },
             'manager_email',
             'personal_email' => function (self $model) {
-                $maskParam = Yii::$app->request->queryParams['mask'] ?? 'yes';
+                $maskParam = Yii::$app->request->queryParams['mask'] ?? 'no';
                 if ($maskParam === 'no') {
                     return $model->personal_email;
                 } else {
@@ -538,17 +538,19 @@ class User extends UserBase
      */
     public function getMethodFields()
     {
-        $maskParam = Yii::$app->request->queryParams['mask'] ?? 'yes';
+        $maskParam = Yii::$app->request->queryParams['mask'] ?? 'no';
 
         /*
-         * Ensure that emails are not masked in the authenticate scenario for the purpose
-         * of profile review. Otherwise, the default is to mask the addresses for privacy.
+         * Provide method data when a profile review is requested OR
+         * if a `mask=yes` query parameter has been given.
          */
-        $shouldMaskEmails = $this->scenario !== self::SCENARIO_AUTHENTICATE && $maskParam === 'yes';
+        $shouldProvideMethodOptions =
+            ($this->getNagState() === NagState::NAG_PROFILE_REVIEW
+            && $this->scenario == self::SCENARIO_AUTHENTICATE)
+            || $maskParam === 'yes';
+        $methods = $shouldProvideMethodOptions ? $this->methods : [];
 
-        $methods = $this->methods;
-
-        if ($shouldMaskEmails) {
+        if ($maskParam === 'yes') {
             foreach ($methods as $key => $method) {
                 $methods[$key]->value = $method->getMaskedValue();
             }
