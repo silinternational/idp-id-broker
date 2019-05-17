@@ -347,18 +347,22 @@ types:
         type: string
         description: Search user by username.
         example: "username=john_smith"
-      email:
+      email?:
         description: Search user by email.
-        required: false
         type: string
         example: "email=john_smith@example.com"
-      search:
+      search?:
         description: |
           Partial text search across multiple fields: 'employee_id', 'first_name',
           'last_name', 'display_name', 'username', 'email', and 'personal_email'
-        required: false
         type: string
         example: "search=@example.com"
+      mask?:
+        description: |
+          Mask personal information (method options, personal_email) for privacy.
+          Default is 'yes'.
+        enum: [ yes, no ]
+        example: "mask=yes"
     responses:
       200:
         body:
