@@ -20,7 +20,7 @@ $verifyLink = $passwordProfileUrl . '/password/recovery/' . $uid . '/verify/' . 
 <p>Dear <?= yHtml::encode($displayName) ?>,</p>
 
 <p>
-    Someone recently requested to add this email address, <?= yHtml::encode($toAddress); ?>,
+    Someone has submitted a request to add this email address, <?= yHtml::encode($toAddress); ?>,
     as a method for verifying themselves should they need to reset their
     <?= yHtml::encode($idpDisplayName); ?> Identity account password. If this was you, please click
     <?= yHtml::a(yHtml::encode($verifyLink), $verifyLink) ?>
