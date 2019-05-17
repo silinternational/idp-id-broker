@@ -4,6 +4,7 @@ namespace common\helpers;
 use yii\base\Security;
 use yii\helpers\Html;
 use yii\validators\EmailValidator;
+use yii\web\BadRequestHttpException
 
 class Utils
 {
