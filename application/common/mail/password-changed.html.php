@@ -27,11 +27,12 @@ use yii\helpers\Html as yHtml;
     Dear <?=yHtml::encode($displayName)?>,
 </p>
 <p>
-    The password for your <?=yHtml::encode($idpDisplayName)?> Identity account has been changed. If you did not make this change
-    please contact <?=yHtml::encode($supportName)?> at <?=yHtml::encode($supportEmail)?> immediately to let us know.
+    The password for your <?=yHtml::encode($idpDisplayName)?> Identity account has been changed. If you did not make
+    this change please contact <?=yHtml::encode($supportName)?> at <?=yHtml::encode($supportEmail)?> immediately to let
+    us know.
 </p>
 <p>
-    Please remember that this account will be your primary means for logging into many corporate
+    Please remember that this account will be your primary means for logging into corporate
     applications. It is also important to note that this account (username and password) is unique and will not be kept
     in sync with any other accounts you have.
 </p>

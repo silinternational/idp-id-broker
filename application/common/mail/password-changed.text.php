@@ -29,7 +29,7 @@ did not make this change please contact <?= $supportName ?> at
 <?= $supportEmail ?> immediately to let us know.
 
 Please remember that this account will be your primary means for logging into
-many corporate applications. It is also important to note that this account
+corporate applications. It is also important to note that this account
 (username and password) is unique and will not be kept in sync with any other
 accounts you have.
 
