@@ -26,8 +26,12 @@ If you did not request adding this email address to your account please contact
 <?= $supportName ?> at <?= $supportEmail ?> as soon as possible to report the
 incident. Do NOT click the link above.
 
-To maintain security, please don't forward this email to anyone. See
-our Help Center at <?= $helpCenterUrl ?> for more security tips.
+To maintain security, please don't forward this email to anyone.
+<?php if (empty($helpCenterUrl)) { ?>
+If you have any questions, please contact <?= $supportName ?> at <?= $supportEmail ?>.
+<?php } else { ?>
+See our Help Center at <?= $helpCenterUrl ?> for more security tips.
+<?php } ?>
 
 Thanks,
 <?= $emailSignature ?>

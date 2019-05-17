@@ -53,9 +53,11 @@ $passwordForgotUrl = $passwordProfileUrl . '/password/forgot';
     <li>Log out and log in again to see how it works and to have it remember your computer for 30 days. Note that
         logging out will undo the "Remember this computer" setting.</li>
 </ol>
-<p>
-    To learn more about 2-Step Verification go to <?=yHtml::a(yHtml::encode($helpCenterUrl), $helpCenterUrl)?>
-</p>
+    <?php if (! empty($helpCenterUrl)) { ?>
+        <p>
+            To learn more about 2-Step Verification go to <?=yHtml::a(yHtml::encode($helpCenterUrl), $helpCenterUrl)?>
+        </p>
+    <?php } ?>
 <?php endif ?>
 <p>
     If you have any difficulties completing this task, please contact <?=yHtml::encode($supportName)?> at

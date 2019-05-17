@@ -81,12 +81,12 @@ if (! $isMfaEnabled) {
         Printable Codes)</li>
     <li>Log out and log in again to see how it works and to have it remember your computer for 30 days.</li>
 </ol>
+    <?php if (! empty($helpCenterUrl)) { ?>
 <p>
     To learn more about 2-Step Verification go to <?=yHtml::a(yHtml::encode($helpCenterUrl), $helpCenterUrl)?>
 </p>
-<?php
-}
-?>
+    <?php } ?>
+<?php } ?>
 <p>
     If you have any difficulties completing this task, please contact <?=yHtml::encode($supportName)?> at
     <?=yHtml::encode($supportEmail)?>.

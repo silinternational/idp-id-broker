@@ -28,8 +28,12 @@ If you still wish to add this email, please go to your profile page here:
 <?= $passwordProfileUrl . PHP_EOL ?>
 <?php endif ?>
 
+<?php if (empty($helpCenterUrl)) { ?>
+If you have any questions, please contact <?= $supportName ?> at <?= $supportEmail ?>.
+<?php } else { ?>
 If you have any questions, you can visit our Help Center at
 <?= $helpCenterUrl . PHP_EOL ?>
+<?php } ?>
 
 Thanks,
 <?= $emailSignature ?>

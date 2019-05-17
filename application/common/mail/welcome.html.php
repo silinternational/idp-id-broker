@@ -51,10 +51,12 @@ use yii\helpers\Html as yHtml;
         <?=yHtml::a(yHtml::encode($forgotUrl), $forgotUrl)?>
     </li>
 
+    <?php if (! empty($helpCenterUrl)) { ?>
     <li>
         <strong>Help & FAQs:</strong>
         <?=yHtml::a(yHtml::encode($helpCenterUrl), $helpCenterUrl)?>
     </li>
+    <?php } ?>
     
     <li>
         <strong>Contact Support:</strong> <?=yHtml::encode($supportEmail)?>

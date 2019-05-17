@@ -34,8 +34,13 @@ use yii\helpers\Html as yHtml;
 <?php endif ?>
 </p>
 <p>
-    If you have any questions, you can visit our Help Center at
-    <?= yHtml::a(yHtml::encode($helpCenterUrl), $helpCenterUrl) ?>
+    <?php if (empty($helpCenterUrl)) { ?>
+        If you have any questions, please contact <?= yHtml::encode($supportName) ?> at
+        <?= yHtml::encode($supportEmail) ?>.
+    <?php } else { ?>
+        If you have any questions, you can visit our Help Center at
+        <?= yHtml::a(yHtml::encode($helpCenterUrl), $helpCenterUrl) ?>
+    <?php } ?>
 </p>
 <p>
     Thanks,

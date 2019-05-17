@@ -48,9 +48,11 @@ Security Key, Smartphone App, and/or Printable Codes)
 computer for 30 days. Note that logging out will undo the "Remember this
 computer" setting.
 
+<?php if (! empty($helpCenterUrl)) { ?>
 To learn more about 2-Step Verification go to <?= $helpCenterUrl . PHP_EOL ?>
-<?php endif ?>
 
+<?php } ?>
+<?php endif ?>
 If you have any difficulties completing this task, please contact
 <?= $supportName ?> at <?= $supportEmail ?>.
 
