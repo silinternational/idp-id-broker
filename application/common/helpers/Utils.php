@@ -75,6 +75,10 @@ class Utils
      */
     public static function maskEmail($email)
     {
+        if (empty($email)) {
+            return '';
+        }
+
         $validator = new EmailValidator();
         if (! $validator->validate($email)) {
             \Yii::warning([
