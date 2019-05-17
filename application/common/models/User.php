@@ -413,7 +413,14 @@ class User extends UserBase
                 return Utils::getIso8601($model->last_login_utc);
             },
             'manager_email',
-            'personal_email',
+            'personal_email' => function (self $model) {
+                $maskParam = Yii::$app->request->queryParams['mask'] ?? 'yes';
+                if ($maskParam === 'no') {
+                    return $model->personal_email;
+                } else {
+                    return Utils::maskEmail($model->personal_email);
+                }
+            },
             'hide',
             'groups' => function (self $model) {
                 if (empty($model->groups)) {
@@ -531,12 +538,25 @@ class User extends UserBase
      */
     public function getMethodFields()
     {
-        $shouldProvideMethodOptions = $this->getNagState() === NagState::NAG_PROFILE_REVIEW
-            && $this->scenario == self::SCENARIO_AUTHENTICATE;
+        $maskParam = Yii::$app->request->queryParams['mask'] ?? 'yes';
+
+        /*
+         * Ensure that emails are not masked in the authenticate scenario for the purpose
+         * of profile review. Otherwise, the default is to mask the addresses for privacy.
+         */
+        $shouldMaskEmails = $this->scenario !== self::SCENARIO_AUTHENTICATE && $maskParam === 'yes';
+
+        $methods = $this->methods;
+
+        if ($shouldMaskEmails) {
+            foreach ($methods as $key => $method) {
+                $methods[$key]->value = $method->getMaskedValue();
+            }
+        }
 
         return [
             'add' => $this->getNagState() == NagState::NAG_ADD_METHOD ? 'yes' : 'no',
-            'options' => $shouldProvideMethodOptions ? $this->methods : [],
+            'options' => $methods,
         ];
     }
 
@@ -742,6 +762,7 @@ class User extends UserBase
                     ]));
                     break;
                 case 'fields':
+                case 'mask':
                     break;
                 default:
                     // if no criteria names match, this will ensure an empty result is returned
