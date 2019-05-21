@@ -12,6 +12,8 @@ use Yii;
 use yii\behaviors\AttributeBehavior;
 use yii\data\ActiveDataProvider;
 use yii\db\ActiveRecord;
+use yii\db\conditions\LikeCondition;
+use yii\db\conditions\OrCondition;
 use yii\helpers\ArrayHelper;
 
 class User extends UserBase
@@ -411,7 +413,14 @@ class User extends UserBase
                 return Utils::getIso8601($model->last_login_utc);
             },
             'manager_email',
-            'personal_email',
+            'personal_email' => function (self $model) {
+                $maskParam = Yii::$app->request->queryParams['mask'] ?? 'no';
+                if ($maskParam === 'no') {
+                    return $model->personal_email;
+                } else {
+                    return Utils::maskEmail($model->personal_email);
+                }
+            },
             'hide',
             'groups' => function (self $model) {
                 if (empty($model->groups)) {
@@ -529,12 +538,27 @@ class User extends UserBase
      */
     public function getMethodFields()
     {
-        $shouldProvideMethodOptions = $this->getNagState() === NagState::NAG_PROFILE_REVIEW
-            && $this->scenario == self::SCENARIO_AUTHENTICATE;
+        $maskParam = Yii::$app->request->queryParams['mask'] ?? 'no';
+
+        /*
+         * Provide method data when a profile review is requested OR
+         * if a `mask=yes` query parameter has been given.
+         */
+        $shouldProvideMethodOptions =
+            ($this->getNagState() === NagState::NAG_PROFILE_REVIEW
+            && $this->scenario == self::SCENARIO_AUTHENTICATE)
+            || $maskParam === 'yes';
+        $methods = $shouldProvideMethodOptions ? $this->methods : [];
+
+        if ($maskParam === 'yes') {
+            foreach ($methods as $key => $method) {
+                $methods[$key]->value = $method->getMaskedValue();
+            }
+        }
 
         return [
             'add' => $this->getNagState() == NagState::NAG_ADD_METHOD ? 'yes' : 'no',
-            'options' => $shouldProvideMethodOptions ? $this->methods : [],
+            'options' => $methods,
         ];
     }
 
@@ -728,7 +752,19 @@ class User extends UserBase
                 case 'email':
                     $query->andWhere([$name => $value]);
                     break;
+                case 'search':
+                    $query->andWhere(new OrCondition([
+                        new LikeCondition('employee_id', 'LIKE', $value),
+                        new LikeCondition('first_name', 'LIKE', $value),
+                        new LikeCondition('last_name', 'LIKE', $value),
+                        new LikeCondition('display_name', 'LIKE', $value),
+                        new LikeCondition('username', 'LIKE', $value),
+                        new LikeCondition('email', 'LIKE', $value),
+                        new LikeCondition('personal_email', 'LIKE', $value),
+                    ]));
+                    break;
                 case 'fields':
+                case 'mask':
                     break;
                 default:
                     // if no criteria names match, this will ensure an empty result is returned
