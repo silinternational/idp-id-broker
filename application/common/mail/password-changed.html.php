@@ -95,5 +95,5 @@ if (! $isMfaEnabled) {
     Thanks,
 </p>
 <p>
-    <i><?=yHtml::encode($emailSignature)?></i>
+    <i><?=nl2br(yHtml::encode($emailSignature), false)?></i>
 </p>
