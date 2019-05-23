@@ -23,6 +23,7 @@
  */
 
 $passwordForgotUrl = $passwordProfileUrl . '/password/forgot';
+$pwExtension = ltrim(\Yii::$app->params['passwordMfaLifespanExtension'], '+');
 
 ?>
 Dear <?= $displayName ?>,
@@ -35,9 +36,9 @@ Password last changed on: <?= $lastChangedUtc . PHP_EOL ?>
 Password expired on: <?= $passwordExpiresUtc . PHP_EOL ?>
 
 <?php if (! $isMfaEnabled) : ?>
-If you enable 2-Step Verification, your password expiration will be extended
-significantly. To do this, first reset your password as described above, then
-follow these instructions:
+If you enable 2-Step Verification, your password expiration will be
+extended by <?= $pwExtension ?>. This would take effect immediately, so you would
+not have to change your password at this time.
 
 Instructions to set up 2-Step Verification:
 -------------------------------------------

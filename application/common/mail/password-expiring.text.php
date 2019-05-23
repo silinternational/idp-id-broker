@@ -21,6 +21,8 @@
  * @var string $supportName
  * @var bool   $isMfaEnabled
  */
+
+$pwExtension = ltrim(\Yii::$app->params['passwordMfaLifespanExtension'], '+');
 ?>
 Dear <?= $displayName ?>,
 
@@ -31,10 +33,10 @@ and login to change your password.
 Password changed on: <?= $lastChangedUtc . PHP_EOL ?>
 Password expires on: <?= $passwordExpiresUtc . PHP_EOL ?>
 
-<?php if ($isMfaEnabled) : ?>
-If you enable 2-Step Verification, your password expiration will be extended
-significantly. This would take effect immediately, so you would not have to change
-your password at this time.
+<?php if (! $isMfaEnabled) : ?>
+If you enable 2-Step Verification, your password expiration will be
+extended by <?= $pwExtension ?>. This would take effect immediately, so you would
+not have to change your password at this time.
 <?php endif ?>
 
 If you have any difficulties completing this task, please contact

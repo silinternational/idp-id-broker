@@ -24,6 +24,7 @@ use yii\helpers\Html as yHtml;
  */
 
 $passwordForgotUrl = $passwordProfileUrl . '/password/forgot';
+$pwExtension = ltrim(\Yii::$app->params['passwordMfaLifespanExtension'], '+');
 
 ?>
 <p>
@@ -42,8 +43,8 @@ $passwordForgotUrl = $passwordProfileUrl . '/password/forgot';
 <?php if (! $isMfaEnabled) : ?>
 <p>
     If you enable 2-Step Verification, your password expiration will be extended
-    significantly. To do this, first reset your password as described above, then
-    follow these instructions:
+    by <?= yHtml::encode($pwExtension) ?>. This would take effect immediately, so you would not have to change
+    your password at this time.
 </p>
 <strong>Instructions to set up 2-Step Verification:</strong>
 <ol>

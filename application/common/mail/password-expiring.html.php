@@ -22,6 +22,8 @@ use yii\helpers\Html as yHtml;
  * @var string $supportName
  * @var bool   $isMfaEnabled
  */
+
+$pwExtension = ltrim(\Yii::$app->params['passwordMfaLifespanExtension'], '+');
 ?>
 <p>
     Dear <?=yHtml::encode($displayName)?>,
@@ -39,7 +41,7 @@ use yii\helpers\Html as yHtml;
 <?php if (! $isMfaEnabled) : ?>
 <p>
     If you enable 2-Step Verification, your password expiration will be extended
-    significantly. This would take effect immediately, so you would not have to change
+    by <?= yHtml::encode($pwExtension) ?>. This would take effect immediately, so you would not have to change
     your password at this time.
 </p>
 <?php endif ?>
