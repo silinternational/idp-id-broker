@@ -19,14 +19,14 @@ as an alternate method for verifying your Identity should you ever need to reset
 <?= $idpDisplayName ?> Identity account password. Because it was not verified before
 its expiration time, it has been removed from your <?= $idpDisplayName ?> Identity account.
 
-<?php if ($numberVerified === 0) : ?>
+<?php if ($numberVerified === 0) { ?>
 Please go to your profile page at
 <?= $passwordProfileUrl . PHP_EOL ?>
 to add an alternate password recovery email.
-<?php else : ?>
+<?php } else { ?>
 If you still wish to add this email, please go to your profile page here:
 <?= $passwordProfileUrl . PHP_EOL ?>
-<?php endif ?>
+<?php } ?>
 
 <?php if (empty($helpCenterUrl)) { ?>
 If you have any questions, please contact <?= $supportName ?> at <?= $supportEmail ?>.

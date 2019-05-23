@@ -24,14 +24,14 @@ use yii\helpers\Html as yHtml;
     Identity account.
 </p>
 <p>
-<?php if ($numberVerified === 0) : ?>
-    Please go to your profile page at
-    <?= yHtml::a(yHtml::encode($passwordProfileUrl), $passwordProfileUrl) ?>
-    to add an alternate password recovery email.
-<?php else : ?>
-    If you still wish to add this email, please go to your profile page here:
-    <?= yHtml::a(yHtml::encode($passwordProfileUrl), $passwordProfileUrl) ?>
-<?php endif ?>
+    <?php if ($numberVerified === 0) { ?>
+        Please go to your profile page at
+        <?= yHtml::a(yHtml::encode($passwordProfileUrl), $passwordProfileUrl) ?>
+        to add an alternate password recovery email.
+    <?php } else { ?>
+        If you still wish to add this email, please go to your profile page here:
+        <?= yHtml::a(yHtml::encode($passwordProfileUrl), $passwordProfileUrl) ?>
+    <?php } ?>
 </p>
 <p>
     <?php if (empty($helpCenterUrl)) { ?>
