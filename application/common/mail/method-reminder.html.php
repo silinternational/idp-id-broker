@@ -23,6 +23,7 @@ use yii\helpers\Html as yHtml;
     find that email, you can generate a new one at your profile page here:
     <?= yHtml::a(yHtml::encode($passwordProfileUrl), $passwordProfileUrl) ?>
 </p>
+<p>
 <?php if (empty($helpCenterUrl)) { ?>
     If you have any questions, please contact <?= yHtml::encode($supportName) ?> at
     <?= yHtml::encode($supportEmail) ?>.
@@ -30,6 +31,7 @@ use yii\helpers\Html as yHtml;
     If you have any questions, you can visit our Help Center at
     <?= yHtml::a(yHtml::encode($helpCenterUrl), $helpCenterUrl) ?>
 <?php } ?>
+</p>
 <p>
     Thanks,
 </p>
