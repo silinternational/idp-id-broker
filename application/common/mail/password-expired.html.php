@@ -40,7 +40,7 @@ $pwExtension = ltrim(\Yii::$app->params['passwordMfaLifespanExtension'], '+');
     Password last changed on: <?=yHtml::encode($lastChangedUtc)?><br>
     Password expired on: <?=yHtml::encode($passwordExpiresUtc)?>
 </p>
-<?php if (! $isMfaEnabled) : ?>
+<?php if (! $isMfaEnabled) { ?>
 <p>
     If you enable 2-Step Verification, your password expiration will be extended
     by <?= yHtml::encode($pwExtension) ?>. This would take effect immediately, so you would not have to change
@@ -59,7 +59,7 @@ $pwExtension = ltrim(\Yii::$app->params['passwordMfaLifespanExtension'], '+');
             To learn more about 2-Step Verification go to <?=yHtml::a(yHtml::encode($helpCenterUrl), $helpCenterUrl)?>
         </p>
     <?php } ?>
-<?php endif ?>
+<?php } ?>
 <p>
     If you have any difficulties completing this task, please contact <?=yHtml::encode($supportName)?> at
     <?=yHtml::encode($supportEmail)?>.

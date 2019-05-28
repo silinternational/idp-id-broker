@@ -35,7 +35,7 @@ reset process.
 Password last changed on: <?= $lastChangedUtc . PHP_EOL ?>
 Password expired on: <?= $passwordExpiresUtc . PHP_EOL ?>
 
-<?php if (! $isMfaEnabled) : ?>
+<?php if (! $isMfaEnabled) { ?>
 If you enable 2-Step Verification, your password expiration will be
 extended by <?= $pwExtension ?>. This would take effect immediately, so you would
 not have to change your password at this time.
@@ -49,11 +49,11 @@ Security Key, Smartphone App, and/or Printable Codes)
 computer for 30 days. Note that logging out will undo the "Remember this
 computer" setting.
 
-<?php if (! empty($helpCenterUrl)) { ?>
+<?php   if (! empty($helpCenterUrl)) { ?>
 To learn more about 2-Step Verification go to <?= $helpCenterUrl . PHP_EOL ?>
 
+<?php   } ?>
 <?php } ?>
-<?php endif ?>
 If you have any difficulties completing this task, please contact
 <?= $supportName ?> at <?= $supportEmail ?>.
 
