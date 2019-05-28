@@ -628,6 +628,13 @@ class Emailer extends Component
     {
         foreach ($this->otherDataForEmails as $keyForEmail => $valueForEmail) {
             if (empty($valueForEmail)) {
+                if ($keyForEmail === 'helpCenterUrl') {
+                    /*
+                     * helpCenterUrl is not required
+                     */
+                    continue;
+                }
+
                 $this->logger->critical(sprintf(
                     'Missing a value for %s (for use in emails)',
                     $keyForEmail
