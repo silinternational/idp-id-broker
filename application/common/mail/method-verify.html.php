@@ -29,7 +29,7 @@ $verifyLink = $passwordProfileUrl . '/password/recovery/' . $uid . '/verify/' . 
 <p>
     If you did not request adding this email address to your account please delete this email
     and contact <?= yHtml::encode($supportName) ?> at <?= yHtml::encode($supportEmail) ?>
-    as soon as possible to report the incident.
+    as soon as possible to report the incident.  Do NOT click the link above.
 </p>
 <p>
     To maintain security, please don't forward this email to anyone.
