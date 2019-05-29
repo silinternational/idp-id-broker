@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [4.4.0] - 2019-05-29
+### Added
+- Use `supportName` and `supportEmail` if `helpCenterUrl` is not provided
+- Allow multi-line email signature
+
 ## [4.3.0] - 2019-05-21
 ### Added
 - Added multi-field search on /user endpoint.
@@ -130,7 +135,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 - Initial version of ID Broker.
 
-[Unreleased]: https://github.com/silinternational/idp-id-broker/compare/4.3.0...HEAD
+[Unreleased]: https://github.com/silinternational/idp-id-broker/compare/4.4.0...HEAD
+[4.4.0]: https://github.com/silinternational/idp-id-broker/compare/4.3.0...4.4.0
 [4.3.0]: https://github.com/silinternational/idp-id-broker/compare/4.2.1...4.3.0
 [4.2.1]: https://github.com/silinternational/idp-id-broker/compare/4.2.0...4.2.1
 [4.2.0]: https://github.com/silinternational/idp-id-broker/compare/4.1.1...4.2.0
