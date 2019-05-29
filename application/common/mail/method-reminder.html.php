@@ -24,12 +24,17 @@ use yii\helpers\Html as yHtml;
     <?= yHtml::a(yHtml::encode($passwordProfileUrl), $passwordProfileUrl) ?>
 </p>
 <p>
+<?php if (empty($helpCenterUrl)) { ?>
+    If you have any questions, please contact <?= yHtml::encode($supportName) ?> at
+    <?= yHtml::encode($supportEmail) ?>.
+<?php } else { ?>
     If you have any questions, you can visit our Help Center at
     <?= yHtml::a(yHtml::encode($helpCenterUrl), $helpCenterUrl) ?>
+<?php } ?>
 </p>
 <p>
     Thanks,
 </p>
 <p>
-    <i><?= yHtml::encode($emailSignature); ?></i>
+    <i><?= nl2br(yHtml::encode($emailSignature), false); ?></i>
 </p>

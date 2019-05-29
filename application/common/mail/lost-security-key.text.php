@@ -28,8 +28,8 @@ We noticed you have a Security Key configured for 2-Step Verification on your
 instead have been using a different option for 2-Step Verification (a
 Smartphone App or Printable Codes).
 
-This email is just a courtesy to check if you have lost your Security Key and
-to remind you to remove it from your account to ensure it cannot be used by
+This email is just a courtesy to check that you still have your Security Key.
+If not, please remove it from your account to ensure it cannot be used by
 someone else. If you still have your Security Key and have just been using
 other methods recently you can ignore and delete this email.
 

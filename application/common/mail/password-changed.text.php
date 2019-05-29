@@ -29,7 +29,7 @@ did not make this change please contact <?= $supportName ?> at
 <?= $supportEmail ?> immediately to let us know.
 
 Please remember that this account will be your primary means for logging into
-many corporate applications. It is also important to note that this account
+corporate applications. It is also important to note that this account
 (username and password) is unique and will not be kept in sync with any other
 accounts you have.
 
@@ -73,12 +73,11 @@ Instructions to set up 2-Step Verification:
 3. Log out and log in again to see how it works and to have it remember your
    computer for 30 days.
 
-To learn more about 2-Step Verification go to <?= $helpCenterUrl ?>
+    <?php if (! empty($helpCenterUrl)) { ?>
+To learn more about 2-Step Verification go to <?= $helpCenterUrl . PHP_EOL ?>
 
-    <?php
-}
-?>
-
+    <?php } ?>
+<?php } ?>
 If you have any difficulties completing this task, please contact
 <?= $supportName ?> at <?= $supportEmail ?>.
 

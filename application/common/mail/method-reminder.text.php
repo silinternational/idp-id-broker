@@ -20,8 +20,12 @@ that account and click the link in the verification email we sent earlier. If yo
 find that email, you can generate a new one at your profile page here:
 <?= $passwordProfileUrl . PHP_EOL ?>
 
-If you have any questions, you can visit our Help Center at
-<?= $helpCenterUrl . PHP_EOL ?>
+<?php if (empty($helpCenterUrl)) { ?>
+    If you have any questions, please contact <?= $supportName ?> at <?= $supportEmail ?>.
+<?php } else { ?>
+    If you have any questions, you can visit our Help Center at
+    <?= $helpCenterUrl . PHP_EOL ?>
+<?php } ?>
 
 Thanks,
 <?= $emailSignature ?>

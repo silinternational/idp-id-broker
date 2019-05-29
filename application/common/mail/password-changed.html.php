@@ -27,11 +27,12 @@ use yii\helpers\Html as yHtml;
     Dear <?=yHtml::encode($displayName)?>,
 </p>
 <p>
-    The password for your <?=yHtml::encode($idpDisplayName)?> Identity account has been changed. If you did not make this change
-    please contact <?=yHtml::encode($supportName)?> at <?=yHtml::encode($supportEmail)?> immediately to let us know.
+    The password for your <?=yHtml::encode($idpDisplayName)?> Identity account has been changed. If you did not make
+    this change please contact <?=yHtml::encode($supportName)?> at <?=yHtml::encode($supportEmail)?> immediately to let
+    us know.
 </p>
 <p>
-    Please remember that this account will be your primary means for logging into many corporate
+    Please remember that this account will be your primary means for logging into corporate
     applications. It is also important to note that this account (username and password) is unique and will not be kept
     in sync with any other accounts you have.
 </p>
@@ -80,12 +81,12 @@ if (! $isMfaEnabled) {
         Printable Codes)</li>
     <li>Log out and log in again to see how it works and to have it remember your computer for 30 days.</li>
 </ol>
+    <?php if (! empty($helpCenterUrl)) { ?>
 <p>
     To learn more about 2-Step Verification go to <?=yHtml::a(yHtml::encode($helpCenterUrl), $helpCenterUrl)?>
 </p>
-<?php
-}
-?>
+    <?php } ?>
+<?php } ?>
 <p>
     If you have any difficulties completing this task, please contact <?=yHtml::encode($supportName)?> at
     <?=yHtml::encode($supportEmail)?>.
@@ -94,5 +95,5 @@ if (! $isMfaEnabled) {
     Thanks,
 </p>
 <p>
-    <i><?=yHtml::encode($emailSignature)?></i>
+    <i><?=nl2br(yHtml::encode($emailSignature), false)?></i>
 </p>

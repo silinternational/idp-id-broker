@@ -20,25 +20,30 @@ $verifyLink = $passwordProfileUrl . '/password/recovery/' . $uid . '/verify/' . 
 <p>Dear <?= yHtml::encode($displayName) ?>,</p>
 
 <p>
-    Someone recently requested to add this email address, <?= yHtml::encode($toAddress); ?>,
+    Someone has submitted a request to add this email address, <?= yHtml::encode($toAddress); ?>,
     as a method for verifying themselves should they need to reset their
-    <?= yHtml::encode($idpDisplayName); ?> Identity account password. If this was you, you may click
+    <?= yHtml::encode($idpDisplayName); ?> Identity account password. If this was you, please click
     <?= yHtml::a(yHtml::encode($verifyLink), $verifyLink) ?>
-    to add it to your account.
+    to verify this email address.
 </p>
 <p>
-    If you did not do this, it could be a sign someone else has compromised your account.
-    Please contact <?= yHtml::encode($supportName) ?> at <?= yHtml::encode($supportEmail) ?>
-    as soon as possible to report the incident.
+    If you did not request adding this email address to your account please delete this email
+    and contact <?= yHtml::encode($supportName) ?> at <?= yHtml::encode($supportEmail) ?>
+    as soon as possible to report the incident.  Do NOT click the link above.
 </p>
 <p>
     To maintain security, please don't forward this email to anyone.
+<?php if (empty($helpCenterUrl)) { ?>
+    If you have any questions, please contact <?= yHtml::encode($supportName) ?> at
+    <?= yHtml::encode($supportEmail) ?>.
+<?php } else { ?>
     See our Help Center at <?= yHtml::a(yHtml::encode($helpCenterUrl), $helpCenterUrl) ?> for more security
     tips.
+<?php } ?>
 </p>
 <p>
     Thanks,
 </p>
 <p>
-    <i><?= yHtml::encode($emailSignature); ?></i>
+    <i><?= nl2br(yHtml::encode($emailSignature), false); ?></i>
 </p>

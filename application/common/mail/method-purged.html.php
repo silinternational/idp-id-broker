@@ -24,22 +24,27 @@ use yii\helpers\Html as yHtml;
     Identity account.
 </p>
 <p>
-<?php if ($numberVerified === 0) : ?>
-    Please go to your profile page at
-    <?= yHtml::a(yHtml::encode($passwordProfileUrl), $passwordProfileUrl) ?>
-    to add an alternate password recovery email.
-<?php else : ?>
-    If you still wish to add this email, please go to your profile page here:
-    <?= yHtml::a(yHtml::encode($passwordProfileUrl), $passwordProfileUrl) ?>
-<?php endif ?>
+    <?php if ($numberVerified === 0) { ?>
+        Please go to your profile page at
+        <?= yHtml::a(yHtml::encode($passwordProfileUrl), $passwordProfileUrl) ?>
+        to add an alternate password recovery email.
+    <?php } else { ?>
+        If you still wish to add this email, please go to your profile page here:
+        <?= yHtml::a(yHtml::encode($passwordProfileUrl), $passwordProfileUrl) ?>
+    <?php } ?>
 </p>
 <p>
-    If you have any questions, you can visit our Help Center at
-    <?= yHtml::a(yHtml::encode($helpCenterUrl), $helpCenterUrl) ?>
+    <?php if (empty($helpCenterUrl)) { ?>
+        If you have any questions, please contact <?= yHtml::encode($supportName) ?> at
+        <?= yHtml::encode($supportEmail) ?>.
+    <?php } else { ?>
+        If you have any questions, you can visit our Help Center at
+        <?= yHtml::a(yHtml::encode($helpCenterUrl), $helpCenterUrl) ?>
+    <?php } ?>
 </p>
 <p>
     Thanks,
 </p>
 <p>
-    <i><?= yHtml::encode($emailSignature); ?></i>
+    <i><?= nl2br(yHtml::encode($emailSignature), false); ?></i>
 </p>

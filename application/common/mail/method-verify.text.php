@@ -15,19 +15,23 @@
 ?>
 Dear <?= $displayName ?>,
 
-Someone recently requested to add this email address, <?= $toAddress ?>,
+Someone has submitted a request to add this email address, <?= $toAddress ?>,
 as a method for verifying themselves should they need to reset their
-<?= $idpDisplayName ?> Identity account password. If this was you, you may go to the
-following address to add it to your account:
+<?= $idpDisplayName ?> Identity account password. If this was you, please go to the
+following address to verify this email address:
 
 <?= $passwordProfileUrl . '/password/recovery/' . $uid . '/verify/' . $code . PHP_EOL ?>
 
-If you did not do this, it could be a sign someone else has compromised your
-account. Please contact <?= $supportName ?> at <?= $supportEmail ?> as soon
-as possible to report the incident.
+If you did not request adding this email address to your account please contact
+<?= $supportName ?> at <?= $supportEmail ?> as soon as possible to report the
+incident. Do NOT click the link above.
 
-To maintain security, please don't forward this email to anyone. See
-our Help Center at <?= $helpCenterUrl ?> for more security tips.
+To maintain security, please don't forward this email to anyone.
+<?php if (empty($helpCenterUrl)) { ?>
+If you have any questions, please contact <?= $supportName ?> at <?= $supportEmail ?>.
+<?php } else { ?>
+See our Help Center at <?= $helpCenterUrl ?> for more security tips.
+<?php } ?>
 
 Thanks,
 <?= $emailSignature ?>

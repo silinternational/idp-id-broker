@@ -23,8 +23,12 @@ If <?= $firstName ?> did not do this, it could be a sign someone else has
 compromised their account. Please contact <?= $supportName . PHP_EOL ?>
 at <?= $supportEmail ?> as soon as possible to report the incident.
 
-To maintain security, please don't forward this email to anyone. See our Help
-Center at <?= $helpCenterUrl ?> for more security tips.
+To maintain security, please don't forward this email to anyone.
+<?php if (empty($helpCenterUrl)) { ?>
+    If you have any questions, please contact <?= $supportName ?> at <?= $supportEmail ?>.
+<?php } else { ?>
+    See our Help Center at <?= $helpCenterUrl ?> for more security tips.
+<?php } ?>
 
 Thanks,
 <?= $emailSignature; ?>

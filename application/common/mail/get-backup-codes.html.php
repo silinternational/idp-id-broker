@@ -53,4 +53,4 @@ use yii\helpers\Html as yHtml;
 
 <p>Thank you,</p>
 
-<p><i><?= yHtml::encode($emailSignature) ?></i></p>
+<p><i><?= nl2br(yHtml::encode($emailSignature), false) ?></i></p>

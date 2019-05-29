@@ -22,6 +22,8 @@ use yii\helpers\Html as yHtml;
  * @var string $supportName
  * @var bool   $isMfaEnabled
  */
+
+$pwExtension = ltrim(\Yii::$app->params['passwordMfaLifespanExtension'], '+');
 ?>
 <p>
     Dear <?=yHtml::encode($displayName)?>,
@@ -29,8 +31,8 @@ use yii\helpers\Html as yHtml;
 <p>
     The password for your <?=yHtml::encode($idpDisplayName)?> Identity account is about to
     expire. Please go to your account profile at
-    <?=yHtml::a(yHtml::encode($passwordProfileUrl), $passwordProfileUrl)?> and login, if
-    necessary, to change your password.
+    <?=yHtml::a(yHtml::encode($passwordProfileUrl), $passwordProfileUrl)?> and login to
+    change your password.
 </p>
 <p>
     Password changed on: <?=yHtml::encode($lastChangedUtc)?><br>
@@ -39,7 +41,7 @@ use yii\helpers\Html as yHtml;
 <?php if (! $isMfaEnabled) : ?>
 <p>
     If you enable 2-Step Verification, your password expiration will be extended
-    significantly. This would take effect immediately, so you would not have to change
+    by <?= yHtml::encode($pwExtension) ?>. This would take effect immediately, so you would not have to change
     your password at this time.
 </p>
 <?php endif ?>
@@ -51,5 +53,5 @@ use yii\helpers\Html as yHtml;
     Thanks,
 </p>
 <p>
-    <i><?=yHtml::encode($emailSignature)?></i>
+    <i><?=nl2br(yHtml::encode($emailSignature), false)?></i>
 </p>

@@ -28,7 +28,7 @@ use yii\helpers\Html as yHtml;
 
 <p>
     You have added a new option for 2-Step Verification to your <?= yHtml::encode($idpDisplayName) ?> Identity account.
-    When you are prompted for 2-Step Verification in the future, you will now have the option to choose a different
+    When you are prompted for 2-Step Verification in the future, you will have the option to choose a different
     method of 2-Step Verification if you do not have access to the primary method.
 </p>
 <p>
@@ -49,4 +49,4 @@ use yii\helpers\Html as yHtml;
 <p>
     Thanks,
 </p>
-<p><i><?= yHtml::encode($emailSignature) ?></i></p>
+<p><i><?= nl2br(yHtml::encode($emailSignature), false) ?></i></p>
