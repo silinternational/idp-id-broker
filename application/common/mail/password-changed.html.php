@@ -33,13 +33,12 @@ use yii\helpers\Html as yHtml;
     us know.
 </p>
 <p>
+    Your new password expires on <?=yHtml::encode($passwordExpiresUtc)?>
+</p>
+<p>
     Please remember that this account will be your primary means for logging into corporate
     applications. It is also important to note that this account (username and password) is unique and will not be kept
     in sync with any other accounts you have.
-</p>
-<p>
-    Password changed on: <?=yHtml::encode($lastChangedUtc)?><br />
-    Password expires on: <?=yHtml::encode($passwordExpiresUtc)?>
 </p>
 <?php
 if (! $hasRecoveryMethods) {

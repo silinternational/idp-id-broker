@@ -29,13 +29,12 @@ The password for your <?= $idpDisplayName ?> Identity account has been changed. 
 did not make this change please contact <?= $supportName ?> at
 <?= $supportEmail ?> immediately to let us know.
 
+Your new password expires on <?= $passwordExpiresUtc . PHP_EOL ?>
+
 Please remember that this account will be your primary means for logging into
 corporate applications. It is also important to note that this account
 (username and password) is unique and will not be kept in sync with any other
 accounts you have.
-
-Password changed on: <?= $lastChangedUtc . PHP_EOL ?>
-Password expires on: <?= $passwordExpiresUtc . PHP_EOL ?>
 
 <?php if (! $hasRecoveryMethods) { ?>
 If you have not already done so, it is highly recommended that you configure
