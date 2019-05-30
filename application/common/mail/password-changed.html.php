@@ -21,6 +21,7 @@ use yii\helpers\Html as yHtml;
  * @var string $supportEmail
  * @var string $supportName
  * @var bool   $isMfaEnabled
+ * @var bool   $hasRecoveryMethods
  */
 ?>
 <p>
@@ -40,8 +41,11 @@ use yii\helpers\Html as yHtml;
     Password changed on: <?=yHtml::encode($lastChangedUtc)?><br />
     Password expires on: <?=yHtml::encode($passwordExpiresUtc)?>
 </p>
+<?php
+if (! $hasRecoveryMethods) {
+?>
 <p>
-    If you have not already done so, it is highly recommended that you configure
+    It is highly recommended that you configure
     <strong>recovery methods</strong> for the potential event that you forget your password. You
     can reset your password using your primary email address, <?=yHtml::encode($email)?>,
     but you can also add other addresses for verification.
@@ -56,6 +60,7 @@ use yii\helpers\Html as yHtml;
     <li>Check for a new email in the inbox for that address and click the link
         in that email.</li>
 </ol>
+<?php } ?>
 
 <?php
 if (! $isMfaEnabled) {
@@ -88,7 +93,7 @@ if (! $isMfaEnabled) {
     <?php } ?>
 <?php } ?>
 <p>
-    If you have any difficulties completing this task, please contact <?=yHtml::encode($supportName)?> at
+    If you have any questions, please contact <?=yHtml::encode($supportName)?> at
     <?=yHtml::encode($supportEmail)?>.
 </p>
 <p>
