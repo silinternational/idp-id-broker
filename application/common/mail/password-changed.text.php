@@ -20,6 +20,7 @@
  * @var string $supportEmail
  * @var string $supportName
  * @var bool   $isMfaEnabled
+ * @var bool   $hasRecoveryMethods
  */
 ?>
 Dear <?= $displayName ?>,
@@ -28,14 +29,14 @@ The password for your <?= $idpDisplayName ?> Identity account has been changed. 
 did not make this change please contact <?= $supportName ?> at
 <?= $supportEmail ?> immediately to let us know.
 
+Your new password expires on <?= $passwordExpiresUtc . PHP_EOL ?>
+
 Please remember that this account will be your primary means for logging into
-many corporate applications. It is also important to note that this account
+corporate applications. It is also important to note that this account
 (username and password) is unique and will not be kept in sync with any other
 accounts you have.
 
-Password changed on: <?= $lastChangedUtc . PHP_EOL ?>
-Password expires on: <?= $passwordExpiresUtc . PHP_EOL ?>
-
+<?php if (! $hasRecoveryMethods) { ?>
 If you have not already done so, it is highly recommended that you configure
 recovery methods for the potential event that you forget your password. You
 can reset your password using your primary email address, <?= $email ?>,
@@ -49,10 +50,8 @@ Instructions to add recovery methods:
 4. Check for a new email in the inbox for that address and click the link
    in that email.
 
-<?php
-if (! $isMfaEnabled) {
-    ?>
-
+<?php } ?>
+<?php if (! $isMfaEnabled) { ?>
 Enable 2-Step Verification (please)
 ===================================
 2-Step Verification can help keep bad guys out, even if they have your
@@ -73,14 +72,12 @@ Instructions to set up 2-Step Verification:
 3. Log out and log in again to see how it works and to have it remember your
    computer for 30 days.
 
-To learn more about 2-Step Verification go to <?= $helpCenterUrl ?>
+    <?php if (! empty($helpCenterUrl)) { ?>
+To learn more about 2-Step Verification go to <?= $helpCenterUrl . PHP_EOL ?>
 
-    <?php
-}
-?>
-
-If you have any difficulties completing this task, please contact
-<?= $supportName ?> at <?= $supportEmail ?>.
+    <?php } ?>
+<?php } ?>
+If you have any questions, please contact <?= $supportName ?> at <?= $supportEmail ?>.
 
 Thanks,
 <?= $emailSignature ?>

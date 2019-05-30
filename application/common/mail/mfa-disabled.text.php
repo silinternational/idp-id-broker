@@ -40,8 +40,10 @@ Instructions to set up 2-Step Verification:
    3. Log out and log in again to see how it works and to have it remember
       your browser for 30 days.
 
-To learn more about 2-Step Verification go to <?= $helpCenterUrl ?>
+<?php if (! empty($helpCenterUrl)) { ?>
+To learn more about 2-Step Verification go to <?= $helpCenterUrl . PHP_EOL ?>
 
+<?php } ?>
 If you have any difficulties completing this task, please contact
 <?= $supportName ?> at <?= $supportEmail ?>.
 

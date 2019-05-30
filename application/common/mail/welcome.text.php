@@ -29,11 +29,11 @@ Thank you for setting your <?= $idpDisplayName ?> Identity
 account password. Below is some important information about this account
 that you may want to keep for future reference.
 
-- Username: <?= $username ?>
-- To update profile, go to: <?= $passwordProfileUrl ?>
-- If you forget your password, go to: <?= $passwordProfileUrl  . '/password/forgot' ?>
-- Help & FAQs: <?= $helpCenterUrl ?>
-- Contact Support: <?= $supportEmail ?>
+- Username: <?= $username . PHP_EOL ?>
+- To update profile, go to: <?= $passwordProfileUrl . PHP_EOL ?>
+- If you forget your password, go to: <?= $passwordProfileUrl . '/password/forgot' . PHP_EOL ?>
+<?php if (! empty($helpCenterUrl)) : ?>- Help & FAQs: <?= $helpCenterUrl . PHP_EOL ?><?php endif; ?>
+- Contact Support: <?= $supportEmail . PHP_EOL ?>
 
 Thanks,
 <?= $emailSignature ?>

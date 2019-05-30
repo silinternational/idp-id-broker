@@ -27,11 +27,11 @@ use yii\helpers\Html as yHtml;
 
 <p>
     We noticed you have a Security Key configured for 2-Step Verification on your <?= yHtml::encode($idpDisplayName) ?>
-    Identity account but have not used it recently and instead have been using a different option for 2-Step Verification
-    (a Smartphone App or Printable Codes).
+    Identity account but have not used it recently and instead have been using a different option for 2-Step
+    Verification (a Smartphone App or Printable Codes).
 </p>
 <p>
-    This email is just a courtesy to check if you have lost your Security Key and to remind you to remove it from your
+    This email is just a courtesy to check that you still have your Security Key. If not, please remove it from your
     account to ensure it cannot be used by someone else. If you still have your Security Key and have just been using
     other methods recently you can ignore and delete this email.
 </p>
@@ -51,4 +51,4 @@ use yii\helpers\Html as yHtml;
 
 <p>Thanks,</p>
 
-<p><i><?= yHtml::encode($emailSignature) ?></i></p>
+<p><i><?= nl2br(yHtml::encode($emailSignature), false) ?></i></p>

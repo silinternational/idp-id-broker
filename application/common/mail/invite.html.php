@@ -42,7 +42,7 @@ $inviteLink = $passwordProfileUrl . '/profile/intro?invite=' . $inviteCode;
 
 <p><b>Instructions:</b></p>
 <p>
-    To proceed with establishing your account, please follow the step-by-step guidance
+    To set up your account, please follow the step-by-step guidance
     here: <?= yHtml::a(yHtml::encode($inviteLink), $inviteLink) ?>
 </p>
 
@@ -53,4 +53,4 @@ $inviteLink = $passwordProfileUrl . '/profile/intro?invite=' . $inviteCode;
 
 <p>Thank you,</p>
 
-<p><i><?= yHtml::encode($emailSignature) ?></i></p>
+<p><i><?= nl2br(yHtml::encode($emailSignature), false) ?></i></p>

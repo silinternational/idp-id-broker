@@ -24,6 +24,7 @@ use yii\helpers\Html as yHtml;
  */
 
 $passwordForgotUrl = $passwordProfileUrl . '/password/forgot';
+$pwExtension = ltrim(\Yii::$app->params['passwordMfaLifespanExtension'], '+');
 
 ?>
 <p>
@@ -39,11 +40,11 @@ $passwordForgotUrl = $passwordProfileUrl . '/password/forgot';
     Password last changed on: <?=yHtml::encode($lastChangedUtc)?><br>
     Password expired on: <?=yHtml::encode($passwordExpiresUtc)?>
 </p>
-<?php if (! $isMfaEnabled) : ?>
+<?php if (! $isMfaEnabled) { ?>
 <p>
     If you enable 2-Step Verification, your password expiration will be extended
-    significantly. To do this, first reset your password as described above, then
-    follow these instructions:
+    by <?= yHtml::encode($pwExtension) ?>. This would take effect immediately, so you would not have to change
+    your password at this time.
 </p>
 <strong>Instructions to set up 2-Step Verification:</strong>
 <ol>
@@ -53,10 +54,12 @@ $passwordForgotUrl = $passwordProfileUrl . '/password/forgot';
     <li>Log out and log in again to see how it works and to have it remember your computer for 30 days. Note that
         logging out will undo the "Remember this computer" setting.</li>
 </ol>
-<p>
-    To learn more about 2-Step Verification go to <?=yHtml::a(yHtml::encode($helpCenterUrl), $helpCenterUrl)?>
-</p>
-<?php endif ?>
+    <?php if (! empty($helpCenterUrl)) { ?>
+        <p>
+            To learn more about 2-Step Verification go to <?=yHtml::a(yHtml::encode($helpCenterUrl), $helpCenterUrl)?>
+        </p>
+    <?php } ?>
+<?php } ?>
 <p>
     If you have any difficulties completing this task, please contact <?=yHtml::encode($supportName)?> at
     <?=yHtml::encode($supportEmail)?>.
@@ -65,5 +68,5 @@ $passwordForgotUrl = $passwordProfileUrl . '/password/forgot';
     Thanks,
 </p>
 <p>
-    <i><?=yHtml::encode($emailSignature)?></i>
+    <i><?=nl2br(yHtml::encode($emailSignature), false)?></i>
 </p>

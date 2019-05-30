@@ -42,9 +42,11 @@ use yii\helpers\Html as yHtml;
     Printable Codes)</li>
     <li>Log out and log in again to see how it works and to have it remember your browser for 30 days.</li>
 </ol>
+<?php if (! empty($helpCenterUrl)) { ?>
 <p>
     To learn more about 2-Step Verification go to <?=yHtml::a(yHtml::encode($helpCenterUrl), $helpCenterUrl)?>
 </p>
+<?php } ?>
 <p>
     If you have any difficulties completing this task, please contact <?= yHtml::encode($supportName) ?> at
 <?= yHtml::encode($supportEmail) ?>.
@@ -53,4 +55,4 @@ use yii\helpers\Html as yHtml;
 <p>
     Thanks,
 </p>
-<p><i><?= yHtml::encode($emailSignature) ?></i></p>
+<p><i><?= nl2br(yHtml::encode($emailSignature), false) ?></i></p>
