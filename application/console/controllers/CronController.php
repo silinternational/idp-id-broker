@@ -129,4 +129,13 @@ class CronController extends Controller
         $emailer->sendPasswordExpiringEmails();
         $emailer->sendPasswordExpiredEmails();
     }
+
+    public function actionDeleteInactiveUsers()
+    {
+        \Yii::warning([
+            'action' => 'delete inactive users',
+            'status' => 'starting',
+        ]);
+        User::deleteInactiveUsers();
+    }
 }
