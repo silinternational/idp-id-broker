@@ -152,7 +152,7 @@ return [
                 [
                     'class' => EmailServiceTarget::class,
                     'categories' => ['application'], // stick to messages from this app, not all of Yii's built-in messaging.
-                    'enabled' => !empty($notificationEmail),
+                    'enabled' => ! empty($notificationEmail),
                     'except' => [
                         'yii\web\HttpException:400',
                         'yii\web\HttpException:401',
@@ -164,7 +164,7 @@ return [
                     'logVars' => [], // Disable logging of _SERVER, _POST, etc.
                     'message' => [
                         'to' => $notificationEmail ?? '(disabled)',
-                        'subject' => 'ERROR - ' . $idpName . ' ID Broker [' . YII_ENV .']',
+                        'subject' => 'ERROR - ' . $idpName . ' ID Broker [' . YII_ENV . ']',
                     ],
                     'baseUrl' => $emailServiceConfig['baseUrl'],
                     'accessToken' => $emailServiceConfig['accessToken'],
