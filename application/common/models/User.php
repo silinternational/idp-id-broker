@@ -1032,7 +1032,7 @@ class User extends UserBase
     }
 
     /**
-     * Delete all user records that are inactive and have not logged in recently.
+     * Delete all user records that are inactive and have not been updated recently.
      */
     public static function deleteInactiveUsers()
     {
