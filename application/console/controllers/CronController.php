@@ -132,15 +132,6 @@ class CronController extends Controller
 
     public function actionDeleteInactiveUsers()
     {
-        $logMessage = [ 'action' => 'delete inactive users' ];
-
-        if (\Yii::$app->params['inactiveUserDeletionEnable']) {
-            $logMessage['status'] = 'starting';
-            \Yii::warning($logMessage);
-            User::deleteInactiveUsers();
-        } else {
-            $logMessage['status'] = 'disabled';
-            \Yii::warning($logMessage);
-        }
+        User::deleteInactiveUsers();
     }
 }

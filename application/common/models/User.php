@@ -1036,6 +1036,14 @@ class User extends UserBase
      */
     public static function deleteInactiveUsers()
     {
+        $enabled = \Yii::$app->params['inactiveUserDeletionEnable'];
+
+        \Yii::warning([
+            'action' => 'delete inactive users',
+            'enabled' => $enabled,
+            'status' => 'starting',
+        ]);
+
         /*
          * Replace '+' with '-' so all env parameters can be defined consistently as '+n unit'
          */
@@ -1049,6 +1057,7 @@ class User extends UserBase
         $users = self::find()
             ->andWhere(['<', 'last_changed_utc', $removeBefore])
             ->andWhere(['active' => 'no'])
+            ->andWhere('1=' . (int)$enabled)
             ->all();
 
         $numDeleted = 0;
