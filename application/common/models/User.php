@@ -1039,13 +1039,13 @@ class User extends UserBase
         /*
          * Replace '+' with '-' so all env parameters can be defined consistently as '+n unit'
          */
-        $userInactivePeriod = '-' . ltrim(\Yii::$app->params['userInactivePeriod'], '+');
+        $inactiveUserPeriod = '-' . ltrim(\Yii::$app->params['inactiveUserPeriod'], '+');
 
         /**
          * @var string $removeBefore   All records that have not been updated since before this date
          * should be deleted. Calculated relative to now (time of execution).
          */
-        $removeBefore = MySqlDateTime::relative($userInactivePeriod);
+        $removeBefore = MySqlDateTime::relative($inactiveUserPeriod);
         $users = self::find()
             ->andWhere(['<', 'last_changed_utc', $removeBefore])
             ->andWhere(['active' => 'no'])
