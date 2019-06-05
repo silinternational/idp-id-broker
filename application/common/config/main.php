@@ -203,7 +203,7 @@ return [
         'passwordGracePeriodExtension'  => '+7 days',
         'inviteLifespan'                => Env::get('INVITE_LIFESPAN', '+1 month'),
         'inviteGracePeriod'             => Env::get('INVITE_GRACE_PERIOD', '+3 months'),
-        'enableInactiveUserDeletion'    => Env::get('INACTIVE_USER_DELETION_ENABLE', false),
+        'inactiveUserDeletionEnable'    => Env::get('INACTIVE_USER_DELETION_ENABLE', false),
         'inactiveUserPeriod'            => Env::get('INACTIVE_USER_PERIOD', '+18 months'),
         'googleAnalytics'               => [
             'trackingId' => Env::get('GA_TRACKING_ID'),
