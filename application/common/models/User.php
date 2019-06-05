@@ -1057,7 +1057,7 @@ class User extends UserBase
         $users = self::find()
             ->andWhere(['<', 'last_changed_utc', $removeBefore])
             ->andWhere(['active' => 'no'])
-            ->andWhere('1=' . (int)$enabled)
+            ->andWhere('1=' . (int) $enabled)
             ->all();
 
         $numDeleted = 0;
