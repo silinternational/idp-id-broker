@@ -618,7 +618,12 @@ class User extends UserBase
             if ($this->personal_email && $this->email) {
                 $data['ccAddress'] = $this->personal_email;
             }
-            $emailer->sendMessageTo(EmailLog::MESSAGE_TYPE_INVITE, $this, $data, 3600);
+            $emailer->sendMessageTo(
+                EmailLog::MESSAGE_TYPE_INVITE,
+                $this,
+                $data,
+                \Yii::$app->params['inviteEmailDelaySeconds']
+            );
         }
         
         if ($emailer->shouldSendPasswordChangedMessageTo($this, $changedAttributes)) {

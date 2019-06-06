@@ -207,7 +207,7 @@ return [
             'trackingId' => Env::get('GA_TRACKING_ID'),
             'clientId'   => Env::get('GA_CLIENT_ID'),
         ],
-        'method' => ArrayHelper::merge(
+        'method'                        => ArrayHelper::merge(
             [
                 'lifetime' => '+5 days',
                 'gracePeriod' => '+15 days',
@@ -216,7 +216,8 @@ return [
             ],
             Env::getArrayFromPrefix('METHOD_')
         ),
-        'mfaLifetime' => Env::get('MFA_LIFETIME', '+2 hours'),
-        'contingentUserDuration' => Env::get('CONTINGENT_USER_DURATION', '+4 weeks'),
+        'mfaLifetime'                   => Env::get('MFA_LIFETIME', '+2 hours'),
+        'contingentUserDuration'        => Env::get('CONTINGENT_USER_DURATION', '+4 weeks'),
+        'inviteEmailDelaySeconds'       => Env::get('INVITE_EMAIL_DELAY_SECONDS', 0),
     ],
 ];
