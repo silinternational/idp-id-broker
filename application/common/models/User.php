@@ -1038,9 +1038,16 @@ class User extends UserBase
     {
         $enabled = \Yii::$app->params['inactiveUserDeletionEnable'];
 
+        if ($enabled !== true) {
+            \Yii::warning([
+                'action' => 'delete inactive users',
+                'status' => 'disabled',
+            ]);
+            return;
+        }
+
         \Yii::warning([
             'action' => 'delete inactive users',
-            'enabled' => $enabled,
             'status' => 'starting',
         ]);
 
@@ -1057,7 +1064,6 @@ class User extends UserBase
         $users = self::find()
             ->andWhere(['<', 'last_changed_utc', $removeBefore])
             ->andWhere(['active' => 'no'])
-            ->andWhere('1=' . (int) $enabled)
             ->all();
 
         $numDeleted = 0;
