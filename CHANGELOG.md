@@ -5,6 +5,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+### Changed
+- Renamed UserResponse property `groups` to `member` to coincide with SAML2 naming.
 
 ## [4.4.0] - 2019-05-29
 ### Added
