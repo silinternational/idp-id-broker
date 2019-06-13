@@ -426,7 +426,7 @@ class User extends UserBase
                 }
             },
             'hide',
-            'groups' => function (self $model) {
+            'member' => function (self $model) {
                 if (empty($model->groups)) {
                     return [];
                 } else {
