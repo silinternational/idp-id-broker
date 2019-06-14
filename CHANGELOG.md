@@ -5,6 +5,12 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+
+## [4.5.0]
+### Added
+- Config option for invite email delay. Default is no delay.
+- Purge inactive users after a configurable amount of time.
+
 ### Changed
 - Renamed UserResponse property `groups` to `member` to coincide with SAML2 naming.
 
