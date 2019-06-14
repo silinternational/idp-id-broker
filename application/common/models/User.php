@@ -50,9 +50,13 @@ class User extends UserBase
             return false;
         }
 
-        // First "disconnect" the user's current password.
+        /*
+         * First "disconnect" the user's current password and mark user as inactive to
+         * prevent any emails being sent to the user.
+         */
         $this->current_password_id = null;
-        if (! $this->save(false, ['current_password_id'])) {
+        $this->active = 'no';
+        if (! $this->save(false, ['current_password_id', 'active'])) {
             \Yii::error([
                 'action' => 'unset current_password_id before deleting user',
                 'status' => 'error',
@@ -422,7 +426,7 @@ class User extends UserBase
                 }
             },
             'hide',
-            'groups' => function (self $model) {
+            'member' => function (self $model) {
                 if (empty($model->groups)) {
                     return [];
                 } else {
@@ -618,7 +622,12 @@ class User extends UserBase
             if ($this->personal_email && $this->email) {
                 $data['ccAddress'] = $this->personal_email;
             }
-            $emailer->sendMessageTo(EmailLog::MESSAGE_TYPE_INVITE, $this, $data, 3600);
+            $emailer->sendMessageTo(
+                EmailLog::MESSAGE_TYPE_INVITE,
+                $this,
+                $data,
+                \Yii::$app->params['inviteEmailDelaySeconds']
+            );
         }
         
         if ($emailer->shouldSendPasswordChangedMessageTo($this, $changedAttributes)) {
@@ -1025,5 +1034,63 @@ class User extends UserBase
                 'grace_period_ends_on' => $this->currentPassword->grace_period_ends_on,
             ]);
         }
+    }
+
+    /**
+     * Delete all user records that are inactive and have not been updated recently.
+     */
+    public static function deleteInactiveUsers()
+    {
+        $enabled = \Yii::$app->params['inactiveUserDeletionEnable'];
+
+        if ($enabled !== true) {
+            \Yii::warning([
+                'action' => 'delete inactive users',
+                'status' => 'disabled',
+            ]);
+            return;
+        }
+
+        \Yii::warning([
+            'action' => 'delete inactive users',
+            'status' => 'starting',
+        ]);
+
+        /*
+         * Replace '+' with '-' so all env parameters can be defined consistently as '+n unit'
+         */
+        $inactiveUserPeriod = '-' . ltrim(\Yii::$app->params['inactiveUserPeriod'], '+');
+
+        /**
+         * @var string $removeBefore   All records that have not been updated since before this date
+         * should be deleted. Calculated relative to now (time of execution).
+         */
+        $removeBefore = MySqlDateTime::relative($inactiveUserPeriod);
+        $users = self::find()
+            ->andWhere(['<', 'last_changed_utc', $removeBefore])
+            ->andWhere(['active' => 'no'])
+            ->all();
+
+        $numDeleted = 0;
+        foreach ($users as $user) {
+            try {
+                if ($user->delete() !== false) {
+                    $numDeleted += 1;
+                }
+            } catch (\Exception $e) {
+                \Yii::error([
+                    'action' => 'delete inactive users',
+                    'status' => 'failed',
+                    'error' => $e->getMessage(),
+                    'uuid' => $user->uuid,
+                ]);
+            }
+        }
+
+        \Yii::warning([
+            'action' => 'delete inactive users',
+            'status' => 'complete',
+            'count' => $numDeleted,
+        ]);
     }
 }

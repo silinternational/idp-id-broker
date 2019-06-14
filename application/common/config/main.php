@@ -152,7 +152,7 @@ return [
                 [
                     'class' => EmailServiceTarget::class,
                     'categories' => ['application'], // stick to messages from this app, not all of Yii's built-in messaging.
-                    'enabled' => !empty($notificationEmail),
+                    'enabled' => ! empty($notificationEmail),
                     'except' => [
                         'yii\web\HttpException:400',
                         'yii\web\HttpException:401',
@@ -164,7 +164,7 @@ return [
                     'logVars' => [], // Disable logging of _SERVER, _POST, etc.
                     'message' => [
                         'to' => $notificationEmail ?? '(disabled)',
-                        'subject' => 'ERROR - ' . $idpName . ' ID Broker [' . YII_ENV .']',
+                        'subject' => 'ERROR - ' . $idpName . ' ID Broker [' . YII_ENV . ']',
                     ],
                     'baseUrl' => $emailServiceConfig['baseUrl'],
                     'accessToken' => $emailServiceConfig['accessToken'],
@@ -203,11 +203,13 @@ return [
         'passwordGracePeriodExtension'  => '+7 days',
         'inviteLifespan'                => Env::get('INVITE_LIFESPAN', '+1 month'),
         'inviteGracePeriod'             => Env::get('INVITE_GRACE_PERIOD', '+3 months'),
+        'inactiveUserDeletionEnable'    => Env::get('INACTIVE_USER_DELETION_ENABLE', false),
+        'inactiveUserPeriod'            => Env::get('INACTIVE_USER_PERIOD', '+18 months'),
         'googleAnalytics'               => [
             'trackingId' => Env::get('GA_TRACKING_ID'),
             'clientId'   => Env::get('GA_CLIENT_ID'),
         ],
-        'method' => ArrayHelper::merge(
+        'method'                        => ArrayHelper::merge(
             [
                 'lifetime' => '+5 days',
                 'gracePeriod' => '+15 days',
@@ -216,7 +218,8 @@ return [
             ],
             Env::getArrayFromPrefix('METHOD_')
         ),
-        'mfaLifetime' => Env::get('MFA_LIFETIME', '+2 hours'),
-        'contingentUserDuration' => Env::get('CONTINGENT_USER_DURATION', '+4 weeks'),
+        'mfaLifetime'                   => Env::get('MFA_LIFETIME', '+2 hours'),
+        'contingentUserDuration'        => Env::get('CONTINGENT_USER_DURATION', '+4 weeks'),
+        'inviteEmailDelaySeconds'       => Env::get('INVITE_EMAIL_DELAY_SECONDS', 0),
     ],
 ];
