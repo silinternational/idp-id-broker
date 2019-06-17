@@ -414,7 +414,7 @@ class User extends UserBase
             'active',
             'locked',
             'last_login_utc' => function (self $model) {
-                return Utils::getIso8601($model->last_login_utc);
+                return $model->last_login_utc === null ? null : Utils::getIso8601($model->last_login_utc);
             },
             'manager_email',
             'personal_email' => function (self $model) {
