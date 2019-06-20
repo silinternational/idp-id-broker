@@ -27,16 +27,15 @@ provide a GitHub auth. token.
 
 ## Customizing Email Content
 There are various emails that ID Broker can send, such as when a user's password
-has been changed. The templates for those (both the HTML version and the plain
-text version) are in `application/common/mail/`. When running this yourself,
-you can certainly replace those template files with modified versions.
+has been changed. The templates for those are in `application/common/mail/`. When
+running this yourself, you can certainly replace those template files with
+modified versions.
 
 Things to remember if you customize the email templates:
 
  - Make sure you don't change the filenames of any of the templates.
  - Ensure that content inserted into the HTML templates (*.html.php) are
    HTML-encoded. (See the existing HTML templates for examples.)
- - Don't HTML-encode content for the plain text templates.
 
 If there is additional information that you need to include in your emails but
 which isn't currently made available to the email templates, please submit a
