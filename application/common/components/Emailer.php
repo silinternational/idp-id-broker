@@ -258,20 +258,6 @@ class Emailer extends Component
     }
 
     /**
-     * Retrieve the view identifier for the given message type. The view is read from a
-     * file in common/mail: e.g. mfa-disabled.html.php
-     * @param string $messageType Message type -- should be defined in EmailLog getMessageTypes().
-     * @return string
-     */
-    protected function getViewForMessage(string $messageType): string
-    {
-        return sprintf(
-            '@common/mail/%s.html.php',
-            Inflector::slug($messageType)
-        );
-    }
-    
-    /**
      * Set up various values, using defaults when needed, and ensure the values
      * we end up with are valid.
      */
@@ -360,7 +346,7 @@ class Emailer extends Component
             $data
         );
 
-        $htmlView = $this->getViewForMessage($messageType, 'html');
+        $htmlView = sprintf('@common/mail/%s.html.php', Inflector::slug($messageType));
         $htmlBody = \Yii::$app->view->render($htmlView, $dataForEmail);
 
         $toAddress = $data['toAddress'] ?? $user->getEmailAddress();
