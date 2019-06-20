@@ -381,7 +381,43 @@ Feature: User
       And I request "/user" be created
     Then the response status code should be 422
       And the property message should contain "Email"
-#TODO: need one of these for employee id now too.
+
+  Scenario: Attempt to create a new user with an employee id that already exists
+    Given the requester is authorized
+      And the user store is empty
+      And I provide the following valid data:
+        | property     | value                 |
+        | employee_id  | 123                   |
+        | first_name   | Shep                  |
+        | last_name    | Clark                 |
+        | username     | shep_clark            |
+        | email        | shep_clark@example.org|
+      And I request "/user" be created
+      And a record exists with an employee_id of "123"
+    When I provide the following valid data:
+        | property     | value                 |
+        | employee_id  | 123                   |
+        | first_name   | Someone               |
+        | last_name    | Else                  |
+        | username     | someone_else          |
+        | email        | someone@example.org   |
+      And I request "/user" be created
+    Then the response status code should be 422
+      And the property message should contain "Employee ID"
+
+  Scenario: Attempt to create a new user with an employee id that contains invalid characters
+    Given the requester is authorized
+      And the user store is empty
+      And I provide the following valid data:
+        | property     | value                 |
+        | employee_id  | 123-456               |
+        | first_name   | Test                  |
+        | last_name    | User                  |
+        | username     | test_user             |
+        | email        | test_user@example.org |
+    When I request "/user" be created
+    Then the response status code should be 422
+      And the property message should contain "invalid character(s) in Employee ID"
 
   Scenario: Retrieve all users
     Given the requester is authorized

@@ -272,6 +272,13 @@ class User extends UserBase
                     return $model->personal_email === null;
                 }
             ],
+            [
+                'employee_id',
+                'match',
+                'pattern' => '/^\w+$/',
+                'message' => 'invalid character(s) in {attribute} {value}',
+                'on' => self::SCENARIO_NEW_USER,
+            ],
         ], parent::rules());
     }
 
