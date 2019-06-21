@@ -258,29 +258,6 @@ class Emailer extends Component
     }
 
     /**
-     * Retrieve the view identifier for the given message type and format. The view is read from a
-     * file in common/mail: e.g. mfa-disabled.html.php
-     * @param string $messageType Message type -- should be defined in EmailLog getMessageTypes().
-     * @param string $format Message format -- must be either 'text' or 'html'
-     * @return string
-     */
-    protected function getViewForMessage(string $messageType, string $format): string
-    {
-        if (! self::isValidFormat($format)) {
-            throw new \InvalidArgumentException(sprintf(
-                "The email format must be 'html' or 'text', not %s.",
-                var_export($format, true)
-            ), 1511801775);
-        }
-        
-        return sprintf(
-            '@common/mail/%s.%s.php',
-            Inflector::slug($messageType),
-            $format
-        );
-    }
-    
-    /**
      * Set up various values, using defaults when needed, and ensure the values
      * we end up with are valid.
      */
@@ -340,18 +317,7 @@ class Emailer extends Component
         
         parent::init();
     }
-    
-    /**
-     * Determine whether the given format string is valid.
-     *
-     * @param string $format
-     * @return bool
-     */
-    protected function isValidFormat($format)
-    {
-        return in_array($format, ['html', 'text'], true);
-    }
-    
+
     /**
      * Send the specified type of message to the given User.
      *
@@ -380,17 +346,14 @@ class Emailer extends Component
             $data
         );
 
-        $htmlView = $this->getViewForMessage($messageType, 'html');
+        $htmlView = sprintf('@common/mail/%s.html.php', Inflector::slug($messageType));
         $htmlBody = \Yii::$app->view->render($htmlView, $dataForEmail);
-
-        $textView = $this->getViewForMessage($messageType, 'text');
-        $textBody = \Yii::$app->view->render($textView, $dataForEmail);
 
         $toAddress = $data['toAddress'] ?? $user->getEmailAddress();
         $ccAddress = $data['ccAddress'] ?? '';
         $subject = $this->getSubjectForMessage($messageType, $dataForEmail);
 
-        $this->email($toAddress, $subject, $htmlBody, $textBody, $ccAddress, $delaySeconds);
+        $this->email($toAddress, $subject, $htmlBody, strip_tags($htmlBody), $ccAddress, $delaySeconds);
 
         EmailLog::logMessage($messageType, $user->id);
     }
