@@ -191,25 +191,21 @@ class Method extends MethodBase
     }
 
     /**
-     * Create new password recovery method, normally un-verified, and send a
-     * verification message to the user. If a matching record already exists,
-     * record creation is bypassed. If 'created' parameter is specified,
-     * then the record is created pre-verified and no message is sent to the
-     * user.
+     * Create new password recovery method and send a verification message to the
+     * user. If a matching record already exists, record creation is bypassed.
      *
      * @param integer $userId
      * @param string $value
-     * @param string $created Date recovery method was created, in MySQL datetime format.
      * @return Method
      * @throws ConflictHttpException
      * @throws ServerErrorHttpException
      */
-    public static function findOrCreate($userId, $value, $created = '')
+    public static function findOrCreate($userId, $value)
     {
         $method = Method::findOne(['value' => $value, 'user_id' => $userId]);
 
         if ($method === null) {
-            $method = self::create($userId, $value, $created);
+            $method = self::create($userId, $value);
         } else {
             if (! $method->isVerified()) {
                 $method->restartVerification();
@@ -217,9 +213,7 @@ class Method extends MethodBase
             return $method;
         }
 
-        if (empty($created)) {
-            $method->sendVerification();
-        }
+        $method->sendVerification();
 
         return $method;
     }
@@ -305,24 +299,18 @@ class Method extends MethodBase
     }
 
     /**
-     * Create new password recovery method. If 'created' parameter is specified,
-     * then the record is created pre-verified.
+     * Create new password recovery method.
      *
      * @param integer $userId
      * @param string $value
-     * @param string $created Date recovery method was created, in MySQL datetime format.
      * @return Method
      * @throws UnprocessableEntityHttpException
      */
-    public static function create($userId, $value, $created = '')
+    public static function create($userId, $value)
     {
         $method = new Method();
         $method->user_id = $userId;
         $method->value = mb_strtolower($value);
-        if (! empty($created)) {
-            $method->created = $created;
-            $method->verified = 1;
-        }
 
         if (! $method->save()) {
             throw new UnprocessableEntityHttpException(
