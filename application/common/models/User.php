@@ -315,17 +315,11 @@ class User extends UserBase
     public function getAttributesForEmail()
     {
         $attrs = [
-            'employeeId' => $this->employee_id,
             'firstName' => $this->first_name,
-            'lastName' => $this->last_name,
             'displayName' => $this->getDisplayName(),
             'username' => $this->username,
             'email' => $this->getEmailAddress(),
-            'active' => $this->active,
-            'locked' => $this->locked,
             'lastChangedUtc' => MySqlDateTime::formatDateForHumans($this->last_changed_utc),
-            'lastSyncedUtc' => MySqlDateTime::formatDateForHumans($this->last_synced_utc),
-            'lastLoginUtc' => MySqlDateTime::formatDateForHumans($this->last_login_utc),
             'passwordExpiresUtc' => null, // Entry needed even if null.
             'isMfaEnabled' => count($this->mfas) > 0 ? true : false,
             'mfaOptions' => $this->getVerifiedMfaOptions(),
