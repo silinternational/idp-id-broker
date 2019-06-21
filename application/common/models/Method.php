@@ -191,21 +191,25 @@ class Method extends MethodBase
     }
 
     /**
-     * Create new password recovery method and send a verification message to the
-     * user. If a matching record already exists, record creation is bypassed.
+     * Create new password recovery method, normally un-verified, and send a
+     * verification message to the user. If a matching record already exists,
+     * record creation is bypassed. If `preVerified` parameter is `true`,
+     * then the record is created pre-verified and no message is sent to the
+     * user.
      *
      * @param integer $userId
      * @param string $value
+     * @param bool $preVerified
      * @return Method
      * @throws ConflictHttpException
      * @throws ServerErrorHttpException
      */
-    public static function findOrCreate($userId, $value)
+    public static function findOrCreate($userId, $value, $preVerified = false)
     {
         $method = Method::findOne(['value' => $value, 'user_id' => $userId]);
 
         if ($method === null) {
-            $method = self::create($userId, $value);
+            $method = self::create($userId, $value, $preVerified);
         } else {
             if (! $method->isVerified()) {
                 $method->restartVerification();
@@ -213,7 +217,9 @@ class Method extends MethodBase
             return $method;
         }
 
-        $method->sendVerification();
+        if ($preVerified === false) {
+            $method->sendVerification();
+        }
 
         return $method;
     }
@@ -299,18 +305,21 @@ class Method extends MethodBase
     }
 
     /**
-     * Create new password recovery method.
+     * Create new password recovery method. If `preVerified` parameter is `true`,
+     * then the record is created pre-verified.
      *
      * @param integer $userId
      * @param string $value
+     * @param bool $preVerified
      * @return Method
      * @throws UnprocessableEntityHttpException
      */
-    public static function create($userId, $value)
+    public static function create($userId, $value, $preVerified = false)
     {
         $method = new Method();
         $method->user_id = $userId;
         $method->value = mb_strtolower($value);
+        $method->verified = ($preVerified === true ? 1 : 0);
 
         if (! $method->save()) {
             throw new UnprocessableEntityHttpException(

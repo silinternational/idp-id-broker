@@ -853,7 +853,7 @@ class User extends UserBase
             'email' => $this->personal_email,
         ]);
 
-        Method::findOrCreate($this->id, $this->personal_email, MySqlDateTime::now());
+        Method::findOrCreate($this->id, $this->personal_email, true);
     }
 
     /**
