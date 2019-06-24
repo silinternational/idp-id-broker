@@ -92,7 +92,7 @@ class MethodController extends BaseRestController
     public function actionCreate()
     {
         $value = \Yii::$app->request->post('value');
-        if ($value === null) {
+        if ( ! is_string($value)) {
             throw new BadRequestHttpException(
                 'value is required',
                 1541627665
