@@ -332,6 +332,7 @@ class User extends UserBase
             'numRemainingCodes' => $this->countMfaBackupCodes(),
             'managerEmail' => $this->manager_email,
             'hasRecoveryMethods' => count($this->getVerifiedMethodOptions()) > 0 ? true : false,
+            'passwordLastChanged' => $this->getPasswordLastChanged(),
         ];
         if ($this->currentPassword !== null) {
             $attrs['passwordExpiresUtc'] = MySqlDateTime::formatDateForHumans($this->currentPassword->getExpiresOn());
@@ -1099,5 +1100,20 @@ class User extends UserBase
             'status' => 'complete',
             'count' => $numDeleted,
         ]);
+    }
+
+    /**
+     * @return string Date password last changed, in human-friendly format.
+     * @throws Exception if an invalid time is stored in `created_utc`
+     */
+    public function getPasswordLastChanged()
+    {
+        /** @var Password $pw */
+        $pw = $this->currentPassword;
+        if ($pw === null) {
+            return '(no password set)';
+        }
+
+        return MySqlDateTime::formatDateForHumans($pw->created_utc);
     }
 }
