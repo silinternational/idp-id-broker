@@ -50,7 +50,8 @@ class MySqlDateTime
     /**
      * Format timestamp to human friendly date
      * @param string|null $timestamp
-     * @return false|string
+     * @return string
+     * @throws \Exception if an invalid timestamp is provided
      */
     public static function formatDateForHumans(string $timestamp = null)
     {
@@ -58,7 +59,13 @@ class MySqlDateTime
             $timestamp = strtotime($timestamp);
         }
 
-        return gmdate(self::HUMAN_DATE_FORMAT, $timestamp);
+        $formattedDate = gmdate(self::HUMAN_DATE_FORMAT, $timestamp);
+
+        if ($formattedDate === false) {
+            throw new \Exception('invalid timestamp provided');
+        }
+
+        return $formattedDate;
     }
 
     /**

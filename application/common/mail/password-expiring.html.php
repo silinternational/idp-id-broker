@@ -14,6 +14,7 @@ use yii\helpers\Html as yHtml;
  * @var string $supportEmail
  * @var string $supportName
  * @var bool   $isMfaEnabled
+ * @var string $passwordLastChanged
  */
 
 $pwExtension = ltrim(\Yii::$app->params['passwordMfaLifespanExtension'], '+');
@@ -28,6 +29,7 @@ $pwExtension = ltrim(\Yii::$app->params['passwordMfaLifespanExtension'], '+');
     change your password.
 </p>
 <p>
+    Password changed on: <?=yHtml::encode($passwordLastChanged)?><br>
     Password expires on: <?=yHtml::encode($passwordExpiresUtc)?>
 </p>
 <?php if (! $isMfaEnabled) : ?>
