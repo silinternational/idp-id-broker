@@ -2,17 +2,10 @@
 use yii\helpers\Html as yHtml;
 
 /**
- * @var string $employeeId
  * @var string $firstName
- * @var string $lastName
  * @var string $displayName
  * @var string $username
  * @var string $email
- * @var string $active
- * @var string $locked
- * @var string $lastChangedUtc
- * @var string $lastSyncedUtc
- * @var string $lastLoginUtc
  * @var string $passwordExpiresUtc
  * @var string $emailSignature
  * @var string $helpCenterUrl
@@ -21,6 +14,7 @@ use yii\helpers\Html as yHtml;
  * @var string $supportEmail
  * @var string $supportName
  * @var bool   $isMfaEnabled
+ * @var string $passwordLastChanged
  */
 
 $passwordForgotUrl = $passwordProfileUrl . '/password/forgot';
@@ -37,7 +31,7 @@ $pwExtension = ltrim(\Yii::$app->params['passwordMfaLifespanExtension'], '+');
     the password reset process.
 </p>
 <p>
-    Password last changed on: <?=yHtml::encode($lastChangedUtc)?><br>
+    Password last changed on: <?=yHtml::encode($passwordLastChanged)?><br>
     Password expired on: <?=yHtml::encode($passwordExpiresUtc)?>
 </p>
 <?php if (! $isMfaEnabled) { ?>
