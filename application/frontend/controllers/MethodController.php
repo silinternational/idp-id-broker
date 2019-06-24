@@ -91,10 +91,8 @@ class MethodController extends BaseRestController
      */
     public function actionCreate()
     {
-        $created = (string)\Yii::$app->request->post('created');
-
         $value = \Yii::$app->request->post('value');
-        if ($value === null) {
+        if ( ! is_string($value)) {
             throw new BadRequestHttpException(
                 'value is required',
                 1541627665
@@ -111,7 +109,7 @@ class MethodController extends BaseRestController
 
         $userId = User::findOne(['employee_id' => $employeeId])->id ?? null;
 
-        return Method::findOrCreate($userId, $value, $created);
+        return Method::findOrCreate($userId, $value);
     }
 
     /**

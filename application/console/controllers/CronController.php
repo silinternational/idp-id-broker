@@ -105,16 +105,6 @@ class CronController extends Controller
         $emailer->sendDelayedMfaRelatedEmails();
     }
 
-    /**
-     * @deprecated
-     */
-    public function actionSendMethodVerifyEmails()
-    {
-        /* @var $emailer Emailer */
-        $emailer = \Yii::$app->emailer;
-        $emailer->sendMethodReminderEmails();
-    }
-
     public function actionSendMethodReminderEmails()
     {
         /* @var $emailer Emailer */
