@@ -319,7 +319,6 @@ class User extends UserBase
             'displayName' => $this->getDisplayName(),
             'username' => $this->username,
             'email' => $this->getEmailAddress(),
-            'lastChangedUtc' => MySqlDateTime::formatDateForHumans($this->last_changed_utc),
             'passwordExpiresUtc' => null, // Entry needed even if null.
             'isMfaEnabled' => count($this->mfas) > 0 ? true : false,
             'mfaOptions' => $this->getVerifiedMfaOptions(),

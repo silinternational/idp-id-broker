@@ -6,7 +6,6 @@ use yii\helpers\Html as yHtml;
  * @var string $displayName
  * @var string $username
  * @var string $email
- * @var string $lastChangedUtc
  * @var string $passwordExpiresUtc
  * @var string $emailSignature
  * @var string $helpCenterUrl
