@@ -6,7 +6,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
-## [4.5.1] - 2019-06-24
+## [4.5.2] - 2019-06-25
 ### Fixed
 - An incorrect date was reported for last password change in the password 
   expiry emails.
@@ -16,6 +16,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - The text segment of email messages is now generated from the html templates,
   rather than separately-maintained text templates.
   
+## [4.5.1] - 2019-06-17
+### Fixed
+- Fixed bug in field for last_login_utc to return null when null 
+
 ## [4.5.0]
 ### Added
 - Config option for invite email delay. Default is no delay.
@@ -153,7 +157,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 - Initial version of ID Broker.
 
-[Unreleased]: https://github.com/silinternational/idp-id-broker/compare/4.5.1...HEAD
+[Unreleased]: https://github.com/silinternational/idp-id-broker/compare/4.5.2...HEAD
+[4.5.2]: https://github.com/silinternational/idp-id-broker/compare/4.5.1...4.5.2
 [4.5.1]: https://github.com/silinternational/idp-id-broker/compare/4.5.0...4.5.1
 [4.5.0]: https://github.com/silinternational/idp-id-broker/compare/4.4.0...4.5.0
 [4.4.0]: https://github.com/silinternational/idp-id-broker/compare/4.3.0...4.4.0
