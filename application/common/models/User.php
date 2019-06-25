@@ -272,6 +272,13 @@ class User extends UserBase
                     return $model->personal_email === null;
                 }
             ],
+            [
+                'employee_id',
+                'match',
+                'pattern' => '/^\w+$/',
+                'message' => 'invalid character(s) in {attribute} {value}',
+                'on' => self::SCENARIO_NEW_USER,
+            ],
         ], parent::rules());
     }
 
@@ -308,23 +315,17 @@ class User extends UserBase
     public function getAttributesForEmail()
     {
         $attrs = [
-            'employeeId' => $this->employee_id,
             'firstName' => $this->first_name,
-            'lastName' => $this->last_name,
             'displayName' => $this->getDisplayName(),
             'username' => $this->username,
             'email' => $this->getEmailAddress(),
-            'active' => $this->active,
-            'locked' => $this->locked,
-            'lastChangedUtc' => MySqlDateTime::formatDateForHumans($this->last_changed_utc),
-            'lastSyncedUtc' => MySqlDateTime::formatDateForHumans($this->last_synced_utc),
-            'lastLoginUtc' => MySqlDateTime::formatDateForHumans($this->last_login_utc),
             'passwordExpiresUtc' => null, // Entry needed even if null.
             'isMfaEnabled' => count($this->mfas) > 0 ? true : false,
             'mfaOptions' => $this->getVerifiedMfaOptions(),
             'numRemainingCodes' => $this->countMfaBackupCodes(),
             'managerEmail' => $this->manager_email,
             'hasRecoveryMethods' => count($this->getVerifiedMethodOptions()) > 0 ? true : false,
+            'passwordLastChanged' => $this->getPasswordLastChanged(),
         ];
         if ($this->currentPassword !== null) {
             $attrs['passwordExpiresUtc'] = MySqlDateTime::formatDateForHumans($this->currentPassword->getExpiresOn());
@@ -852,7 +853,7 @@ class User extends UserBase
             'email' => $this->personal_email,
         ]);
 
-        Method::findOrCreate($this->id, $this->personal_email, MySqlDateTime::now());
+        Method::findOrCreate($this->id, $this->personal_email, true);
     }
 
     /**
@@ -913,8 +914,6 @@ class User extends UserBase
             ], 'application');
         }
 
-        $this->setEmptyNagDates();
-
         parent::afterFind();
     }
 
@@ -931,42 +930,6 @@ class User extends UserBase
         }
 
         return true;
-    }
-
-    /**
-     * Set dates that are empty. These are records that existed before the migration added these
-     * columns in the database. Once all records are updated, this function can be removed.
-     */
-    protected function setEmptyNagDates(): void
-    {
-        $needToSave = false;
-
-        if ($this->review_profile_after === '0000-00-00') {
-            $this->review_profile_after = MySqlDateTime::relative(\Yii::$app->params['profileReviewInterval']);
-            $needToSave = true;
-        }
-
-        if ($this->nag_for_mfa_after === '0000-00-00') {
-            $this->nag_for_mfa_after = MySqlDateTime::relative(\Yii::$app->params['mfaAddInterval']);
-            $needToSave = true;
-        }
-
-        if ($this->nag_for_method_after === '0000-00-00') {
-            $this->nag_for_method_after = MySqlDateTime::relative(\Yii::$app->params['methodAddInterval']);
-            $needToSave = true;
-        }
-
-        if ($needToSave) {
-            $this->scenario = self::SCENARIO_UPDATE_USER;
-            if (! $this->save()) {
-                Yii::warning([
-                    'event' => 'setEmptyNagDates',
-                    'status' => 'save failed',
-                    'employeeId' => $this->employee_id,
-                    'scenario' => $this->scenario,
-                ], 'application');
-            }
-        }
     }
 
     /**
@@ -1092,5 +1055,20 @@ class User extends UserBase
             'status' => 'complete',
             'count' => $numDeleted,
         ]);
+    }
+
+    /**
+     * @return string Date password last changed, in human-friendly format.
+     * @throws Exception if an invalid time is stored in `created_utc`
+     */
+    public function getPasswordLastChanged()
+    {
+        /** @var Password $pw */
+        $pw = $this->currentPassword;
+        if ($pw === null) {
+            return '(no password set)';
+        }
+
+        return MySqlDateTime::formatDateForHumans($pw->created_utc);
     }
 }
