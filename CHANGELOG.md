@@ -13,8 +13,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - No validation was done on employee ID character set. This allowed the
   creation of users that couldn't be accessed through the REST API.
 ### Changed
-- The text segment of email messages is not generated from the html templates.
-
+- The text segment of email messages is now generated from the html templates,
+  rather than separately-maintained text templates.
+  
 ## [4.5.0]
 ### Added
 - Config option for invite email delay. Default is no delay.
