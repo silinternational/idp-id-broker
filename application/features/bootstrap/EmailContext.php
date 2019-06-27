@@ -52,7 +52,7 @@ class EmailContext extends YiiContext
     /** @var Method */
     protected $testMethod;
 
-    /** @var string */
+    /** @var array<array> */
     protected $matchingFakeEmails;
 
     const METHOD_EMAIL_ADDRESS = 'method@example.com';
