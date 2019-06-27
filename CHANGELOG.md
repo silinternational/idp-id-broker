@@ -6,7 +6,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 ### Added
-- Optionally include an email address on the bcc line of manage mfa emails 
+- Optionally include an email address on the bcc line of manager mfa emails 
 
 ## [4.5.1] - 2019-06-24
 ### Fixed
