@@ -48,6 +48,7 @@ class Emailer extends Component
     const PROP_SUBJECT = 'subject';
     const PROP_TO_ADDRESS = 'to_address';
     const PROP_CC_ADDRESS = 'cc_address';
+    const PROP_BCC_ADDRESS = 'bcc_address';
     const PROP_HTML_BODY = 'html_body';
     const PROP_TEXT_BODY = 'text_body';
     const PROP_DELAY_SECONDS = 'delay_seconds';
@@ -181,6 +182,7 @@ class Emailer extends Component
      * @param string $htmlBody The email body (as HTML).
      * @param string $textBody The email body (as plain text).
      * @param string $ccAddress Optional. Email address to include as 'cc'.
+     * @param string $bccAddress Optional. Email address to include as 'bcc'.
      * @param string $delaySeconds Number of seconds to delay sending the email. Default = no delay.
      * @throws \Sil\EmailService\Client\EmailServiceClientException
      */
@@ -190,6 +192,7 @@ class Emailer extends Component
         string $htmlBody,
         string $textBody,
         string $ccAddress = '',
+        string $bccAddress = '',
         int $delaySeconds = 0
     ) {
         $properties = [
@@ -202,6 +205,10 @@ class Emailer extends Component
 
         if ($ccAddress) {
             $properties[self::PROP_CC_ADDRESS] = $ccAddress;
+        }
+
+        if ($bccAddress) {
+            $properties[self::PROP_BCC_ADDRESS] = $bccAddress;
         }
 
         $this->getEmailServiceClient()->email($properties);
@@ -351,9 +358,10 @@ class Emailer extends Component
 
         $toAddress = $data['toAddress'] ?? $user->getEmailAddress();
         $ccAddress = $data['ccAddress'] ?? '';
+        $bccAddress = $data['bccAddress'] ?? '';
         $subject = $this->getSubjectForMessage($messageType, $dataForEmail);
 
-        $this->email($toAddress, $subject, $htmlBody, strip_tags($htmlBody), $ccAddress, $delaySeconds);
+        $this->email($toAddress, $subject, $htmlBody, strip_tags($htmlBody), $ccAddress, $bccAddress, $delaySeconds);
 
         EmailLog::logMessage($messageType, $user->id);
     }
