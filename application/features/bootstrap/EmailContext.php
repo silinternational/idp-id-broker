@@ -966,6 +966,12 @@ class EmailContext extends YiiContext
         ));
     }
 
+    protected function assertEmailBcc($address)
+    {
+        Assert::greaterThan(count($this->matchingFakeEmails), 0);
+        Assert::contains(current($this->matchingFakeEmails)['bcc_address'], $address, 'address not on bcc line');
+    }
+
     /**
      * @Then a Method Verify email is sent to that method
      */
@@ -1129,5 +1135,21 @@ class EmailContext extends YiiContext
         } else {
             Assert::false(true, 'Invalid tense provided in scenario.');
         }
+    }
+
+    /**
+     * @Given a mfaManagerBcc email address is configured
+     */
+    public function aMfamanagerbccEmailAddressIsConfigured()
+    {
+        \Yii::$app->params['mfaManagerBcc'] = 'email@example.com';
+    }
+
+    /**
+     * @Then the mfaManagerBcc email address is on the bcc line
+     */
+    public function theMfamanagerbccEmailAddressIsOnTheBccLine()
+    {
+        $this->assertEmailBcc(\Yii::$app->params['mfaManagerBcc']);
     }
 }
