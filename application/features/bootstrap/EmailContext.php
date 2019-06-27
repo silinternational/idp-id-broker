@@ -52,6 +52,9 @@ class EmailContext extends YiiContext
     /** @var Method */
     protected $testMethod;
 
+    /** @var string */
+    protected $matchingFakeEmails;
+
     const METHOD_EMAIL_ADDRESS = 'method@example.com';
     const MANAGER_EMAIL = 'manager@example.com';
 
@@ -60,15 +63,7 @@ class EmailContext extends YiiContext
      */
     public function aEmailShouldHaveBeenSentToThem($messageType)
     {
-        $matchingFakeEmails = $this->fakeEmailer->getFakeEmailsOfTypeSentToUser(
-            $messageType,
-            $this->tempUser->email,
-            $this->tempUser
-        );
-        Assert::greaterThan(count($matchingFakeEmails), 0, sprintf(
-            'Did not find any %s emails sent to that user.',
-            $messageType
-        ));
+        $this->assertEmailSent($messageType, $this->tempUser->email);
     }
 
     /**
@@ -76,12 +71,12 @@ class EmailContext extends YiiContext
      */
     public function aEmailShouldNotHaveBeenSentToThem($messageType)
     {
-        $matchingFakeEmails = $this->fakeEmailer->getFakeEmailsOfTypeSentToUser(
+        $this->matchingFakeEmails = $this->fakeEmailer->getFakeEmailsOfTypeSentToUser(
             $messageType,
             $this->tempUser->email,
             $this->tempUser
         );
-        Assert::isEmpty($matchingFakeEmails);
+        Assert::isEmpty($this->matchingFakeEmails);
     }
 
     /**
@@ -963,9 +958,9 @@ class EmailContext extends YiiContext
 
     protected function assertEmailSent($type, $address)
     {
-        $matchingFakeEmails = $this->fakeEmailer->getFakeEmailsOfTypeSentToUser($type, $address, $this->tempUser);
+        $this->matchingFakeEmails = $this->fakeEmailer->getFakeEmailsOfTypeSentToUser($type, $address, $this->tempUser);
 
-        Assert::greaterThan(count($matchingFakeEmails), 0, sprintf(
+        Assert::greaterThan(count($this->matchingFakeEmails), 0, sprintf(
             'Did not find any %s emails sent to that address.',
             $type
         ));
@@ -1016,12 +1011,7 @@ class EmailContext extends YiiContext
      */
     public function thatEmailShouldHaveBeenCopiedToThePersonalEmailAddress()
     {
-        $matchingFakeEmails = $this->fakeEmailer->getFakeEmailsOfTypeSentToUser(
-            EmailLog::MESSAGE_TYPE_INVITE,
-            $this->tempUser->email,
-            $this->tempUser
-        );
-        Assert::eq($matchingFakeEmails[0]['cc_address'], $this->tempUser->personal_email);
+        Assert::eq($this->matchingFakeEmails[0]['cc_address'], $this->tempUser->personal_email);
     }
 
     /**
