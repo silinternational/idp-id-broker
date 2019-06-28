@@ -52,6 +52,9 @@ class EmailContext extends YiiContext
     /** @var Method */
     protected $testMethod;
 
+    /** @var array<array> */
+    protected $matchingFakeEmails;
+
     const METHOD_EMAIL_ADDRESS = 'method@example.com';
     const MANAGER_EMAIL = 'manager@example.com';
 
@@ -60,15 +63,7 @@ class EmailContext extends YiiContext
      */
     public function aEmailShouldHaveBeenSentToThem($messageType)
     {
-        $matchingFakeEmails = $this->fakeEmailer->getFakeEmailsOfTypeSentToUser(
-            $messageType,
-            $this->tempUser->email,
-            $this->tempUser
-        );
-        Assert::greaterThan(count($matchingFakeEmails), 0, sprintf(
-            'Did not find any %s emails sent to that user.',
-            $messageType
-        ));
+        $this->assertEmailSent($messageType, $this->tempUser->email);
     }
 
     /**
@@ -76,12 +71,12 @@ class EmailContext extends YiiContext
      */
     public function aEmailShouldNotHaveBeenSentToThem($messageType)
     {
-        $matchingFakeEmails = $this->fakeEmailer->getFakeEmailsOfTypeSentToUser(
+        $this->matchingFakeEmails = $this->fakeEmailer->getFakeEmailsOfTypeSentToUser(
             $messageType,
             $this->tempUser->email,
             $this->tempUser
         );
-        Assert::isEmpty($matchingFakeEmails);
+        Assert::isEmpty($this->matchingFakeEmails);
     }
 
     /**
@@ -963,12 +958,18 @@ class EmailContext extends YiiContext
 
     protected function assertEmailSent($type, $address)
     {
-        $matchingFakeEmails = $this->fakeEmailer->getFakeEmailsOfTypeSentToUser($type, $address, $this->tempUser);
+        $this->matchingFakeEmails = $this->fakeEmailer->getFakeEmailsOfTypeSentToUser($type, $address, $this->tempUser);
 
-        Assert::greaterThan(count($matchingFakeEmails), 0, sprintf(
+        Assert::greaterThan(count($this->matchingFakeEmails), 0, sprintf(
             'Did not find any %s emails sent to that address.',
             $type
         ));
+    }
+
+    protected function assertEmailBcc($address)
+    {
+        Assert::greaterThan(count($this->matchingFakeEmails), 0);
+        Assert::contains(current($this->matchingFakeEmails)['bcc_address'], $address, 'address not on bcc line');
     }
 
     /**
@@ -1016,12 +1017,7 @@ class EmailContext extends YiiContext
      */
     public function thatEmailShouldHaveBeenCopiedToThePersonalEmailAddress()
     {
-        $matchingFakeEmails = $this->fakeEmailer->getFakeEmailsOfTypeSentToUser(
-            EmailLog::MESSAGE_TYPE_INVITE,
-            $this->tempUser->email,
-            $this->tempUser
-        );
-        Assert::eq($matchingFakeEmails[0]['cc_address'], $this->tempUser->personal_email);
+        Assert::eq($this->matchingFakeEmails[0]['cc_address'], $this->tempUser->personal_email);
     }
 
     /**
@@ -1139,5 +1135,21 @@ class EmailContext extends YiiContext
         } else {
             Assert::false(true, 'Invalid tense provided in scenario.');
         }
+    }
+
+    /**
+     * @Given a mfaManagerBcc email address is configured
+     */
+    public function aMfamanagerbccEmailAddressIsConfigured()
+    {
+        \Yii::$app->params['mfaManagerBcc'] = 'email@example.com';
+    }
+
+    /**
+     * @Then the mfaManagerBcc email address is on the bcc line
+     */
+    public function theMfamanagerbccEmailAddressIsOnTheBccLine()
+    {
+        $this->assertEmailBcc(\Yii::$app->params['mfaManagerBcc']);
     }
 }

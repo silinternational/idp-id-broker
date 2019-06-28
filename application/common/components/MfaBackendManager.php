@@ -46,6 +46,7 @@ class MfaBackendManager extends Component implements MfaBackendInterface
 
         $data = [
             'toAddress' => $mfa->user->manager_email,
+            'bccAddress' => \Yii::$app->params['mfaManagerBcc'] ?? '',
             'code' => $code,
             'id' => $mfa->id,
         ];
