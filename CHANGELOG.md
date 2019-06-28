@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [4.6.0]
+### Added
+- Optionally include an email address on the bcc line of manager mfa emails 
+
 ## [4.5.2] - 2019-06-25
 ### Fixed
 - An incorrect date was reported for last password change in the password 
@@ -157,7 +161,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 - Initial version of ID Broker.
 
-[Unreleased]: https://github.com/silinternational/idp-id-broker/compare/4.5.2...HEAD
+[Unreleased]: https://github.com/silinternational/idp-id-broker/compare/4.6.0...HEAD
+[4.6.0]: https://github.com/silinternational/idp-id-broker/compare/4.5.2...4.6.0
 [4.5.2]: https://github.com/silinternational/idp-id-broker/compare/4.5.1...4.5.2
 [4.5.1]: https://github.com/silinternational/idp-id-broker/compare/4.5.0...4.5.1
 [4.5.0]: https://github.com/silinternational/idp-id-broker/compare/4.4.0...4.5.0

@@ -9,10 +9,10 @@ appfortests: db deps
 bash:
 	docker-compose run --rm cli bash
 
-deps: api.html
+deps:
 	docker-compose run --rm cli composer install
 
-depsupdate: api.html
+depsupdate:
 	docker-compose run --rm cli composer update
 
 db:
@@ -27,7 +27,7 @@ basemodels: db tables
 quicktest:
 	docker-compose run --rm test bash -c "vendor/bin/behat --stop-on-failure --strict --append-snippets"
 
-test: appfortests api.html
+test: appfortests
 	docker-compose run --rm test
 
 clean:
