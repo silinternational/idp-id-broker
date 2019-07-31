@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [4.6.1]
+### Added
+- Cron deletes old manager "rescue" 2SV (MFA) codes 
+
 ## [4.6.0]
 ### Added
 - Optionally include an email address on the bcc line of manager mfa emails 
@@ -161,7 +165,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 - Initial version of ID Broker.
 
-[Unreleased]: https://github.com/silinternational/idp-id-broker/compare/4.6.0...HEAD
+[Unreleased]: https://github.com/silinternational/idp-id-broker/compare/4.6.1...HEAD
+[4.6.1]: https://github.com/silinternational/idp-id-broker/compare/4.6.0...4.6.1
 [4.6.0]: https://github.com/silinternational/idp-id-broker/compare/4.5.2...4.6.0
 [4.5.2]: https://github.com/silinternational/idp-id-broker/compare/4.5.1...4.5.2
 [4.5.1]: https://github.com/silinternational/idp-id-broker/compare/4.5.0...4.5.1
