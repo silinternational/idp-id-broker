@@ -453,19 +453,25 @@ class Mfa extends MfaBase
      */
     public static function removeOldUnverifiedRecords()
     {
-        /*
-         * Replace '+' with '-' so all env parameters can be defined consistently as '+n unit'
-         */
-        $mfaLifetime = str_replace('+', '-', \Yii::$app->params['mfaLifetime']);
+        self::deleteOldRecords(\Yii::$app->params['mfaLifetime'], ['verified' => 0]);
+    }
+
+    /**
+     * @param string $age PHP relative time denoting how old a record must be to qualify for removal
+     * @param array $criteria array suitable for passing to a query, like ['field' => value]
+     */
+    protected static function deleteOldRecords(string $age, array $criteria): void
+    {
+        $age = '-' . ltrim($age, '+');
 
         /**
-         * @var string $removeOlderThan   All unverified records that expired before this date
-         * should be deleted. Calculated relative to now (time of execution).
+         * @var string $removeOlderThan  Records created before this date should be deleted
+         * (if they also satisfy $criteria). Calculated relative to now (time of execution).
          */
-        $removeOlderThan = MySqlDateTime::relativeTime($mfaLifetime);
+        $removeOlderThan = MySqlDateTime::relativeTime($age);
         /** @var Mfa[] $mfas */
         $mfas = self::find()
-            ->where(['verified' => 0])
+            ->where($criteria)
             ->andWhere(['<', 'created_utc', $removeOlderThan])
             ->all();
 
@@ -474,7 +480,8 @@ class Mfa extends MfaBase
             try {
                 if ($mfa->delete() === false) {
                     \Yii::error([
-                        'action' => 'delete old unverified mfa records',
+                        'action' => 'delete old mfa records',
+                        'criteria' => $criteria,
                         'status' => 'error',
                         'error' => $mfa->getFirstErrors(),
                         'mfa_id' => $mfa->id,
@@ -484,21 +491,22 @@ class Mfa extends MfaBase
                 }
             } catch (\Exception $e) {
                 \Yii::error([
-                    'action' => 'delete old unverified mfa records',
+                    'action' => 'delete old mfa records',
+                    'criteria' => $criteria,
                     'status' => 'error',
                     'error' => $e->getMessage(),
                     'mfa_id' => $mfa->id,
                 ]);
             }
         }
-        
+
         \Yii::warning([
-            'action' => 'delete old unverified mfa records',
+            'action' => 'delete old mfa records',
+            'criteria' => $criteria,
             'status' => 'complete',
             'count' => $numDeleted,
         ]);
     }
-
 
     /**
      * @param User $user
@@ -565,5 +573,10 @@ class Mfa extends MfaBase
         } else {
             $this->label = $this->getReadableType();
         }
+    }
+
+    public static function removeOldManagerMfaRecords(): void
+    {
+        self::deleteOldRecords('1 week', ['type' => Mfa::TYPE_MANAGER]);
     }
 }

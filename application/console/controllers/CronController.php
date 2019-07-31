@@ -31,6 +31,12 @@ class CronController extends Controller
             'status' => 'starting',
         ]);
         Mfa::removeOldUnverifiedRecords();
+
+        \Yii::warning([
+            'action' => 'delete old manager mfa records',
+            'status' => 'starting',
+        ]);
+        Mfa::removeOldManagerMfaRecords();
     }
 
     /**
