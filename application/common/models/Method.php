@@ -150,6 +150,11 @@ class Method extends MethodBase
      */
     public static function deleteExpiredUnverifiedMethods()
     {
+        \Yii::warning([
+            'action' => 'delete old unverified method records',
+            'status' => 'starting',
+        ]);
+
         /*
          * Replace '+' with '-' so all env parameters can be defined consistently as '+n unit'
          */

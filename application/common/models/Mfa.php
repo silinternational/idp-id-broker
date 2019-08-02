@@ -462,6 +462,12 @@ class Mfa extends MfaBase
      */
     protected static function deleteOldRecords(string $age, array $criteria): void
     {
+        \Yii::warning([
+            'action' => 'delete old mfa records',
+            'criteria' => $criteria,
+            'status' => 'starting',
+        ]);
+
         $age = str_replace('+', '-', $age);
 
         /**

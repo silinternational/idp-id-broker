@@ -14,28 +14,12 @@ class CronController extends Controller
 {
     public function actionRemoveOldUnverifiedRecords()
     {
-        \Yii::warning([
-            'action' => 'delete old unverified method records',
-            'status' => 'starting',
-        ]);
         Method::deleteExpiredUnverifiedMethods();
 
-        \Yii::warning([
-            'action' => 'delete old invite records',
-            'status' => 'starting',
-        ]);
         Invite::deleteOldInvites();
 
-        \Yii::warning([
-            'action' => 'delete old unverified mfa records',
-            'status' => 'starting',
-        ]);
         Mfa::removeOldUnverifiedRecords();
 
-        \Yii::warning([
-            'action' => 'delete old manager mfa records',
-            'status' => 'starting',
-        ]);
         Mfa::removeOldManagerMfaRecords();
     }
 
