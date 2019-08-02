@@ -462,7 +462,7 @@ class Mfa extends MfaBase
      */
     protected static function deleteOldRecords(string $age, array $criteria): void
     {
-        $age = '-' . ltrim($age, '+');
+        $age = str_replace('+', '-', $age);
 
         /**
          * @var string $removeOlderThan  Records created before this date should be deleted
