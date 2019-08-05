@@ -6,11 +6,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
-## [4.6.1]
+## [4.6.1] - 2019-08-05
 ### Added
 - Cron deletes old manager "rescue" 2SV (MFA) codes 
 
-## [4.6.0]
+## [4.6.0] - 2019-06-28
 ### Added
 - Optionally include an email address on the bcc line of manager mfa emails 
 
