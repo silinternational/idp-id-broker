@@ -145,6 +145,11 @@ class Invite extends InviteBase
      */
     public static function deleteOldInvites()
     {
+        \Yii::warning([
+            'action' => 'delete old invite records',
+            'status' => 'starting',
+        ]);
+
         /*
          * Replace '+' with '-' so all env parameters can be defined consistently as '+n unit'
          */
