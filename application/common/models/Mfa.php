@@ -464,9 +464,9 @@ class Mfa extends MfaBase
     {
         if (! preg_match('/[\+\-].*/', $age)) {
             $age = '-' . $age;
-        } else {
-            $age = str_replace('+', '-', $age);
         }
+
+        $age = str_replace('+', '-', $age);
 
         /**
          * @var string $removeOlderThan  Records created before this date should be deleted
