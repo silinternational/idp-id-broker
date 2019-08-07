@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [4.6.3] - 2019-08-06
+### Fixed
+- Fix defect in Mfa::deleteOldRecords. 
+
 ## [4.6.2] - 2019-08-05
 ### Added
 - Cron deletes old manager "rescue" 2SV (MFA) codes 
@@ -169,7 +173,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 - Initial version of ID Broker.
 
-[Unreleased]: https://github.com/silinternational/idp-id-broker/compare/4.6.2...HEAD
+[Unreleased]: https://github.com/silinternational/idp-id-broker/compare/4.6.3...HEAD
+[4.6.2]: https://github.com/silinternational/idp-id-broker/compare/4.6.1...4.6.3
 [4.6.2]: https://github.com/silinternational/idp-id-broker/compare/4.6.1...4.6.2
 [4.6.1]: https://github.com/silinternational/idp-id-broker/compare/4.6.0...4.6.1
 [4.6.0]: https://github.com/silinternational/idp-id-broker/compare/4.5.2...4.6.0
