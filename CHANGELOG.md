@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 ## [4.6.3] - 2019-08-06
-### Added
+### Fixed
 - Fix defect in Mfa::deleteOldRecords. 
 
 ## [4.6.2] - 2019-08-05
