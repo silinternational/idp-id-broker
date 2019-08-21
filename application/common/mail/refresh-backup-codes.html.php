@@ -42,7 +42,7 @@ use yii\helpers\Html as yHtml;
 <ol>
     <li>Go to <?=yHtml::a(yHtml::encode($passwordProfileUrl), $passwordProfileUrl)?>.</li>
     <li>Login if needed</li>
-    <li>Under 2-Step Verification, click on CREATE next to the Printable Codes option.</li>
+    <li>Under 2-Step Verification, click on REPLACE next to the Printable Codes option.</li>
     <li>Either print the codes out, download them to a safe place, or copy and paste them into a safe place.</li>
 </ol>
 
