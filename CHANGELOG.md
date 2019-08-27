@@ -5,6 +5,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+### Added
+- Added config option to bcc the mfa-manager-help email to another address
+### Changed
+- Changed "manager" to "recovery contact" in user-facing text
 
 ## [4.6.4] - 2019-08-20
 ### Fixed

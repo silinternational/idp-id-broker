@@ -44,15 +44,23 @@ class MfaBackendManager extends Component implements MfaBackendInterface
         /* @var $emailer Emailer */
         $emailer = \Yii::$app->emailer;
 
-        $data = [
-            'toAddress' => $mfa->user->manager_email,
-            'bccAddress' => \Yii::$app->params['mfaManagerBcc'] ?? '',
-            'code' => $code,
-            'id' => $mfa->id,
-        ];
+        $emailer->sendMessageTo(
+            EmailLog::MESSAGE_TYPE_MFA_MANAGER,
+            $mfa->user,
+            [
+                'toAddress' => $mfa->user->manager_email,
+                'bccAddress' => \Yii::$app->params['mfaManagerBcc'] ?? '',
+                'code' => $code,
+            ]
+        );
 
-        $emailer->sendMessageTo(EmailLog::MESSAGE_TYPE_MFA_MANAGER, $mfa->user, $data);
-        $emailer->sendMessageTo(EmailLog::MESSAGE_TYPE_MFA_MANAGER_HELP, $mfa->user);
+        $emailer->sendMessageTo(
+            EmailLog::MESSAGE_TYPE_MFA_MANAGER_HELP,
+            $mfa->user,
+            [
+                'bccAddress' => \Yii::$app->params['mfaManagerHelpBcc'] ?? '',
+            ]
+        );
     }
 
     /**

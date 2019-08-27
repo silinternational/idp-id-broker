@@ -961,8 +961,9 @@ class EmailContext extends YiiContext
         $this->matchingFakeEmails = $this->fakeEmailer->getFakeEmailsOfTypeSentToUser($type, $address, $this->tempUser);
 
         Assert::greaterThan(count($this->matchingFakeEmails), 0, sprintf(
-            'Did not find any %s emails sent to that address.',
-            $type
+            'Did not find any %s emails sent to %s.',
+            $type,
+            $address
         ));
     }
 
@@ -1151,5 +1152,21 @@ class EmailContext extends YiiContext
     public function theMfamanagerbccEmailAddressIsOnTheBccLine()
     {
         $this->assertEmailBcc(\Yii::$app->params['mfaManagerBcc']);
+    }
+
+    /**
+     * @Given a mfaManagerHelpBcc email address is configured
+     */
+    public function aMfamanagerHelpbccEmailAddressIsConfigured()
+    {
+        \Yii::$app->params['mfaManagerHelpBcc'] = 'email@example.com';
+    }
+
+    /**
+     * @Then the mfaManagerHelpBcc email address is on the bcc line
+     */
+    public function theMfamanagerHelpbccEmailAddressIsOnTheBccLine()
+    {
+        $this->assertEmailBcc(\Yii::$app->params['mfaManagerHelpBcc']);
     }
 }
