@@ -15,22 +15,22 @@ class AnalyticsContext extends YiiContext
     /** @var User */
     protected $tempUser;
 
-    /** @var  int */
+    /** @var  string */
     protected $mfaCount;
 
-    /** @var  int */
+    /** @var  string */
     protected $passwordCount;
 
-    /** @var  int */
+    /** @var  string */
     protected $mfaRequiredCount;
 
-    /** @var  float */
+    /** @var  float/int */
     protected $mfaAverage;
 
-    /** @var  int */
+    /** @var  string */
     protected $mfaOnlyTotpOrU2f;
 
-    /** @var  int */
+    /** @var  string */
     protected $noMethodButPersonal;
 
     protected function createNewUser($makeActive=true, $requireMfa=false)
