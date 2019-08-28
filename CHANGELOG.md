@@ -5,8 +5,11 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+
+## [4.7.0] - 2019-08-28
 ### Added
 - Added config option to bcc the mfa-manager-help email to another address
+- Two more metrics for analytics
 ### Changed
 - Changed "manager" to "recovery contact" in user-facing text
 
@@ -181,7 +184,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 - Initial version of ID Broker.
 
-[Unreleased]: https://github.com/silinternational/idp-id-broker/compare/4.6.4...HEAD
+[Unreleased]: https://github.com/silinternational/idp-id-broker/compare/4.7.0...HEAD
+[4.7.0]: https://github.com/silinternational/idp-id-broker/compare/4.6.4...4.7.0
 [4.6.4]: https://github.com/silinternational/idp-id-broker/compare/4.6.3...4.6.4
 [4.6.3]: https://github.com/silinternational/idp-id-broker/compare/4.6.2...4.6.3
 [4.6.2]: https://github.com/silinternational/idp-id-broker/compare/4.6.1...4.6.2
