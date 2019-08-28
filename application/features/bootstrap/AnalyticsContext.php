@@ -2,6 +2,7 @@
 namespace Sil\SilIdBroker\Behat\Context;
 
 use common\models\EmailLog;
+use common\models\Method;
 use common\models\Mfa;
 use common\models\MfaBackupcode;
 use common\models\User;
@@ -14,19 +15,23 @@ class AnalyticsContext extends YiiContext
     /** @var User */
     protected $tempUser;
 
-    /** @var  int */
+    /** @var  string */
     protected $mfaCount;
 
-    /** @var  int */
+    /** @var  string */
     protected $passwordCount;
 
-    /** @var  int */
+    /** @var  string */
     protected $mfaRequiredCount;
 
-    /** @var  float */
+    /** @var  float/int */
     protected $mfaAverage;
 
+    /** @var  string */
+    protected $mfaOnlyTotpOrU2f;
 
+    /** @var  string */
+    protected $noMethodButPersonal;
 
     protected function createNewUser($makeActive=true, $requireMfa=false)
     {
@@ -75,7 +80,7 @@ class AnalyticsContext extends YiiContext
     }
 
     /**
-     * @Given I create a new user
+     * @Given I create a(nother) new user
      */
     public function iCreateANewUser()
     {
@@ -299,5 +304,80 @@ class AnalyticsContext extends YiiContext
             $this->mfaRequiredCount,
             $number
         );
+    }
+
+    /**
+     * @When I get the count of active users with u2f or totp but not backupcodes
+     */
+    public function iGetTheCountOfActiveUsersWithUfOrTotpButNotBackupcodes()
+    {
+        $this->mfaOnlyTotpOrU2f = User::numberWithOneMfaNotBackupCodes();
+    }
+
+    /**
+     * @Then the count of active users with u2f or totp but not backupcodes should be :number
+     */
+    public function theCountOfActiveUsersWithUfOrTotpButNotBackupcodesShouldBe($number)
+    {
+        Assert::same(
+            $this->mfaOnlyTotpOrU2f,
+            $number
+        );
+    }
+
+    /**
+     * @Given that user has a personal email address
+     */
+    public function thatUserHasAPersonalEmailAddress()
+    {
+        $this->tempUser->scenario = User::SCENARIO_UPDATE_USER;
+        $this->tempUser->personal_email = "email@example.com";
+        Assert::true($this->tempUser->save());
+    }
+
+    /**
+     * @When I get the count of active users with a personal email but no recovery methods
+     */
+    public function iGetTheCountOfActiveUsersWithAPersonalEmailButNoRecoveryMethods()
+    {
+        $this->noMethodButPersonal = User::numberWithPersonalEmailButNoMethods();
+    }
+
+    /**
+     * @Then the count of active users with a personal email but no recovery methods should be :number
+     */
+    public function theCountOfActiveUsersWithAPersonalEmailButNoRecoveryMethodsShouldBe($number)
+    {
+        Assert::same(
+            $this->noMethodButPersonal,
+            $number
+        );
+    }
+
+    protected static function createMethod($user, $alreadyVerified = true)
+    {
+        $method = new Method();
+        $method->user_id = $user->id;
+        $method->value = "method@example.com";
+        if ($alreadyVerified) {
+            $method->verified = 1;
+        }
+        $method->save();
+    }
+
+    /**
+     * @Given that user has a recovery method
+     */
+    public function thatUserHasARecoveryMethod()
+    {
+        self::createMethod($this->tempUser);
+    }
+
+    /**
+     * @Given that user has an unverified recovery method
+     */
+    public function thatUserHasAnUnverifiedRecoveryMethod()
+    {
+        self::createMethod($this->tempUser, false);
     }
 }

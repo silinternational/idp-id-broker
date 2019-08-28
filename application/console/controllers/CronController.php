@@ -69,6 +69,8 @@ class CronController extends Controller
             'active-users-with-password' => User::countUsersWithPassword(),
             // Since GA doesn't accept event values as floats, multiply this by 10 and round it
             'average-mfas-per-user-with-mfas-times-ten' => round(User::getAverageNumberOfMfasPerUserWithMfas() * 10.0),
+            'active-users-personal-email-no-methods' => User::numberWithPersonalEmailButNoMethods(),
+            'active-users-only-2sv-or-u2f' => User::numberWithOneMfaNotBackupCodes()
         ];
 
         $analytics = new Analytics();

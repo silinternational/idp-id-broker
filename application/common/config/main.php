@@ -220,6 +220,7 @@ return [
         ),
         'mfaLifetime'                   => Env::get('MFA_LIFETIME', '+2 hours'),
         'mfaManagerBcc'                 => Env::get('MFA_MANAGER_BCC', ''),
+        'mfaManagerHelpBcc'             => Env::get('MFA_MANAGER_HELP_BCC', ''),
         'contingentUserDuration'        => Env::get('CONTINGENT_USER_DURATION', '+4 weeks'),
         'inviteEmailDelaySeconds'       => Env::get('INVITE_EMAIL_DELAY_SECONDS', 0),
     ],

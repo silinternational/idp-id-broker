@@ -35,7 +35,7 @@ class Emailer extends Component
     const SUBJ_MFA_DISABLED = '2-Step Verification was disabled on your {idpDisplayName} Identity account';
     const SUBJ_MFA_MANAGER = '{displayName} has sent you a login code for their {idpDisplayName} Identity account';
     const SUBJ_MFA_MANAGER_HELP = 'An access code for your {idpDisplayName} Identity account has been sent to'
-        . ' your manager';
+        . ' your recovery contact';
 
     const SUBJ_METHOD_VERIFY = 'Please verify your new password recovery method';
     const SUBJ_METHOD_REMINDER = 'REMINDER: Please verify your new password recovery method';

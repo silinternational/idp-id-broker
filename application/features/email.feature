@@ -309,9 +309,16 @@ Feature: Email
       And no mfas exist
       And a mfaManagerBcc email address is configured
     When I request a new manager mfa
-     Then a "mfa-manager-help" email should have been sent to them
-      And a Manager Rescue email is sent to the manager
+    Then a Manager Rescue email is sent to the manager
       And the mfaManagerBcc email address is on the bcc line
+
+  Scenario: Send a manager rescue code help email after creation of manager mfa
+    Given a user already exists
+      And no mfas exist
+      And a mfaManagerHelpBcc email address is configured
+    When I request a new manager mfa
+    Then a "mfa-manager-help" email should have been sent to them
+      And the mfaManagerHelpBcc email address is on the bcc line
 
   Scenario: Copy a user's personal email address on invite email message
     Given a specific user does NOT exist
