@@ -97,3 +97,39 @@ Feature: User
       And I create a new user
     When I get the count of active users with require mfa
     Then the count of active users with require mfa should be 2
+
+  Scenario: Get a count of active users with either u2f or totp but not backupcodes
+    Given I create a new user
+      And I create another new user
+      And that user has a backup code mfa record
+      And I create another new user
+      And that user has a verified totp mfa record
+      And I create another new user
+      And that user has a verified u2f mfa record
+      And I create another new user
+      And that user has a verified totp mfa record
+      And that user has a verified u2f mfa record
+      And I create another new user
+      And that user has a backup code mfa record
+      And that user has a verified totp mfa record
+      And I create another new user
+      And that user has an unverified totp mfa record
+      And I create a new inactive user
+      And that user has a verified u2f mfa record
+    When I get the count of active users with u2f or totp but not backupcodes
+    Then the count of active users with u2f or totp but not backupcodes should be 2
+
+    Scenario: Get a count of active users with a personal email but no recovery methods
+      Given I create a new user
+        And I create another new user
+        And that user has a personal email address
+        And I create another new user
+        And that user has a personal email address
+        And that user has a recovery method
+        And I create another new user
+        And that user has a personal email address
+        And that user has an unverified recovery method
+        And I create a new inactive user
+        And that user has a personal email address
+      When I get the count of active users with a personal email but no recovery methods
+      Then the count of active users with a personal email but no recovery methods should be 2

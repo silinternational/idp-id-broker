@@ -1071,4 +1071,48 @@ class User extends UserBase
 
         return MySqlDateTime::formatDateForHumans($pw->created_utc);
     }
+
+    /**
+     * Count the number of active users with a personal email address but no
+     * verified recovery methods.
+     * @return string
+     * @throws \yii\db\Exception
+     */
+    public static function numberWithPersonalEmailButNoMethods()
+    {
+        $result = Yii::$app->getDb()->createCommand("
+            SELECT COUNT(*)
+            FROM (
+                SELECT u.personal_email
+                FROM `user` u 
+                LEFT JOIN `method` m ON u.id=m.user_id
+                WHERE u.active='yes' AND (m.verified is NULL OR m.verified=0)
+                GROUP BY u.id
+            ) sub
+            WHERE sub.personal_email is NOT NULL
+        ")->queryOne();
+        return $result['COUNT(*)'];
+    }
+
+    /**
+     * Count the number of active users with one of either totp or u2f, but no
+     * backup codes.
+     * @return string
+     * @throws \yii\db\Exception
+     */
+    public static function numberWithOneMfaNotBackupCodes()
+    {
+        $result = Yii::$app->getDb()->createCommand("
+            SELECT COUNT(*)
+            FROM (
+                SELECT GROUP_CONCAT(m.type) AS types,COUNT(m.type) AS n
+                FROM `mfa` m 
+                JOIN `user` u ON m.user_id=u.id 
+                WHERE m.verified=1 AND u.active='yes'
+                GROUP BY u.id
+                ) sub
+            WHERE sub.types NOT LIKE 'backupcode' AND sub.n=1
+        ")->queryOne();
+        return $result['COUNT(*)'];
+    }
 }
