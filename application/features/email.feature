@@ -358,6 +358,8 @@ Feature: Email
 
     Examples:
       | toSendOrNot  | number  | hasOrHasNot  | shouldOrNot    |
+      | to send      | -1      | has NOT      | should NOT     |
+      | to send      | 0       | has NOT      | should         |
       | to send      | 13      | has NOT      | should         |
       | to send      | 14      | has NOT      | should         |
       | to send      | 15      | has NOT      | should NOT     |
