@@ -6,7 +6,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
-## [4.7.1] - 2019-09-26
+## [4.7.1] - 2019-10-02
 ### Fixed
 - Don't send password expiring notices if the password has already expired
 
