@@ -696,7 +696,11 @@ class FeatureContext extends YiiContext
         $property = $this->resBody[$key];
         $n = 0;
         foreach ($data as $row) {
-            Assert::true(in_array($row['element'], $property), "not in array");
+            $want = $row['element'];
+            if ($want == '{idpName}') {
+                $want = \Yii::$app->params['idpName'];
+            }
+            Assert::true(in_array($want, $property), '"' . $want . '" not in array');
             $n++;
         }
 

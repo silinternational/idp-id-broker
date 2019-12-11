@@ -671,6 +671,5 @@ Feature: User
       And the response should contain a member array with only these elements:
         | element              |
         |   it                 |
-            # "test" represents the name of the IdP
-        |   test               |
+        |   {idpName}          |
       And the uuid property should be a valid UUID
