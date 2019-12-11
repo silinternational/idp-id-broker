@@ -687,4 +687,32 @@ class FeatureContext extends YiiContext
     {
         Assert::eq(count($this->resBody), 0, 'response is not empty');
     }
+
+    /**
+     * @Given the response should contain a :key array with only these elements:
+     */
+    public function theResponseShouldContainAMemberArrayWithOnlyTheseElements($key, TableNode $data)
+    {
+        $property = $this->resBody[$key];
+        $n = 0;
+        foreach ($data as $row) {
+            Assert::true(in_array($row['element'], $property), "not in array");
+            $n++;
+        }
+
+        Assert::eq(count($property), $n, "unexpected element(s) in property array: " .
+            implode(", ", $property));
+    }
+
+
+    /**
+     * @Then the uuid property should be a valid UUID
+     */
+    public function theUuidPropertyShouldBeAValidUuid()
+    {
+        Assert::regex(
+            $this->resBody['uuid'],
+            '/[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[1-4][0-9a-fA-F]{3}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}/'
+        );
+    }
 }

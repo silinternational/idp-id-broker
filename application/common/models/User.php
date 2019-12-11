@@ -428,11 +428,11 @@ class User extends UserBase
             },
             'hide',
             'member' => function (self $model) {
-                if (empty($model->groups)) {
-                    return [];
-                } else {
-                    return explode(',', $model->groups);
+                if (! empty($model->groups)) {
+                    $member = explode(',', $model->groups);
                 }
+                $member[] = \Yii::$app->params['idpName'];
+                return $member;
             },
             'mfa' => function (self $model) {
                 return $model->getMfaFields();
