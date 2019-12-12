@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [4.8.0] - 2019-12-12
+### Added
+- Include `idpName` in `member` list in user responses
+
 ## [4.7.1] - 2019-10-02
 ### Fixed
 - Don't send password expiring notices if the password has already expired
