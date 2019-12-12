@@ -24,7 +24,6 @@ Feature: User
     Then the response status code should be 200
       And the following data is returned:
         | property        | value                 |
-#TODO:need to ensure uuid came back but not sure about value...
         | employee_id     | 123                   |
         | first_name      | Shep                  |
         | last_name       | Clark                 |
@@ -36,6 +35,7 @@ Feature: User
         | manager_email   | boss_man@example.org  |
         | hide            | yes                   |
         | profile_review  | no                    |
+      And the uuid property should be a valid UUID
       And the following data is not returned:
         | property                |
         | current_password_id     |
@@ -463,7 +463,6 @@ Feature: User
 #TODO: PUT with a change to an existing value on one of the unique fields should generate an error.
 #TODO: PUT with a change should update the last_changed data properly...as well as the field to be updated :-)
 
-#TODO: need to think about how to verify uuid comes back in calls.
 #TODO: ensure uuid cannot be changed in any way.
 
 #TODO: add site.feature to test all verbs to status, not found, authn/nonauthn...as well as NotFound
@@ -629,3 +628,48 @@ Feature: User
       | 1               | 1                 | 0            | 1              | add_mfa        |
       | 1               | 1                 | 1            | 0              | profile_review |
       | 1               | 1                 | 1            | 1              | profile_review |
+
+  Scenario: Retrieve a single user
+    Given the requester is authorized
+      And the user store is empty
+      And I provide the following valid data:
+        | property         | value                     |
+        |   employee_id    |   123                     |
+        |   first_name     |   John                    |
+        |   last_name      |   Connor                  |
+        |   display_name   |   John Connor             |
+        |   username       |   john_connor             |
+        |   email          |   john_connor@example.org |
+        |   personal_email |   john_connor@example.com |
+        |   manager_email  |   kyle_reese@example.org  |
+        |   groups         |   it                      |
+      And I request "/user" be created
+    When I request "/user/123" be retrieved
+    Then the response status code should be 200
+      And the following data is returned:
+        | property         | value                     |
+        |   employee_id    |   123                     |
+        |   employee_id    |   123                     |
+        |   first_name     |   John                    |
+        |   last_name      |   Connor                  |
+        |   display_name   |   John Connor             |
+        |   username       |   john_connor             |
+        |   email          |   john_connor@example.org |
+        |   active         |   yes                     |
+        |   locked         |   no                      |
+        |   hide           |   no                      |
+        |   profile_review |   no                      |
+        |   manager_email  |   kyle_reese@example.org  |
+        |   personal_email |   john_connor@example.com |
+        |   mfa.prompt     |   no                      |
+        |   mfa.add        |   no                      |
+        |   method.add     |   no                      |
+      And the following data is not returned:
+        | property                  |
+        |   current_password_id     |
+        |   password_expires_at_utc |
+      And the response should contain a member array with only these elements:
+        | element              |
+        |   it                 |
+        |   {idpName}          |
+      And the uuid property should be a valid UUID
