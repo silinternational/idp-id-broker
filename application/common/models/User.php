@@ -878,6 +878,10 @@ class User extends UserBase
             $this->expires_on = null;
         }
 
+        if ($this->isExpired()) {
+            $this->deactivate();
+        }
+
         return parent::beforeSave($insert);
     }
 
@@ -902,16 +906,8 @@ class User extends UserBase
      */
     public function afterFind()
     {
-        if ($this->expires_on !== null && MySqlDateTime::isBefore($this->expires_on, time())) {
-            $this->active = 'no';
-
-            Yii::warning([
-                'event' => 'onAfterFind',
-                'status' => 'user is expired',
-                'employeeId' => $this->employee_id,
-                'scenario' => $this->scenario,
-                'expires_on' => $this->expires_on
-            ], 'application');
+        if ($this->isExpired()) {
+            $this->deactivate();
         }
 
         parent::afterFind();
@@ -1114,5 +1110,35 @@ class User extends UserBase
             WHERE sub.types NOT LIKE 'backupcode' AND sub.n=1
         ")->queryOne();
         return $result['COUNT(*)'];
+    }
+
+    protected function isExpired(): bool
+    {
+        return $this->expires_on != null && MySqlDateTime::isBefore($this->expires_on, time());
+    }
+
+    protected function deactivate(): void
+    {
+        if ($this->active == 'no') {
+            return;
+        }
+
+        $logAttributes = [
+            'action' => 'deactivate expired user',
+            'employeeId' => $this->employee_id,
+            'scenario' => $this->scenario,
+            'expires_on' => $this->expires_on
+        ];
+
+        $this->active = 'no';
+        if (!$this->save(false, ['active'])) {
+            $logAttributes['status'] = 'error';
+            $logAttributes['error'] = $this->getFirstError('active');
+            Yii::error($logAttributes);
+            return;
+        }
+
+        $logAttributes['status'] = 'success';
+        Yii::warning($logAttributes);
     }
 }
