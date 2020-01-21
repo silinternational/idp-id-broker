@@ -879,7 +879,7 @@ class User extends UserBase
         }
 
         if ($this->isExpired()) {
-            $this->deactivate();
+            $this->deactivateExpiredUser();
         }
 
         return parent::beforeSave($insert);
@@ -907,7 +907,7 @@ class User extends UserBase
     public function afterFind()
     {
         if ($this->isExpired()) {
-            $this->deactivate();
+            $this->deactivateExpiredUser();
         }
 
         parent::afterFind();
@@ -1114,10 +1114,13 @@ class User extends UserBase
 
     protected function isExpired(): bool
     {
-        return $this->expires_on != null && MySqlDateTime::isBefore($this->expires_on, time());
+        return $this->expires_on !== null && MySqlDateTime::isBefore($this->expires_on, time());
     }
 
-    protected function deactivate(): void
+    /**
+     * Attempts to deactivate an expired user. If not successful, an error is logged.
+     */
+    protected function deactivateExpiredUser(): void
     {
         if ($this->active == 'no') {
             return;
