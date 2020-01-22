@@ -719,4 +719,16 @@ class FeatureContext extends YiiContext
             '/[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[1-4][0-9a-fA-F]{3}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}/'
         );
     }
+
+    /**
+     * @Given I wait until after the user :username expiration date
+     */
+    public function iWaitUntilAfterTheUserExpirationDate($username)
+    {
+        $this->userFromDb = User::findOne(['username' => $username]);
+        $earlier = MySqlDateTime::relative("-1 year");
+        $this->userFromDb->expires_on = MySqlDateTime::relative($earlier);
+        $this->userFromDb->scenario = User::SCENARIO_UPDATE_USER;
+        $this->userFromDb->save();
+    }
 }

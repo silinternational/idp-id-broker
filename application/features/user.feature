@@ -673,3 +673,32 @@ Feature: User
         |   it                 |
         |   {idpName}          |
       And the uuid property should be a valid UUID
+
+  Scenario: Fetch a user with no primary email address after user's expiration date
+    Given a record does not exist with an employee_id of "123"
+      And the requester is authorized
+      And I provide the following valid data:
+        | property        | value                 |
+        | employee_id     | 123                   |
+        | first_name      | New                   |
+        | last_name       | Guy                   |
+        | username        | new_guy               |
+        | personal_email  | personal@example.com  |
+      And I request "/user" be created
+      And I wait until after the user new_guy expiration date
+    When I request "/user/123" be retrieved
+    Then the response status code should be 200
+      And the following data is returned:
+        | property         | value                     |
+        |   employee_id    |   123                     |
+        |   username       |   new_guy                 |
+        |   email          |   personal@example.com    |
+        |   personal_email |   personal@example.com    |
+        |   active         |   no                      |
+        |   locked         |   no                      |
+      And a record exists with an employee_id of "123"
+      And the following data should be stored:
+        | property            | value              |
+        | username            | new_guy            |
+        | active              | no                 |
+        | locked              | no                 |
