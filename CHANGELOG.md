@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [4.8.1] - 2020-01-22
+### Fixed
+- Expired users are actually deactivated, not just in API responses
+
 ## [4.8.0] - 2019-12-12
 ### Added
 - Include `idpName` in `member` list in user responses
