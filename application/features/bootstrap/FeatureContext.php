@@ -396,7 +396,7 @@ class FeatureContext extends YiiContext
     }
 
     /**
-     * @Given /^I change the (.*) to (.*)$/
+     * @Given /^I change the (\w*) to (.*)$/
      */
     public function iChangeThe($property, $value)
     {
