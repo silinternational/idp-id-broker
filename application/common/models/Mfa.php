@@ -104,6 +104,14 @@ class Mfa extends MfaBase
                 self::EVENT_TYPE_VERIFY,
                 $this
             );
+
+            if (! \Yii::$app->params['mfaAllowDisable']
+                && $this->user->require_mfa === 'no'
+            ) {
+                $this->user->require_mfa = 'yes';
+                $this->user->scenario = User::SCENARIO_UPDATE_USER;
+                $this->user->save();
+            }
         }
     }
 

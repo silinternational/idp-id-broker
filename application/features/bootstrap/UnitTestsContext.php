@@ -41,6 +41,9 @@ class UnitTestsContext extends YiiContext
     /** @var Invite */
     protected $inviteCode;
 
+    /** @var string[] */
+    protected $originalParams = [];
+
     /**
      * @afterScenario @database
      */
@@ -60,22 +63,25 @@ class UnitTestsContext extends YiiContext
      * username, they will be deleted.
      *
      * @param string $username
+     * @param string[] $properties
      * @return User
      */
-    protected function createNewUserInDatabase($username)
+    protected function createNewUserInDatabase($username, $properties = [])
     {
         $existingUser = User::findByUsername($username);
         if ($existingUser !== null) {
             Assert::notSame($existingUser->delete(), false);
         }
 
-        $user = new User([
+        $mergedProperties = array_merge([
             'email' => $username . '@example.com',
             'employee_id' => (string)uniqid(),
             'first_name' => 'Test',
             'last_name' => 'User',
             'username' => $username,
-        ]);
+        ], $properties);
+
+        $user = new User($mergedProperties);
         $user->scenario = User::SCENARIO_NEW_USER;
         Assert::true(
             $user->save(),
@@ -266,5 +272,88 @@ class UnitTestsContext extends YiiContext
                 $verifiedOrUnverified == 'verified' ? 1 : 0
             );
         }
+    }
+
+    /**
+     * @When I create a new user with a :property property of :value
+     */
+    public function iCreateANewUserWithAPropertyOf($property, $value)
+    {
+        $this->tempUser = $this->createNewUserInDatabase('test_user', [$property => $value]);
+    }
+
+    /**
+     * @Given the database contains a user (with no MFA options)
+     */
+    public function theDatabaseContainsAUser()
+    {
+        $this->tempUser = $this->createNewUserInDatabase('test_user');
+    }
+
+    /**
+     * @Given that user has a :property property value of :value
+     */
+    public function thatUserHasAPropertyValueOf($property, $value)
+    {
+        $this->tempUser->$property = $value;
+        $this->tempUser->save();
+        Assert::eq($this->tempUser->$property, $value);
+    }
+
+    /**
+     * @When I change the user's :property property to :value
+     */
+    public function iChangeTheUsersPropertyTo($property, $value)
+    {
+        $this->tempUser->scenario = User::SCENARIO_UPDATE_USER;
+        $this->tempUser->$property = $value;
+        Assert::eq(true, $this->tempUser->save());
+    }
+
+    /**
+     * @Then I see the user's :property property is :value
+     */
+    public function iSeeTheUsersPropertyIs($property, $value)
+    {
+        $this->tempUser->refresh();
+        Assert::eq($this->tempUser->$property, $value);
+    }
+
+    /**
+     * @Given the :param config parameter is true
+     */
+    public function theConfigParameterIsTrue($param)
+    {
+        $this->originalParams[$param] = \Yii::$app->params[$param];
+        \Yii::$app->params[$param] = true;
+    }
+
+    /**
+     * @Given the :param config parameter is false
+     * Behat can't seem to pass a false boolean correctly as an argument
+     */
+    public function theConfigParameterIsFalse($param)
+    {
+        $this->originalParams[$param] = \Yii::$app->params[$param];
+        \Yii::$app->params[$param] = false;
+    }
+
+
+    /**
+     * @AfterScenario
+     */
+    public function resetParams()
+    {
+        foreach ($this->originalParams as $param => $value) {
+            \Yii::$app->params[$param] = $value;
+        }
+    }
+
+    /**
+     * @When I add backup codes for that user
+     */
+    public function iAddBackupCodesForThatUser()
+    {
+        $this->createMfa(Mfa::TYPE_BACKUPCODE);
     }
 }
