@@ -278,31 +278,42 @@ class FeatureContext extends YiiContext
     }
 
     /**
-     * @Given /^the following data (is|is not) returned:$/
+     * @Then the following data is returned:
      */
-    public function theFollowingDataReturned($isOrIsNot, TableNode $data)
+    public function theFollowingDataIsReturned(TableNode $data)
     {
         foreach ($data as $row) {
             if (strpos($row['property'], '.') !== false) {
                 $name = explode('.', $row['property'], 2);
-                if ($isOrIsNot === 'is') {
-                    Assert::eq(
-                        $this->resBody[$name[0]][$name[1]],
+                Assert::eq(
+                    $this->resBody[$name[0]][$name[1]],
+                    $row['value'],
+                    sprintf(
+                        '"%s" not equal to "%s", "%s" found',
+                        $row['property'],
                         $row['value'],
-                        sprintf(
-                            '"%s" not equal to "%s", "%s" found',
-                            $row['property'],
-                            $row['value'],
-                            $this->resBody[$name[0]][$name[1]]
-                        )
-                    );
-                } else {
-                    Assert::true(false, "invalid test condition");
-                }
+                        $this->resBody[$name[0]][$name[1]]
+                    )
+                );
             } else {
-                $isOrIsNot === 'is' ? Assert::eq($this->resBody[$row['property']], $row['value'])
-                    : Assert::keyNotExists($this->resBody, $row['property']);
+                Assert::keyExists(
+                    $this->resBody,
+                    $row['property'],
+                    'key ' . $row['property'] . ' not found in ' . var_export($this->resBody, true)
+                );
+                Assert::eq($this->resBody[$row['property']], $row['value']);
             }
+        }
+    }
+
+
+    /**
+     * @Given the following data is not returned:
+     */
+    public function theFollowingDataIsNotReturned(TableNode $data)
+    {
+        foreach ($data as $row) {
+            Assert::keyNotExists($this->resBody, $row['property']);
         }
     }
 
