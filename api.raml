@@ -96,6 +96,8 @@ types:
         description: >
           Flag to indicate whether to remind the user to review their mfa options and
           recovery methods.
+      require_mfa?:
+        enum: [ yes, no ]
     example: |
       {
         "uuid": "11111111-aaaa-1111-aaaa-111111111111",
