@@ -295,9 +295,7 @@ class UnitTestsContext extends YiiContext
      */
     public function thatUserHasAPropertyValueOf($property, $value)
     {
-        $this->tempUser->$property = $value;
-        $this->tempUser->save();
-        Assert::eq($this->tempUser->$property, $value);
+        $this->iChangeTheUsersPropertyTo($property, $value);
     }
 
     /**
