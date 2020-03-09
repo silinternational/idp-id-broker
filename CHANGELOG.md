@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [4.9.0] - 2020-03-09
+### Added
+- Added two new configuration options: `mfa_required_for_new_users` and `mfa_allow_disable`
+- Added `require_mfa` to User API responses
+
 ## [4.8.1] - 2020-01-22
 ### Fixed
 - Expired users are actually deactivated, not just in API responses
