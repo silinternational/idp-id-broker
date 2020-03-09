@@ -194,6 +194,8 @@ return [
         'idpName'                       => $idpName,
         'idpDisplayName'                => $idpDisplayName,
         'mfaAddInterval'                => Env::get('MFA_ADD_INTERVAL', '+30 days'),
+        'mfaRequiredForNewUsers'        => Env::get('MFA_REQUIRED_FOR_NEW_USERS', false),
+        'mfaAllowDisable'               => Env::get('MFA_ALLOW_DISABLE', true),
         'methodAddInterval'             => Env::get('METHOD_ADD_INTERVAL', '+6 months'),
         'profileReviewInterval'         => Env::get('PROFILE_REVIEW_INTERVAL', '+6 months'),
         'passwordReuseLimit'            => Env::get('PASSWORD_REUSE_LIMIT', 10),

@@ -442,7 +442,8 @@ class User extends UserBase
             },
             'profile_review' => function (self $model) {
                 return $model->getNagState() == NagState::NAG_PROFILE_REVIEW ? 'yes' : 'no';
-            }
+            },
+            'require_mfa',
         ];
 
         if ($this->current_password_id !== null) {
@@ -880,6 +881,19 @@ class User extends UserBase
 
         if ($this->isExpired()) {
             $this->deactivateExpiredUser();
+        }
+
+        if ($this->scenario == self::SCENARIO_NEW_USER
+            && \Yii::$app->params['mfaRequiredForNewUsers']
+        ) {
+            $this->require_mfa = 'yes';
+        }
+
+        if (! \Yii::$app->params['mfaAllowDisable']
+            && $this->require_mfa == 'no'
+            && $this->getOldAttribute('require_mfa') == 'yes'
+        ) {
+            $this->require_mfa = 'yes';
         }
 
         return parent::beforeSave($insert);
