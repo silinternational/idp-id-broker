@@ -6,7 +6,6 @@ use common\components\MfaBackendBackupcode;
 use common\components\MfaBackendManager;
 use common\components\MfaBackendTotp;
 use common\components\MfaBackendU2f;
-use Sil\JsonLog\target\JsonSyslogTarget;
 use Sil\JsonLog\target\EmailServiceTarget;
 use Sil\PhpEnv\Env;
 use yii\db\Connection;
@@ -156,12 +155,6 @@ return [
                     'url' => 'php://stderr',
                     'levels' => ['error', 'warning'],
                     'logVars' => [],
-                    'prefix' => $logPrefix,
-                ],
-                [
-                    'class' => JsonSyslogTarget::class,
-                    'categories' => ['application'], // only messages from this app, not all of Yii's built-in messaging
-                    'logVars' => [], // http://www.yiiframework.com/doc-2.0/yii-log-target.html#$logVars-detail
                     'prefix' => $logPrefix,
                 ],
                 [

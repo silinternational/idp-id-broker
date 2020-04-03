@@ -9,18 +9,6 @@ term_handler() {
 }
 trap 'kill ${!}; term_handler' SIGTERM
 
-if [[ "x" == "x$LOGENTRIES_KEY" ]]; then
-    echo "Missing LOGENTRIES_KEY environment variable";
-else
-    # Set logentries key based on environment variable
-    sed -i /etc/rsyslog.conf -e "s/LOGENTRIESKEY/${LOGENTRIES_KEY}/"
-    # Start syslog
-    rsyslogd
-
-    # Give syslog time to fully start up.
-    sleep 10
-fi
-
 if [[ $APP_ENV == "dev" ]]; then
     export XDEBUG_CONFIG="remote_enable=1 remote_host="$REMOTE_DEBUG_IP
     apt-get -y -q install php-xdebug
