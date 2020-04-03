@@ -46,7 +46,9 @@ $passwordProfileUrl = Env::get('PASSWORD_PROFILE_URL');
 
 $logPrefix = function () {
     $request = Yii::$app->request;
-    $prefixData['env'] = YII_ENV;
+    $prefixData = [
+        'env' => YII_ENV,
+    ];
     if ($request instanceof \yii\web\Request) {
         // Assumes format: Bearer consumer-module-name-32randomcharacters
         $prefixData['id'] = substr($request->headers['Authorization'], 7, 16) ?: 'unknown';
