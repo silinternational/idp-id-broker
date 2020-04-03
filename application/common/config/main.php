@@ -9,11 +9,9 @@ use common\components\MfaBackendU2f;
 use Sil\JsonLog\target\JsonSyslogTarget;
 use Sil\JsonLog\target\EmailServiceTarget;
 use Sil\PhpEnv\Env;
-use Sil\Psr3Adapters\Psr3Yii2Logger;
 use yii\db\Connection;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Json;
-use yii\web\Request;
 
 $idpName        = Env::requireEnv('IDP_NAME');
 $idpDisplayName = Env::get('IDP_DISPLAY_NAME', $idpName);
