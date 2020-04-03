@@ -1,5 +1,6 @@
 <?php
 
+use codemix\streamlog\Target as Streamlog;
 use common\components\Emailer;
 use common\components\MfaBackendBackupcode;
 use common\components\MfaBackendManager;
@@ -45,6 +46,22 @@ $emailServiceConfig = Env::getArrayFromPrefix('EMAIL_SERVICE_');
 $emailServiceConfig['validIpRanges'] = Env::getArray('EMAIL_SERVICE_validIpRanges');
 
 $passwordProfileUrl = Env::get('PASSWORD_PROFILE_URL');
+
+$logPrefix = function () {
+    $request = Yii::$app->request;
+    $prefixData['env'] = YII_ENV;
+    if ($request instanceof \yii\web\Request) {
+        // Assumes format: Bearer consumer-module-name-32randomcharacters
+        $prefixData['id'] = substr($request->headers['Authorization'], 7, 16) ?: 'unknown';
+        $prefixData['ip'] = $request->getUserIP();
+        $prefixData['method'] = $request->getMethod();
+        $prefixData['url'] = $request->getUrl();
+    } elseif ($request instanceof \yii\console\Request) {
+        $prefixData['id'] = '(console)';
+    }
+
+    return Json::encode($prefixData);
+};
 
 return [
     'id' => 'app-common',
@@ -129,29 +146,29 @@ return [
         'log' => [
             'targets' => [
                 [
+                    'class' => Streamlog::class,
+                    'url' => 'php://stdout',
+                    'levels' => ['info'],
+                    'logVars' => [],
+                    'categories' => ['application'],
+                    'prefix' => $logPrefix,
+                ],
+                [
+                    'class' => Streamlog::class,
+                    'url' => 'php://stderr',
+                    'levels' => ['error', 'warning'],
+                    'logVars' => [],
+                    'prefix' => $logPrefix,
+                ],
+                [
                     'class' => JsonSyslogTarget::class,
-                    'categories' => ['application'], // stick to messages from this app, not all of Yii's built-in messaging.
-                    'logVars' => [], // no need for default stuff: http://www.yiiframework.com/doc-2.0/yii-log-target.html#$logVars-detail
-                    'prefix' => function () {
-                        $request = Yii::$app->request;
-                        $prefixData = [
-                            'env' => YII_ENV,
-                        ];
-                        
-                        if ($request instanceof \yii\web\Request) {
-                            // Assumes format: Bearer consumer-module-name-32randomcharacters
-                            $prefixData['id'] = substr($request->headers['Authorization'], 7, 16) ?: 'unknown';
-                            $prefixData['ip'] = $request->getUserIP();
-                        } elseif ($request instanceof \yii\console\Request) {
-                            $prefixData['id'] = '(console)';
-                        }
-                        
-                        return Json::encode($prefixData);
-                    },
+                    'categories' => ['application'], // only messages from this app, not all of Yii's built-in messaging
+                    'logVars' => [], // http://www.yiiframework.com/doc-2.0/yii-log-target.html#$logVars-detail
+                    'prefix' => $logPrefix,
                 ],
                 [
                     'class' => EmailServiceTarget::class,
-                    'categories' => ['application'], // stick to messages from this app, not all of Yii's built-in messaging.
+                    'categories' => ['application'], // only messages from this app, not all of Yii's built-in messaging
                     'enabled' => ! empty($notificationEmail),
                     'except' => [
                         'yii\web\HttpException:400',
@@ -170,21 +187,7 @@ return [
                     'accessToken' => $emailServiceConfig['accessToken'],
                     'assertValidIp' => $emailServiceConfig['assertValidIp'],
                     'validIpRanges' => $emailServiceConfig['validIpRanges'],
-                    'prefix' => function ($message) {
-                        $prefixData = [
-                            'env' => YII_ENV,
-                        ];
-                        
-                        try {
-                            $request = \Yii::$app->request;
-                            $prefixData['url'] = $request->getUrl();
-                            $prefixData['method'] = $request->getMethod();
-                        } catch (\Exception $e) {
-                            $prefixData['url'] = 'not available';
-                        }
-                        
-                        return Json::encode($prefixData);
-                    },
+                    'prefix' => $logPrefix,
                 ],
             ],
         ],
