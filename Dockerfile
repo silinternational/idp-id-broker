@@ -1,20 +1,15 @@
 FROM silintl/php7:7.2
 MAINTAINER Phillip Shipley <phillip_shipley@sil.org>
 
-ENV REFRESHED_AT 2017-02-03
+ENV REFRESHED_AT 2020-04-06
 
 RUN apt-get update -y && \
     apt-get install -y make
 
-COPY dockerbuild/vhost.conf /etc/apache2/sites-enabled/
 COPY dockerbuild/broker-cron /etc/cron.d/
 RUN chmod 0644 /etc/cron.d/broker-cron
 
 RUN mkdir -p /data
-
-# Copy in syslog config
-RUN rm -f /etc/rsyslog.d/*
-COPY dockerbuild/rsyslog.conf /etc/rsyslog.conf
 
 # get s3-expand
 RUN curl https://raw.githubusercontent.com/silinternational/s3-expand/1.5/s3-expand -o /usr/local/bin/s3-expand
@@ -33,6 +28,11 @@ COPY application/ /data/
 # Fix folder permissions
 RUN chown -R www-data:www-data \
     console/runtime/
+
+COPY dockerbuild/vhost.conf /etc/apache2/sites-enabled/
+
+# ErrorLog inside a VirtualHost block is ineffective for unknown reasons
+RUN sed -i -E 's@ErrorLog .*@ErrorLog /proc/self/fd/2@i' /etc/apache2/apache2.conf
 
 EXPOSE 80
 ENTRYPOINT ["/usr/local/bin/s3-expand"]
