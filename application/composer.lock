@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "efcd7d4445f56ab2c0548b390f249fcf",
+    "content-hash": "930899f8801f653b35cc10da19bffa47",
     "packages": [
         {
             "name": "bower-asset/inputmask",
@@ -330,6 +330,12 @@
                 "type": "git",
                 "url": "https://github.com/fillup/fake-bower-assets.git",
                 "reference": "9845d8e91eea0922fd6446ba99c68682c9f46a38"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/fillup/fake-bower-assets/zipball/9845d8e91eea0922fd6446ba99c68682c9f46a38",
+                "reference": "9845d8e91eea0922fd6446ba99c68682c9f46a38",
+                "shasum": ""
             },
             "replace": {
                 "bower-asset/bootstrap": "3.3.6",
@@ -1371,19 +1377,20 @@
         },
         {
             "name": "silinternational/yii2-json-log-targets",
-            "version": "1.0.0",
+            "version": "1.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/silinternational/yii2-json-log-targets.git",
-                "reference": "b7fc486f94afbb25be391db7137c82d4c8386f3f"
+                "reference": "957a6cec938ebbadddc57dc84ce281fa49f2ced5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/silinternational/yii2-json-log-targets/zipball/b7fc486f94afbb25be391db7137c82d4c8386f3f",
-                "reference": "b7fc486f94afbb25be391db7137c82d4c8386f3f",
+                "url": "https://api.github.com/repos/silinternational/yii2-json-log-targets/zipball/957a6cec938ebbadddc57dc84ce281fa49f2ced5",
+                "reference": "957a6cec938ebbadddc57dc84ce281fa49f2ced5",
                 "shasum": ""
             },
             "require": {
+                "codemix/yii2-streamlog": "^1.3",
                 "php": ">=5.6",
                 "roave/security-advisories": "dev-master",
                 "silinternational/email-service-php-client": "^2.0.0",
@@ -1413,7 +1420,7 @@
                 "target",
                 "yii2"
             ],
-            "time": "2017-08-29T20:30:16+00:00"
+            "time": "2020-04-07T17:54:08+00:00"
         },
         {
             "name": "swiftmailer/swiftmailer",
@@ -2384,6 +2391,7 @@
             ],
             "description": "Promoting the interoperability of container objects (DIC, SL, etc.)",
             "homepage": "https://github.com/container-interop/container-interop",
+            "abandoned": "psr/container",
             "time": "2017-02-14T19:40:03+00:00"
         },
         {
@@ -3551,5 +3559,6 @@
         "php": ">=7.2",
         "ext-json": "*"
     },
-    "platform-dev": []
+    "platform-dev": [],
+    "plugin-api-version": "1.1.0"
 }

@@ -1,12 +1,12 @@
 <?php
 
-use codemix\streamlog\Target as Streamlog;
 use common\components\Emailer;
 use common\components\MfaBackendBackupcode;
 use common\components\MfaBackendManager;
 use common\components\MfaBackendTotp;
 use common\components\MfaBackendU2f;
 use Sil\JsonLog\target\EmailServiceTarget;
+use Sil\JsonLog\target\JsonStreamTarget;
 use Sil\PhpEnv\Env;
 use yii\db\Connection;
 use yii\helpers\ArrayHelper;
@@ -145,7 +145,7 @@ return [
         'log' => [
             'targets' => [
                 [
-                    'class' => Streamlog::class,
+                    'class' => JsonStreamTarget::class,
                     'url' => 'php://stdout',
                     'levels' => ['info'],
                     'logVars' => [],
@@ -153,7 +153,7 @@ return [
                     'prefix' => $logPrefix,
                 ],
                 [
-                    'class' => Streamlog::class,
+                    'class' => JsonStreamTarget::class,
                     'url' => 'php://stderr',
                     'levels' => ['error', 'warning'],
                     'logVars' => [],
