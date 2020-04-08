@@ -116,4 +116,14 @@ class CronController extends Controller
     {
         User::deleteInactiveUsers();
     }
+
+    public function actionAll()
+    {
+        $this->actionRemoveOldUnverifiedRecords();
+        $this->actionDeleteInactiveUsers();
+        $this->actionSendDelayedMfaRelatedEmails();
+        $this->actionSendMethodReminderEmails();
+        $this->actionSendPasswordExpiryEmails();
+        $this->actionGoogleAnalytics();
+    }
 }
