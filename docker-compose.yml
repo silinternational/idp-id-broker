@@ -25,6 +25,7 @@ services:
         env_file:
             - ./local.env
         environment:
+#            RUN_TASK: cron/all
             EMAILER_CLASS: \Sil\SilIdBroker\Behat\Context\fakes\FakeEmailer
             EMAIL_SIGNATURE: "Dummy Signature for Development\r\rdo not reply to this email"
 
