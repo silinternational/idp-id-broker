@@ -119,11 +119,40 @@ class CronController extends Controller
 
     public function actionAll()
     {
-        $this->actionRemoveOldUnverifiedRecords();
-        $this->actionDeleteInactiveUsers();
-        $this->actionSendDelayedMfaRelatedEmails();
-        $this->actionSendMethodReminderEmails();
-        $this->actionSendPasswordExpiryEmails();
-        $this->actionGoogleAnalytics();
+        try {
+            $this->actionRemoveOldUnverifiedRecords();
+        } catch (\Throwable $e) {
+            \Yii::error($e->getMessage());
+        }
+
+        try {
+            $this->actionDeleteInactiveUsers();
+        } catch (\Throwable $e) {
+            \Yii::error($e->getMessage());
+        }
+
+        try {
+            $this->actionSendDelayedMfaRelatedEmails();
+        } catch (\Throwable $e) {
+            \Yii::error($e->getMessage());
+        }
+
+        try {
+            $this->actionSendMethodReminderEmails();
+        } catch (\Throwable $e) {
+            \Yii::error($e->getMessage());
+        }
+
+        try {
+            $this->actionSendPasswordExpiryEmails();
+        } catch (\Throwable $e) {
+            \Yii::error($e->getMessage());
+        }
+
+        try {
+            $this->actionGoogleAnalytics();
+        } catch (\Throwable $e) {
+            \Yii::error($e->getMessage());
+        }
     }
 }
