@@ -14,6 +14,11 @@ if [[ $APP_ENV == "dev" ]]; then
     apt-get -y -q install php-xdebug
 fi
 
+if [[ ! -z $RUN_TASK ]]; then
+    ./yii $RUN_TASK
+    exit $?
+fi
+
 apache2ctl -k start -D FOREGROUND
 
 # endless loop with a wait is needed for the trap to work
