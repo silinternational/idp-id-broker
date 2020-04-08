@@ -117,6 +117,9 @@ class CronController extends Controller
         User::deleteInactiveUsers();
     }
 
+    /**
+     * Run all cron tasks, catching and logging errors to allow remaining tasks to run after an exception
+     */
     public function actionAll()
     {
         try {
