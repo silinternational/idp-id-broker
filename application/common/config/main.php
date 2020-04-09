@@ -221,5 +221,9 @@ return [
         'mfaManagerHelpBcc'             => Env::get('MFA_MANAGER_HELP_BCC', ''),
         'contingentUserDuration'        => Env::get('CONTINGENT_USER_DURATION', '+4 weeks'),
         'inviteEmailDelaySeconds'       => Env::get('INVITE_EMAIL_DELAY_SECONDS', 0),
+        'hibpCheckOnLogin'              => Env::get('HIBP_CHECK_ON_LOGIN', true),
+        'hibpCheckInterval'             => Env::get('HIBP_CHECK_INTERVAL', '+1 week'),
+        'hibpGracePeriod'               => Env::get('HIBP_GRACE_PERIOD', '+1 week'),
+        'hibpRequire2svIfPwned'         => Env::get('HIBP_REQUIRE_2SV_IF_PWNED', false),
     ],
 ];

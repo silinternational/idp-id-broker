@@ -10,15 +10,15 @@ use Yii;
  * @property int $id
  * @property int $user_id
  * @property string $type
- * @property string $external_uuid
- * @property string $label
+ * @property string|null $external_uuid
+ * @property string|null $label
  * @property int $verified
  * @property string $created_utc
- * @property string $last_used_utc
+ * @property string|null $last_used_utc
  *
- * @property User $user
  * @property MfaBackupcode[] $mfaBackupcodes
  * @property MfaFailedAttempt[] $mfaFailedAttempts
+ * @property User $user
  */
 class MfaBase extends \yii\db\ActiveRecord
 {
@@ -63,14 +63,8 @@ class MfaBase extends \yii\db\ActiveRecord
     }
 
     /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getUser()
-    {
-        return $this->hasOne(User::className(), ['id' => 'user_id']);
-    }
-
-    /**
+     * Gets query for [[MfaBackupcodes]].
+     *
      * @return \yii\db\ActiveQuery
      */
     public function getMfaBackupcodes()
@@ -79,10 +73,22 @@ class MfaBase extends \yii\db\ActiveRecord
     }
 
     /**
+     * Gets query for [[MfaFailedAttempts]].
+     *
      * @return \yii\db\ActiveQuery
      */
     public function getMfaFailedAttempts()
     {
         return $this->hasMany(MfaFailedAttempt::className(), ['mfa_id' => 'id']);
+    }
+
+    /**
+     * Gets query for [[User]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getUser()
+    {
+        return $this->hasOne(User::className(), ['id' => 'user_id']);
     }
 }

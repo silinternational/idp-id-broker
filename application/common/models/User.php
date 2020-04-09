@@ -4,10 +4,12 @@ namespace common\models;
 
 use Closure;
 use common\components\Emailer;
+use common\components\HIBP;
 use common\helpers\MySqlDateTime;
 use common\helpers\Utils;
 use Exception;
 use Ramsey\Uuid\Uuid;
+use Sil\EmailService\Client\EmailServiceClientException;
 use Yii;
 use yii\behaviors\AttributeBehavior;
 use yii\data\ActiveDataProvider;
@@ -290,6 +292,56 @@ class User extends UserBase
                 $this->addError($attributeName, 'Incorrect password.');
             }
         };
+    }
+
+    /**
+     * If user is due to have password checked with HIBP, check it
+     * If password is found to be pwned, process it
+     * Fail gracefully to allow user to login if HIBP is unavailable
+     */
+    public function checkAndProcessHIBP(): void
+    {
+        if ( ! \Yii::$app->params['hibpCheckOnLogin'] || empty($this->password) || strtotime($this->currentPassword->check_hibp_after) > time()) {
+            return;
+        }
+
+        try {
+            if (!HIBP::isPwned($this->password)) {
+                $this->currentPassword->check_hibp_after = MySqlDateTime::relativeTime(\Yii::$app->params['hibpCheckInterval']);
+                if (!$this->currentPassword->save()) {
+                    \Yii::warning([
+                        'action' => 'check and process hibp',
+                        'employee_id' => $this->employee_id,
+                        'message' => 'unable to update check_hibp_after',
+                        'errors' => $this->getFirstErrors(),
+                    ]);
+                }
+
+                return;
+            }
+        } catch (Exception $e) {
+            \Yii::error([
+                'action' => 'check and process hibp',
+                'employee_id' => $this->employee_id,
+                'message' => $e->getMessage(),
+            ]);
+        }
+
+        // red alert!!!
+        $this->currentPassword->markPwned();
+
+        try {
+            /* @var $emailer Emailer */
+            $emailer = \Yii::$app->emailer;
+            $emailer->sendMessageTo(EmailLog::MESSAGE_TYPE_PASSWORD_PWNED, $this);
+        } catch (EmailServiceClientException $e) {
+            \Yii::error([
+                'action' => 'check and process hibp',
+                'employee_id' => $this->employee_id,
+                'message' => 'unable to send password-pwned email to user',
+                'error' => $e->getMessage(),
+            ]);
+        }
     }
 
     public static function findByUsername(string $username)

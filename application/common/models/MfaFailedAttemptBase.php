@@ -49,6 +49,8 @@ class MfaFailedAttemptBase extends \yii\db\ActiveRecord
     }
 
     /**
+     * Gets query for [[Mfa]].
+     *
      * @return \yii\db\ActiveQuery
      */
     public function getMfa()

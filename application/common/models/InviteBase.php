@@ -54,6 +54,8 @@ class InviteBase extends \yii\db\ActiveRecord
     }
 
     /**
+     * Gets query for [[User]].
+     *
      * @return \yii\db\ActiveQuery
      */
     public function getUser()

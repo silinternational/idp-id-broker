@@ -236,4 +236,25 @@ class Password extends PasswordBase
 
         return $scenarios;
     }
+
+    /**
+     * Mark password as pwned by:
+     *  - set hibp_is_pwned to yes
+     *  - set expiration to now
+     *  - set graceperiod based on config
+     */
+    public function markPwned(): void
+    {
+        $this->hibp_is_pwned = 'yes';
+        $this->expires_on = MySqlDateTime::now();
+        $this->grace_period_ends_on = MySqlDateTime::relativeTime(\Yii::$app->params['hibpGracePeriod']);
+        if ( ! $this->save() ) {
+            \Yii::error([
+                'action' => 'check and process hibp',
+                'employee_id' => $this->user->employee_id,
+                'message' => 'unable to force expire a pwned password',
+                'errors' => $this->getFirstErrors(),
+            ]);
+        }
+    }
 }
