@@ -49,7 +49,5 @@ The API is described by [api.raml](api.raml), and an auto-generated [api.html](a
 `raml2html`. To regenerate the HTML file, run `make raml2html`.
 
 ## Running tests interactively locally
-1. Run `make appfortests` to build and start needed containers
-2. Run `docker-compose run test bash` to get into a shell
-3. Run `./yii migrate --interactive=0` to set up database
-4. Run desired tests, example: `./vendor/bin/behat features/authentication.feature`
+1. Run `make testcli` to build and start needed containers and drop you in a shell
+2. Run desired tests, example: `./vendor/bin/behat features/authentication.feature`
