@@ -288,7 +288,7 @@ Feature: Authentication
     Given I provide the following valid data:
       | property  | value        |
       | username  | pwned_user   |
-      | password  | pass123    |
+      | password  | pass123      |
     When I request "/authentication" be created
     Then the response status code should be 200
     And The user's current password should be marked as pwned
