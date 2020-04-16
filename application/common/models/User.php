@@ -294,18 +294,28 @@ class User extends UserBase
         };
     }
 
-    /**
+    /*
+     * Check the following to decide if HIBP should be called:
+     *  - if Yii::$app->params['hibpCheckOnLogin'] is true
+     *  - if $this->password is not empty
+     *
+     */
+    public function shouldHibpBeChecked(): bool
+    {
+        return (\Yii::$app->params['hibpCheckOnLogin'] &&
+                ! empty($this->password) &&
+                time() >= strtotime($this->currentPassword->check_hibp_after) &&
+                $this->currentPassword->hibp_is_pwned == 'no');
+    }
+
+    /*
      * If user is due to have password checked with HIBP, check it
      * If password is found to be pwned, process it
      * Fail gracefully to allow user to login if HIBP is unavailable
      */
     public function checkAndProcessHIBP(): void
     {
-        if ( ! \Yii::$app->params['hibpCheckOnLogin'] ||
-            empty($this->password) ||
-            time() < strtotime($this->currentPassword->check_hibp_after) ||
-            $this->currentPassword->hibp_is_pwned == 'yes') {
-
+        if (! $this->shouldHibpBeChecked()) {
             return;
         }
 
