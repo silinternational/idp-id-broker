@@ -278,7 +278,7 @@ class Password extends PasswordBase
         try {
             $trackingId = \Yii::$app->params['googleAnalytics']['trackingId']; // 'UA-12345678-12'
             if ($trackingId === null) {
-                \Yii::warning(['google-analytics' => "Aborting GA cron, since the config has no GA trackingId"]);
+                \Yii::warning(['google-analytics' => "Aborting GA pwned since the config has no GA trackingId"]);
                 return;
             }
 
