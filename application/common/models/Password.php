@@ -284,7 +284,7 @@ class Password extends PasswordBase
 
             $clientId = \Yii::$app->params['googleAnalytics']['clientId']; // 'IDP_ID_BROKER_LOCALHOST'
             if ($clientId === null) {
-                \Yii::warning(['google-analytics' => "Aborting GA cron, since the config has no GA clientId"]);
+                \Yii::warning(['google-analytics' => "Aborting GA pwned since the config has no GA clientId"]);
                 return;
             }
             $analytics = new Analytics();
