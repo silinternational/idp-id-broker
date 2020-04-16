@@ -23,7 +23,9 @@ class HIBP
         $response = $client->get($hashes['Prefix']);
         if ($response->getStatusCode() != 200) {
             throw new \Exception(
-                "Error calling HIBP service, status code: " . $response->getStatusCode(), 1586375152);
+                "Error calling HIBP service, status code: " . $response->getStatusCode(),
+                1586375152
+            );
         }
 
         $results = $response->getBody()->getContents();
