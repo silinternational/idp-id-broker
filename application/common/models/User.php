@@ -303,7 +303,8 @@ class User extends UserBase
     {
         if ( ! \Yii::$app->params['hibpCheckOnLogin'] ||
             empty($this->password) ||
-            time() < strtotime($this->currentPassword->check_hibp_after)) {
+            time() < strtotime($this->currentPassword->check_hibp_after) ||
+            $this->currentPassword->hibp_is_pwned == 'yes') {
 
             return;
         }
