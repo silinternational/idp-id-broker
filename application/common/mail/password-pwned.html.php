@@ -16,10 +16,10 @@ use yii\helpers\Html as yHtml;
 <p>Dear <?= yHtml::encode($displayName) ?>,</p>
 
 <p>
-    This email is to inform you that the password you use with your <?= $idpDisplayName ?> account has been discovered
-    in a database of leaked passwords. This does not specifically mean your <?= $idpDisplayName ?> account has been
-    hacked, it just means you have used the same password on other sites as well and one of them was hacked and had it's
-    database of credentials stolen.
+    This email is to inform you that the password you use with your <?= $idpDisplayName ?> identity (IdP) account has
+    been discovered in a database of leaked passwords. This does not specifically mean your <?= $idpDisplayName ?>
+    account has been hacked, it just means you have used the same password on other sites as well and one of them was
+    hacked and had its database of credentials stolen.
 </p>
 
 <p>
@@ -34,9 +34,10 @@ if ( ! $isMfaEnabled) {
     ?>
     <p>
         We also recommend you enable 2-Step Verification on all accounts where possible, but especially for your
-        <?= $idpDisplayName ?> account. With 2-Step Verification, a bad actor having your password would not be
-        to access your account without also having your second authentication factor (a security key, your phone, or
-        your printable backup codes).
+        <?= $idpDisplayName ?> account. With 2-Step Verification, a bad actor having your password would not be able
+        to access your account without also having your second authentication factor (a security key, a code generated
+        on your phone or computer by an app that does not require an internet connection or a data plan or cell service,
+        or your printable backup codes).
     </p>
     <?php
 }

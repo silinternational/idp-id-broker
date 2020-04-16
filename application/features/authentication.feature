@@ -8,6 +8,20 @@ Feature: Authentication
       And the user store is empty
       And I provide the following valid data:
         | property     | value                 |
+        | employee_id  | 93939202111           |
+        | first_name   | Pwned                 |
+        | last_name    | User                  |
+        | display_name | Pwned User            |
+        | username     | pwned_user            |
+        | email        | pwned_user@example.org|
+      And I request "/user" be created
+      And a record exists with an employee_id of "93939202111"
+      And the user has a password of "pass123"
+
+    Given the requester is authorized
+
+      And I provide the following valid data:
+        | property     | value                 |
         | employee_id  | 123                   |
         | first_name   | Shep                  |
         | last_name    | Clark                 |
@@ -260,3 +274,21 @@ Feature: Authentication
         | invite    | xyz123      |
     When I request "/authentication" be created
     Then the response status code should be 400
+
+  Scenario: Attempt to authenticate a user with not pwned password
+    Given I provide the following valid data:
+      | property  | value        |
+      | username  | shep_clark   |
+      | password  | govols!!!    |
+    When I request "/authentication" be created
+    Then the response status code should be 200
+    And The user's current password should not be marked as pwned
+
+  Scenario: Attempt to authenticate a user with pwned password
+    Given I provide the following valid data:
+      | property  | value        |
+      | username  | pwned_user   |
+      | password  | pass123    |
+    When I request "/authentication" be created
+    Then the response status code should be 200
+    And The user's current password should be marked as pwned

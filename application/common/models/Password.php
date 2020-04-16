@@ -237,6 +237,20 @@ class Password extends PasswordBase
         return $scenarios;
     }
 
+    public function extendHibpCheckAfter(): void
+    {
+        $this->setScenario(self::SCENARIO_UPDATE_METADATA);
+        $this->check_hibp_after = MySqlDateTime::relativeTime(\Yii::$app->params['hibpCheckInterval']);
+        if (!$this->save()) {
+            \Yii::warning([
+                'action' => 'extend hibp check after',
+                'employee_id' => $this->employee_id,
+                'message' => 'unable to update check_hibp_after',
+                'errors' => $this->getFirstErrors(),
+            ]);
+        }
+    }
+
     /**
      * Mark password as pwned by:
      *  - set hibp_is_pwned to yes
@@ -245,8 +259,9 @@ class Password extends PasswordBase
      */
     public function markPwned(): void
     {
+        $this->setScenario(self::SCENARIO_UPDATE_METADATA);
         $this->hibp_is_pwned = 'yes';
-        $this->expires_on = MySqlDateTime::now();
+        $this->expires_on = MySqlDateTime::relativeTime('-5 minutes');
         $this->grace_period_ends_on = MySqlDateTime::relativeTime(\Yii::$app->params['hibpGracePeriod']);
         if ( ! $this->save() ) {
             \Yii::error([

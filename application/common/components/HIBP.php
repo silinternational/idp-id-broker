@@ -27,19 +27,14 @@ class HIBP
         }
 
         $results = $response->getBody()->getContents();
-
-        // remove found counts for easier matching
-        $sufixes = preg_replace('/:\d+/m','', $results);
-        $hashlist = explode('\n', $sufixes);
-
-        return in_array($hashes['Suffix'], $hashlist);
+        return stripos($results, $hashes['Suffix']) !== false;
     }
 
-    private static function asHashes(string $password): array {
+    public static function asHashes(string $password): array {
         $hash = sha1($password);
         return [
-            "Prefix" => substr($hash, 0,4),
-            "Suffix" => substr($hash, 5,strlen($hash)-1),
+            "Prefix" => substr($hash, 0,5),
+            "Suffix" => substr($hash, 5,strlen($hash)),
         ];
     }
 

@@ -301,22 +301,16 @@ class User extends UserBase
      */
     public function checkAndProcessHIBP(): void
     {
-        if ( ! \Yii::$app->params['hibpCheckOnLogin'] || empty($this->password) || strtotime($this->currentPassword->check_hibp_after) > time()) {
+        if ( ! \Yii::$app->params['hibpCheckOnLogin'] ||
+            empty($this->password) ||
+            time() < strtotime($this->currentPassword->check_hibp_after)) {
+
             return;
         }
 
         try {
             if (!HIBP::isPwned($this->password)) {
-                $this->currentPassword->check_hibp_after = MySqlDateTime::relativeTime(\Yii::$app->params['hibpCheckInterval']);
-                if (!$this->currentPassword->save()) {
-                    \Yii::warning([
-                        'action' => 'check and process hibp',
-                        'employee_id' => $this->employee_id,
-                        'message' => 'unable to update check_hibp_after',
-                        'errors' => $this->getFirstErrors(),
-                    ]);
-                }
-
+                $this->currentPassword->extendHibpCheckAfter();
                 return;
             }
         } catch (Exception $e) {
@@ -325,6 +319,8 @@ class User extends UserBase
                 'employee_id' => $this->employee_id,
                 'message' => $e->getMessage(),
             ]);
+
+            return;
         }
 
         // red alert!!!

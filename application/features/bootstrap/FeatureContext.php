@@ -742,4 +742,24 @@ class FeatureContext extends YiiContext
         $this->userFromDb->scenario = User::SCENARIO_UPDATE_USER;
         $this->userFromDb->save();
     }
+
+    /**
+     * @Given /^The user's current password should not be marked as pwned$/
+     */
+    public function theUserSCurrentPasswordShouldNotBeMarkedAsPwned()
+    {
+        $user = User::findOne(['username' => $this->reqBody['username']]);
+        Assert::eq($user->currentPassword->hibp_is_pwned, "no");
+        Assert::greaterThanEq(strtotime($user->currentPassword->expires_on), time());
+    }
+
+    /**
+     * @Given /^The user's current password should be marked as pwned$/
+     */
+    public function theUserSCurrentPasswordShouldBeMarkedAsPwned()
+    {
+        $user = User::findOne(['username' => $this->reqBody['username']]);
+        Assert::eq($user->currentPassword->hibp_is_pwned, "yes");
+        Assert::lessThanEq(strtotime($user->currentPassword->expires_on), time());
+    }
 }
