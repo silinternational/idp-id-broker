@@ -263,9 +263,9 @@ class Password extends PasswordBase
     {
         $this->setScenario(self::SCENARIO_UPDATE_METADATA);
         $this->hibp_is_pwned = 'yes';
-        $this->expires_on = MySqlDateTime::relativeTime('-5 minutes');
+        $this->expires_on = MySqlDateTime::relativeTime('-20 years');
         $this->grace_period_ends_on = MySqlDateTime::relativeTime(\Yii::$app->params['hibpGracePeriod']);
-        if ( ! $this->save() ) {
+        if (! $this->save()) {
             \Yii::error([
                 'action' => 'check and process hibp',
                 'employee_id' => $this->user->employee_id,
@@ -303,6 +303,5 @@ class Password extends PasswordBase
                 'error' => $e->getMessage(),
             ]);
         }
-
     }
 }
