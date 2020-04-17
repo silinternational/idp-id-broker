@@ -283,6 +283,7 @@ Feature: Authentication
     When I request "/authentication" be created
     Then the response status code should be 200
     And The user's current password should not be marked as pwned
+    And The user's password is not expired
 
   Scenario: Attempt to authenticate a user with pwned password
     Given I provide the following valid data:
@@ -292,3 +293,4 @@ Feature: Authentication
     When I request "/authentication" be created
     Then the response status code should be 200
     And The user's current password should be marked as pwned
+    And The user's password is expired

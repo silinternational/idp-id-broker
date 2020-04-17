@@ -12,7 +12,7 @@ Feature: Unit Tests for the HIBP component
 
 
   Scenario: Validate HIBP responses for pwned password
-    Given I have a pwned "govols"
+    Given I have a pwned password
     When I ask if it is pwned
     Then I'll get a true response
 

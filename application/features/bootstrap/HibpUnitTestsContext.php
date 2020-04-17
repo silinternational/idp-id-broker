@@ -36,11 +36,11 @@ class HibpUnitTestsContext extends UnitTestsContext
     }
 
     /**
-     * @Given I have a pwned :arg1
+     * @Given I have a pwned password
      */
-    public function iHaveAPwned($arg1)
+    public function iHaveAPwnedPassword()
     {
-        $this->password = $arg1;
+        $this->password = 'pass123';
     }
 
     /**
@@ -74,5 +74,4 @@ class HibpUnitTestsContext extends UnitTestsContext
     {
         Assert::false($this->isPwned);
     }
-
 }

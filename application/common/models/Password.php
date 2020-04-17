@@ -172,21 +172,23 @@ class Password extends PasswordBase
     }
 
     /**
-     * Calculate expires_on date based on if user has MFA configured
+     * If password is pwned, return actual expires_on.
+     * Otherwise calculate expires_on date based on if user has MFA configured
      * @return string
      */
     public function getExpiresOn()
     {
-        return $this->getMfaExtendedDate($this->expires_on);
+        return $this->hibp_is_pwned == 'yes' ? $this->expires_on : $this->getMfaExtendedDate($this->expires_on);
     }
 
     /**
-     * Calculate grace_period_ends_on based on if user has MFA configured
+     * If password is pwned, return actual grace_period_ends_on.
+     * Otherwise calculate grace_period_ends_on based on if user has MFA configured
      * @return string
      */
     public function getGracePeriodEndsOn()
     {
-        return $this->getMfaExtendedDate($this->grace_period_ends_on);
+        return $this->hibp_is_pwned == 'yes' ? $this->grace_period_ends_on : $this->getMfaExtendedDate($this->grace_period_ends_on);
     }
 
     /**
