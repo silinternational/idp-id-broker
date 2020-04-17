@@ -18,8 +18,8 @@ use yii\helpers\Html as yHtml;
 <p>
     This email is to inform you that the password you use with your <?= $idpDisplayName ?> identity (IdP) account has
     been discovered in a database of leaked passwords. This does not specifically mean your <?= $idpDisplayName ?>
-    account has been hacked, it just means you (or someone else) used the same password on other websites as well, and one of them was
-    hacked and had its database of credentials stolen.
+    identity account has been hacked, it just means you (or someone else) used the same password on other websites as
+    well, and one of them was hacked and had its database of credentials stolen.
 </p>
 
 <p>
@@ -30,7 +30,7 @@ use yii\helpers\Html as yHtml;
 </p>
 
 <?php
-if ( ! $isMfaEnabled) {
+if (! $isMfaEnabled) {
     ?>
     <p>
         We also recommend you enable 2-Step Verification on all accounts where possible, but especially for your
