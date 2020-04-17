@@ -339,7 +339,9 @@ class User extends UserBase
         try {
             /* @var $emailer Emailer */
             $emailer = \Yii::$app->emailer;
-            $emailer->sendMessageTo(EmailLog::MESSAGE_TYPE_PASSWORD_PWNED, $this);
+            $emailer->sendMessageTo(EmailLog::MESSAGE_TYPE_PASSWORD_PWNED, $this, [
+                'bccAddress' => \Yii::$app->params['hibpNotificationBcc']
+            ]);
         } catch (EmailServiceClientException $e) {
             \Yii::error([
                     'action' => 'check and process hibp',

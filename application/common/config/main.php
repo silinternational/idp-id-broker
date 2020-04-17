@@ -225,5 +225,6 @@ return [
         'hibpCheckInterval'             => Env::get('HIBP_CHECK_INTERVAL', '+1 week'),
         'hibpGracePeriod'               => Env::get('HIBP_GRACE_PERIOD', '+1 week'),
         'hibpTrackingOnly'              => Env::get('HIBP_TRACKING_ONLY', false),
+        'hibpNotificationBcc'           => Env::get('HIBP_NOTIFICATION_BCC', ''),
     ],
 ];
