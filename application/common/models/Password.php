@@ -11,8 +11,6 @@ use yii\db\ActiveRecord;
 use yii\helpers\ArrayHelper;
 use yii\web\ConflictHttpException;
 
-use TheIconic\Tracking\GoogleAnalytics\Analytics;
-
 /**
  * Class Password
  * @package common\models
@@ -274,35 +272,11 @@ class Password extends PasswordBase
                 'message' => 'unable to force expire a pwned password',
                 'errors' => $this->getFirstErrors(),
             ]);
-        }
-
-        // track event
-        try {
-            $trackingId = \Yii::$app->params['googleAnalytics']['trackingId']; // 'UA-12345678-12'
-            if ($trackingId === null) {
-                \Yii::warning(['google-analytics' => "Aborting GA pwned since the config has no GA trackingId"]);
-                return;
-            }
-
-            $clientId = \Yii::$app->params['googleAnalytics']['clientId']; // 'IDP_ID_BROKER_LOCALHOST'
-            if ($clientId === null) {
-                \Yii::warning(['google-analytics' => "Aborting GA pwned since the config has no GA clientId"]);
-                return;
-            }
-            $analytics = new Analytics();
-            $analytics->setProtocolVersion('1')
-                ->setTrackingId($trackingId)
-                ->setClientId($clientId)
-                ->setEventCategory('password')
-                ->setEventAction('login')
-                ->setEventLabel('pwned')
-                ->sendEvent();
-        } catch (\Exception $e) {
+        } else {
             \Yii::warning([
-                'action' => 'track password pwned event',
-                'employee_id' => $this->employee_id,
-                'message' => 'unable to track event in GA',
-                'error' => $e->getMessage(),
+                'action' => 'mark pwned',
+                'employee_id' => $this->user->employee_id,
+                'message' => 'pwned password detected and processed'
             ]);
         }
     }

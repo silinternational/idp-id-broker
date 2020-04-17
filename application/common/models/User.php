@@ -10,6 +10,7 @@ use common\helpers\Utils;
 use Exception;
 use Ramsey\Uuid\Uuid;
 use Sil\EmailService\Client\EmailServiceClientException;
+use TheIconic\Tracking\GoogleAnalytics\Analytics;
 use Yii;
 use yii\behaviors\AttributeBehavior;
 use yii\data\ActiveDataProvider;
@@ -319,33 +320,78 @@ class User extends UserBase
             return;
         }
 
-        try {
-            if (!HIBP::isPwned($this->password)) {
-                $this->currentPassword->extendHibpCheckAfter();
-                return;
-            }
-        } catch (Exception $e) {
-            \Yii::error([
-                'action' => 'check and process hibp',
-                'employee_id' => $this->employee_id,
-                'message' => $e->getMessage(),
-            ]);
-
+        if (! $this->isPasswordPwned()) {
+            $this->currentPassword->extendHibpCheckAfter();
             return;
         }
 
-        // red alert!!!
-        $this->currentPassword->markPwned();
+        if (\Yii::$app->params['hibpTrackingOnly']) {
+            // extend check after date to only track user once per checking period
+            $this->currentPassword->extendHibpCheckAfter();
+            $this->trackPwnedPasswordGAEvent();
+            return;
+        }
 
+        $this->currentPassword->markPwned();
+        $this->trackPwnedPasswordGAEvent();
+
+        // notify user
         try {
             /* @var $emailer Emailer */
             $emailer = \Yii::$app->emailer;
             $emailer->sendMessageTo(EmailLog::MESSAGE_TYPE_PASSWORD_PWNED, $this);
         } catch (EmailServiceClientException $e) {
             \Yii::error([
+                    'action' => 'check and process hibp',
+                    'employee_id' => $this->employee_id,
+                    'message' => 'unable to send password-pwned email to user',
+                    'error' => $e->getMessage(),
+                ]);
+        }
+    }
+
+    public function isPasswordPwned(): bool
+    {
+        try {
+            return HIBP::isPwned($this->password);
+        } catch (Exception $e) {
+            \Yii::error([
                 'action' => 'check and process hibp',
                 'employee_id' => $this->employee_id,
-                'message' => 'unable to send password-pwned email to user',
+                'message' => $e->getMessage(),
+            ]);
+        }
+
+        return false;
+    }
+
+    public function trackPwnedPasswordGAEvent(): void
+    {
+        try {
+            $trackingId = \Yii::$app->params['googleAnalytics']['trackingId']; // 'UA-12345678-12'
+            if ($trackingId === null) {
+                \Yii::warning(['google-analytics' => "Aborting GA pwned since the config has no GA trackingId"]);
+                return;
+            }
+
+            $clientId = \Yii::$app->params['googleAnalytics']['clientId']; // 'IDP_ID_BROKER_LOCALHOST'
+            if ($clientId === null) {
+                \Yii::warning(['google-analytics' => "Aborting GA pwned since the config has no GA clientId"]);
+                return;
+            }
+            $analytics = new Analytics();
+            $analytics->setProtocolVersion('1')
+                ->setTrackingId($trackingId)
+                ->setClientId($clientId)
+                ->setEventCategory('password')
+                ->setEventAction('login')
+                ->setEventLabel('pwned')
+                ->sendEvent();
+        } catch (\Exception $e) {
+            \Yii::warning([
+                'action' => 'track password pwned event',
+                'employee_id' => $this->employee_id,
+                'message' => 'unable to track event in GA',
                 'error' => $e->getMessage(),
             ]);
         }
