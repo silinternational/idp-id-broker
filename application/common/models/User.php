@@ -325,15 +325,15 @@ class User extends UserBase
             return;
         }
 
+        $this->trackPwnedPasswordGAEvent();
+
         if (\Yii::$app->params['hibpTrackingOnly']) {
             // extend check after date to only track user once per checking period
             $this->currentPassword->extendHibpCheckAfter();
-            $this->trackPwnedPasswordGAEvent();
             return;
         }
 
         $this->currentPassword->markPwned();
-        $this->trackPwnedPasswordGAEvent();
 
         // notify user
         try {
