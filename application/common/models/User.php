@@ -344,11 +344,11 @@ class User extends UserBase
             ]);
         } catch (EmailServiceClientException $e) {
             \Yii::error([
-                    'action' => 'check and process hibp',
-                    'employee_id' => $this->employee_id,
-                    'message' => 'unable to send password-pwned email to user',
-                    'error' => $e->getMessage(),
-                ]);
+                'action' => 'check and process hibp',
+                'employee_id' => $this->employee_id,
+                'message' => 'unable to send password-pwned email to user',
+                'error' => $e->getMessage(),
+            ]);
         }
     }
 
