@@ -44,6 +44,7 @@ class Emailer extends Component
 
     const SUBJ_PASSWORD_EXPIRING = 'The password for your {idpDisplayName} Identity account is about to expire';
     const SUBJ_PASSWORD_EXPIRED = 'The password for your {idpDisplayName} Identity account has expired';
+    const SUBJ_PASSWORD_PWNED = 'ALERT: The password for your {idpDisplayName} Identity account has been exposed';
 
     const PROP_SUBJECT = 'subject';
     const PROP_TO_ADDRESS = 'to_address';
@@ -130,6 +131,7 @@ class Emailer extends Component
 
     public $subjectForPasswordExpiring;
     public $subjectForPasswordExpired;
+    public $subjectForPasswordPwned;
 
     /* The number of days of not using a security key after which we email the user */
     public $lostSecurityKeyEmailDays;
@@ -296,6 +298,7 @@ class Emailer extends Component
 
         $this->subjectForPasswordExpiring = $this->subjectForPasswordExpiring ?? self::SUBJ_PASSWORD_EXPIRING;
         $this->subjectForPasswordExpired = $this->subjectForPasswordExpired ?? self::SUBJ_PASSWORD_EXPIRED;
+        $this->subjectForPasswordPwned = $this->subjectForPasswordPwned ?? self::SUBJ_PASSWORD_PWNED;
 
         $this->subjects = [
             EmailLog::MESSAGE_TYPE_INVITE => $this->subjectForInvite,
@@ -316,6 +319,7 @@ class Emailer extends Component
             EmailLog::MESSAGE_TYPE_MFA_MANAGER_HELP => $this->subjectForMfaManagerHelp,
             EmailLog::MESSAGE_TYPE_PASSWORD_EXPIRING => $this->subjectForPasswordExpiring,
             EmailLog::MESSAGE_TYPE_PASSWORD_EXPIRED => $this->subjectForPasswordExpired,
+            EmailLog::MESSAGE_TYPE_PASSWORD_PWNED => $this->subjectForPasswordPwned,
         ];
         
         $this->assertConfigIsValid();
@@ -331,9 +335,10 @@ class Emailer extends Component
      * @param string $messageType The message type. Must be one of the
      *     EmailLog::MESSAGE_TYPE_* values.
      * @param User $user The intended recipient.
-     * @param string[] $data  Data fields for email template. Include key 'toAddress' to override
+     * @param string[] $data Data fields for email template. Include key 'toAddress' to override
      *     sending to primary address in User object.
      * @param int $delaySeconds Number of seconds to delay sending the email. Default = no delay.
+     * @throws \Sil\EmailService\Client\EmailServiceClientException
      */
     public function sendMessageTo(string $messageType, User $user, array $data = [], int $delaySeconds = 0)
     {

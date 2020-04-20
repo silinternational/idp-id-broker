@@ -9,7 +9,7 @@ use Yii;
  *
  * @property int $id
  * @property int $user_id
- * @property string $message_type
+ * @property string|null $message_type
  * @property string $sent_utc
  *
  * @property User $user
@@ -52,6 +52,8 @@ class EmailLogBase extends \yii\db\ActiveRecord
     }
 
     /**
+     * Gets query for [[User]].
+     *
      * @return \yii\db\ActiveQuery
      */
     public function getUser()

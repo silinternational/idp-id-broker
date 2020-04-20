@@ -4,10 +4,13 @@ namespace common\models;
 
 use Closure;
 use common\components\Emailer;
+use common\components\HIBP;
 use common\helpers\MySqlDateTime;
 use common\helpers\Utils;
 use Exception;
 use Ramsey\Uuid\Uuid;
+use Sil\EmailService\Client\EmailServiceClientException;
+use TheIconic\Tracking\GoogleAnalytics\Analytics;
 use Yii;
 use yii\behaviors\AttributeBehavior;
 use yii\data\ActiveDataProvider;
@@ -290,6 +293,110 @@ class User extends UserBase
                 $this->addError($attributeName, 'Incorrect password.');
             }
         };
+    }
+
+    /*
+     * Check the following to decide if HIBP should be called:
+     *  - if Yii::$app->params['hibpCheckOnLogin'] is true
+     *  - if $this->password is not empty
+     *
+     */
+    public function shouldHibpBeChecked(): bool
+    {
+        return (\Yii::$app->params['hibpCheckOnLogin'] &&
+                ! empty($this->password) &&
+                time() >= strtotime($this->currentPassword->check_hibp_after) &&
+                $this->currentPassword->hibp_is_pwned == 'no');
+    }
+
+    /*
+     * If user is due to have password checked with HIBP, check it
+     * If password is found to be pwned, process it
+     * Fail gracefully to allow user to login if HIBP is unavailable
+     */
+    public function checkAndProcessHIBP(): void
+    {
+        if (! $this->shouldHibpBeChecked()) {
+            return;
+        }
+
+        if (! $this->isPasswordPwned()) {
+            $this->currentPassword->extendHibpCheckAfter();
+            return;
+        }
+
+        $this->trackPwnedPasswordGAEvent();
+
+        if (\Yii::$app->params['hibpTrackingOnly']) {
+            // extend check after date to only track user once per checking period
+            $this->currentPassword->extendHibpCheckAfter();
+            return;
+        }
+
+        $this->currentPassword->markPwned();
+
+        // notify user
+        try {
+            /* @var $emailer Emailer */
+            $emailer = \Yii::$app->emailer;
+            $emailer->sendMessageTo(EmailLog::MESSAGE_TYPE_PASSWORD_PWNED, $this, [
+                'bccAddress' => \Yii::$app->params['hibpNotificationBcc']
+            ]);
+        } catch (EmailServiceClientException $e) {
+            \Yii::error([
+                'action' => 'check and process hibp',
+                'employee_id' => $this->employee_id,
+                'message' => 'unable to send password-pwned email to user',
+                'error' => $e->getMessage(),
+            ]);
+        }
+    }
+
+    public function isPasswordPwned(): bool
+    {
+        try {
+            return HIBP::isPwned($this->password);
+        } catch (Exception $e) {
+            \Yii::error([
+                'action' => 'check and process hibp',
+                'employee_id' => $this->employee_id,
+                'message' => $e->getMessage(),
+            ]);
+        }
+
+        return false;
+    }
+
+    public function trackPwnedPasswordGAEvent(): void
+    {
+        try {
+            $trackingId = \Yii::$app->params['googleAnalytics']['trackingId']; // 'UA-12345678-12'
+            if ($trackingId === null) {
+                \Yii::warning(['google-analytics' => "Aborting GA pwned since the config has no GA trackingId"]);
+                return;
+            }
+
+            $clientId = \Yii::$app->params['googleAnalytics']['clientId']; // 'IDP_ID_BROKER_LOCALHOST'
+            if ($clientId === null) {
+                \Yii::warning(['google-analytics' => "Aborting GA pwned since the config has no GA clientId"]);
+                return;
+            }
+            $analytics = new Analytics();
+            $analytics->setProtocolVersion('1')
+                ->setTrackingId($trackingId)
+                ->setClientId($clientId)
+                ->setEventCategory('password')
+                ->setEventAction('login')
+                ->setEventLabel('pwned')
+                ->sendEvent();
+        } catch (\Exception $e) {
+            \Yii::warning([
+                'action' => 'track password pwned event',
+                'employee_id' => $this->employee_id,
+                'message' => 'unable to track event in GA',
+                'error' => $e->getMessage(),
+            ]);
+        }
     }
 
     public static function findByUsername(string $username)

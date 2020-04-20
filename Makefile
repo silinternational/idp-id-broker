@@ -30,6 +30,9 @@ quicktest:
 test: appfortests
 	docker-compose run --rm test
 
+testcli: appfortests tables
+	docker-compose run --rm test bash
+
 clean:
 	docker-compose kill
 	docker system prune -f
