@@ -23,7 +23,7 @@ use yii\helpers\Html as yHtml;
 </p>
 
 <p>
-    As a result, your <?= $idpDisplayName ?> account password has been disabled for future use and you will need to
+    As a result, your <?= $idpDisplayName ?> identity account password has been disabled for future use and you will need to
     change your password before you can log in again. You should also change the password on any other sites where you
     used the same password. We do not recommend that you use the same password on multiple sites. We HIGHLY recommend
     you use a password manager to generate strong unique passwords for every website.
