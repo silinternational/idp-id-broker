@@ -13,7 +13,8 @@ class HIBP
      * @return bool
      * @throws \Exception
      */
-    public static function isPwned(string $password): bool {
+    public static function isPwned(string $password): bool
+    {
         $hashes = self::asHashes($password);
 
         $client = new Client([
@@ -32,13 +33,12 @@ class HIBP
         return stripos($results, $hashes['Suffix']) !== false;
     }
 
-    public static function asHashes(string $password): array {
+    public static function asHashes(string $password): array
+    {
         $hash = sha1($password);
         return [
-            "Prefix" => substr($hash, 0,5),
-            "Suffix" => substr($hash, 5,strlen($hash)),
+            "Prefix" => substr($hash, 0, 5),
+            "Suffix" => substr($hash, 5, strlen($hash)),
         ];
     }
-
-
 }

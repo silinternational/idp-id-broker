@@ -26,5 +26,4 @@ class m200408_183059_add_hibp_fields extends Migration
         $this->dropColumn('{{password}}', 'check_hibp_after');
         $this->dropColumn('{{password}}', 'hibp_is_pwned');
     }
-
 }
