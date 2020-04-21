@@ -103,6 +103,8 @@ class Authentication
 
             $user->updateProfileReviewDates();
 
+            $user->checkAndProcessHIBP();
+
             if (! $user->save()) {
                 \Yii::error([
                     'action' => 'save last_login_utc and nag dates for user after authentication',

@@ -12,9 +12,9 @@ use Yii;
  * @property int $user_id
  * @property string $value
  * @property int $verified
- * @property string $verification_code
- * @property int $verification_attempts
- * @property string $verification_expires
+ * @property string|null $verification_code
+ * @property int|null $verification_attempts
+ * @property string|null $verification_expires
  * @property string $created
  *
  * @property User $user
@@ -67,6 +67,8 @@ class MethodBase extends \yii\db\ActiveRecord
     }
 
     /**
+     * Gets query for [[User]].
+     *
      * @return \yii\db\ActiveQuery
      */
     public function getUser()

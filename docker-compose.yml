@@ -25,17 +25,23 @@ services:
         env_file:
             - ./local.env
         environment:
-#            EMAILER_CLASS: \Sil\SilIdBroker\Behat\Context\fakes\FakeEmailer
-            EMAIL_SIGNATURE: Dummy Signature for Development
+#            RUN_TASK: cron/all
+            EMAILER_CLASS: \Sil\SilIdBroker\Behat\Context\fakes\FakeEmailer
+            EMAIL_SIGNATURE: "Dummy Signature for Development\r\rdo not reply to this email"
 
     cron:
         build: ./
         volumes_from:
             - data
+        volumes:
+            - ./dockerbuild/broker-cron:/etc/cron.d/broker-cron
         depends_on:
             - db
         env_file:
             - ./local.env
+        environment:
+            EMAILER_CLASS: \Sil\SilIdBroker\Behat\Context\fakes\FakeEmailer
+            EMAIL_SIGNATURE: "Dummy Signature for Development\r\rdo not reply to this email"
         command: ["/data/run-cron.sh"]
 
     appfortests:

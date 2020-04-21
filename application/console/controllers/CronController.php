@@ -116,4 +116,46 @@ class CronController extends Controller
     {
         User::deleteInactiveUsers();
     }
+
+    /**
+     * Run all cron tasks, catching and logging errors to allow remaining tasks to run after an exception
+     */
+    public function actionAll()
+    {
+        try {
+            $this->actionRemoveOldUnverifiedRecords();
+        } catch (\Throwable $e) {
+            \Yii::error($e->getMessage());
+        }
+
+        try {
+            $this->actionDeleteInactiveUsers();
+        } catch (\Throwable $e) {
+            \Yii::error($e->getMessage());
+        }
+
+        try {
+            $this->actionSendDelayedMfaRelatedEmails();
+        } catch (\Throwable $e) {
+            \Yii::error($e->getMessage());
+        }
+
+        try {
+            $this->actionSendMethodReminderEmails();
+        } catch (\Throwable $e) {
+            \Yii::error($e->getMessage());
+        }
+
+        try {
+            $this->actionSendPasswordExpiryEmails();
+        } catch (\Throwable $e) {
+            \Yii::error($e->getMessage());
+        }
+
+        try {
+            $this->actionGoogleAnalytics();
+        } catch (\Throwable $e) {
+            \Yii::error($e->getMessage());
+        }
+    }
 }

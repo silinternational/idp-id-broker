@@ -11,7 +11,7 @@ use Yii;
  * @property int $mfa_id
  * @property string $value
  * @property string $created_utc
- * @property string $expires_utc
+ * @property string|null $expires_utc
  *
  * @property Mfa $mfa
  */
@@ -54,6 +54,8 @@ class MfaBackupcodeBase extends \yii\db\ActiveRecord
     }
 
     /**
+     * Gets query for [[Mfa]].
+     *
      * @return \yii\db\ActiveQuery
      */
     public function getMfa()

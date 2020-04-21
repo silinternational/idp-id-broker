@@ -170,21 +170,23 @@ class Password extends PasswordBase
     }
 
     /**
-     * Calculate expires_on date based on if user has MFA configured
+     * If password is pwned, return actual expires_on.
+     * Otherwise calculate expires_on date based on if user has MFA configured
      * @return string
      */
     public function getExpiresOn()
     {
-        return $this->getMfaExtendedDate($this->expires_on);
+        return $this->hibp_is_pwned == 'yes' ? $this->expires_on : $this->getMfaExtendedDate($this->expires_on);
     }
 
     /**
-     * Calculate grace_period_ends_on based on if user has MFA configured
+     * If password is pwned, return actual grace_period_ends_on.
+     * Otherwise calculate grace_period_ends_on based on if user has MFA configured
      * @return string
      */
     public function getGracePeriodEndsOn()
     {
-        return $this->getMfaExtendedDate($this->grace_period_ends_on);
+        return $this->hibp_is_pwned == 'yes' ? $this->grace_period_ends_on : $this->getMfaExtendedDate($this->grace_period_ends_on);
     }
 
     /**
@@ -235,5 +237,47 @@ class Password extends PasswordBase
         ];
 
         return $scenarios;
+    }
+
+    public function extendHibpCheckAfter(): void
+    {
+        $this->setScenario(self::SCENARIO_UPDATE_METADATA);
+        $this->check_hibp_after = MySqlDateTime::relativeTime(\Yii::$app->params['hibpCheckInterval']);
+        if (!$this->save()) {
+            \Yii::warning([
+                'action' => 'extend hibp check after',
+                'employee_id' => $this->employee_id,
+                'message' => 'unable to update check_hibp_after',
+                'errors' => $this->getFirstErrors(),
+            ]);
+        }
+    }
+
+    /**
+     * Mark password as pwned by:
+     *  - set hibp_is_pwned to yes
+     *  - set expiration to now
+     *  - set graceperiod based on config
+     */
+    public function markPwned(): void
+    {
+        $this->setScenario(self::SCENARIO_UPDATE_METADATA);
+        $this->hibp_is_pwned = 'yes';
+        $this->expires_on = MySqlDateTime::relativeTime('-20 years');
+        $this->grace_period_ends_on = MySqlDateTime::relativeTime(\Yii::$app->params['hibpGracePeriod']);
+        if (! $this->save()) {
+            \Yii::error([
+                'action' => 'check and process hibp',
+                'employee_id' => $this->user->employee_id,
+                'message' => 'unable to force expire a pwned password',
+                'errors' => $this->getFirstErrors(),
+            ]);
+        } else {
+            \Yii::warning([
+                'action' => 'mark pwned',
+                'employee_id' => $this->user->employee_id,
+                'message' => 'pwned password detected and processed'
+            ]);
+        }
     }
 }

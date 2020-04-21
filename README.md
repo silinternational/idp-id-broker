@@ -47,3 +47,7 @@ email.
 ## API Documentation
 The API is described by [api.raml](api.raml), and an auto-generated [api.html](api.html) created by
 `raml2html`. To regenerate the HTML file, run `make raml2html`.
+
+## Running tests interactively locally
+1. Run `make testcli` to build and start needed containers and drop you in a shell
+2. Run desired tests, example: `./vendor/bin/behat features/authentication.feature`

@@ -68,6 +68,11 @@ class UnitTestsContext extends YiiContext
      */
     protected function createNewUserInDatabase($username, $properties = [])
     {
+        Assert::false(
+            array_key_exists('username', $properties),
+            'properties array cannot override username'
+        );
+
         $existingUser = User::findByUsername($username);
         if ($existingUser !== null) {
             Assert::notSame($existingUser->delete(), false);
