@@ -14,6 +14,13 @@ if [[ $APP_ENV == "dev" ]]; then
     apt-get -y -q install php-xdebug
 fi
 
+# fix folder permissions
+chown -R www-data:www-data \
+  /data/console/runtime/
+
+# Run database migrations
+runny /data/yii migrate --interactive=0
+
 if [[ ! -z $RUN_TASK ]]; then
     ./yii $RUN_TASK
     exit $?
