@@ -36,6 +36,7 @@ return [
         ],
         // http://www.yiiframework.com/doc-2.0/guide-runtime-routing.html
         'urlManager' => [
+            'cache' => null,
             'enablePrettyUrl' => true, // turns /index.php?r=post%2Fview&id=100 into /index.php/post/100
             'showScriptName' => false, // turns /index.php/post/100 into /post/100
             // http://www.yiiframework.com/doc-2.0/guide-rest-routing.html
