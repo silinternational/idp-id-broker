@@ -6,6 +6,18 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [5.0.1] - 2020-04-23
+### Fixed
+- Moved migration run from run-cron.sh to run.sh 
+- Silenced a new Yii warning
+### Changed
+- pwned expiration changed from past (-20 years) to near future (+5 minutes)
+
+## [5.0.0] - 2020-04-21
+### Added
+- Added haveibeenpwend checking during authentication
+- Changed logging from syslog to stdout/stderr
+
 ## [4.9.0] - 2020-03-09
 ### Added
 - Added two new configuration options: `mfa_required_for_new_users` and `mfa_allow_disable`
@@ -201,7 +213,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 - Initial version of ID Broker.
 
-[Unreleased]: https://github.com/silinternational/idp-id-broker/compare/4.7.1...HEAD
+[Unreleased]: https://github.com/silinternational/idp-id-broker/compare/5.0.1...HEAD
+[5.0.1]: https://github.com/silinternational/idp-id-broker/compare/5.0.0...5.0.1
+[5.0.0]: https://github.com/silinternational/idp-id-broker/compare/4.7.1...5.0.0
 [4.7.1]: https://github.com/silinternational/idp-id-broker/compare/4.7.0...4.7.1
 [4.7.0]: https://github.com/silinternational/idp-id-broker/compare/4.6.4...4.7.0
 [4.6.4]: https://github.com/silinternational/idp-id-broker/compare/4.6.3...4.6.4
