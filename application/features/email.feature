@@ -372,17 +372,19 @@ Feature: Email
     Given we are configured <toSendOrNot> password expired emails
       And I remove records of any emails that have been sent
       And a user already exists
-      And that user has a password that expires <day>
+      And that user has a password that expires in <number> days
       And a "password-expired" email <hasOrHasNot> been sent to that user
     When I send password expired emails
     Then a "password-expired" email <shouldOrNot> have been sent to them
 
     Examples:
-      | toSendOrNot  | day        | hasOrHasNot  | shouldOrNot    |
-      | to send      | tomorrow   | has NOT      | should NOT     |
-      | to send      | today      | has NOT      | should NOT     |
-      | to send      | yesterday  | has NOT      | should         |
-      | to send      | tomorrow   | has          | should NOT     |
-      | to send      | today      | has          | should NOT     |
-      | to send      | yesterday  | has          | should NOT     |
-      | NOT to send  | yesterday  | has NOT      | should NOT     |
+      | toSendOrNot  | number | hasOrHasNot  | shouldOrNot    |
+      | to send      | 1      | has NOT      | should NOT     |
+      | to send      | 0      | has NOT      | should NOT     |
+      | to send      | -1     | has NOT      | should         |
+      | to send      | -15    | has NOT      | should         |
+      | to send      | -16    | has NOT      | should NOT     |
+      | to send      | 1      | has          | should NOT     |
+      | to send      | 0      | has          | should NOT     |
+      | to send      | -1     | has          | should NOT     |
+      | NOT to send  | -1     | has NOT      | should NOT     |
