@@ -661,16 +661,26 @@ class Emailer extends Component
             return;
         }
 
+        $logData = [
+            'action' => 'send password expiring notices',
+            'status' => 'starting',
+        ];
+
+        $users = User::getActiveUnlockedUsers();
+
+        $this->logger->info(array_merge($logData, [
+            'active_users' => count($users)
+        ]));
+
         $numEmailsSent = 0;
-        $users = User::findAll(['active' => 'yes', 'locked' => 'no', ]);
         foreach ($users as $user) {
             /** @var Password $userPassword */
             $userPassword = $user->currentPassword;
             if ($userPassword) {
                 $passwordExpiry = strtotime($userPassword->getExpiresOn());
                 if ($passwordExpiry < strtotime('+15 days')
-                    && !($passwordExpiry < time())
-                    && !$this->hasReceivedMessageRecently($user->id, EmailLog::MESSAGE_TYPE_PASSWORD_EXPIRING)
+                    && ! ($passwordExpiry < time())
+                    && ! $this->hasReceivedMessageRecently($user->id, EmailLog::MESSAGE_TYPE_PASSWORD_EXPIRING)
                 ) {
                     $this->sendMessageTo(EmailLog::MESSAGE_TYPE_PASSWORD_EXPIRING, $user);
                     $numEmailsSent++;
@@ -678,11 +688,10 @@ class Emailer extends Component
             }
         }
 
-        $this->logger->info([
-            'action' => 'send password expiring notices',
+        $this->logger->info(array_merge($logData, [
             'status' => 'finished',
             'number_sent' => $numEmailsSent,
-        ]);
+        ]));
     }
 
     /**
@@ -694,8 +703,18 @@ class Emailer extends Component
             return;
         }
 
+        $logData = [
+            'action' => 'send password expired notices',
+            'status' => 'starting',
+        ];
+
+        $users = User::getActiveUnlockedUsers();
+
+        $this->logger->info(array_merge($logData, [
+            'active_users' => count($users)
+        ]));
+
         $numEmailsSent = 0;
-        $users = User::findAll(['active' => 'yes', 'locked' => 'no', ]);
         foreach ($users as $user) {
             /** @var Password $userPassword */
             $userPassword = $user->currentPassword;
@@ -708,10 +727,9 @@ class Emailer extends Component
             }
         }
 
-        $this->logger->info([
-            'action' => 'send password expired notices',
+        $this->logger->info(array_merge($logData, [
             'status' => 'finished',
             'number_sent' => $numEmailsSent,
-        ]);
+        ]));
     }
 }

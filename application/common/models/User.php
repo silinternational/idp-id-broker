@@ -1265,4 +1265,12 @@ class User extends UserBase
         $logAttributes['status'] = 'success';
         Yii::warning($logAttributes);
     }
+
+    /**
+     * @return User[]
+     */
+    public static function getActiveUnlockedUsers()
+    {
+        return User::findAll(['active' => 'yes', 'locked' => 'no']);
+    }
 }
