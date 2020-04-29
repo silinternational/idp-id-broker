@@ -290,6 +290,20 @@ Feature: Email
     Then I see that the first user has received a lost-security-key email
       And I see that the second user has received a get-backup-codes email
 
+  Scenario: NOT sending delayed mfa related emails to inactive users
+    Given we are configured to send lost key emails
+    And we are configured to send get backup codes emails
+    And I remove records of any emails that have been sent
+    And no mfas exist
+    And an inactive user already exists
+    And a u2f mfa option was used 222 days ago
+    And a backup code mfa option was used 2 days ago
+    And a "lost-security-key" email has NOT been sent to that user
+    And a second inactive user exists with a totp mfa option
+    When I send delayed mfa related emails
+    Then I see that the first user has NOT received a lost-security-key email
+    And I see that the second user has NOT received a get-backup-codes email
+
   Scenario: Send a recovery method verify email upon creation of the object
     Given a user already exists
       And no methods exist
