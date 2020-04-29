@@ -54,8 +54,8 @@ class Emailer extends Component
     const PROP_TEXT_BODY = 'text_body';
     const PROP_DELAY_SECONDS = 'delay_seconds';
 
-    const FIFTEEN_DAYS_AGO = '-15 days';
-    const FIFTEEN_DAYS_FROM_NOW = '+15 days';
+    const PASSWORD_EXPIRED_CUTOFF = '-15 days';
+    const PASSWORD_EXPIRING_CUTOFF = '+15 days';
 
     /**
      * The configuration for the email-service client.
@@ -681,7 +681,7 @@ class Emailer extends Component
             $userPassword = $user->currentPassword;
             if ($userPassword) {
                 $passwordExpiry = strtotime($userPassword->getExpiresOn());
-                if ($passwordExpiry < strtotime(self::FIFTEEN_DAYS_FROM_NOW)
+                if ($passwordExpiry < strtotime(self::PASSWORD_EXPIRING_CUTOFF)
                     && ! ($passwordExpiry < time())
                     && ! $this->hasReceivedMessageRecently($user->id, EmailLog::MESSAGE_TYPE_PASSWORD_EXPIRING)
                 ) {
@@ -724,7 +724,7 @@ class Emailer extends Component
             if ($userPassword) {
                 $passwordExpiry = strtotime($userPassword->getExpiresOn());
                 if ($passwordExpiry < time()
-                    && $passwordExpiry > strtotime(self::FIFTEEN_DAYS_AGO)
+                    && $passwordExpiry > strtotime(self::PASSWORD_EXPIRED_CUTOFF)
                     && ! $this->hasReceivedMessageRecently($user->id, EmailLog::MESSAGE_TYPE_PASSWORD_EXPIRED)
                 ) {
                     $this->sendMessageTo(EmailLog::MESSAGE_TYPE_PASSWORD_EXPIRED, $user);
