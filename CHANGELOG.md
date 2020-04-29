@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+### Fixed
+- Silence unhelpful log messages on mfa emails
+
 ## [5.0.2] - 2020-04-29
 ### Fixed
 - Log messages are now written to log output immediately
