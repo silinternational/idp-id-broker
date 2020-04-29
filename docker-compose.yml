@@ -20,6 +20,7 @@ services:
             - data
         ports:
             - "51140:80"
+        mem_limit: 200m
         depends_on:
             - db
         env_file:
@@ -33,6 +34,7 @@ services:
         build: ./
         volumes_from:
             - data
+        mem_limit: 200m
         volumes:
             - ./dockerbuild/broker-cron:/etc/cron.d/broker-cron
         depends_on:
@@ -48,6 +50,7 @@ services:
         build: ./
         volumes_from:
             - data
+        mem_limit: 200m
         ports:
             - "80"
         depends_on:
@@ -84,6 +87,7 @@ services:
             - ${COMPOSER_CACHE_DIR}:/composer
         volumes_from:
             - data
+        mem_limit: 200m
         working_dir: /data
         environment:
             COMPOSER_CACHE_DIR: /composer
@@ -95,6 +99,7 @@ services:
         image: silintl/php7:7.2
         volumes_from:
             - data
+        mem_limit: 200m
         working_dir: /data
         depends_on:
             - appfortests
