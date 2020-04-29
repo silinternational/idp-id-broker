@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [5.0.2] - 2020-04-29
+### Fixed
+- Log messages are now written to log output immediately
+### Changed
+- Password-expired emails don't send if the password has been expired for a while.
+
 ## [5.0.1] - 2020-04-23
 ### Fixed
 - Moved migration run from run-cron.sh to run.sh 
