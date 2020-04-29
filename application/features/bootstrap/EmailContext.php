@@ -1123,22 +1123,6 @@ class EmailContext extends YiiContext
     }
 
     /**
-     * @Given /^that user has a password that expires (yesterday|today|tomorrow)/
-     */
-    public function thatUserHasAPasswordThatExpires($day)
-    {
-        if ($day == 'yesterday') {
-            $this->thatUserHasAPasswordThatExpiresInDays(-1);
-        } elseif ($day == 'today') {
-            $this->thatUserHasAPasswordThatExpiresInDays(0);
-        } elseif ($day == 'tomorrow') {
-            $this->thatUserHasAPasswordThatExpiresInDays(1);
-        } else {
-            Assert::false(true, 'Invalid tense provided in scenario.');
-        }
-    }
-
-    /**
      * @Given a mfaManagerBcc email address is configured
      */
     public function aMfamanagerbccEmailAddressIsConfigured()
