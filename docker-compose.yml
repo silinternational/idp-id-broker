@@ -87,7 +87,6 @@ services:
             - ${COMPOSER_CACHE_DIR}:/composer
         volumes_from:
             - data
-        mem_limit: 200m
         working_dir: /data
         environment:
             COMPOSER_CACHE_DIR: /composer

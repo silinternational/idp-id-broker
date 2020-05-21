@@ -379,7 +379,7 @@ class Emailer extends Component
      */
     public function sendDelayedMfaRelatedEmails()
     {
-        $query = (new Query)->from('user');
+        $query = (new Query)->from('user')->where(['active' => 'yes']);
 
         // iterate over one user at a time.
         foreach ($query->each() as $userData) {

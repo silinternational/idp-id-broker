@@ -264,6 +264,22 @@ class EmailContext extends YiiContext
     }
 
     /**
+     * @Given an(other) inactive user already exists
+     */
+    public function anInactiveUserAlreadyExists()
+    {
+        $this->tempUser = $this->createNewUser();
+        self::deactivateUser($this->tempUser);
+    }
+
+    protected static function deactivateUser($user)
+    {
+        $user->active = 'no';
+        $user->scenario = User::SCENARIO_UPDATE_USER;
+        $user->save();
+    }
+
+    /**
      * @Given that user does NOT have a password
      */
     public function thatUserDoesNotHaveAPassword()
@@ -284,6 +300,16 @@ class EmailContext extends YiiContext
     {
         $this->tempUser2 = $this->createNewUser();
         $this->createMfa(Mfa::TYPE_TOTP, null, $this->tempUser2);
+    }
+
+    /**
+     * @Given a second inactive user exists with a totp mfa option
+     */
+    public function aSecondInactiveUserExistsWithATotpMfaOption()
+    {
+        $this->tempUser2 = $this->createNewUser();
+        $this->createMfa(Mfa::TYPE_TOTP, null, $this->tempUser2);
+        self::deactivateUser($this->tempUser2);
     }
 
     /**
@@ -925,6 +951,22 @@ class EmailContext extends YiiContext
     public function iSeeThatTheSecondUserHasReceivedAGetBackupCodesEmail()
     {
         Assert::true($this->fakeEmailer->hasReceivedMessageRecently($this->tempUser2->id, EmailLog::MESSAGE_TYPE_GET_BACKUP_CODES));
+    }
+
+    /**
+     * @Then I see that the first user has NOT received a lost-security-key email
+     */
+    public function iSeeThatTheFirstUserHasNotReceivedALostSecurityKeyEmail()
+    {
+        Assert::false($this->fakeEmailer->hasReceivedMessageRecently($this->tempUser->id, EmailLog::MESSAGE_TYPE_LOST_SECURITY_KEY));
+    }
+
+    /**
+     * @Then I see that the second user has NOT received a get-backup-codes email
+     */
+    public function iSeeThatTheSecondUserHasNotReceivedAGetBackupCodesEmail()
+    {
+        Assert::false($this->fakeEmailer->hasReceivedMessageRecently($this->tempUser2->id, EmailLog::MESSAGE_TYPE_GET_BACKUP_CODES));
     }
 
     /**

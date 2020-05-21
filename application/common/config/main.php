@@ -183,6 +183,7 @@ return [
                     'assertValidIp' => $emailServiceConfig['assertValidIp'],
                     'validIpRanges' => $emailServiceConfig['validIpRanges'],
                     'prefix' => $logPrefix,
+                    'exportInterval' => 1,
                 ],
             ],
         ],
