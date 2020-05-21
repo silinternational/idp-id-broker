@@ -78,6 +78,9 @@ types:
           add:
             enum: [ yes, no ]
             description: Flag to indicate whether to remind the user to add an MFA option
+          active:
+            enum: [ yes, no ]
+            description: Flag to indicate whether the user has at least one active MFA option
           options: MfaResponse[]
       method:
         type: object
@@ -115,6 +118,7 @@ types:
         "mfa": {
           "prompt": "yes",
           "add": "no",
+          "active": "yes",
           "options": [
             {
               "id": 123,
@@ -343,28 +347,27 @@ types:
       fields?:
         type: string
         description: A comma-delimited list of fields to include for each user.
-        default: "fields=uuid,employee_id,first_name,last_name,display_name,username,email,active,locked,password"
-        example: "fields=employee_id,active"
+        default: "uuid,employee_id,first_name,last_name,display_name,username,email,active,locked,password"
+        example: "employee_id,active"
       username?:
         type: string
         description: Search user by username.
-        example: "username=john_smith"
+        example: "john_smith"
       email?:
         description: Search user by email.
         type: string
-        example: "email=john_smith@example.com"
+        example: "john_smith@example.com"
       search?:
         description: |
           Partial text search across multiple fields: 'employee_id', 'first_name',
           'last_name', 'display_name', 'username', 'email', and 'personal_email'
         type: string
-        example: "search=@example.com"
+        example: "@example.com"
       mask?:
         description: |
           Mask personal information (method options, personal_email) for privacy.
           Default is 'yes'.
         enum: [ yes, no ]
-        example: "mask=yes"
     responses:
       200:
         body:

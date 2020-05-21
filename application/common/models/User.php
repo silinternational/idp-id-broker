@@ -602,6 +602,7 @@ class User extends UserBase
         return [
             'prompt'  => $this->isPromptForMfa() ? 'yes' : 'no',
             'add'     => $this->getNagState() == NagState::NAG_ADD_MFA ? 'yes' : 'no',
+            'active'  => count($this->getVerifiedMfaOptions()) > 0 ? 'yes' : 'no',
             'options' => $this->getVerifiedMfaOptions(),
         ];
     }

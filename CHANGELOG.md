@@ -6,7 +6,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
-## [5.0.3] - 2020-05-13
+## [5.1.0] - 2020-05-21
+### Added
+- Added `active` flag to `mfa` object in User API response
 ### Fixed
 - Silence unhelpful log messages on mfa emails
 
@@ -223,8 +225,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 - Initial version of ID Broker.
 
-[Unreleased]: https://github.com/silinternational/idp-id-broker/compare/5.0.3...HEAD
-[5.0.3]: https://github.com/silinternational/idp-id-broker/compare/5.0.2...5.0.3
+[Unreleased]: https://github.com/silinternational/idp-id-broker/compare/5.1.0...HEAD
+[5.1.0]: https://github.com/silinternational/idp-id-broker/compare/5.0.2...5.1.0
 [5.0.2]: https://github.com/silinternational/idp-id-broker/compare/5.0.1...5.0.2
 [5.0.1]: https://github.com/silinternational/idp-id-broker/compare/5.0.0...5.0.1
 [5.0.0]: https://github.com/silinternational/idp-id-broker/compare/4.7.1...5.0.0
