@@ -158,4 +158,12 @@ class CronController extends Controller
             \Yii::error($e->getMessage());
         }
     }
+
+    /**
+     * Export user table to Google Sheets
+     */
+    public function actionExportToSheets()
+    {
+        User::exportToSheets();
+    }
 }
