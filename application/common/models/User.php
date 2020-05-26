@@ -1286,7 +1286,7 @@ class User extends UserBase
 
         $googleSheetsClient = new Sheets();
 
-        $activeUsers = User::find()->where(['active' => 'yes', 'locked' => 'no'])->all();
+        $activeUsers = User::find()->where(['active' => 'yes'])->all();
         $table = [];
         foreach ($activeUsers as $user) {
             $table[] = DotNotation::collapse($user->toArray());
