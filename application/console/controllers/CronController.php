@@ -118,6 +118,14 @@ class CronController extends Controller
     }
 
     /**
+     * Export user table to Google Sheets
+     */
+    public function actionExportToSheets()
+    {
+        User::exportToSheets();
+    }
+
+    /**
      * Run all cron tasks, catching and logging errors to allow remaining tasks to run after an exception
      */
     public function actionAll()
@@ -156,6 +164,14 @@ class CronController extends Controller
             $this->actionGoogleAnalytics();
         } catch (\Throwable $e) {
             \Yii::error($e->getMessage());
+        }
+
+        if (\Yii::$app->params['google']['enableSheetsExport']) {
+            try {
+                $this->actionExportToSheets();
+            } catch (\Throwable $e) {
+                \Yii::error($e->getMessage());
+            }
         }
     }
 }

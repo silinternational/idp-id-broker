@@ -89,7 +89,7 @@ class FeatureContext extends YiiContext
 
     /**
      * @Given the user store is empty
-     * @AfterSuite
+     * @AfterSuite @database
      */
     public static function theUserStoreIsEmpty()
     {

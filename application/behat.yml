@@ -44,3 +44,7 @@ default:
             paths:
                 - "%paths.base%/features/mysql-date-time.feature"
             contexts: [ Sil\SilIdBroker\Behat\Context\MySqlDateTimeContext ]
+        sheets_unit_tests_features:
+            paths:
+                - "%paths.base%/features/sheets-unit-tests.feature"
+            contexts: [ Sil\SilIdBroker\Behat\Context\SheetsUnitTestsContext ]
