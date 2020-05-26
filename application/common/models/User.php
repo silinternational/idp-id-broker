@@ -1279,10 +1279,16 @@ class User extends UserBase
 
     public static function exportToSheets()
     {
+        Yii::info([
+            'action' => 'export to Google Sheets',
+            'status' => 'start',
+        ]);
+
         $googleSheetsClient = new Sheets([
             'applicationName' => \Yii::$app->params['google']['applicationName'],
             'jsonAuthFilePath' => \Yii::$app->params['google']['jsonAuthFilePath'],
             'jsonAuthString' => \Yii::$app->params['google']['jsonAuthString'],
+            'delegatedAdmin' => \Yii::$app->params['google']['delegatedAdmin'],
             'spreadsheetId' => \Yii::$app->params['google']['spreadsheetId'],
         ]);
 
@@ -1292,5 +1298,11 @@ class User extends UserBase
             $table[] = DotNotation::collapse($user->toArray());
         }
         $googleSheetsClient->append($table);
+
+        Yii::info([
+            'action' => 'export to Google Sheets',
+            'count' => count($table),
+            'status' => 'finish',
+        ]);
     }
 }

@@ -8,8 +8,6 @@ use yii\helpers\Json;
 
 class Sheets extends Component
 {
-    const FIRST_ROW_AFTER_HEADERS = 2;
-
     /**
      * @var null|string The Application Name to use with Google_Client.
      */
@@ -27,6 +25,11 @@ class Sheets extends Component
     public $jsonAuthString = null;
 
     /**
+     * @var null|string The delegated admin account for Google API access.
+     */
+    public $delegatedAdmin = null;
+
+    /**
      * @var null|string The Spreadsheet ID.
      */
     public $spreadsheetId = null;
@@ -39,7 +42,7 @@ class Sheets extends Component
     /**
      * @var \Google_Service_Sheets
      */
-    private $sheets = null;
+    private $service = null;
 
     /**
      * Init and ensure required properties are set
@@ -60,6 +63,7 @@ class Sheets extends Component
             'applicationName',
             'jsonAuthString',
             'spreadsheetId',
+            'delegatedAdmin',
         ];
         foreach ($requiredProperties as $requiredProperty) {
             if (empty($this->$requiredProperty)) {
@@ -75,18 +79,18 @@ class Sheets extends Component
 
     protected function getGoogleClient()
     {
-        if (! $this->sheets instanceof \Google_Service_Sheets) {
+        if (! $this->service instanceof \Google_Service_Sheets) {
             $jsonCreds = Json::decode($this->jsonAuthString);
             $googleClient = new \Google_Client();
             $googleClient->setApplicationName($this->applicationName);
             $googleClient->setScopes($this->scopes);
             $googleClient->setAuthConfig($jsonCreds);
             $googleClient->setAccessType('offline');
-            $googleClient->setSubject('schram@springsgfi.org');
-            $this->sheets = new \Google_Service_Sheets($googleClient);
+            $googleClient->setSubject($this->delegatedAdmin);
+            $this->service = new \Google_Service_Sheets($googleClient);
         }
 
-        return $this->sheets;
+        return $this->service;
     }
 
     public function append(array $records)

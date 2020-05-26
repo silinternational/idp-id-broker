@@ -235,6 +235,7 @@ return [
             'applicationName'     => 'id-broker',
             'jsonAuthFilePath'    => '',
             'jsonAuthString'      => '',
+            'delegatedAdmin'     => '',
             'spreadsheetId'       => '',
             'fields'              => 'employee_id,email,manager_email,require_mfa',
             ],
