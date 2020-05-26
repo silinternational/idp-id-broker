@@ -92,15 +92,7 @@ class Sheets extends Component
     public function append(array $records)
     {
         $header = $this->getHeader();
-
-        $table = [];
-        foreach ($records as $record) {
-            $row = [];
-            foreach ($header as $field) {
-                $row[] = self::getFieldValue($record, $field);
-            }
-            $table[] = $row;
-        }
+        $table = self::makeTable($header, $records);
 
         $updateRange = 'Sheet1!A2:ZZ';
         $updateBody = new \Google_Service_Sheets_ValueRange([
@@ -131,33 +123,45 @@ class Sheets extends Component
     }
 
     /**
-     * @param string[] $record
-     * @param string|null $field
-     * @return string
+     * @param string[] $header
+     * @param array $records
+     * @return array
      */
-    public static function getFieldValue($record, $field) : string
+    public static function makeTable(array $header, array $records): array
     {
         $nowAsADateString = date('Y-m-d');
         $nowAsATimeString = date('H:i:s');
         $nowAsADateTimeString = date('Y-m-d H:i:s');
 
-        switch ($field) {
-            case 'date':
-                return $nowAsADateString;
+        $table = [];
+        foreach ($records as $record) {
+            $row = [];
+            foreach ($header as $field) {
+                switch ($field) {
+                    case 'date':
+                        $row[] = $nowAsADateString;
+                        break;
 
-            case 'time':
-                return $nowAsATimeString;
+                    case 'time':
+                        $row[] = $nowAsATimeString;
+                        break;
 
-            case 'datetime':
-                return $nowAsADateTimeString;
+                    case 'datetime':
+                        $row[] = $nowAsADateTimeString;
+                        break;
 
-            default:
-                $value = $record[$field] ?? null;
-                if ($value !== null) {
-                    return $value;
-                } else {
-                    return '';
+                    default:
+                        $value = $record[$field] ?? null;
+                        if ($value !== null) {
+                            $row[] = $value;
+                        } else {
+                            $row[] = '';
+                        }
+                        break;
                 }
+            }
+            $table[] = $row;
         }
+        return $table;
     }
 }
