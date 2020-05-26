@@ -63,7 +63,6 @@ class Sheets extends Component
             'applicationName',
             'jsonAuthString',
             'spreadsheetId',
-            'delegatedAdmin',
         ];
         foreach ($requiredProperties as $requiredProperty) {
             if (empty($this->$requiredProperty)) {
@@ -86,7 +85,9 @@ class Sheets extends Component
             $googleClient->setScopes($this->scopes);
             $googleClient->setAuthConfig($jsonCreds);
             $googleClient->setAccessType('offline');
-            $googleClient->setSubject($this->delegatedAdmin);
+            if (! empty($this->delegatedAdmin)) {
+                $googleClient->setSubject($this->delegatedAdmin);
+            }
             $this->service = new \Google_Service_Sheets($googleClient);
         }
 
