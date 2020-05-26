@@ -1,7 +1,7 @@
 start: app
 
 app: db deps
-	docker-compose up -d app cron phpmyadmin
+	docker-compose up -d app phpmyadmin
 
 appfortests: db deps
 	docker-compose up -d appfortests
