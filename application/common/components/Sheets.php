@@ -49,6 +49,12 @@ class Sheets extends Component
      */
     public function init()
     {
+        $this->applicationName = \Yii::$app->params['google']['applicationName'];
+        $this->jsonAuthFilePath = \Yii::$app->params['google']['jsonAuthFilePath'];
+        $this->jsonAuthString = \Yii::$app->params['google']['jsonAuthString'];
+        $this->delegatedAdmin = \Yii::$app->params['google']['delegatedAdmin'];
+        $this->spreadsheetId = \Yii::$app->params['google']['spreadsheetId'];
+
         if (! empty($this->jsonAuthFilePath)) {
             if (file_exists($this->jsonAuthFilePath)) {
                 $this->jsonAuthString = \file_get_contents($this->jsonAuthFilePath);
