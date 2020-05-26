@@ -232,11 +232,12 @@ return [
         'hibpNotificationBcc'           => Env::get('HIBP_NOTIFICATION_BCC', ''),
         'google' => ArrayHelper::merge(
             [
-            'applicationName'     => 'id-broker',
-            'jsonAuthFilePath'    => '',
-            'jsonAuthString'      => '',
-            'delegatedAdmin'     => '',
-            'spreadsheetId'       => '',
+                'enableSheetsExport'  => false,
+                'applicationName'     => 'id-broker',
+                'jsonAuthFilePath'    => '',
+                'jsonAuthString'      => '',
+                'delegatedAdmin'      => '',
+                'spreadsheetId'       => '',
             ],
             Env::getArrayFromPrefix('GOOGLE_')
         ),
