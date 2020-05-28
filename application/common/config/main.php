@@ -5,6 +5,7 @@ use common\components\MfaBackendBackupcode;
 use common\components\MfaBackendManager;
 use common\components\MfaBackendTotp;
 use common\components\MfaBackendU2f;
+use common\components\Sheets;
 use Sil\JsonLog\target\EmailServiceTarget;
 use Sil\JsonLog\target\JsonStreamTarget;
 use Sil\PhpEnv\Env;
@@ -229,5 +230,16 @@ return [
         'hibpGracePeriod'               => Env::get('HIBP_GRACE_PERIOD', '+1 week'),
         'hibpTrackingOnly'              => Env::get('HIBP_TRACKING_ONLY', false),
         'hibpNotificationBcc'           => Env::get('HIBP_NOTIFICATION_BCC', ''),
+        'google' => ArrayHelper::merge(
+            [
+                'enableSheetsExport'  => false,
+                'applicationName'     => 'id-broker',
+                'jsonAuthFilePath'    => '',
+                'jsonAuthString'      => '',
+                'delegatedAdmin'      => '',
+                'spreadsheetId'       => '',
+            ],
+            Env::getArrayFromPrefix('GOOGLE_')
+        ),
     ],
 ];

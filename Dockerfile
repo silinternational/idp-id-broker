@@ -1,13 +1,10 @@
 FROM silintl/php7:7.2
 MAINTAINER Phillip Shipley <phillip_shipley@sil.org>
 
-ENV REFRESHED_AT 2020-04-06
+ENV REFRESHED_AT 2020-05-26
 
 RUN apt-get update -y && \
     apt-get install -y make
-
-COPY dockerbuild/broker-cron /etc/cron.d/
-RUN chmod 0644 /etc/cron.d/broker-cron
 
 RUN mkdir -p /data
 

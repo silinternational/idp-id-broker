@@ -5,11 +5,13 @@ namespace common\models;
 use Closure;
 use common\components\Emailer;
 use common\components\HIBP;
+use common\components\Sheets;
 use common\helpers\MySqlDateTime;
 use common\helpers\Utils;
 use Exception;
 use Ramsey\Uuid\Uuid;
 use Sil\EmailService\Client\EmailServiceClientException;
+use Sil\PhpArrayDotNotation\DotNotation;
 use TheIconic\Tracking\GoogleAnalytics\Analytics;
 use Yii;
 use yii\behaviors\AttributeBehavior;
@@ -1273,5 +1275,28 @@ class User extends UserBase
     public static function getActiveUnlockedUsers()
     {
         return User::findAll(['active' => 'yes', 'locked' => 'no']);
+    }
+
+    public static function exportToSheets()
+    {
+        Yii::info([
+            'action' => 'export to Google Sheets',
+            'status' => 'start',
+        ]);
+
+        $googleSheetsClient = new Sheets();
+
+        $activeUsers = User::find()->where(['active' => 'yes'])->all();
+        $table = [];
+        foreach ($activeUsers as $user) {
+            $table[] = DotNotation::collapse($user->toArray());
+        }
+        $googleSheetsClient->append($table);
+
+        Yii::info([
+            'action' => 'export to Google Sheets',
+            'count' => count($table),
+            'status' => 'finish',
+        ]);
     }
 }
