@@ -234,7 +234,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Initial version of ID Broker.
 
 [Unreleased]: https://github.com/silinternational/idp-id-broker/compare/5.2.2...HEAD
-[5.2.1]: https://github.com/silinternational/idp-id-broker/compare/5.2.0...5.2.2
+[5.2.2]: https://github.com/silinternational/idp-id-broker/compare/5.2.0...5.2.2
 [5.2.0]: https://github.com/silinternational/idp-id-broker/compare/5.1.0...5.2.0
 [5.1.0]: https://github.com/silinternational/idp-id-broker/compare/5.0.2...5.1.0
 [5.0.2]: https://github.com/silinternational/idp-id-broker/compare/5.0.1...5.0.2
