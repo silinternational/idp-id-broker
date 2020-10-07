@@ -17,3 +17,5 @@ vendor/
 .php_cs.cache
 
 api.html
+
+dockercfg
