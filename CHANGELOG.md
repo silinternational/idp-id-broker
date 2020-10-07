@@ -6,7 +6,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
-## [5.2.1] - 2020-10-06
+## [5.2.2] - 2020-10-07
 ### Fixed
 - Updated Docker credentials
 
@@ -233,8 +233,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 - Initial version of ID Broker.
 
-[Unreleased]: https://github.com/silinternational/idp-id-broker/compare/5.2.1...HEAD
-[5.2.1]: https://github.com/silinternational/idp-id-broker/compare/5.2.0...5.2.1
+[Unreleased]: https://github.com/silinternational/idp-id-broker/compare/5.2.2...HEAD
+[5.2.1]: https://github.com/silinternational/idp-id-broker/compare/5.2.0...5.2.2
 [5.2.0]: https://github.com/silinternational/idp-id-broker/compare/5.1.0...5.2.0
 [5.1.0]: https://github.com/silinternational/idp-id-broker/compare/5.0.2...5.1.0
 [5.0.2]: https://github.com/silinternational/idp-id-broker/compare/5.0.1...5.0.2
