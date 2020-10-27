@@ -1,6 +1,7 @@
 <?php
 namespace common\components;
 
+use common\helpers\MySqlDateTime;
 use common\models\Mfa;
 use common\models\MfaBackupcode;
 use yii\base\Component;
@@ -28,6 +29,10 @@ class MfaBackendBackupcode extends Component implements MfaBackendInterface
         if ($mfa === null) {
             throw new \Exception("A backupcode MFA record does not exist for this user", 1507904428);
         }
+
+        // cheap solution to the problem of reporting an old date for new codes
+        $mfa->created_utc = MySqlDateTime::now();
+        $mfa->save();
 
         $mfa->setVerified();
 
