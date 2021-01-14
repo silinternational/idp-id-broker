@@ -322,6 +322,8 @@ class FeatureContext extends YiiContext
      */
     public function aRecordExistsForThisKey($lookupKey, $lookupValue)
     {
+        $this->userFromDbBefore = $this->userFromDb;
+
         $this->userFromDb = User::findOne([$lookupKey => $lookupValue]);
 
         Assert::notNull($this->userFromDb, sprintf(
@@ -367,6 +369,18 @@ class FeatureContext extends YiiContext
         $storedNow = strtotime($this->userFromDb->$property);
 
         Assert::range($storedNow, $minAcceptable, $maxAcceptable);
+    }
+
+    /**
+     * @Then :property should not change
+     *
+     */
+    public function shouldNotChange($property)
+    {
+        $valueBefore = $this->userFromDbBefore->$property;
+        $valueNow = $this->userFromDb->$property;
+
+        Assert::eq($valueBefore, $valueNow);
     }
 
     /**
