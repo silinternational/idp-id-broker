@@ -171,6 +171,7 @@ class User extends UserBase
             'hide',
             'groups',
             'expires_on',
+            'created_utc',
         ];
 
         $scenarios[self::SCENARIO_UPDATE_USER] = [
@@ -264,7 +265,7 @@ class User extends UserBase
                 ['manager_email', 'personal_email'], 'email',
             ],
             [
-                ['last_synced_utc', 'last_changed_utc'],
+                ['last_synced_utc', 'last_changed_utc', 'created_utc'],
                 'default', 'value' => MySqlDateTime::now(),
             ],
             [
@@ -525,6 +526,9 @@ class User extends UserBase
             'locked',
             'last_login_utc' => function (self $model) {
                 return $model->last_login_utc === null ? null : Utils::getIso8601($model->last_login_utc);
+            },
+            'created_utc' => function (self $model) {
+                return $model->created_utc === null ? null : Utils::getIso8601($model->created_utc);
             },
             'manager_email',
             'personal_email' => function (self $model) {
@@ -909,6 +913,8 @@ class User extends UserBase
 
         $labels['last_changed_utc'] = Yii::t('app', 'Last Changed (UTC)');
         $labels['last_synced_utc'] = Yii::t('app', 'Last Synced (UTC)');
+        $labels['created_utc'] = Yii::t('app', 'Created (UTC)');
+        
 
         return $labels;
     }
