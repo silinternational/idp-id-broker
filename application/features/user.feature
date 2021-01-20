@@ -58,6 +58,7 @@ Feature: User
         | groups              | NULL                  |
       And last_changed_utc should be stored as now UTC
       And last_synced_utc should be stored as now UTC
+      And created_utc should be stored as now UTC
 
 #TODO: related to PUT now.
 #  Scenario: "Touch" an existing user without making any changes
@@ -110,6 +111,7 @@ Feature: User
       And a record exists with a <property> of <value>
       And last_changed_utc should be stored as now UTC
       And last_synced_utc should be stored as now UTC
+      And created_utc should not change
 
     Examples:
       | property        | value              |
