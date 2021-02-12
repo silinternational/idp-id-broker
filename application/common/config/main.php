@@ -5,7 +5,6 @@ use common\components\MfaBackendBackupcode;
 use common\components\MfaBackendManager;
 use common\components\MfaBackendTotp;
 use common\components\MfaBackendU2f;
-use common\components\Sheets;
 use Sil\JsonLog\target\EmailServiceTarget;
 use Sil\JsonLog\target\JsonStreamTarget;
 use Sil\PhpEnv\Env;
@@ -77,7 +76,7 @@ return [
         'emailer' => [
             'class' => $emailerClass,
             'emailServiceConfig' => $emailServiceConfig,
-            
+
             'otherDataForEmails' => [
                 'emailSignature' => Env::get('EMAIL_SIGNATURE', ''),
                 'helpCenterUrl' => Env::get('HELP_CENTER_URL'),
@@ -86,7 +85,7 @@ return [
                 'supportEmail' => Env::get('SUPPORT_EMAIL'),
                 'supportName' => Env::get('SUPPORT_NAME', 'support'),
             ],
-            
+
             'sendInviteEmails' => Env::get('SEND_INVITE_EMAILS', true),
             'sendMfaRateLimitEmails' => Env::get('SEND_MFA_RATE_LIMIT_EMAILS', true),
             'sendPasswordChangedEmails' => Env::get('SEND_PASSWORD_CHANGED_EMAILS', true),
