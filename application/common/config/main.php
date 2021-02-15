@@ -205,8 +205,14 @@ return [
         'passwordGracePeriodExtension'  => '+7 days',
         'inviteLifespan'                => Env::get('INVITE_LIFESPAN', '+1 month'),
         'inviteGracePeriod'             => Env::get('INVITE_GRACE_PERIOD', '+3 months'),
-        'inactiveUserDeletionEnable'    => Env::get('INACTIVE_USER_DELETION_ENABLE', false),
-        'inactiveUserPeriod'            => Env::get('INACTIVE_USER_PERIOD', '+18 months'),
+        'inactiveUser'                  => [
+            'DeletionEnable'            => Env::get('INACTIVE_USER_DELETION_ENABLE', false),
+            'Period'                    => Env::get('INACTIVE_USER_PERIOD', '+18 months'),
+            'contactEmail'              => Env::get('INACTIVE_USER_CONTACT_EMAIL'),
+            'contactName'               => Env::get('INACTIVE_USER_CONTACT_NAME'),
+            'bestPracticeUrl'           => Env::get('INACTIVE_USER_BEST_PRACTICE_URL'),
+            'deactivateInstructionsUrl' => Env::get('DEACTIVATE_INSTRUCTIONS_URL'),
+        ],
         'googleAnalytics'               => [
             'trackingId' => Env::get('GA_TRACKING_ID'),
             'clientId'   => Env::get('GA_CLIENT_ID'),

@@ -1130,7 +1130,7 @@ class User extends UserBase
      */
     public static function deleteInactiveUsers()
     {
-        $enabled = \Yii::$app->params['inactiveUserDeletionEnable'];
+        $enabled = \Yii::$app->params['inactiveUser']['DeletionEnable'];
 
         if ($enabled !== true) {
             \Yii::warning([
@@ -1148,7 +1148,7 @@ class User extends UserBase
         /*
          * Replace '+' with '-' so all env parameters can be defined consistently as '+n unit'
          */
-        $inactiveUserPeriod = '-' . ltrim(\Yii::$app->params['inactiveUserPeriod'], '+');
+        $inactiveUserPeriod = '-' . ltrim(\Yii::$app->params['inactiveUser']['Period'], '+');
 
         /**
          * @var string $removeBefore   All records that have not been updated since before this date
@@ -1181,6 +1181,29 @@ class User extends UserBase
             'status' => 'complete',
             'count' => $numDeleted,
         ]);
+    }
+
+
+    /**
+     * Delete all user records that are inactive and have not been updated recently.
+     */
+    public static function getInactiveUsers()
+    {
+        /*
+         * Replace '+' with '-' so all env parameters can be defined consistently as '+n unit'
+         */
+        $inactiveUserPeriod = '-' . ltrim(\Yii::$app->params['inactiveUser']['Period'], '+');
+
+        /**
+         * @var string $removeBefore   All records that have not been updated since before this date
+         * should be deleted. Calculated relative to now (time of execution).
+         */
+        $removeBefore = MySqlDateTime::relative($inactiveUserPeriod);
+        return self::find()
+            ->andWhere(['<', 'last_login_utc', $removeBefore])
+            ->andWhere(['<', 'created_utc', $removeBefore])
+            ->andWhere(['active' => 'no'])
+            ->all();
     }
 
     /**

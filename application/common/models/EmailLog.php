@@ -31,6 +31,7 @@ class EmailLog extends EmailLogBase
     const MESSAGE_TYPE_PASSWORD_EXPIRING = 'password-expiring';
     const MESSAGE_TYPE_PASSWORD_EXPIRED = 'password-expired';
     const MESSAGE_TYPE_PASSWORD_PWNED = "password-pwned";
+    const MESSAGE_TYPE_UNUSED_USERS = 'unused-users';
 
     /**
      * @inheritdoc
@@ -64,6 +65,7 @@ class EmailLog extends EmailLogBase
             self::MESSAGE_TYPE_PASSWORD_EXPIRING,
             self::MESSAGE_TYPE_PASSWORD_EXPIRED,
             self::MESSAGE_TYPE_PASSWORD_PWNED,
+            self::MESSAGE_TYPE_UNUSED_USERS,
         ];
     }
     

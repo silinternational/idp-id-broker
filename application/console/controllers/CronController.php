@@ -117,6 +117,13 @@ class CronController extends Controller
         User::deleteInactiveUsers();
     }
 
+    public function actionSendInactiveUsersEmail()
+    {
+        /* @var $emailer Emailer */
+        $emailer = \Yii::$app->emailer;
+        $emailer->actionSendInactiveUsersEmail();
+    }
+
     /**
      * Export user table to Google Sheets
      */
