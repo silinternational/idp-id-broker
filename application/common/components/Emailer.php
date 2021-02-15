@@ -46,7 +46,7 @@ class Emailer extends Component
     const SUBJ_PASSWORD_EXPIRED = 'The password for your {idpDisplayName} Identity account has expired';
     const SUBJ_PASSWORD_PWNED = 'ALERT: The password for your {idpDisplayName} Identity account has been exposed';
 
-    const SUBJ_UNUSED_USER_ACCOUNTS = 'Unused SIL Google and SIL Identity Accounts';
+    const SUBJ_UNUSED_USER_ACCOUNTS = 'Unused SIL Identity Accounts';
 
     const PROP_SUBJECT = 'subject';
     const PROP_TO_ADDRESS = 'to_address';
