@@ -150,6 +150,12 @@ class CronController extends Controller
         }
 
         try {
+            $this->actionSendInactiveUsersEmail();
+        } catch (\Throwable $e) {
+            \Yii::error($e->getMessage());
+        }
+
+        try {
             $this->actionSendDelayedMfaRelatedEmails();
         } catch (\Throwable $e) {
             \Yii::error($e->getMessage());
