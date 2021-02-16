@@ -121,7 +121,7 @@ class CronController extends Controller
     {
         /* @var $emailer Emailer */
         $emailer = \Yii::$app->emailer;
-        $emailer->actionSendInactiveUsersEmail();
+        $emailer->sendInactiveUsersEmail();
     }
 
     /**
