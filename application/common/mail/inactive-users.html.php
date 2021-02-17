@@ -11,7 +11,7 @@ use yii\helpers\Html as yHtml;
  * @var string $emailSignature
  */
 ?>
-<p>Dear <?= yHtml::encode($contactName) ?>,</p>
+<p>Dear HR,</p>
 
 <p>
     As GTIS works towards securing <?= yHtml::encode($idpDisplayName) ?>'s accounts, we are auditing

@@ -751,18 +751,18 @@ class Emailer extends Component
     public function sendInactiveUsersEmail()
     {
         $dataForEmail = \Yii::$app->params['inactiveUser'];
+        $dataForEmail = ArrayHelper::merge(
+            $this->otherDataForEmails,
+            $dataForEmail
+        );
 
-        if ($dataForEmail['notificationEnable']) {
+        if (!empty($dataForEmail['hrNotificationsEmail'])) {
             $dataForEmail['users'] = User::getInactiveUsers();
             $dataForEmail['inactivePeriod'] = ltrim($dataForEmail['inactivePeriod'], '+');    
-            $dataForEmail = ArrayHelper::merge(
-                $this->otherDataForEmails,
-                $dataForEmail
-            );
     
             $htmlBody = \Yii::$app->view->render('@common/mail/inactive-users.html.php', $dataForEmail);
     
-            $this->email($dataForEmail['contactEmail'], $this->subjectForInactiveUserAccounts, $htmlBody, strip_tags($htmlBody));
+            $this->email($dataForEmail['hrNotificationsEmail'], $this->subjectForInactiveUserAccounts, $htmlBody, strip_tags($htmlBody));
         }
     }
 }

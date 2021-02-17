@@ -123,11 +123,14 @@ return [
             'subjectForMethodPurged' => Env::get('SUBJECT_FOR_METHOD_PURGED'),
             'subjectForPasswordExpiring' => Env::get('SUBJECT_FOR_PASSWORD_EXPIRING'),
             'subjectForPasswordExpired' => Env::get('SUBJECT_FOR_PASSWORD_EXPIRED'),
+            'subjectForInactiveUsers' => Env::get('SUBJECT_FOR_INACTIVE_USERS'),
 
             'lostSecurityKeyEmailDays' => Env::get('LOST_SECURITY_KEY_EMAIL_DAYS', 62),
             'minimumBackupCodesBeforeNag' => Env::get('MINIMUM_BACKUP_CODES_BEFORE_NAG', 4),
 
             'emailRepeatDelayDays' => Env::get('EMAIL_REPEAT_DELAY_DAYS', 31),
+
+            'hrNotificationsEmail' => Env::get('HR_NOTIFICATIONS_EMAIL'),
         ],
         'backupcode' => [
             'class' => MfaBackendBackupcode::class,
@@ -210,9 +213,6 @@ return [
             // use a different environment variable, so to not break things, Env::get() is used
             'deletionEnable'            => Env::get('INACTIVE_USER_DELETION_ENABLE', false),
             'inactivePeriod'            => Env::get('INACTIVE_USER_PERIOD', '+18 months'),
-            'notificationEnable'        => Env::get('INACTIVE_USER_NOTIFICATION_ENABLE', false),
-            'contactEmail'              => Env::get('INACTIVE_USER_CONTACT_EMAIL'),
-            'contactName'               => Env::get('INACTIVE_USER_CONTACT_NAME'),
             'bestPracticeUrl'           => Env::get('INACTIVE_USER_BEST_PRACTICE_URL'),
             'deactivateInstructionsUrl' => Env::get('INACTIVE_USER_DEACTIVATE_INSTRUCTIONS_URL'),
         ],
