@@ -1130,7 +1130,7 @@ class User extends UserBase
      */
     public static function deleteInactiveUsers()
     {
-        $enabled = \Yii::$app->params['inactiveUser']['DeletionEnable'];
+        $enabled = \Yii::$app->params['inactiveUser']['deletionEnable'];
 
         if ($enabled !== true) {
             \Yii::warning([
@@ -1148,7 +1148,7 @@ class User extends UserBase
         /*
          * Replace '+' with '-' so all env parameters can be defined consistently as '+n unit'
          */
-        $inactiveUserPeriod = '-' . ltrim(\Yii::$app->params['inactiveUser']['Period'], '+');
+        $inactiveUserPeriod = '-' . ltrim(\Yii::$app->params['inactiveUser']['inactivePeriod'], '+');
 
         /**
          * @var string $removeBefore   All records that have not been updated since before this date
@@ -1192,7 +1192,7 @@ class User extends UserBase
         /*
          * Replace '+' with '-' so all env parameters can be defined consistently as '+n unit'
          */
-        $inactiveUserPeriod = '-' . ltrim(\Yii::$app->params['inactiveUser']['Period'], '+');
+        $inactiveUserPeriod = '-' . ltrim(\Yii::$app->params['inactiveUser']['inactivePeriod'], '+');
 
         /**
          * @var string $removeBefore   All records that have not been updated since before this date

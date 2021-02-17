@@ -138,7 +138,7 @@ class Emailer extends Component
     public $subjectForPasswordExpired;
     public $subjectForPasswordPwned;
 
-    public $subjectForUnusedUserAccounts;
+    public $subjectForInactiveUserAccounts;
 
     /* The number of days of not using a security key after which we email the user */
     public $lostSecurityKeyEmailDays;
@@ -307,7 +307,7 @@ class Emailer extends Component
         $this->subjectForPasswordExpired = $this->subjectForPasswordExpired ?? self::SUBJ_PASSWORD_EXPIRED;
         $this->subjectForPasswordPwned = $this->subjectForPasswordPwned ?? self::SUBJ_PASSWORD_PWNED;
 
-        $this->subjectForUnusedUserAccounts = $this->subjectForUnusedUserAccounts ?? self::SUBJ_UNUSED_USER_ACCOUNTS;
+        $this->subjectForInactiveUserAccounts = $this->subjectForInactiveUserAccounts ?? self::SUBJ_UNUSED_USER_ACCOUNTS;
 
         $this->subjects = [
             EmailLog::MESSAGE_TYPE_INVITE => $this->subjectForInvite,
@@ -329,7 +329,6 @@ class Emailer extends Component
             EmailLog::MESSAGE_TYPE_PASSWORD_EXPIRING => $this->subjectForPasswordExpiring,
             EmailLog::MESSAGE_TYPE_PASSWORD_EXPIRED => $this->subjectForPasswordExpired,
             EmailLog::MESSAGE_TYPE_PASSWORD_PWNED => $this->subjectForPasswordPwned,
-            EmailLog::MESSAGE_TYPE_UNUSED_USERS => $this->subjectForUnusedUserAccounts,
         ];
         
         $this->assertConfigIsValid();
@@ -751,21 +750,19 @@ class Emailer extends Component
      */
     public function sendInactiveUsersEmail()
     {
-        $messageType = EmailLog::MESSAGE_TYPE_UNUSED_USERS;
-
         $dataForEmail = \Yii::$app->params['inactiveUser'];
-        $dataForEmail['users'] = User::getInactiveUsers();
 
-        $dataForEmail = ArrayHelper::merge(
-            $dataForEmail,
-            $this->otherDataForEmails
-        );
-
-        $subject = $this->getSubjectForMessage($messageType, $dataForEmail);
-
-        $htmlView = sprintf('@common/mail/%s.html.php', Inflector::slug($messageType));
-        $htmlBody = \Yii::$app->view->render($htmlView, $dataForEmail);
-
-        $this->email($dataForEmail['contactEmail'], $subject, $htmlBody, strip_tags($htmlBody));
+        if ($dataForEmail['notificationEnable']) {
+            $dataForEmail['users'] = User::getInactiveUsers();
+            $dataForEmail['inactivePeriod'] = ltrim($dataForEmail['inactivePeriod'], '+');    
+            $dataForEmail = ArrayHelper::merge(
+                $this->otherDataForEmails,
+                $dataForEmail
+            );
+    
+            $htmlBody = \Yii::$app->view->render('@common/mail/inactive-users.html.php', $dataForEmail);
+    
+            $this->email($dataForEmail['contactEmail'], $this->subjectForInactiveUserAccounts, $htmlBody, strip_tags($htmlBody));
+        }
     }
 }

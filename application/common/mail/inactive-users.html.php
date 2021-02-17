@@ -3,6 +3,8 @@ use yii\helpers\Html as yHtml;
 
 /**
  * @var string $contactName
+ * @var string $idpDisplayName
+ * @var string $inactivePeriod
  * @var string $bestPracticeUrl
  * @var string $deactivateInstructionsUrl
  * @var array  $users
@@ -12,15 +14,13 @@ use yii\helpers\Html as yHtml;
 <p>Dear <?= yHtml::encode($contactName) ?>,</p>
 
 <p>
-    As GTIS works towards securing SIL's accounts, we are auditing SIL Identity access and SIL Google accounts and
-    asking HR to consider deactivating accounts that haven't been used in more than 6 months.
+    As GTIS works towards securing <?= yHtml::encode($idpDisplayName) ?>'s accounts, we are auditing
+    <?= yHtml::encode($idpDisplayName) ?> Identity access and asking HR to consider deactivating accounts that
+    haven't been used in more than <?= yHtml::encode($inactivePeriod) ?>.
 </p>
 <p>
     Identity accounts are used to gain access to Workday, REAP, and Gateway. Often, when an account is not used,
     the staff member uses the Identity from their sending organization. 
-</p>
-<p>
-    Google accounts are used for email and Drive.
 </p>
 <p>
     <?= yHtml::a(yHtml::encode($bestPracticeUrl), "Link to Best Practice") ?>
@@ -36,7 +36,7 @@ use yii\helpers\Html as yHtml;
     you decide are unreasonable. If, in the future, they need to be reactivated, you can do so by re-checking the
     box in the System Access area of the person's profile in Workday. 
 </p>
-<h1>Unused SIL Identity Accounts</h1>
+<h1>Unused <?= yHtml::encode($idpDisplayName) ?> Identity Accounts</h1>
 <table>
     <tr>
         <th>Staff Id</th>
