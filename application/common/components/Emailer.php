@@ -46,7 +46,7 @@ class Emailer extends Component
     const SUBJ_PASSWORD_EXPIRED = 'The password for your {idpDisplayName} Identity account has expired';
     const SUBJ_PASSWORD_PWNED = 'ALERT: The password for your {idpDisplayName} Identity account has been exposed';
 
-    const SUBJ_UNUSED_USER_ACCOUNTS = 'Unused {idpDisplayName} Identity Accounts';
+    const SUBJ_ABANDONED_USER_ACCOUNTS = 'Unused {idpDisplayName} Identity Accounts';
 
     const PROP_SUBJECT = 'subject';
     const PROP_TO_ADDRESS = 'to_address';
@@ -138,7 +138,7 @@ class Emailer extends Component
     public $subjectForPasswordExpired;
     public $subjectForPasswordPwned;
 
-    public $subjectForInactiveUserAccounts;
+    public $subjectForAbandonedUserAccounts;
 
     /* The number of days of not using a security key after which we email the user */
     public $lostSecurityKeyEmailDays;
@@ -307,7 +307,7 @@ class Emailer extends Component
         $this->subjectForPasswordExpired = $this->subjectForPasswordExpired ?? self::SUBJ_PASSWORD_EXPIRED;
         $this->subjectForPasswordPwned = $this->subjectForPasswordPwned ?? self::SUBJ_PASSWORD_PWNED;
 
-        $this->subjectForInactiveUserAccounts = $this->subjectForInactiveUserAccounts ?? self::SUBJ_UNUSED_USER_ACCOUNTS;
+        $this->subjectForAbandonedUserAccounts = $this->subjectForAbandonedUserAccounts ?? self::SUBJ_ABANDONED_USER_ACCOUNTS;
 
         $this->subjects = [
             EmailLog::MESSAGE_TYPE_INVITE => $this->subjectForInvite,
@@ -746,23 +746,22 @@ class Emailer extends Component
     }
 
     /**
-     * Sends email alert to HR with all inactive users
+     * Sends email alert to HR with all abandoned users
      */
-    public function sendInactiveUsersEmail()
+    public function sendAbandonedUsersEmail()
     {
-        $dataForEmail = \Yii::$app->params['inactiveUser'];
+        $dataForEmail = \Yii::$app->params['abandonedUser'];
         $dataForEmail = ArrayHelper::merge(
             $this->otherDataForEmails,
             $dataForEmail
         );
 
         if (!empty($dataForEmail['hrNotificationsEmail'])) {
-            $dataForEmail['users'] = User::getInactiveUsers();
-            $dataForEmail['inactivePeriod'] = ltrim($dataForEmail['inactivePeriod'], '+');    
+            $dataForEmail['users'] = User::getAbandonedUsers();
     
-            $htmlBody = \Yii::$app->view->render('@common/mail/inactive-users.html.php', $dataForEmail);
+            $htmlBody = \Yii::$app->view->render('@common/mail/abandoned-users.html.php', $dataForEmail);
     
-            $this->email($dataForEmail['hrNotificationsEmail'], $this->subjectForInactiveUserAccounts, $htmlBody, strip_tags($htmlBody));
+            $this->email($dataForEmail['hrNotificationsEmail'], $this->subjectForAbandonedUserAccounts, $htmlBody, strip_tags($htmlBody));
         }
     }
 }

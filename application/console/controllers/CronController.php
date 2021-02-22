@@ -117,11 +117,11 @@ class CronController extends Controller
         User::deleteInactiveUsers();
     }
 
-    public function actionSendInactiveUsersEmail()
+    public function actionSendAbandonedUsersEmail()
     {
         /* @var $emailer Emailer */
         $emailer = \Yii::$app->emailer;
-        $emailer->sendInactiveUsersEmail();
+        $emailer->sendAbandonedUsersEmail();
     }
 
     /**
@@ -150,7 +150,7 @@ class CronController extends Controller
         }
 
         try {
-            $this->actionSendInactiveUsersEmail();
+            $this->actionSendAbandonedUsersEmail();
         } catch (\Throwable $e) {
             \Yii::error($e->getMessage());
         }

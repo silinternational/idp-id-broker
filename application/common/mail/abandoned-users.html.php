@@ -4,7 +4,7 @@ use yii\helpers\Html as yHtml;
 /**
  * @var string $contactName
  * @var string $idpDisplayName
- * @var string $inactivePeriod
+ * @var string $abandonedPeriod
  * @var string $bestPracticeUrl
  * @var string $deactivateInstructionsUrl
  * @var array  $users
@@ -16,7 +16,7 @@ use yii\helpers\Html as yHtml;
 <p>
     As GTIS works towards securing <?= yHtml::encode($idpDisplayName) ?>'s accounts, we are auditing
     <?= yHtml::encode($idpDisplayName) ?> Identity access and asking HR to consider deactivating accounts that
-    haven't been used in more than <?= yHtml::encode($inactivePeriod) ?>.
+    haven't been used in more than <?= yHtml::encode(ltrim($abandonedPeriod, '+')) ?>.
 </p>
 <p>
     Identity accounts are used to gain access to Workday, REAP, and Gateway. Often, when an account is not used,

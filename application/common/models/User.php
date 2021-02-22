@@ -1130,7 +1130,7 @@ class User extends UserBase
      */
     public static function deleteInactiveUsers()
     {
-        $enabled = \Yii::$app->params['inactiveUser']['deletionEnable'];
+        $enabled = \Yii::$app->params['inactiveUserDeletionEnable'];
 
         if ($enabled !== true) {
             \Yii::warning([
@@ -1148,7 +1148,7 @@ class User extends UserBase
         /*
          * Replace '+' with '-' so all env parameters can be defined consistently as '+n unit'
          */
-        $inactiveUserPeriod = '-' . ltrim(\Yii::$app->params['inactiveUser']['inactivePeriod'], '+');
+        $inactiveUserPeriod = '-' . ltrim(\Yii::$app->params['inactiveUserPeriod'], '+');
 
         /**
          * @var string $removeBefore   All records that have not been updated since before this date
@@ -1187,12 +1187,12 @@ class User extends UserBase
     /**
      * Delete all user records that are inactive and have not been updated recently.
      */
-    public static function getInactiveUsers()
+    public static function getAbandonedUsers()
     {
         /*
          * Replace '+' with '-' so all env parameters can be defined consistently as '+n unit'
          */
-        $inactiveUserPeriod = '-' . ltrim(\Yii::$app->params['inactiveUser']['inactivePeriod'], '+');
+        $inactiveUserPeriod = '-' . ltrim(\Yii::$app->params['abandonedUser']['abandonedPeriod'], '+');
 
         /**
          * @var string $removeBefore   All records that have not been updated since before this date
@@ -1202,7 +1202,7 @@ class User extends UserBase
         return self::find()
             ->andWhere(['<', 'last_login_utc', $removeBefore])
             ->andWhere(['<', 'created_utc', $removeBefore])
-            ->andWhere(['active' => 'no'])
+            ->andWhere(['active' => 'yes'])
             ->all();
     }
 

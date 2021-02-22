@@ -123,7 +123,7 @@ return [
             'subjectForMethodPurged' => Env::get('SUBJECT_FOR_METHOD_PURGED'),
             'subjectForPasswordExpiring' => Env::get('SUBJECT_FOR_PASSWORD_EXPIRING'),
             'subjectForPasswordExpired' => Env::get('SUBJECT_FOR_PASSWORD_EXPIRED'),
-            'subjectForInactiveUsers' => Env::get('SUBJECT_FOR_INACTIVE_USERS'),
+            'subjectForAbandonedUsers' => Env::get('SUBJECT_FOR_ABANDONED_USERS'),
 
             'lostSecurityKeyEmailDays' => Env::get('LOST_SECURITY_KEY_EMAIL_DAYS', 62),
             'minimumBackupCodesBeforeNag' => Env::get('MINIMUM_BACKUP_CODES_BEFORE_NAG', 4),
@@ -208,14 +208,16 @@ return [
         'passwordGracePeriodExtension'  => '+7 days',
         'inviteLifespan'                => Env::get('INVITE_LIFESPAN', '+1 month'),
         'inviteGracePeriod'             => Env::get('INVITE_GRACE_PERIOD', '+3 months'),
-        'inactiveUser'                  => [
-            // deletionEnable and inactivePeriod existed before and Env::getArrayFromPrefix() would
-            // use a different environment variable, so to not break things, Env::get() is used
-            'deletionEnable'            => Env::get('INACTIVE_USER_DELETION_ENABLE', false),
-            'inactivePeriod'            => Env::get('INACTIVE_USER_PERIOD', '+18 months'),
-            'bestPracticeUrl'           => Env::get('INACTIVE_USER_BEST_PRACTICE_URL'),
-            'deactivateInstructionsUrl' => Env::get('INACTIVE_USER_DEACTIVATE_INSTRUCTIONS_URL'),
-        ],
+        'inactiveUserDeletionEnable'    => Env::get('INACTIVE_USER_DELETION_ENABLE', false),
+        'inactiveUserPeriod'            => Env::get('INACTIVE_USER_PERIOD', '+18 months'),
+        'abandonedUser'                 => ArrayHelper::merge(
+            [
+                'abandonedPeriod'           => '+6 months',
+                'bestPracticeUrl'           => '',
+                'deactivateInstructionsUrl' => '',
+            ],
+            Env::getArrayFromPrefix('ABANDONED_USER_')
+        ),
         'googleAnalytics'               => [
             'trackingId' => Env::get('GA_TRACKING_ID'),
             'clientId'   => Env::get('GA_CLIENT_ID'),
