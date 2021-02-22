@@ -1185,7 +1185,7 @@ class User extends UserBase
 
 
     /**
-     * Delete all user records that are inactive and have not been updated recently.
+     * Get all user records that are abandoned and have not been updated recently.
      */
     public static function getAbandonedUsers()
     {
