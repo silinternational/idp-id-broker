@@ -138,7 +138,10 @@ class Emailer extends Component
     public $subjectForPasswordExpired;
     public $subjectForPasswordPwned;
 
-    public $subjectForAbandonedUserAccounts;
+    public $subjectForAbandonedUsers;
+
+    /* The email to contact for HR notifications */
+    public $hrNotificationsEmail;
 
     /* The number of days of not using a security key after which we email the user */
     public $lostSecurityKeyEmailDays;
@@ -307,7 +310,7 @@ class Emailer extends Component
         $this->subjectForPasswordExpired = $this->subjectForPasswordExpired ?? self::SUBJ_PASSWORD_EXPIRED;
         $this->subjectForPasswordPwned = $this->subjectForPasswordPwned ?? self::SUBJ_PASSWORD_PWNED;
 
-        $this->subjectForAbandonedUserAccounts = $this->subjectForAbandonedUserAccounts ?? self::SUBJ_ABANDONED_USER_ACCOUNTS;
+        $this->subjectForAbandonedUsers = $this->subjectForAbandonedUsers ?? self::SUBJ_ABANDONED_USER_ACCOUNTS;
 
         $this->subjects = [
             EmailLog::MESSAGE_TYPE_INVITE => $this->subjectForInvite,
@@ -330,7 +333,9 @@ class Emailer extends Component
             EmailLog::MESSAGE_TYPE_PASSWORD_EXPIRED => $this->subjectForPasswordExpired,
             EmailLog::MESSAGE_TYPE_PASSWORD_PWNED => $this->subjectForPasswordPwned,
         ];
-        
+
+        $hrNotificationsEmail = $this->hrNotificationsEmail ?? '';
+
         $this->assertConfigIsValid();
         
         $this->verifyOtherDataForEmailIsValid();
@@ -761,7 +766,7 @@ class Emailer extends Component
     
             $htmlBody = \Yii::$app->view->render('@common/mail/abandoned-users.html.php', $dataForEmail);
     
-            $this->email($dataForEmail['hrNotificationsEmail'], $this->subjectForAbandonedUserAccounts, $htmlBody, strip_tags($htmlBody));
+            $this->email($dataForEmail['hrNotificationsEmail'], $this->subjectForAbandonedUsers, $htmlBody, strip_tags($htmlBody));
         }
     }
 }
