@@ -43,13 +43,13 @@ use yii\helpers\Html as yHtml;
         <th>Username</th>
         <th>Last IdP Login</th>
     </tr>
-    <? foreach ($users as $user): ?>
+    <?php foreach ($users as $user): ?>
     <tr>
         <td><?= $user['uuid'] ?></td>
         <td><?= $user['username'] ?></td>
         <td><?= $user['last_login_utc'] ?></td>
     </tr>
-    <? endforeach; ?>
+    <?php endforeach; ?>
 </table>
 
 <p>Thanks,</p>
