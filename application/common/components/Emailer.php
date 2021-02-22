@@ -334,7 +334,7 @@ class Emailer extends Component
             EmailLog::MESSAGE_TYPE_PASSWORD_PWNED => $this->subjectForPasswordPwned,
         ];
 
-        $hrNotificationsEmail = $this->hrNotificationsEmail ?? '';
+        $this->hrNotificationsEmail = $this->hrNotificationsEmail ?? '';
 
         $this->assertConfigIsValid();
         
