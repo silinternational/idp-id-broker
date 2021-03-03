@@ -12,8 +12,12 @@ bash:
 deps:
 	docker-compose run --rm cli composer install
 
+depsshow:
+	docker-compose run --rm cli bash -c "composer show -Df json > versions.json"
+
 depsupdate:
 	docker-compose run --rm cli composer update
+	make depsshow
 
 db:
 	docker-compose up -d db

@@ -1,0 +1,99 @@
+{
+    "installed": [
+        {
+            "name": "behat/behat",
+            "version": "v3.6.1",
+            "description": "Scenario-oriented BDD framework for PHP 5.3"
+        },
+        {
+            "name": "codemix/yii2-streamlog",
+            "version": "1.3.1",
+            "description": "A Yii 2 log target for streams in URL format"
+        },
+        {
+            "name": "fillup/fake-bower-assets",
+            "version": "2.0.9",
+            "description": "Use Composer \"replace\" to fake out installing bower-asset dependencies that aren't really needed"
+        },
+        {
+            "name": "friendsofphp/php-cs-fixer",
+            "version": "v2.16.3",
+            "description": "A tool to automatically fix PHP code style"
+        },
+        {
+            "name": "google/apiclient",
+            "version": "v2.4.1",
+            "description": "Client library for Google APIs"
+        },
+        {
+            "name": "guzzlehttp/guzzle",
+            "version": "6.5.3",
+            "description": "Guzzle is a PHP HTTP client library"
+        },
+        {
+            "name": "ramsey/uuid",
+            "version": "3.9.3",
+            "description": "Formerly rhumsaa/uuid. A PHP 5.4+ library for generating RFC 4122 version 1, 3, 4, and 5 universally unique identifiers (UUID)."
+        },
+        {
+            "name": "roave/security-advisories",
+            "version": "dev-master 5a342e2",
+            "description": "Prevents installation of composer packages with known security vulnerabilities: no API, simply require it"
+        },
+        {
+            "name": "silinternational/email-service-php-client",
+            "version": "2.2.0",
+            "description": "PHP client to interact with our Email Service API: https://github.com/silinternational/email-service"
+        },
+        {
+            "name": "silinternational/php-array-dot-notation",
+            "version": "0.1.0",
+            "description": "PHP library for using dot notation in arrays"
+        },
+        {
+            "name": "silinternational/php-env",
+            "version": "2.1.1",
+            "description": "Simple PHP library for getting (or requiring) environment variables, designed to handle true, false, and null more intelligently. If desired, an environment variable's value can be split into an array automatically."
+        },
+        {
+            "name": "silinternational/psr3-adapters",
+            "version": "1.1.0",
+            "description": "Various PSR3-compatible logging adapters."
+        },
+        {
+            "name": "silinternational/yii2-email-log-target",
+            "version": "1.0.1",
+            "description": "Yii2 log target for sending data to email without trace information"
+        },
+        {
+            "name": "silinternational/yii2-json-log-targets",
+            "version": "2.0.0",
+            "description": "A collection of Yii2 log targets that format the log message as a JSON string."
+        },
+        {
+            "name": "theiconic/php-ga-measurement-protocol",
+            "version": "v2.7.1",
+            "description": "Send data to Google Analytics from the server using PHP. This library fully implements GA measurement protocol."
+        },
+        {
+            "name": "webmozart/assert",
+            "version": "1.8.0",
+            "description": "Assertions to validate method input/output with nice error messages."
+        },
+        {
+            "name": "yiisoft/yii2",
+            "version": "2.0.35",
+            "description": "Yii PHP Framework Version 2"
+        },
+        {
+            "name": "yiisoft/yii2-gii",
+            "version": "2.2.1",
+            "description": "The Gii extension for the Yii framework"
+        },
+        {
+            "name": "yiisoft/yii2-swiftmailer",
+            "version": "2.1.2",
+            "description": "The SwiftMailer integration for the Yii framework"
+        }
+    ]
+}
