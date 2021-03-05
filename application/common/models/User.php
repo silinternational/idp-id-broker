@@ -1192,16 +1192,16 @@ class User extends UserBase
         /*
          * Replace '+' with '-' so all env parameters can be defined consistently as '+n unit'
          */
-        $inactiveUserPeriod = '-' . ltrim(\Yii::$app->params['abandonedUser']['abandonedPeriod'], '+');
+        $abandonedUserPeriod = '-' . ltrim(\Yii::$app->params['abandonedUser']['abandonedPeriod'], '+');
 
         /**
-         * @var string $removeBefore   All records that have not been updated since before this date
+         * @var string $abandonedBefore   All records that have not been updated since before this date
          * should be deleted. Calculated relative to now (time of execution).
          */
-        $removeBefore = MySqlDateTime::relative($inactiveUserPeriod);
+        $abandonedBefore = MySqlDateTime::relative($abandonedUserPeriod);
         return self::find()
-            ->andWhere(['<', 'last_login_utc', $removeBefore])
-            ->andWhere(['<', 'created_utc', $removeBefore])
+            ->andWhere(['<', 'last_login_utc', $abandonedBefore])
+            ->andWhere(['<', 'created_utc', $abandonedBefore])
             ->andWhere(['active' => 'yes'])
             ->all();
     }
