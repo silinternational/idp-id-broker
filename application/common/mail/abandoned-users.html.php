@@ -2,7 +2,6 @@
 use yii\helpers\Html as yHtml;
 
 /**
- * @var string $contactName
  * @var string $idpDisplayName
  * @var string $abandonedPeriod
  * @var string $bestPracticeUrl

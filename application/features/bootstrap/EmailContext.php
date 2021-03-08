@@ -1203,7 +1203,7 @@ class EmailContext extends YiiContext
      */
     public function theUserHasNotLoggedInFor($months)
     {
-        $date = MySqlDateTime::relative("-" & $months);
+        $date = MySqlDateTime::relative("-" . $months);
 
         $this->tempUser->scenario = User::SCENARIO_UPDATE_USER;
         $this->tempUser->last_login_utc = $date;
@@ -1227,9 +1227,7 @@ class EmailContext extends YiiContext
         $emails = $this->fakeEmailer->getFakeEmailsSent();
         $hasBeenSent = false;
 
-        echo "Want: " . $this->fakeEmailer->subjectForAbandonedUsers . PHP_EOL;
         foreach ($emails as $email) {
-            echo "Got:  " . $email[Emailer::PROP_SUBJECT] . PHP_EOL;
             if ($email[Emailer::PROP_SUBJECT] === $this->fakeEmailer->subjectForAbandonedUsers) {
                 $hasBeenSent = true;
                 break;
@@ -1254,5 +1252,6 @@ class EmailContext extends YiiContext
         EmailLog::deleteAll();
         Method::deleteAll();
         User::deleteAll();
+        $this->fakeEmailer->forgetFakeEmailsSent();
     }
 }

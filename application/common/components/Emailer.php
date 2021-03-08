@@ -763,11 +763,10 @@ class Emailer extends Component
 
         if (!empty($this->hrNotificationsEmail)) {
             $dataForEmail['users'] = User::getAbandonedUsers();
-            
+
             if (!empty($dataForEmail['users'])) {
-                echo "Found ".count($dataForEmail['users'])." Users".PHP_EOL;
                 $htmlBody = \Yii::$app->view->render('@common/mail/abandoned-users.html.php', $dataForEmail);
-    
+
                 $this->email($this->hrNotificationsEmail, $this->subjectForAbandonedUsers, $htmlBody, strip_tags($htmlBody));
             }
         }
