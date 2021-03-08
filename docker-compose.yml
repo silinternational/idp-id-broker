@@ -104,6 +104,9 @@ services:
             MYSQL_USER: appfortests
             PASSWORD_PROFILE_URL: https://www.example.com
             SUPPORT_EMAIL: support@example.com
+            HR_NOTIFICATIONS_EMAIL: hr@example.com
+            ABANDONED_USER_bestPracticeUrl: http://www.example.com/best-practices.html
+            ABANDONED_USER_deactivateInstructionsUrl: http://www.example.com/deactivate-instructions.html
         command: ./run-tests.sh
         # running isolated tests
         # docker-compose run --rm test vendor/bin/behat --stop-on-failure features/user.feature

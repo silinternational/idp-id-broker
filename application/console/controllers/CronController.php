@@ -117,6 +117,13 @@ class CronController extends Controller
         User::deleteInactiveUsers();
     }
 
+    public function actionSendAbandonedUsersEmail()
+    {
+        /* @var $emailer Emailer */
+        $emailer = \Yii::$app->emailer;
+        $emailer->sendAbandonedUsersEmail();
+    }
+
     /**
      * Export user table to Google Sheets
      */
@@ -130,45 +137,23 @@ class CronController extends Controller
      */
     public function actionAll()
     {
-        try {
-            $this->actionRemoveOldUnverifiedRecords();
-        } catch (\Throwable $e) {
-            \Yii::error($e->getMessage());
-        }
-
-        try {
-            $this->actionDeleteInactiveUsers();
-        } catch (\Throwable $e) {
-            \Yii::error($e->getMessage());
-        }
-
-        try {
-            $this->actionSendDelayedMfaRelatedEmails();
-        } catch (\Throwable $e) {
-            \Yii::error($e->getMessage());
-        }
-
-        try {
-            $this->actionSendMethodReminderEmails();
-        } catch (\Throwable $e) {
-            \Yii::error($e->getMessage());
-        }
-
-        try {
-            $this->actionSendPasswordExpiryEmails();
-        } catch (\Throwable $e) {
-            \Yii::error($e->getMessage());
-        }
-
-        try {
-            $this->actionGoogleAnalytics();
-        } catch (\Throwable $e) {
-            \Yii::error($e->getMessage());
-        }
+        $actions = [
+            'actionRemoveOldUnverifiedRecords',
+            'actionDeleteInactiveUsers',
+            'actionSendAbandonedUsersEmail',
+            'actionSendDelayedMfaRelatedEmails',
+            'actionSendMethodReminderEmails',
+            'actionSendPasswordExpiryEmails',
+            'actionGoogleAnalytics',
+        ];
 
         if (\Yii::$app->params['google']['enableSheetsExport']) {
+            $actions[] = 'actionExportToSheets';
+        }
+
+        foreach ($actions as $action) {
             try {
-                $this->actionExportToSheets();
+                $this->$action();
             } catch (\Throwable $e) {
                 \Yii::error($e->getMessage());
             }

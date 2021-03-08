@@ -704,3 +704,16 @@ Feature: User
         | username            | new_guy            |
         | active              | no                 |
         | locked              | no                 |
+
+  Scenario Outline: HR notification users
+    Given I create a new user with a "active" property of "<active>"
+      And the user has not logged in for "<loginTime>"
+    When I get users for HR notification
+    Then the user <isOrIsNot> included in the data
+
+    Examples:
+      | active | loginTime | isOrIsNot |
+      | no     | 5 months  | is NOT    |
+      | no     | 7 months  | is NOT    |
+      | yes    | 5 months  | is NOT    |
+      | yes    | 7 months  | is        |

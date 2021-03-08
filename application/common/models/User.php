@@ -1183,6 +1183,29 @@ class User extends UserBase
         ]);
     }
 
+
+    /**
+     * Get all user records that are abandoned and have not been updated recently.
+     */
+    public static function getAbandonedUsers()
+    {
+        /*
+         * Replace '+' with '-' so all env parameters can be defined consistently as '+n unit'
+         */
+        $abandonedUserPeriod = '-' . ltrim(\Yii::$app->params['abandonedUser']['abandonedPeriod'], '+');
+
+        /**
+         * @var string $abandonedBefore   All records that have not been updated since before this date
+         * should be deleted. Calculated relative to now (time of execution).
+         */
+        $abandonedBefore = MySqlDateTime::relative($abandonedUserPeriod);
+        return self::find()
+            ->andWhere(['<', 'last_login_utc', $abandonedBefore])
+            ->andWhere(['<', 'created_utc', $abandonedBefore])
+            ->andWhere(['active' => 'yes'])
+            ->all();
+    }
+
     /**
      * @return string Date password last changed, in human-friendly format.
      * @throws Exception if an invalid time is stored in `created_utc`

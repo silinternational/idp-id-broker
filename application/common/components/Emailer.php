@@ -46,6 +46,8 @@ class Emailer extends Component
     const SUBJ_PASSWORD_EXPIRED = 'The password for your {idpDisplayName} Identity account has expired';
     const SUBJ_PASSWORD_PWNED = 'ALERT: The password for your {idpDisplayName} Identity account has been exposed';
 
+    const SUBJ_ABANDONED_USER_ACCOUNTS = 'Unused {idpDisplayName} Identity Accounts';
+
     const PROP_SUBJECT = 'subject';
     const PROP_TO_ADDRESS = 'to_address';
     const PROP_CC_ADDRESS = 'cc_address';
@@ -135,6 +137,11 @@ class Emailer extends Component
     public $subjectForPasswordExpiring;
     public $subjectForPasswordExpired;
     public $subjectForPasswordPwned;
+
+    public $subjectForAbandonedUsers;
+
+    /* The email to contact for HR notifications */
+    public $hrNotificationsEmail;
 
     /* The number of days of not using a security key after which we email the user */
     public $lostSecurityKeyEmailDays;
@@ -303,6 +310,8 @@ class Emailer extends Component
         $this->subjectForPasswordExpired = $this->subjectForPasswordExpired ?? self::SUBJ_PASSWORD_EXPIRED;
         $this->subjectForPasswordPwned = $this->subjectForPasswordPwned ?? self::SUBJ_PASSWORD_PWNED;
 
+        $this->subjectForAbandonedUsers = $this->subjectForAbandonedUsers ?? self::SUBJ_ABANDONED_USER_ACCOUNTS;
+
         $this->subjects = [
             EmailLog::MESSAGE_TYPE_INVITE => $this->subjectForInvite,
             EmailLog::MESSAGE_TYPE_MFA_RATE_LIMIT => $this->subjectForMfaRateLimit,
@@ -324,7 +333,9 @@ class Emailer extends Component
             EmailLog::MESSAGE_TYPE_PASSWORD_EXPIRED => $this->subjectForPasswordExpired,
             EmailLog::MESSAGE_TYPE_PASSWORD_PWNED => $this->subjectForPasswordPwned,
         ];
-        
+
+        $this->hrNotificationsEmail = $this->hrNotificationsEmail ?? '';
+
         $this->assertConfigIsValid();
         
         $this->verifyOtherDataForEmailIsValid();
@@ -737,5 +748,27 @@ class Emailer extends Component
             'status' => 'finished',
             'number_sent' => $numEmailsSent,
         ]));
+    }
+
+    /**
+     * Sends email alert to HR with all abandoned users, if any
+     */
+    public function sendAbandonedUsersEmail()
+    {
+        $dataForEmail = \Yii::$app->params['abandonedUser'];
+        $dataForEmail = ArrayHelper::merge(
+            $this->otherDataForEmails,
+            $dataForEmail
+        );
+
+        if (!empty($this->hrNotificationsEmail)) {
+            $dataForEmail['users'] = User::getAbandonedUsers();
+
+            if (!empty($dataForEmail['users'])) {
+                $htmlBody = \Yii::$app->view->render('@common/mail/abandoned-users.html.php', $dataForEmail);
+
+                $this->email($this->hrNotificationsEmail, $this->subjectForAbandonedUsers, $htmlBody, strip_tags($htmlBody));
+            }
+        }
     }
 }

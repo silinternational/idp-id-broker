@@ -122,11 +122,14 @@ return [
             'subjectForMethodPurged' => Env::get('SUBJECT_FOR_METHOD_PURGED'),
             'subjectForPasswordExpiring' => Env::get('SUBJECT_FOR_PASSWORD_EXPIRING'),
             'subjectForPasswordExpired' => Env::get('SUBJECT_FOR_PASSWORD_EXPIRED'),
+            'subjectForAbandonedUsers' => Env::get('SUBJECT_FOR_ABANDONED_USERS'),
 
             'lostSecurityKeyEmailDays' => Env::get('LOST_SECURITY_KEY_EMAIL_DAYS', 62),
             'minimumBackupCodesBeforeNag' => Env::get('MINIMUM_BACKUP_CODES_BEFORE_NAG', 4),
 
             'emailRepeatDelayDays' => Env::get('EMAIL_REPEAT_DELAY_DAYS', 31),
+
+            'hrNotificationsEmail' => Env::get('HR_NOTIFICATIONS_EMAIL'),
         ],
         'backupcode' => [
             'class' => MfaBackendBackupcode::class,
@@ -206,6 +209,14 @@ return [
         'inviteGracePeriod'             => Env::get('INVITE_GRACE_PERIOD', '+3 months'),
         'inactiveUserDeletionEnable'    => Env::get('INACTIVE_USER_DELETION_ENABLE', false),
         'inactiveUserPeriod'            => Env::get('INACTIVE_USER_PERIOD', '+18 months'),
+        'abandonedUser'                 => ArrayHelper::merge(
+            [
+                'abandonedPeriod'           => '+6 months',
+                'bestPracticeUrl'           => '',
+                'deactivateInstructionsUrl' => '',
+            ],
+            Env::getArrayFromPrefix('ABANDONED_USER_')
+        ),
         'googleAnalytics'               => [
             'trackingId' => Env::get('GA_TRACKING_ID'),
             'clientId'   => Env::get('GA_CLIENT_ID'),
