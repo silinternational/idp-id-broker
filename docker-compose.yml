@@ -54,6 +54,7 @@ services:
             MYSQL_USER: appfortests
             MYSQL_PASSWORD: appfortests
             SUPPORT_EMAIL: support@example.com
+            HR_NOTIFICATIONS_EMAIL: hr@example.com
 
     appfortestsdb:
         image: silintl/mariadb:latest

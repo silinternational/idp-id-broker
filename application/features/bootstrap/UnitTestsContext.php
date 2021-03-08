@@ -44,6 +44,8 @@ class UnitTestsContext extends YiiContext
     /** @var string[] */
     protected $originalParams = [];
 
+    protected $dataToVerify;
+
     /**
      * @afterScenario @database
      */
@@ -358,5 +360,43 @@ class UnitTestsContext extends YiiContext
     public function iAddBackupCodesForThatUser()
     {
         $this->createMfa(Mfa::TYPE_BACKUPCODE);
+    }
+
+    /**
+     * @Given the user has not logged in for :months
+     */
+    public function theUserHasNotLoggedInFor($months)
+    {
+        $date = MySqlDateTime::relative("-{$months}");
+        $this->iChangeTheUsersPropertyTo("last_login_utc", $date);
+        $this->iChangeTheUsersPropertyTo("created_utc", $date);
+    }
+
+    /**
+     * @When I get users for HR notification
+     */
+    public function iGetUsersForHrNotification()
+    {
+        $this->dataToVerify = User::getAbandonedUsers();
+    }
+
+    /**
+     * @Then /^the user (is|is NOT) included in the data$/
+     */
+    public function isUserIncludedInTheData($option)
+    {
+        $isIncluded = false;
+        foreach ($this->dataToVerify as $user) {
+            if ($user->uuid === $this->tempUser->uuid) {
+                $isIncluded = true;
+                break;
+            }
+        }
+
+        if($option === "is") {
+            Assert::true($isIncluded);
+        } else {
+            Assert::false($isIncluded);
+        }
     }
 }

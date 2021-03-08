@@ -751,7 +751,7 @@ class Emailer extends Component
     }
 
     /**
-     * Sends email alert to HR with all abandoned users
+     * Sends email alert to HR with all abandoned users, if any
      */
     public function sendAbandonedUsersEmail()
     {
@@ -761,12 +761,15 @@ class Emailer extends Component
             $dataForEmail
         );
 
-        if (!empty($dataForEmail['hrNotificationsEmail'])) {
+        if (!empty($this->hrNotificationsEmail)) {
             $dataForEmail['users'] = User::getAbandonedUsers();
+            
+            if (!empty($dataForEmail['users'])) {
+                echo "Found ".count($dataForEmail['users'])." Users".PHP_EOL;
+                $htmlBody = \Yii::$app->view->render('@common/mail/abandoned-users.html.php', $dataForEmail);
     
-            $htmlBody = \Yii::$app->view->render('@common/mail/abandoned-users.html.php', $dataForEmail);
-    
-            $this->email($dataForEmail['hrNotificationsEmail'], $this->subjectForAbandonedUsers, $htmlBody, strip_tags($htmlBody));
+                $this->email($this->hrNotificationsEmail, $this->subjectForAbandonedUsers, $htmlBody, strip_tags($htmlBody));
+            }
         }
     }
 }
