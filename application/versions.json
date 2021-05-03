@@ -2,8 +2,8 @@
     "installed": [
         {
             "name": "behat/behat",
-            "version": "v3.8.1",
-            "description": "Scenario-oriented BDD framework for PHP"
+            "version": "v3.6.1",
+            "description": "Scenario-oriented BDD framework for PHP 5.3"
         },
         {
             "name": "codemix/yii2-streamlog",
@@ -17,17 +17,17 @@
         },
         {
             "name": "friendsofphp/php-cs-fixer",
-            "version": "v2.18.2",
+            "version": "v2.16.3",
             "description": "A tool to automatically fix PHP code style"
         },
         {
             "name": "google/apiclient",
-            "version": "v2.9.1",
+            "version": "v2.4.1",
             "description": "Client library for Google APIs"
         },
         {
             "name": "guzzlehttp/guzzle",
-            "version": "6.5.5",
+            "version": "6.5.3",
             "description": "Guzzle is a PHP HTTP client library"
         },
         {
@@ -37,7 +37,7 @@
         },
         {
             "name": "roave/security-advisories",
-            "version": "dev-master a6bfc5a",
+            "version": "dev-master 5a342e2",
             "description": "Prevents installation of composer packages with known security vulnerabilities: no API, simply require it"
         },
         {
@@ -72,17 +72,17 @@
         },
         {
             "name": "theiconic/php-ga-measurement-protocol",
-            "version": "v2.9.0",
+            "version": "v2.7.1",
             "description": "Send data to Google Analytics from the server using PHP. This library fully implements GA measurement protocol."
         },
         {
             "name": "webmozart/assert",
-            "version": "1.9.1",
+            "version": "1.8.0",
             "description": "Assertions to validate method input/output with nice error messages."
         },
         {
             "name": "yiisoft/yii2",
-            "version": "2.0.40",
+            "version": "2.0.35",
             "description": "Yii PHP Framework Version 2"
         },
         {
