@@ -6,8 +6,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 ### Added
-- Added created date to user
+- Added created date/time to user
 - Send email alert to HR with all abandoned users, if any
+- Added deactivated date/time to user
 
 ## [5.2.3] - 2020-10-27
 ### Fixed
