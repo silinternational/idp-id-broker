@@ -48,7 +48,7 @@ class User extends UserBase
 
         $this->sendAppropriateMessages($insert, $changedAttributes);
     }
-    
+
     public function beforeDelete()
     {
         if (! parent::beforeDelete()) {
@@ -70,9 +70,9 @@ class User extends UserBase
             ]);
             return false;
         }
-        
+
         // Next, delete dependent records:
-        
+
         /* @var $passwordsOfUser Password[] */
         $passwordsOfUser = Password::findAll(['user_id' => $this->id]);
         foreach ($passwordsOfUser as $password) {
@@ -87,7 +87,7 @@ class User extends UserBase
                 return false;
             }
         }
-        
+
         foreach ($this->mfas as $mfa) {
             if (! $mfa->delete()) {
                 \Yii::error([
@@ -145,7 +145,7 @@ class User extends UserBase
 
         return true;
     }
-    
+
     public function scenarios(): array
     {
         $scenarios = parent::scenarios();
@@ -440,17 +440,17 @@ class User extends UserBase
         if ($this->currentPassword !== null) {
             $attrs['passwordExpiresUtc'] = MySqlDateTime::formatDateForHumans($this->currentPassword->getExpiresOn());
         }
-        
+
         return $attrs;
     }
-    
+
     public function hasReceivedMessage(string $messageType)
     {
         return $this->getEmailLogs()->where([
             'message_type' => $messageType,
         ])->exists();
     }
-    
+
     private function validateExpiration(): Closure
     {
         return function ($attributeName) {
@@ -472,7 +472,7 @@ class User extends UserBase
     {
         return [
             'changeTracker' => [
-                'class' => AttributeBehavior::className(),
+                'class' => AttributeBehavior::class,
                 'attributes' => [
                     ActiveRecord::EVENT_BEFORE_INSERT => 'last_changed_utc',
                     ActiveRecord::EVENT_BEFORE_UPDATE => 'last_changed_utc',
@@ -481,7 +481,7 @@ class User extends UserBase
                 'skipUpdateOnClean' => true, // only update the value if something has changed
             ],
             'syncTracker' => [
-                'class' => AttributeBehavior::className(),
+                'class' => AttributeBehavior::class,
                 'attributes' => [
                     ActiveRecord::EVENT_BEFORE_INSERT => 'last_synced_utc',
                     ActiveRecord::EVENT_BEFORE_UPDATE => 'last_synced_utc',
@@ -529,6 +529,9 @@ class User extends UserBase
             },
             'created_utc' => function (self $model) {
                 return $model->created_utc === null ? null : Utils::getIso8601($model->created_utc);
+            },
+            'deactivated_utc' => function (self $model) {
+                return $model->deactivated_utc === null ? null : Utils::getIso8601($model->deactivated_utc);
             },
             'manager_email',
             'personal_email' => function (self $model) {
@@ -726,7 +729,7 @@ class User extends UserBase
     {
         /* @var $emailer Emailer */
         $emailer = \Yii::$app->emailer;
-        
+
         if ($emailer->shouldSendInviteMessageTo($this, $isNewUser)) {
             $invite = Invite::findOrCreate($this->id);
             $data = ['inviteCode' => $invite->getCode()];
@@ -745,11 +748,11 @@ class User extends UserBase
                 \Yii::$app->params['inviteEmailDelaySeconds']
             );
         }
-        
+
         if ($emailer->shouldSendPasswordChangedMessageTo($this, $changedAttributes)) {
             $emailer->sendMessageTo(EmailLog::MESSAGE_TYPE_PASSWORD_CHANGED, $this);
         }
-        
+
         if ($emailer->shouldSendWelcomeMessageTo($this, $changedAttributes)) {
             $emailer->sendMessageTo(EmailLog::MESSAGE_TYPE_WELCOME, $this);
         }
@@ -914,7 +917,7 @@ class User extends UserBase
         $labels['last_changed_utc'] = Yii::t('app', 'Last Changed (UTC)');
         $labels['last_synced_utc'] = Yii::t('app', 'Last Synced (UTC)');
         $labels['created_utc'] = Yii::t('app', 'Created (UTC)');
-        
+        $labels['deactivated_utc'] = Yii::t('app', 'Deactivated (UTC)');
 
         return $labels;
     }
@@ -1012,6 +1015,9 @@ class User extends UserBase
             $this->require_mfa = 'yes';
         }
 
+        if ($this->getOldAttribute('active') == 'yes' && $this->active == 'no') {
+            $this->deactivated_utc = MySqlDateTime::now();
+        }
         return parent::beforeSave($insert);
     }
 
