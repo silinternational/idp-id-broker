@@ -30,6 +30,8 @@ use Yii;
  * @property string|null $expires_on
  * @property string $nag_for_mfa_after
  * @property string $nag_for_method_after
+ * @property string|null $created_utc
+ * @property string|null $deactivated_utc
  *
  * @property Password $currentPassword
  * @property EmailLog[] $emailLogs
@@ -56,7 +58,7 @@ class UserBase extends \yii\db\ActiveRecord
             [['uuid', 'employee_id', 'first_name', 'last_name', 'username', 'active', 'locked', 'last_changed_utc', 'last_synced_utc', 'review_profile_after', 'nag_for_mfa_after', 'nag_for_method_after'], 'required'],
             [['current_password_id'], 'integer'],
             [['active', 'locked', 'require_mfa', 'hide'], 'string'],
-            [['last_changed_utc', 'last_synced_utc', 'review_profile_after', 'last_login_utc', 'expires_on', 'nag_for_mfa_after', 'nag_for_method_after'], 'safe'],
+            [['last_changed_utc', 'last_synced_utc', 'review_profile_after', 'last_login_utc', 'expires_on', 'nag_for_mfa_after', 'nag_for_method_after', 'created_utc', 'deactivated_utc'], 'safe'],
             [['uuid'], 'string', 'max' => 64],
             [['employee_id', 'first_name', 'last_name', 'display_name', 'username', 'email', 'manager_email', 'groups', 'personal_email'], 'string', 'max' => 255],
             [['employee_id'], 'unique'],
@@ -95,6 +97,8 @@ class UserBase extends \yii\db\ActiveRecord
             'expires_on' => Yii::t('app', 'Expires On'),
             'nag_for_mfa_after' => Yii::t('app', 'Nag For Mfa After'),
             'nag_for_method_after' => Yii::t('app', 'Nag For Method After'),
+            'created_utc' => Yii::t('app', 'Created Utc'),
+            'deactivated_utc' => Yii::t('app', 'Deactivated Utc'),
         ];
     }
 

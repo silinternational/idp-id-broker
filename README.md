@@ -2,23 +2,26 @@
 
 
 ## Requirements ##
-1. VirtualBox
-2. Vagrant
+Linux, macOS
+1. Docker
 
 or
 
-1. Docker
+Windows (not actively maintained as a development platform)
+1. VirtualBox
+2. Vagrant
 
 ## Setup ##
 1. Clone this repo
-2. Delete the .git/ folder
-3. [Vagrant users]: Edit Vagrantfile to specify whatever IP address you want, and adjust the synced folder 
+2. (Vagrant users only) Edit Vagrantfile to specify whatever IP address you want, and adjust the synced folder 
    that gets mounted as /data if you need to
-4. Copy ```local.env.dist``` to ```local.env```
-5. Review config files in `common/config/main.php` and `frontend/config/main.php`
-6. Define an environment variable for `COMPOSER_CACHE_DIR` for where composer should cache packages, makes composer 
-   installs and updates much faster
-7. Run `make start`, or if using Vagrant, run `vagrant up`
+3. Copy ```local.env.dist``` to ```local.env``` and fill in the required variable values.
+4. Set the following environment variables on your host (dev) machine:
+   - `COMPOSER_CACHE_DIR`: the path where composer should cache packages. This makes composer 
+   installs and updates much faster. Typically `/home/user/.composer`
+   - `DOCKER_UIDGID`: user ID and group ID. Use `1000:1000` if you are the primary user
+   on a Linux computer. Otherwise, run `id -u` and `id -g` and use the resulting numbers in place of `1000`.
+5. Run `make start`, or if using Vagrant, run `vagrant up`
 
 ## Composer / GitHub rate limit
 If you hit problems of composer unable to pull the necessary dependencies

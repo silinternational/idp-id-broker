@@ -1,8 +1,10 @@
 <?php
 namespace Sil\SilIdBroker\Behat\Context;
 
+use common\components\Emailer;
 use common\helpers\MySqlDateTime;
 use common\models\EmailLog;
+use common\models\Invite;
 use common\models\Method;
 use common\models\Mfa;
 use common\models\MfaBackupcode;
@@ -413,14 +415,6 @@ class EmailContext extends YiiContext
     }
 
     /**
-     * @When I change that user's password
-     */
-    public function iChangeThatUsersPassword()
-    {
-        $this->iGiveThatUserAPassword();
-    }
-
-    /**
      * @Given a specific user does NOT exist
      */
     public function aSpecificUserDoesNotExist()
@@ -670,7 +664,7 @@ class EmailContext extends YiiContext
             if ($desiredCount == 0) {
                 return;
             }
-            throw new InvalidArgumentException('There is no MFA Backup Code option available for the test.');
+            throw new \InvalidArgumentException('There is no MFA Backup Code option available for the test.');
         }
 
         $codeCount = count($this->tempBackupCodes);
@@ -1194,5 +1188,70 @@ class EmailContext extends YiiContext
     public function theMfamanagerHelpbccEmailAddressIsOnTheBccLine()
     {
         $this->assertEmailBcc(\Yii::$app->params['mfaManagerHelpBcc']);
+    }
+
+    /**
+     * @Given /^hr notification email (is|is NOT) set$/
+     */
+    public function hrNotificationEmailIsOrIsNotSet($isOrIsNot)
+    {
+        $this->fakeEmailer->hrNotificationsEmail = ($isOrIsNot === 'is') ? "hr@example.com" : "";
+    }
+
+    /**
+     * @Given the user has not logged in for :months
+     */
+    public function theUserHasNotLoggedInFor($months)
+    {
+        $date = MySqlDateTime::relative("-" . $months);
+
+        $this->tempUser->scenario = User::SCENARIO_UPDATE_USER;
+        $this->tempUser->last_login_utc = $date;
+        $this->tempUser->created_utc = $date;
+        $this->tempUser->save();
+    }
+
+    /**
+     * @When I send abandoned user email
+     */
+    public function iSendAbandonedUserEmail()
+    {
+        $this->fakeEmailer->sendAbandonedUsersEmail();
+    }
+
+    /**
+     * @Then /^the abandoned user email (has|has NOT) been sent$/
+     */
+    public function theAbandonedUserEmailHasOrHasNotBeenSent($hasOrHasNot)
+    {
+        $emails = $this->fakeEmailer->getFakeEmailsSent();
+        $hasBeenSent = false;
+
+        foreach ($emails as $email) {
+            if ($email[Emailer::PROP_SUBJECT] === $this->fakeEmailer->subjectForAbandonedUsers) {
+                $hasBeenSent = true;
+                break;
+            }
+        }
+
+        if ($hasOrHasNot === 'has') {
+            Assert::true($hasBeenSent);
+        } else {
+            Assert::false($hasBeenSent);
+        }
+    }
+
+    /**
+     * @Given the database has been purged
+     */
+    public function theDatabaseHasBeenPurged()
+    {
+        MfaBackupcode::deleteAll();
+        Mfa::deleteAll();
+        Invite::deleteAll();
+        EmailLog::deleteAll();
+        Method::deleteAll();
+        User::deleteAll();
+        $this->fakeEmailer->forgetFakeEmailsSent();
     }
 }

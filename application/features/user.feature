@@ -56,8 +56,10 @@ Feature: User
         | personal_email      | NULL                  |
         | hide                | yes                   |
         | groups              | NULL                  |
+        | deactivated_utc     | NULL                  |
       And last_changed_utc should be stored as now UTC
       And last_synced_utc should be stored as now UTC
+      And created_utc should be stored as now UTC
 
 #TODO: related to PUT now.
 #  Scenario: "Touch" an existing user without making any changes
@@ -110,6 +112,7 @@ Feature: User
       And a record exists with a <property> of <value>
       And last_changed_utc should be stored as now UTC
       And last_synced_utc should be stored as now UTC
+      And created_utc should not change
 
     Examples:
       | property        | value              |
@@ -128,6 +131,26 @@ Feature: User
       | hide            | no                 |
       | hide            | yes                |
       | groups          | mensa,hackers      |
+
+  Scenario: Deactivate an existing user
+    Given a record does not exist with an employee_id of "123"
+      And the requester is authorized
+      And I provide the following valid data:
+        | property        | value                 |
+        | employee_id     | 123                   |
+        | first_name      | Shep                  |
+        | last_name       | Clark                 |
+        | display_name    | Shep Clark            |
+        | username        | shep_clark            |
+        | email           | shep_clark@example.org|
+        | hide            | yes                   |
+      And I request "/user" be created
+      And the response status code should be 200
+      And I change the active to no
+    When I request "/user/123" be updated
+    Then the response status code should be 200
+      And a record exists with a active of no
+      And deactivated_utc should be stored as now UTC
 
 #TODO: consider creating a new security.feature file for all these security-related tests.
 #TODO: need to think through tests for API_ACCESS_KEYS config, i.e., need tests for ApiConsumer
@@ -702,3 +725,16 @@ Feature: User
         | username            | new_guy            |
         | active              | no                 |
         | locked              | no                 |
+
+  Scenario Outline: HR notification users
+    Given I create a new user with a "active" property of "<active>"
+      And the user has not logged in for "<loginTime>"
+    When I get users for HR notification
+    Then the user <isOrIsNot> included in the data
+
+    Examples:
+      | active | loginTime | isOrIsNot |
+      | no     | 5 months  | is NOT    |
+      | no     | 7 months  | is NOT    |
+      | yes    | 5 months  | is NOT    |
+      | yes    | 7 months  | is        |

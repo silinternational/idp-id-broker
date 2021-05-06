@@ -402,3 +402,23 @@ Feature: Email
       | to send      | 0      | has          | should NOT     |
       | to send      | -1     | has          | should NOT     |
       | NOT to send  | -1     | has NOT      | should NOT     |
+
+
+  Scenario Outline: HR notification users
+    Given hr notification email <isOrIsNot> set
+      And the database has been purged
+      And <active> user already exists
+      And the user has not logged in for "<loginTime>"
+    When I send abandoned user email
+    Then the abandoned user email <hasOrHasNot> been sent
+
+    Examples:
+      | isOrIsNot | active      | loginTime | hasOrHasNot |
+      | is NOT    | an inactive | 5 months  | has NOT     |
+      | is NOT    | an inactive | 7 months  | has NOT     |
+      | is NOT    | a           | 5 months  | has NOT     |
+      | is NOT    | a           | 7 months  | has NOT     |
+      | is        | an inactive | 5 months  | has NOT     |
+      | is        | an inactive | 7 months  | has NOT     |
+      | is        | a           | 5 months  | has NOT     |
+      | is        | a           | 7 months  | has         |
