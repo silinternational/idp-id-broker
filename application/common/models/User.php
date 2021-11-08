@@ -281,7 +281,7 @@ class User extends UserBase
             [
                 'employee_id',
                 'match',
-                'pattern' => '/^\w+$/',
+                'pattern' => '/^[\w+\-]+$/',
                 'message' => 'invalid character(s) in {attribute} {value}',
                 'on' => self::SCENARIO_NEW_USER,
             ],
