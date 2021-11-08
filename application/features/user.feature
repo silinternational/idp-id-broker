@@ -433,7 +433,7 @@ Feature: User
       And the user store is empty
       And I provide the following valid data:
         | property     | value                 |
-        | employee_id  | 123-456               |
+        | employee_id  | 123&456               |
         | first_name   | Test                  |
         | last_name    | User                  |
         | username     | test_user             |
