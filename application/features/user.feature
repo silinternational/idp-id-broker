@@ -7,40 +7,40 @@ Feature: User
     Given the user store is empty
 
   Scenario: Create a new user
-    Given a record does not exist with an employee_id of "123-456"
+    Given a record does not exist with an employee_id of "f6bf51f2-4ccc-4d85-8f75-02132c67af27"
       And the requester is authorized
       And I provide the following valid data:
-        | property        | value                 |
-        | employee_id     | 123-456               |
-        | first_name      | Shep                  |
-        | last_name       | Clark                 |
-        | display_name    | Shep Clark            |
-        | username        | shep_clark            |
-        | email           | shep_clark@example.org|
-        | manager_email   | boss_man@example.org  |
-        | require_mfa     | yes                   |
-        | hide            | yes                   |
+        | property        | value                               |
+        | employee_id     | f6bf51f2-4ccc-4d85-8f75-02132c67af27|
+        | first_name      | Shep                                |
+        | last_name       | Clark                               |
+        | display_name    | Shep Clark                          |
+        | username        | shep_clark                          |
+        | email           | shep_clark@example.org              |
+        | manager_email   | boss_man@example.org                |
+        | require_mfa     | yes                                 |
+        | hide            | yes                                 |
     When I request "/user" be created
     Then the response status code should be 200
       And the following data is returned:
-        | property        | value                 |
-        | employee_id     | 123-456               |
-        | first_name      | Shep                  |
-        | last_name       | Clark                 |
-        | display_name    | Shep Clark            |
-        | username        | shep_clark            |
-        | email           | shep_clark@example.org|
-        | active          | yes                   |
-        | locked          | no                    |
-        | manager_email   | boss_man@example.org  |
-        | hide            | yes                   |
-        | profile_review  | no                    |
+        | property        | value                               |
+        | employee_id     | f6bf51f2-4ccc-4d85-8f75-02132c67af27|
+        | first_name      | Shep                                |
+        | last_name       | Clark                               |
+        | display_name    | Shep Clark                          |
+        | username        | shep_clark                          |
+        | email           | shep_clark@example.org              |
+        | active          | yes                                 |
+        | locked          | no                                  |
+        | manager_email   | boss_man@example.org                |
+        | hide            | yes                                 |
+        | profile_review  | no                                  |
       And the uuid property should be a valid UUID
       And the following data is not returned:
         | property                |
         | current_password_id     |
         | password_expires_at_utc |
-      And a record exists with an employee_id of "123-456"
+      And a record exists with an employee_id of "f6bf51f2-4ccc-4d85-8f75-02132c67af27"
       And the following data should be stored:
         | property            | value                 |
         | first_name          | Shep                  |
@@ -433,11 +433,11 @@ Feature: User
       And the user store is empty
       And I provide the following valid data:
         | property     | value                 |
-        | employee_id  | 123&456               |
         | first_name   | Test                  |
         | last_name    | User                  |
         | username     | test_user             |
         | email        | test_user@example.org |
+    But I provide an invalid employee_id of "123&456"
     When I request "/user" be created
     Then the response status code should be 422
       And the property message should contain "invalid character(s) in Employee ID"
