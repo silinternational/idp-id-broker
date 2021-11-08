@@ -7,11 +7,11 @@ Feature: User
     Given the user store is empty
 
   Scenario: Create a new user
-    Given a record does not exist with an employee_id of "123"
+    Given a record does not exist with an employee_id of "123-456"
       And the requester is authorized
       And I provide the following valid data:
         | property        | value                 |
-        | employee_id     | 123                   |
+        | employee_id     | 123-456               |
         | first_name      | Shep                  |
         | last_name       | Clark                 |
         | display_name    | Shep Clark            |
@@ -24,7 +24,7 @@ Feature: User
     Then the response status code should be 200
       And the following data is returned:
         | property        | value                 |
-        | employee_id     | 123                   |
+        | employee_id     | 123-456               |
         | first_name      | Shep                  |
         | last_name       | Clark                 |
         | display_name    | Shep Clark            |
@@ -40,7 +40,7 @@ Feature: User
         | property                |
         | current_password_id     |
         | password_expires_at_utc |
-      And a record exists with an employee_id of "123"
+      And a record exists with an employee_id of "123-456"
       And the following data should be stored:
         | property            | value                 |
         | first_name          | Shep                  |
