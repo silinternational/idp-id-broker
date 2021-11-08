@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+
+## [5.3.2] - 2021-11-08
+### Changed
+- Allow hyphens (UUIDs) in user employee_id
+
 ## [5.3.0] - 2021-05-04
 ### Added
 - Added created date/time to user
