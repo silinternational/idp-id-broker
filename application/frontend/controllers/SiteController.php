@@ -42,7 +42,7 @@ class SiteController extends BaseRestController
         }
 
         // Checking the email service status causes too many error emails to be sent out to the dev team
-        $this->checkEmailServiceStatus($webApp);
+        // $this->checkEmailServiceStatus($webApp);
 
         Yii::$app->response->statusCode = 204;
     }
