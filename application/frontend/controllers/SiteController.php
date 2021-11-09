@@ -42,44 +42,49 @@ class SiteController extends BaseRestController
         }
 
         // Checking the email service status causes too many error emails to be sent out to the dev team
-//        try {
-//            $emailer = $webApp->get('emailer');
-//        } catch (Exception $e) {
-//            Yii::error('Emailer config problem: ' . $e->getMessage());
-//            throw new Http500('Emailer config problem.');
-//        }
-        
-//        try {
-//            $emailer->getSiteStatus();
-//        } catch (GuzzleCommandException $e) {
-//            $response = $e->getResponse();
-//            if ($response) {
-//                $responseBody = $response->getBody();
-//                if ($responseBody) {
-//                    $responseContents = $responseBody->getContents();
-//                }
-//                $responseHeaders = $response->getHeaders();
-//            }
-//            Yii::error([
-//                'event' => 'email service guzzle command error',
-//                'errorCode' => $e->getCode(),
-//                'errorMessage' => $e->getMessage(),
-//                'responseHeaders' => $responseHeaders ?? null,
-//                'responseContents' => $responseContents ?? null,
-//                'stackTrace' => $e->getTrace(),
-//            ]);
-//            throw new Http500('Email Service problem.', $e->getCode());
-//        } catch (Exception $e) {
-//            Yii::error([
-//                'event' => 'email service status error',
-//                'exceptionClass' => get_class($e),
-//                'errorCode' => $e->getCode(),
-//                'errorMessage' => $e->getMessage(),
-//            ]);
-//            throw new Http500('Email Service problem.', $e->getCode());
-//        }
+        $this->checkEmailServiceStatus($webApp);
 
         Yii::$app->response->statusCode = 204;
+    }
+
+    private function checkEmailServiceStatus($webApp)
+    {
+        try {
+            $emailer = $webApp->get('emailer');
+        } catch (Exception $e) {
+            Yii::error('Emailer config problem: ' . $e->getMessage());
+            throw new Http500('Emailer config problem.');
+        }
+
+        try {
+            $emailer->getSiteStatus();
+        } catch (GuzzleCommandException $e) {
+            $response = $e->getResponse();
+            if ($response) {
+                $responseBody = $response->getBody();
+                if ($responseBody) {
+                    $responseContents = $responseBody->getContents();
+                }
+                $responseHeaders = $response->getHeaders();
+            }
+            Yii::error([
+                'event' => 'email service guzzle command error',
+                'errorCode' => $e->getCode(),
+                'errorMessage' => $e->getMessage(),
+                'responseHeaders' => $responseHeaders ?? null,
+                'responseContents' => $responseContents ?? null,
+                'stackTrace' => $e->getTrace(),
+            ]);
+            throw new Http500('Email Service problem.', $e->getCode());
+        } catch (Exception $e) {
+            Yii::error([
+                'event' => 'email service status error',
+                'exceptionClass' => get_class($e),
+                'errorCode' => $e->getCode(),
+                'errorMessage' => $e->getMessage(),
+            ]);
+            throw new Http500('Email Service problem.', $e->getCode());
+        }
     }
 
     public function actionUndefinedRequest()
