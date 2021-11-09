@@ -41,14 +41,7 @@ class SiteController extends BaseRestController
             throw new Http500('DB connection problem.', $e->getCode());
         }
 
-        // Checking the email service status causes too many error emails to be sent out to the dev team
-        // $this->checkEmailServiceStatus($webApp);
 
-        Yii::$app->response->statusCode = 204;
-    }
-
-    private function checkEmailServiceStatus($webApp)
-    {
         try {
             $emailer = $webApp->get('emailer');
         } catch (Exception $e) {
@@ -56,6 +49,14 @@ class SiteController extends BaseRestController
             throw new Http500('Emailer config problem.');
         }
 
+        // Checking the email service status causes too many error emails to be sent out to the dev team
+        // $this->checkEmailServiceStatus($emailer);
+
+        Yii::$app->response->statusCode = 204;
+    }
+
+    private function checkEmailServiceStatus($emailer)
+    {
         try {
             $emailer->getSiteStatus();
         } catch (GuzzleCommandException $e) {
