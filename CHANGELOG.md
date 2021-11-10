@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 
+## [5.3.3] - 2021-11-10
+### Removed
+- Avoid error spam by removing email service status check
+
 ## [5.3.2] - 2021-11-08
 ### Changed
 - Allow hyphens (UUIDs) in user employee_id
