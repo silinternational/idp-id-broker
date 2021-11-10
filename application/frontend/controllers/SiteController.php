@@ -40,14 +40,23 @@ class SiteController extends BaseRestController
             Yii::error('DB connection problem: ' . $e->getMessage());
             throw new Http500('DB connection problem.', $e->getCode());
         }
-        
+
+
         try {
             $emailer = $webApp->get('emailer');
         } catch (Exception $e) {
             Yii::error('Emailer config problem: ' . $e->getMessage());
             throw new Http500('Emailer config problem.');
         }
-        
+
+        // Checking the email service status causes too many error emails to be sent out to the dev team
+        // $this->checkEmailServiceStatus($emailer);
+
+        Yii::$app->response->statusCode = 204;
+    }
+
+    private function checkEmailServiceStatus($emailer)
+    {
         try {
             $emailer->getSiteStatus();
         } catch (GuzzleCommandException $e) {
@@ -77,8 +86,6 @@ class SiteController extends BaseRestController
             ]);
             throw new Http500('Email Service problem.', $e->getCode());
         }
-
-        Yii::$app->response->statusCode = 204;
     }
 
     public function actionUndefinedRequest()
