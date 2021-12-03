@@ -68,7 +68,7 @@ class Mfa extends MfaBase
     }
 
     /**
-     * @param string $rpOrigin The Relay Party Origin, used for WebAuthn and ignored for others
+     * @param string $rpOrigin The Relying Party Origin, used for WebAuthn and ignored for others
      */
     public function loadData(string $rpOrigin = '')
     {
