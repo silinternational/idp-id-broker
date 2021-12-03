@@ -66,6 +66,7 @@ class CronController extends Controller
             'active-users-with-backup-codes' => User::getQueryOfUsersWithMfa(Mfa::TYPE_BACKUPCODE)->count(),
             'active-users-with-totp' => User::getQueryOfUsersWithMfa(Mfa::TYPE_TOTP)->count(),
             'active-users-with-u2f' => User::getQueryOfUsersWithMfa(Mfa::TYPE_U2F)->count(),
+            'active-users-with-webauthn' => User::getQueryOfUsersWithMfa(Mfa::TYPE_WEBAUTHN)->count(),
             'active-users-with-password' => User::countUsersWithPassword(),
             // Since GA doesn't accept event values as floats, multiply this by 10 and round it
             'average-mfas-per-user-with-mfas-times-ten' => round(User::getAverageNumberOfMfasPerUserWithMfas() * 10.0),

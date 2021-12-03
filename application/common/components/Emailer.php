@@ -523,7 +523,7 @@ class Emailer extends Component
         foreach ($mfaOptions as $mfaOption) {
 
             // If this is a U2F and it was used recently, don't send an email.
-            if ($mfaOption->type === Mfa::TYPE_U2F) {
+            if ($mfaOption->type === Mfa::TYPE_U2F || $mfaOption->type === Mfa::TYPE_WEBAUTHN) {
                 $hasU2fOption = true;
                 if (! empty($mfaOption->last_used_utc) && MySqlDateTime::dateIsRecent($mfaOption->last_used_utc, $recentDays)) {
                     return false;

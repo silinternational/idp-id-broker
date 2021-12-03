@@ -5,6 +5,7 @@ namespace common\components;
 use GuzzleHttp\Client as GuzzleClient;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\ClientException;
+use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Exception\ServerException;
 use yii\helpers\Json;
 
@@ -13,36 +14,44 @@ class MfaApiClient
     /**
      * @var string
      */
-    public $apiBaseUrl;
+    public string $apiBaseUrl;
 
     /**
      * @var string
      */
-    public $apiKey;
+    public string $apiKey;
 
     /**
      * @var string
      */
-    public $apiSecret;
+    public string $apiSecret;
 
     /**
      * @var GuzzleClient
      */
-    public $client;
+    public GuzzleClient $client;
+
+    /**
+     * Associative array of headers to include with each request
+     * @var array
+     */
+    private array $headers;
 
     public function __construct(string $apiBaseUrl, $apiKey, $apiSecret)
     {
         if (substr($apiBaseUrl, -1) !== '/') {
             throw new \InvalidArgumentException('The MFA apiBaseUrl must end with a slash (/).');
         }
+        $this->headers = [
+            'X-MFA-APIKey' => $apiKey,
+            'X-MFA-APISecret' => $apiSecret,
+            'Content-type' => 'application/json',
+        ];
+
         $this->client = new GuzzleClient([
             'base_uri' => $apiBaseUrl,
             'timeout' => 30,
-            'headers' => [
-                'X-MFA-APIKey' => $apiKey,
-                'X-MFA-APISecret' => $apiSecret,
-                'Content-type' => 'application/json',
-            ],
+            'headers' => $this->headers,
         ]);
     }
 
@@ -50,6 +59,7 @@ class MfaApiClient
      * Create a new TOTP configuration
      * @param string $username
      * @return array
+     * @throws GuzzleException
      */
     public function createTotp(string $username, string $issuer): array
     {
@@ -65,6 +75,7 @@ class MfaApiClient
      * Delete an existing TOTP configuration
      * @param string $uuid
      * @return bool
+     * @throws GuzzleException
      */
     public function deleteTotp(string $uuid): bool
     {
@@ -77,7 +88,7 @@ class MfaApiClient
      * @param string $uuid
      * @param string $code
      * @return bool
-     * @throws \Exception
+     * @throws GuzzleException
      */
     public function validateTotp(string $uuid, string $code): bool
     {
@@ -100,7 +111,7 @@ class MfaApiClient
     /**
      * @param string $uuid
      * @return array
-     * @throws \Exception
+     * @throws GuzzleException
      */
     public function u2fCreateAuthentication(string $uuid): array
     {
@@ -109,6 +120,11 @@ class MfaApiClient
         return Json::decode($response->getBody()->getContents());
     }
 
+    /**
+     * @param string $appId
+     * @return array
+     * @throws GuzzleException
+     */
     public function u2fCreateRegistration(string $appId): array
     {
         $response = $this->callApi('u2f', 'POST', [
@@ -118,13 +134,24 @@ class MfaApiClient
         return Json::decode($response->getBody()->getContents());
     }
 
+    /**
+     * @param string $uuid
+     * @return bool
+     * @throws GuzzleException
+     */
     public function u2fDelete(string $uuid): bool
     {
         $this->callApi('u2f/' . $uuid, 'DELETE');
         return true;
     }
 
-    public function u2fValidateAuthentication(string $uuid, $signResultJson): bool
+    /**
+     * @param string $uuid
+     * @param string $signResultJson
+     * @return bool
+     * @throws GuzzleException
+     */
+    public function u2fValidateAuthentication(string $uuid, string $signResultJson): bool
     {
         $this->callApi('u2f/' . $uuid . '/auth', 'PUT', [
             'signResult' => $signResultJson,
@@ -132,7 +159,13 @@ class MfaApiClient
         return true;
     }
 
-    public function u2fValidateRegistration(string $uuid, $signResultJson): bool
+    /**
+     * @param string $uuid
+     * @param string $signResultJson
+     * @return bool
+     * @throws GuzzleException
+     */
+    public function u2fValidateRegistration(string $uuid, string $signResultJson): bool
     {
         $this->callApi('u2f/' . $uuid, 'PUT', [
             'signResult' => $signResultJson,
@@ -140,21 +173,89 @@ class MfaApiClient
         return true;
     }
 
+    /**
+     * @param array $additionalHeaders
+     * @return array
+     * @throws GuzzleException
+     */
+    public function webauthnCreateAuthentication(array $additionalHeaders): array
+    {
+        $response = $this->callApi('webauthn/login', 'POST', [], $additionalHeaders);
+        return Json::decode($response->getBody()->getContents());
+    }
+
+    /**
+     * @param array $additionalHeaders
+     * @param array $signResultJson
+     * @return bool
+     * @throws GuzzleException
+     */
+    public function webauthnValidateAuthentication(array $additionalHeaders, array $signResultJson): bool
+    {
+        try {
+            $this->callApi('webauthn/login', 'PUT', $signResultJson, $additionalHeaders);
+            return true;
+        } catch (\Exception $e) {
+            return false;
+        }
+    }
+
+    /**
+     * @param array $additionalHeaders
+     * @return array
+     * @throws GuzzleException
+     */
+    public function webauthnCreateRegistration(array $additionalHeaders): array
+    {
+        $response = $this->callApi('webauthn/register', 'POST', [], $additionalHeaders);
+        return Json::decode($response->getBody()->getContents());
+    }
+
+    /**
+     * @param array $additionalHeaders
+     * @param array $signResultJson
+     * @return bool
+     * @throws GuzzleException
+     */
+    public function webauthnValidateRegistration(array $additionalHeaders, array $signResultJson): bool
+    {
+        try {
+            $this->callApi('webauthn/register', 'PUT', $signResultJson, $additionalHeaders);
+            return true;
+        } catch (\Exception $e) {
+            return false;
+        }
+    }
+
+    /**
+     * @param string $uuid The external ID for MFA record
+     * @return bool
+     * @throws GuzzleException
+     */
+    public function webauthnDelete(string $uuid)
+    {
+        $this->callApi('webauthn/' . $uuid, 'DELETE');
+        return true;
+    }
 
     /**
      * @param string $path
      * @param string $method
      * @param array $body
+     * @param array $additionalHeaders
      * @return mixed|\Psr\Http\Message\ResponseInterface
-     * @throws \Exception
+     * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    private function callApi(string $path, string $method, array $body = [])
+    private function callApi(string $path, string $method, array $body = [], array $additionalHeaders = [])
     {
         try {
             return $this->client->request(
                 $method,
                 $path,
-                ['json' => $body]
+                [
+                    'json' => $body,
+                    'headers' => array_merge($this->headers, $additionalHeaders)
+                ]
             );
         } catch (\Exception $e) {
             if ($e instanceof ConnectException || $e instanceof ServerException) {
@@ -168,4 +269,6 @@ class MfaApiClient
             throw $e;
         }
     }
+
+
 }

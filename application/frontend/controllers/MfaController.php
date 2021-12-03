@@ -6,6 +6,7 @@ use common\models\User;
 use frontend\components\BaseRestController;
 use yii\web\BadRequestHttpException;
 use yii\web\ConflictHttpException;
+use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
 use yii\web\ServerErrorHttpException;
 use yii\web\TooManyRequestsHttpException;
@@ -19,6 +20,7 @@ class MfaController extends BaseRestController
      * @throws BadRequestHttpException
      * @throws ConflictHttpException
      * @throws ServerErrorHttpException
+     * @throws ForbiddenHttpException
      */
     public function actionCreate()
     {
@@ -40,7 +42,13 @@ class MfaController extends BaseRestController
 
         $label = $req->getBodyParam('label');
 
-        return Mfa::create($user->id, $type, $label);
+        // rpOrigin is needed for WebAuthn authentication
+        $rpOrigin = $req->get('rporigin', '');
+        if ($rpOrigin != '' && !in_array($rpOrigin, \Yii::$app->params['authorizedRPOrigins'])){
+            throw new ForbiddenHttpException("Invalid rporigin", 1638539433);
+        }
+
+        return Mfa::create($user->id, $type, $label, $rpOrigin);
     }
 
     /**
@@ -82,7 +90,13 @@ class MfaController extends BaseRestController
             $value = preg_replace('/\D/', '', $value);
         }
 
-        if (! $mfa->verify($value)) {
+        // rpOrigin is needed for WebAuthn authentication
+        $rpOrigin = $req->get('rporigin', '');
+        if ($rpOrigin != '' && !in_array($rpOrigin, \Yii::$app->params['authorizedRPOrigins'])){
+            throw new ForbiddenHttpException("Invalid rporigin", 1638539443);
+        }
+
+        if (! $mfa->verify($value, $rpOrigin)) {
             throw new BadRequestHttpException();
         }
 
@@ -94,6 +108,7 @@ class MfaController extends BaseRestController
      * @param string $employeeId
      * @return Mfa[]
      * @throws BadRequestHttpException
+     * @throws ForbiddenHttpException
      */
     public function actionList(string $employeeId): array
     {
@@ -105,7 +120,18 @@ class MfaController extends BaseRestController
             );
         }
 
-        return Mfa::findAll(['user_id' => $user->id, 'verified' => 1]);
+        // rpOrigin is needed for WebAuthn authentication
+        $rpOrigin = \Yii::$app->request->get('rporigin', '');
+        if ($rpOrigin != '' && !in_array($rpOrigin, \Yii::$app->params['authorizedRPOrigins'])){
+            throw new ForbiddenHttpException("Invalid rporigin", 1638378156);
+        }
+
+        $mfaOptions = Mfa::findAll(['user_id' => $user->id, 'verified' => 1]);
+        foreach ($mfaOptions as $opt) {
+            $opt->loadData($rpOrigin);
+        }
+
+        return $mfaOptions;
     }
 
     /**
@@ -142,6 +168,13 @@ class MfaController extends BaseRestController
                 1506697614
             );
         }
+
+        // rpOrigin is needed for WebAuthn authentication
+        $rpOrigin = \Yii::$app->request->get('rporigin', '');
+        if ($rpOrigin != '' && !in_array($rpOrigin, \Yii::$app->params['authorizedRPOrigins'])){
+            throw new ForbiddenHttpException("Invalid rporigin", 1638539680);
+        }
+        $mfa->loadData($rpOrigin);
 
         return $mfa;
     }

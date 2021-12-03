@@ -12,27 +12,27 @@ class MfaBackendU2f extends Component implements MfaBackendInterface
     /**
      * @var string
      */
-    public $apiBaseUrl;
+    public string $apiBaseUrl;
 
     /**
      * @var string
      */
-    public $apiKey;
+    public string $apiKey;
 
     /**
      * @var string
      */
-    public $apiSecret;
+    public string $apiSecret;
 
     /**
      * @var MfaApiClient
      */
-    public $client;
+    public MfaApiClient $client;
 
     /**
      * @var string
      */
-    public $appId;
+    public string $appId;
 
     public function init()
     {
@@ -43,11 +43,10 @@ class MfaBackendU2f extends Component implements MfaBackendInterface
     /**
      * Initialize a new MFA backend registration
      * @param int $userId
+     * @param string $rpOrigin
      * @return array
-     * @throws NotFoundHttpException
-     * @throws ServerErrorHttpException
      */
-    public function regInit(int $userId): array
+    public function regInit(int $userId, string $rpOrigin = ''): array
     {
         return $this->client->u2fCreateRegistration($this->appId);
     }
@@ -55,10 +54,12 @@ class MfaBackendU2f extends Component implements MfaBackendInterface
     /**
      * Initialize authentication sequence
      * @param int $mfaId
+     * @param string $rpOrigin
      * @return array
      * @throws NotFoundHttpException
+     * @throws \Exception
      */
-    public function authInit(int $mfaId): array
+    public function authInit(int $mfaId, string $rpOrigin = ''): array
     {
         $mfa = Mfa::findOne(['id' => $mfaId]);
         if ($mfa == null) {
@@ -76,11 +77,12 @@ class MfaBackendU2f extends Component implements MfaBackendInterface
      * Verify response from user is correct for the MFA backend device
      * @param int $mfaId The MFA ID
      * @param string $value Value provided by user, such as TOTP number or U2F challenge response
+     * @param string $rpOrigin
      * @return bool
      * @throws NotFoundHttpException
      * @throws ServerErrorHttpException
      */
-    public function verify(int $mfaId, $value): bool
+    public function verify(int $mfaId, string $value, string $rpOrigin = ''): bool
     {
         $mfa = Mfa::findOne(['id' => $mfaId]);
         if ($mfa == null) {
@@ -108,7 +110,6 @@ class MfaBackendU2f extends Component implements MfaBackendInterface
      * @param int $mfaId
      * @return bool
      * @throws NotFoundHttpException
-     * @throws ServerErrorHttpException
      */
     public function delete(int $mfaId): bool
     {
