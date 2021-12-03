@@ -74,7 +74,7 @@ class MfaBackendWebAuthn extends Component implements MfaBackendInterface
     /**
      * Initialize authentication sequence
      * @param int $mfaId The MFA ID
-     * @param string $rpOrigin The Replay Party Origin URL (with scheme, without port or path)
+     * @param string $rpOrigin The Relying Party Origin URL (with scheme, without port or path)
      * @return array
      * @throws NotFoundHttpException
      * @throws GuzzleException
