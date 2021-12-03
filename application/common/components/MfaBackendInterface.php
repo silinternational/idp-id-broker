@@ -7,7 +7,7 @@ interface MfaBackendInterface
     /**
      * Initialize a new MFA backend registration
      * @param int $userId
-     * @param string $rpOrigin Relay Party Origin (only used for WebAuthn)
+     * @param string $rpOrigin Relying Party Origin (only used for WebAuthn)
      * @return array
      */
     public function regInit(int $userId, string $rpOrigin): array;
