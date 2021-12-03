@@ -100,7 +100,7 @@ class MfaBackendWebAuthn extends Component implements MfaBackendInterface
      * Verify response from user is correct for the MFA backend device
      * @param int $mfaId The MFA ID
      * @param string $value The stringified JSON response from the browser credential api
-     * @param string $rpOrigin The Replay Party Origin URL (with scheme, without port or path)
+     * @param string $rpOrigin The Relying Party Origin URL (with scheme, without port or path)
      * @return bool
      * @throws GuzzleException
      */
