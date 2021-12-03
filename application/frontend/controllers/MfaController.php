@@ -92,7 +92,7 @@ class MfaController extends BaseRestController
 
         // rpOrigin is needed for WebAuthn authentication
         $rpOrigin = $req->get('rporigin', '');
-        if ($rpOrigin != '' && !in_array($rpOrigin, \Yii::$app->params['authorizedRPOrigins'])){
+        if ($rpOrigin != '' && !in_array($rpOrigin, \Yii::$app->params['authorizedRPOrigins'], true)){
             throw new ForbiddenHttpException("Invalid rporigin", 1638539443);
         }
 
