@@ -55,7 +55,7 @@ class MfaBackendWebAuthn extends Component implements MfaBackendInterface
     /**
      * Initialize a new WebAuthn registration
      * @param int $userId The User ID
-     * @param string $rpOrigin The Replay Party Origin URL (with scheme, without port or path)
+     * @param string $rpOrigin The Relying Party Origin URL (with scheme, without port or path)
      * @return array JSON decoded object to be passed to browser credential create API for WebAuthn dance
      * @throws GuzzleException
      */
