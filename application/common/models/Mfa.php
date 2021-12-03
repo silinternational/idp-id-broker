@@ -70,7 +70,8 @@ class Mfa extends MfaBase
     /**
      * @param string $rpOrigin The Relay Party Origin, used for WebAuthn and ignored for others
      */
-    public function loadData(string $rpOrigin = '') {
+    public function loadData(string $rpOrigin = '')
+    {
         $this->data = [];
         if ($this->verified === 1 && $this->scenario === User::SCENARIO_AUTHENTICATE) {
             $this->data += $this->authInit($rpOrigin);

@@ -7,6 +7,7 @@ use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Exception\ServerException;
+use Psr\Http\Message\ResponseInterface;
 use yii\helpers\Json;
 
 class MfaApiClient
@@ -192,12 +193,8 @@ class MfaApiClient
      */
     public function webauthnValidateAuthentication(array $additionalHeaders, array $signResultJson): bool
     {
-        try {
-            $this->callApi('webauthn/login', 'PUT', $signResultJson, $additionalHeaders);
-            return true;
-        } catch (\Exception $e) {
-            return false;
-        }
+        $this->callApi('webauthn/login', 'PUT', $signResultJson, $additionalHeaders);
+        return true;
     }
 
     /**
@@ -219,12 +216,8 @@ class MfaApiClient
      */
     public function webauthnValidateRegistration(array $additionalHeaders, array $signResultJson): bool
     {
-        try {
-            $this->callApi('webauthn/register', 'PUT', $signResultJson, $additionalHeaders);
-            return true;
-        } catch (\Exception $e) {
-            return false;
-        }
+        $this->callApi('webauthn/register', 'PUT', $signResultJson, $additionalHeaders);
+        return true;
     }
 
     /**
@@ -232,7 +225,7 @@ class MfaApiClient
      * @return bool
      * @throws GuzzleException
      */
-    public function webauthnDelete(string $uuid)
+    public function webauthnDelete(string $uuid): bool
     {
         $this->callApi('webauthn/' . $uuid, 'DELETE');
         return true;
@@ -243,8 +236,8 @@ class MfaApiClient
      * @param string $method
      * @param array $body
      * @param array $additionalHeaders
-     * @return mixed|\Psr\Http\Message\ResponseInterface
-     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @return mixed|ResponseInterface
+     * @throws GuzzleException
      */
     private function callApi(string $path, string $method, array $body = [], array $additionalHeaders = [])
     {
