@@ -67,8 +67,8 @@ services:
 
     cli:
         image: silintl/php7:7.4
-#        volumes:
-#            - ${COMPOSER_CACHE_DIR}:/composer
+        volumes:
+            - ${COMPOSER_CACHE_DIR}:/composer
         volumes_from:
             - data
         working_dir: /data
