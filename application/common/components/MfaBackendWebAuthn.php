@@ -99,12 +99,14 @@ class MfaBackendWebAuthn extends Component implements MfaBackendInterface
     /**
      * Verify response from user is correct for the MFA backend device
      * @param int $mfaId The MFA ID
-     * @param string $value The stringified JSON response from the browser credential api
-     * @param string $rpOrigin The Relying Party Origin URL (with scheme, without port or path)
+     * @param string|array $value The stringified JSON response from the browser credential api
+     * @param string $rpOrigin The Replay Party Origin URL (with scheme, without port or path)
      * @return bool
      * @throws GuzzleException
+     * @throws ServerErrorHttpException
+     * @throws NotFoundHttpException
      */
-    public function verify(int $mfaId, string $value, string $rpOrigin = ''): bool
+    public function verify(int $mfaId, $value, string $rpOrigin = ''): bool
     {
         $mfa = Mfa::findOne(['id' => $mfaId]);
         if ($mfa == null) {
@@ -118,15 +120,17 @@ class MfaBackendWebAuthn extends Component implements MfaBackendInterface
             $mfa->external_uuid
         );
 
-        $data = Json::decode($value);
-        if ($data == null) {
-            throw new ServerErrorHttpException("Missing data or unable to decode as JSON", 1638447364);
+        if (!is_array($value)) {
+            $value = Json::decode($value);
+            if ($value == null) {
+                throw new ServerErrorHttpException("Missing data or unable to decode as JSON", 1638447364);
+            }
         }
 
         if ($mfa->verified === 1) {
-            return $this->client->webauthnValidateAuthentication($headers, $data);
+            return $this->client->webauthnValidateAuthentication($headers, $value);
         } else {
-            if ($this->client->webauthnValidateRegistration($headers, $data)) {
+            if ($this->client->webauthnValidateRegistration($headers, $value)) {
                 $mfa->verified = 1;
                 if (! $mfa->save()) {
                     throw new ServerErrorHttpException(

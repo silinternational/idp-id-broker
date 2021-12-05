@@ -199,7 +199,7 @@ return [
     ],
     'params' => [
         'authorizedTokens'              => Env::getArray('API_ACCESS_KEYS'),
-        'authorizedRPOrigins'           => Env::getArray('MFA_WEBAUTHN_rpOrigins'),
+        'authorizedRPOrigins'           => Env::getArray('RP_ORIGINS'),
         'idpName'                       => $idpName,
         'idpDisplayName'                => $idpDisplayName,
         'mfaAddInterval'                => Env::get('MFA_ADD_INTERVAL', '+30 days'),

@@ -43,9 +43,9 @@ class MfaController extends BaseRestController
         $label = $req->getBodyParam('label');
 
         // rpOrigin is needed for WebAuthn authentication
-        $rpOrigin = $req->get('rporigin', '');
+        $rpOrigin = urldecode($req->get('rpOrigin', ''));
         if ($rpOrigin != '' && !in_array($rpOrigin, \Yii::$app->params['authorizedRPOrigins'])){
-            throw new ForbiddenHttpException("Invalid rporigin", 1638539433);
+            throw new ForbiddenHttpException("Invalid rpOrigin", 1638539433);
         }
 
         return Mfa::create($user->id, $type, $label, $rpOrigin);
@@ -91,9 +91,9 @@ class MfaController extends BaseRestController
         }
 
         // rpOrigin is needed for WebAuthn authentication
-        $rpOrigin = $req->get('rporigin', '');
-        if ($rpOrigin != '' && !in_array($rpOrigin, \Yii::$app->params['authorizedRPOrigins'], true)){
-            throw new ForbiddenHttpException("Invalid rporigin", 1638539443);
+        $rpOrigin = $req->get('rpOrigin', '');
+        if ($rpOrigin != '' && !in_array($rpOrigin, \Yii::$app->params['authorizedRPOrigins'])){
+            throw new ForbiddenHttpException("Invalid rpOrigin", 1638539443);
         }
 
         if (! $mfa->verify($value, $rpOrigin)) {
@@ -121,9 +121,9 @@ class MfaController extends BaseRestController
         }
 
         // rpOrigin is needed for WebAuthn authentication
-        $rpOrigin = \Yii::$app->request->get('rporigin', '');
-        if ($rpOrigin != '' && !in_array($rpOrigin, \Yii::$app->params['authorizedRPOrigins'], true)){
-            throw new ForbiddenHttpException("Invalid rporigin", 1638378156);
+        $rpOrigin = \Yii::$app->request->get('rpOrigin', '');
+        if ($rpOrigin != '' && !in_array($rpOrigin, \Yii::$app->params['authorizedRPOrigins'])){
+            throw new ForbiddenHttpException("Invalid rpOrigin", 1638378156);
         }
 
         $mfaOptions = Mfa::findAll(['user_id' => $user->id, 'verified' => 1]);
@@ -170,9 +170,9 @@ class MfaController extends BaseRestController
         }
 
         // rpOrigin is needed for WebAuthn authentication
-        $rpOrigin = \Yii::$app->request->get('rporigin', '');
-        if ($rpOrigin != '' && !in_array($rpOrigin, \Yii::$app->params['authorizedRPOrigins'], true)){
-            throw new ForbiddenHttpException("Invalid rporigin", 1638539680);
+        $rpOrigin = \Yii::$app->request->get('rpOrigin', '');
+        if ($rpOrigin != '' && !in_array($rpOrigin, \Yii::$app->params['authorizedRPOrigins'])){
+            throw new ForbiddenHttpException("Invalid rpOrigin", 1638539680);
         }
         $mfa->loadData($rpOrigin);
 

@@ -212,7 +212,7 @@ class Mfa extends MfaBase
      * @throws \Throwable
      * @throws \yii\db\StaleObjectException
      */
-    public function verify(string $value, string $rpOrigin = ''): bool
+    public function verify($value, string $rpOrigin = ''): bool
     {
         if ($this->hasTooManyRecentFailures()) {
             \Yii::warning([
