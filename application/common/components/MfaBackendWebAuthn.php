@@ -101,12 +101,12 @@ class MfaBackendWebAuthn extends Component implements MfaBackendInterface
      * @param int $mfaId The MFA ID
      * @param string|array $value The stringified JSON response from the browser credential api
      * @param string $rpOrigin The Replay Party Origin URL (with scheme, without port or path)
-     * @return bool
+     * @return bool|string
      * @throws GuzzleException
      * @throws ServerErrorHttpException
      * @throws NotFoundHttpException
      */
-    public function verify(int $mfaId, $value, string $rpOrigin = ''): bool
+    public function verify(int $mfaId, $value, string $rpOrigin = '')
     {
         $mfa = Mfa::findOne(['id' => $mfaId]);
         if ($mfa == null) {
@@ -130,8 +130,10 @@ class MfaBackendWebAuthn extends Component implements MfaBackendInterface
         if ($mfa->verified === 1) {
             return $this->client->webauthnValidateAuthentication($headers, $value);
         } else {
-            if ($this->client->webauthnValidateRegistration($headers, $value)) {
+            $results = $this->client->webauthnValidateRegistration($headers, $value);
+            if (isset($results['key_handle_hash'])) {
                 $mfa->verified = 1;
+                $mfa->key_handle_hash = $results['key_handle_hash'];
                 if (! $mfa->save()) {
                     throw new ServerErrorHttpException(
                         "Unable to save WebAuthn record after verification. Error: " . print_r($mfa->getFirstErrors(), true)

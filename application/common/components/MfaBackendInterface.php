@@ -25,9 +25,9 @@ interface MfaBackendInterface
      * @param int $mfaId The MFA ID
      * @param string $value Value provided by user
      * @param string $rpOrigin Relying Party Origin (only used for WebAuthn)
-     * @return bool
+     * @return bool|string
      */
-    public function verify(int $mfaId, string $value, string $rpOrigin = ''): bool;
+    public function verify(int $mfaId, string $value, string $rpOrigin = '');
 
     /**
      * Delete MFA backend configuration
