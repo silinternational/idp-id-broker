@@ -18,7 +18,6 @@ use yii\web\TooManyRequestsHttpException;
 class Mfa extends MfaBase
 {
     const TYPE_TOTP = 'totp';
-    const TYPE_U2F = 'u2f';
     const TYPE_WEBAUTHN = 'webauthn';
     const TYPE_BACKUPCODE = 'backupcode';
     const TYPE_MANAGER = 'manager';
@@ -453,7 +452,6 @@ class Mfa extends MfaBase
             self::TYPE_BACKUPCODE => 'Printable Codes',
             self::TYPE_MANAGER => 'Manager Backup Code',
             self::TYPE_TOTP => 'Smartphone App',
-            self::TYPE_U2F => 'Security Key',
             self::TYPE_WEBAUTHN => 'Security Key',
         ];
     }

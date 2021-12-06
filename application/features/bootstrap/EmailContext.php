@@ -560,54 +560,54 @@ class EmailContext extends YiiContext
     }
 
     /**
-     * @Given a verified u2f mfa option does exist
+     * @Given a verified webauthn mfa option does exist
      */
-    public function aVerifiedU2fMfaOptionDoesExist()
+    public function aVerifiedWebAuthnMfaOptionDoesExist()
     {
-        $this->createMfa(Mfa::TYPE_U2F);
+        $this->createMfa(Mfa::TYPE_WEBAUTHN);
     }
 
 
     /**
-     * @Given a verified u2f mfa option was just deleted
+     * @Given a verified webauthn mfa option was just deleted
      */
-    public function aVerifiedU2fMfaOptionWasJustDeleted()
+    public function aVerifiedWebAuthnMfaOptionWasJustDeleted()
     {
-        $this->testMfaOption = $this->createTempMfa(Mfa::TYPE_U2F, 1);
+        $this->testMfaOption = $this->createTempMfa(Mfa::TYPE_WEBAUTHN, 1);
         $this->mfaEventType = 'delete_mfa';
     }
 
     /**
-     * @Given an unverified u2f mfa option was just deleted
+     * @Given an unverified webauthn mfa option was just deleted
      */
-    public function anUnverifiedU2fMfaOptionWasJustDeleted()
+    public function anUnverifiedWebAuthnMfaOptionWasJustDeleted()
     {
-        $this->testMfaOption = $this->createTempMfa(Mfa::TYPE_U2F, 0);
+        $this->testMfaOption = $this->createTempMfa(Mfa::TYPE_WEBAUTHN, 0);
         $this->mfaEventType = 'delete_mfa';
     }
 
     /**
-     * @Given an unverified u2f mfa option does exist
+     * @Given an unverified webauthn mfa option does exist
      */
-    public function anUnverifiedU2fMfaOptionDoesExist()
+    public function anUnverifiedWebAuthnMfaOptionDoesExist()
     {
-        $this->createMfa(Mfa::TYPE_U2F, null, null, 0);
+        $this->createMfa(Mfa::TYPE_WEBAUTHN, null, null, 0);
     }
 
     /**
-     * @Given a (verified) u2f mfa option does NOT Exist
+     * @Given a (verified) webauthn mfa option does NOT Exist
      */
-    public function aU2fMfaOptionDoesNotExist()
+    public function aWebAuthnMfaOptionDoesNotExist()
     {
-        $this->deleteMfaOfType(Mfa::TYPE_U2F);
+        $this->deleteMfaOfType(Mfa::TYPE_WEBAUTHN);
     }
 
     /**
-     * @Given a u2f mfa option was used :arg1 days ago
+     * @Given a webauthn mfa option was used :arg1 days ago
      */
-    public function aU2fMfaOptionWasXUsedDaysAgo($lastUsedDaysAgo)
+    public function aWebAuthnMfaOptionWasXUsedDaysAgo($lastUsedDaysAgo)
     {
-        $this->createMfa(Mfa::TYPE_U2F, $lastUsedDaysAgo);
+        $this->createMfa(Mfa::TYPE_WEBAUTHN, $lastUsedDaysAgo);
     }
 
     /**

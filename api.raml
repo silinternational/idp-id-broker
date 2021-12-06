@@ -135,14 +135,6 @@ types:
               }
             },
             {
-              "id": 234,
-              "type": "u2f",
-              "label": "Blue YubiKey",
-              "created_utc": "2017-10-24T20:40:47Z",
-              "last_used_utc": null,
-              "data": []
-            },
-            {
               "id": 432,
               "type": "webauthn",
               "label": "Blue YubiKey",
@@ -230,7 +222,7 @@ types:
     properties:
       employee_id: string
       type:
-        enum: [ backupcode, totp, u2f, webauthn, manager ]
+        enum: [ backupcode, totp, webauthn, manager ]
       label?: string
     example: |
       {
@@ -263,7 +255,7 @@ types:
     properties:
       id: integer
       type:
-        enum: [ backupcode, totp, u2f, webauthn, manager ]
+        enum: [ backupcode, totp, webauthn, manager ]
       label: string
       created_utc: string
       last_used_utc: string?
@@ -280,15 +272,6 @@ types:
             "data": {
                 "count": 10
             }
-        }
-      u2f: |
-        {
-            "id": 8,
-            "type": "u2f",
-            "label": "2SV #2",
-            "created_utc": "2017-10-24T20:40:57Z",
-            "last_used_utc": null,
-            "data": []
         }
       webauthn: |
         {
@@ -572,7 +555,7 @@ types:
       409:
         description: >
           An MFA of the requested type already exists. Note that this would only
-          be returned for 'totp' or 'u2f'. The code types ('backupcode' and
+          be returned for 'totp' or 'webauthn'. The code types ('backupcode' and
           'manager') reuse the existing MFA and create new codes.
         body:
           type: Error

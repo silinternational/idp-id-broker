@@ -66,12 +66,12 @@ Feature: Email
         | NOT to send    | already exists  | has           | gets a password    | should NOT  |
         | NOT to send    | already exists  | has           | has non-pw changes | should NOT  |
 
-  Scenario Outline:  When to send lost security key emails when there is no u2f usage
+  Scenario Outline:  When to send lost security key emails when there is no webauthn usage
     Given we are configured <sendLostKeyEml> lost key emails
       And I remove records of any emails that have been sent
       And no mfas exist
       And a user already exists
-      And a verified u2f mfa option <u2fExistsOrNot>
+      And a verified webauthn mfa option <webauthnExistsOrNot>
       And a backup code mfa option was used <backupUsedDaysAgo> days ago
       And a totp mfa option was used <totpUsedDaysAgo> days ago
       And a "lost-security-key" email <hasOrHasNot> been sent to that user
@@ -79,7 +79,7 @@ Feature: Email
     Then I see that a lost security key email <shouldOrNot> be sent
 
     Examples:
-      | sendLostKeyEml | u2fExistsOrNot | backupUsedDaysAgo | totpUsedDaysAgo | hasOrHasNot | shouldOrNot |
+      | sendLostKeyEml | webauthnExistsOrNot | backupUsedDaysAgo | totpUsedDaysAgo | hasOrHasNot | shouldOrNot |
       | to send        | does NOT exist | 2                 | 3               | has NOT     | should NOT  |
       | to send        | does exist     | 222               | 333             | has NOT     | should NOT  |
       | to send        | does exist     | 2                 | 333             | has NOT     | should      |
@@ -88,19 +88,19 @@ Feature: Email
       | NOT to send    | does exist     | 2                 | 333             | has NOT     | should NOT  |
 
 
-  Scenario Outline:  When to send lost security key emails when there is u2f usage
+  Scenario Outline:  When to send lost security key emails when there is webauthn usage
     Given we are configured <sendLostKeyEml> lost key emails
       And I remove records of any emails that have been sent
       And no mfas exist
       And a user already exists
-      And a u2f mfa option was used <u2fUsedDaysAgo> days ago
+      And a webauthn mfa option was used <webauthnUsedDaysAgo> days ago
       And a backup code mfa option was used <backupUsedDaysAgo> days ago
       And a "lost-security-key" email <hasOrHasNot> been sent to that user
     When I check if a lost security key email should be sent
     Then I see that a lost security key email <shouldOrNot> be sent
 
     Examples:
-      | sendLostKeyEml | u2fUsedDaysAgo | backupUsedDaysAgo | hasOrHasNot | shouldOrNot |
+      | sendLostKeyEml | webauthnUsedDaysAgo | backupUsedDaysAgo | hasOrHasNot | shouldOrNot |
       | to send        | 4              | 2                 | has NOT     | should NOT  |
       | to send        | 444            | 222               | has NOT     | should NOT  |
       | to send        | 444            | 2                 | has NOT     | should      |
@@ -112,7 +112,7 @@ Feature: Email
       And I remove records of any emails that have been sent
       And no mfas exist
       And a user already exists
-      And a verified u2f mfa option <u2fExistsOrNot>
+      And a verified webauthn mfa option <webauthnExistsOrNot>
       And a totp mfa option <totpExistsOrNot>
       And a backup code mfa option <backupExistsOrNot>
       And a "get-backup-codes" email <hasOrHasNot> been sent to that user
@@ -120,7 +120,7 @@ Feature: Email
     Then I see that a get backup codes email <shouldOrNot> be sent
 
     Examples:
-      | sendGetBackupCodesEml | u2fExistsOrNot | totpExistsOrNot | backupExistsOrNot | hasOrHasNot | shouldOrNot |
+      | sendGetBackupCodesEml | webauthnExistsOrNot | totpExistsOrNot | backupExistsOrNot | hasOrHasNot | shouldOrNot |
       | to send               | does NOT exist | does NOT exist  | does NOT exist    | has NOT     | should NOT  |
       | to send               | does exist     | does NOT exist  | does NOT exist    | has NOT     | should      |
       | to send               | does NOT exist | does exist      | does NOT exist    | has NOT     | should      |
@@ -136,14 +136,14 @@ Feature: Email
     Given we are configured <sendMfaOptionAddedEml> mfa option added emails
       And no mfas exist
       And a user already exists
-      And a verified u2f mfa option <u2fExistsOrNot>
+      And a verified webauthn mfa option <webauthnExistsOrNot>
       And a totp mfa option <totpExistsOrNot>
       And the latest mfa event type was <mfaEventType>
     When I check if a mfa option added email should be sent
     Then I see that a mfa option added email <shouldOrNot> be sent
 
     Examples:
-      | sendMfaOptionAddedEml | u2fExistsOrNot | totpExistsOrNot | mfaEventType      | shouldOrNot |
+      | sendMfaOptionAddedEml | webauthnExistsOrNot | totpExistsOrNot | mfaEventType      | shouldOrNot |
       | to send               | does exist     | does NOT exist  | verify_mfa        | should NOT  |
       | to send               | does NOT exist | does exist      | verify_mfa        | should NOT  |
       | to send               | does exist     | does exist      | verify_mfa        | should      |
@@ -155,14 +155,14 @@ Feature: Email
     Given we are configured <sendMfaEnabledEml> mfa enabled emails
       And no mfas exist
       And a user already exists
-      And a verified u2f mfa option <u2fExistsOrNot>
+      And a verified webauthn mfa option <webauthnExistsOrNot>
       And a totp mfa option <totpExistsOrNot>
       And the latest mfa event type was <mfaEventType>
     When I check if a mfa enabled email should be sent
     Then I see that a mfa enabled email <shouldOrNot> be sent
 
     Examples:
-      | sendMfaEnabledEml     | u2fExistsOrNot | totpExistsOrNot | mfaEventType      | shouldOrNot |
+      | sendMfaEnabledEml     | webauthnExistsOrNot | totpExistsOrNot | mfaEventType      | shouldOrNot |
       | to send               | does exist     | does NOT exist  | verify_mfa        | should      |
       | to send               | does NOT exist | does exist      | verify_mfa        | should      |
       | to send               | does exist     | does exist      | verify_mfa        | should NOT  |
@@ -174,14 +174,14 @@ Feature: Email
     Given we are configured <sendMfaOptionRemovedEml> mfa option removed emails
       And no mfas exist
       And a user already exists
-      And a verified u2f mfa option <u2fExistsOrNot>
+      And a verified webauthn mfa option <webauthnExistsOrNot>
       And a totp mfa option <totpExistsOrNot>
       And the latest mfa event type was <mfaEventType>
     When I check if a mfa option removed email should be sent
     Then I see that a mfa option removed email <shouldOrNot> be sent
 
     Examples:
-      | sendMfaOptionRemovedEml | u2fExistsOrNot | totpExistsOrNot | mfaEventType      | shouldOrNot |
+      | sendMfaOptionRemovedEml | webauthnExistsOrNot | totpExistsOrNot | mfaEventType      | shouldOrNot |
       | to send                 | does exist     | does NOT exist  | delete_mfa        | should      |
       | to send                 | does NOT exist | does exist      | delete_mfa        | should      |
       | to send                 | does exist     | does exist      | delete_mfa        | should      |
@@ -193,14 +193,14 @@ Feature: Email
     Given we are configured <sendMfaDisabledEml> mfa disabled emails
       And no mfas exist
       And a user already exists
-      And a verified u2f mfa option <u2fExistsOrNot>
+      And a verified webauthn mfa option <webauthnExistsOrNot>
       And a totp mfa option <totpExistsOrNot>
       And the latest mfa event type was <mfaEventType>
     When I check if a mfa disabled email should be sent
     Then I see that a mfa disabled email <shouldOrNot> be sent
 
     Examples:
-      | sendMfaDisabledEml | u2fExistsOrNot | totpExistsOrNot | mfaEventType | shouldOrNot |
+      | sendMfaDisabledEml | webauthnExistsOrNot | totpExistsOrNot | mfaEventType | shouldOrNot |
       | to send            | does exist     | does NOT exist  | delete_mfa   | should NOT  |
       | to send            | does NOT exist | does exist      | delete_mfa   | should NOT  |
       | to send            | does exist     | does exist      | delete_mfa   | should NOT  |
@@ -214,7 +214,7 @@ Feature: Email
       And we are configured to send mfa option removed emails
       And no mfas exist
       And a user already exists
-      And a verified u2f mfa option was just deleted
+      And a verified webauthn mfa option was just deleted
     When I check if a mfa <optionRemovedOrDisabled> email should be sent
     Then I see that a mfa <optionRemovedOrDisabled> email <shouldOrNot> be sent
 
@@ -223,20 +223,20 @@ Feature: Email
       | option removed          | should NOT  |
       | disabled                | should      |
 
-  Scenario: When to send a mfa option removed email after an unverified u2f mfa option has been deleted.
+  Scenario: When to send a mfa option removed email after an unverified webauthn mfa option has been deleted.
     Given we are configured to send mfa option removed emails
       And no mfas exist
       And a user already exists
-      And a verified u2f mfa option does exist
-      And an unverified u2f mfa option was just deleted
+      And a verified webauthn mfa option does exist
+      And an unverified webauthn mfa option was just deleted
     When I check if a mfa option removed email should be sent
     Then I see that a mfa option removed email should not be sent
 
-  Scenario: When to send a mfa disabled email after an unverified u2f mfa option has been deleted.
+  Scenario: When to send a mfa disabled email after an unverified webauthn mfa option has been deleted.
     Given we are configured to send mfa disabled emails
       And no mfas exist
       And a user already exists
-      And an unverified u2f mfa option was just deleted
+      And an unverified webauthn mfa option was just deleted
     When I check if a mfa disabled email should be sent
     Then I see that a mfa disabled email should not be sent
 
@@ -282,7 +282,7 @@ Feature: Email
       And I remove records of any emails that have been sent
       And no mfas exist
       And a user already exists
-      And a u2f mfa option was used 222 days ago
+      And a webauthn mfa option was used 222 days ago
       And a backup code mfa option was used 2 days ago
       And a "lost-security-key" email has NOT been sent to that user
       And a second user exists with a totp mfa option
@@ -296,7 +296,7 @@ Feature: Email
     And I remove records of any emails that have been sent
     And no mfas exist
     And an inactive user already exists
-    And a u2f mfa option was used 222 days ago
+    And a webauthn mfa option was used 222 days ago
     And a backup code mfa option was used 2 days ago
     And a "lost-security-key" email has NOT been sent to that user
     And a second inactive user exists with a totp mfa option

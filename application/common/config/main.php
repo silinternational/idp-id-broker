@@ -27,7 +27,6 @@ $mfaNumBackupCodes = Env::get('MFA_NUM_BACKUPCODES', 10);
 $mfaTotpConfig = Env::getArrayFromPrefix('MFA_TOTP_');
 $mfaTotpConfig['issuer'] = $idpDisplayName;
 
-$mfaU2fConfig = Env::getArrayFromPrefix('MFA_U2F_');
 $mfaWebAuthnConfig = Env::getArrayFromPrefix('MFA_WEBAUTHN_');
 
 $emailerClass = Env::get('EMAILER_CLASS', Emailer::class);
@@ -140,10 +139,6 @@ return [
         'totp' => ArrayHelper::merge(
             ['class' => MfaBackendTotp::class],
             $mfaTotpConfig
-        ),
-        'u2f' => ArrayHelper::merge(
-            ['class' => MfaBackendU2f::class],
-            $mfaU2fConfig
         ),
         'webauthn' => ArrayHelper::merge(
             ['class' => MfaBackendWebAuthn::class],

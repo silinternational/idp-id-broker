@@ -93,7 +93,7 @@ class FeatureContext extends YiiContext
      */
     public static function theUserStoreIsEmpty()
     {
-        // To avoid calls to try to remove TOTP/U2F entries from their
+        // To avoid calls to try to remove TOTP/WebAuthn entries from their
         // respective backend services, we are simply deleting all relevant
         // records here via deleteAll() to prevent their before/afterDelete()
         // functions from being called.

@@ -1250,7 +1250,7 @@ class User extends UserBase
     }
 
     /**
-     * Count the number of active users with one of either totp or u2f, but no
+     * Count the number of active users with one of either totp or webauthn, but no
      * backup codes.
      * @return string
      * @throws \yii\db\Exception

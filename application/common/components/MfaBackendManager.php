@@ -81,7 +81,7 @@ class MfaBackendManager extends Component implements MfaBackendInterface
     /**
      * Verify response from user is correct for the MFA backend device
      * @param int $mfaId The MFA ID
-     * @param string $value Value provided by user, such as TOTP number or U2F challenge response
+     * @param string $value Value provided by user, such as TOTP number or WebAuthn challenge response
      * @param string $rpOrigin
      * @return bool
      * @throws ServerErrorHttpException

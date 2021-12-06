@@ -496,7 +496,7 @@ class Emailer extends Component
     }
 
     /**
-     * If a TOTP or backup code was used in the last X days but not a U2f option
+     * If a TOTP or backup code was used in the last X days but not a WebAuthn option
      *   and if we are configured to send this sort of email, then
      *   send it.
      *
@@ -513,7 +513,7 @@ class Emailer extends Component
             return false;
         }
 
-        $hasU2fOption = false;
+        $hasWebAuthnOption = false;
         $lastOtherUseDate = null;
         $mfaOptions = $user->getVerifiedMfaOptions();
 
@@ -523,8 +523,8 @@ class Emailer extends Component
         foreach ($mfaOptions as $mfaOption) {
 
             // If this is a Security Key and it was used recently, don't send an email.
-            if ($mfaOption->type === Mfa::TYPE_U2F || $mfaOption->type === Mfa::TYPE_WEBAUTHN) {
-                $hasU2fOption = true;
+            if ($mfaOption->type === Mfa::TYPE_WEBAUTHN) {
+                $hasWebAuthnOption = true;
                 if (! empty($mfaOption->last_used_utc) && MySqlDateTime::dateIsRecent($mfaOption->last_used_utc, $recentDays)) {
                     return false;
                 }
@@ -536,12 +536,12 @@ class Emailer extends Component
             }
         }
 
-        // If they don't even have a u2f option, don't send an email
-        if (! $hasU2fOption) {
+        // If they don't even have a webauthn option, don't send an email
+        if (! $hasWebAuthnOption) {
             return false;
         }
 
-        // If a totp or backup code was used in the last X days (but not the u2f option), send an email
+        // If a totp or backup code was used in the last X days (but not the webauthn option), send an email
         if ($lastOtherUseDate !== null) {
             return true;
         }

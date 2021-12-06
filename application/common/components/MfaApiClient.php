@@ -109,70 +109,7 @@ class MfaApiClient
         }
     }
 
-    /**
-     * @param string $uuid
-     * @return array
-     * @throws GuzzleException
-     */
-    public function u2fCreateAuthentication(string $uuid): array
-    {
-        $response = $this->callApi('u2f/' . $uuid . '/auth', 'POST');
 
-        return Json::decode($response->getBody()->getContents());
-    }
-
-    /**
-     * @param string $appId
-     * @return array
-     * @throws GuzzleException
-     */
-    public function u2fCreateRegistration(string $appId): array
-    {
-        $response = $this->callApi('u2f', 'POST', [
-            'appId' => $appId,
-        ]);
-
-        return Json::decode($response->getBody()->getContents());
-    }
-
-    /**
-     * @param string $uuid
-     * @return bool
-     * @throws GuzzleException
-     */
-    public function u2fDelete(string $uuid): bool
-    {
-        $this->callApi('u2f/' . $uuid, 'DELETE');
-        return true;
-    }
-
-    /**
-     * @param string $uuid
-     * @param string $signResultJson
-     * @return bool
-     * @throws GuzzleException
-     */
-    public function u2fValidateAuthentication(string $uuid, string $signResultJson): bool
-    {
-        $this->callApi('u2f/' . $uuid . '/auth', 'PUT', [
-            'signResult' => $signResultJson,
-        ]);
-        return true;
-    }
-
-    /**
-     * @param string $uuid
-     * @param string $signResultJson
-     * @return bool
-     * @throws GuzzleException
-     */
-    public function u2fValidateRegistration(string $uuid, string $signResultJson): bool
-    {
-        $this->callApi('u2f/' . $uuid, 'PUT', [
-            'signResult' => $signResultJson,
-        ]);
-        return true;
-    }
 
     /**
      * @param array $additionalHeaders
