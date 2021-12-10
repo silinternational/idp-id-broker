@@ -32,6 +32,9 @@ class User extends UserBase
     /** @var string */
     public $password;
 
+    /** @var array */
+    public array $mfa;
+
     /** @var NagState */
     protected $nagState = null;
 
@@ -550,9 +553,7 @@ class User extends UserBase
                 $member[] = \Yii::$app->params['idpName'];
                 return $member;
             },
-            'mfa' => function (self $model) {
-                return $model->getMfaFields();
-            },
+            'mfa',
             'method' => function (self $model) {
                 return $model->getMethodFields();
             },
@@ -602,30 +603,28 @@ class User extends UserBase
         return $this->nagState->getState();
     }
 
-
-    /**
-     * @return array MFA related properties
-     */
-    public function getMfaFields()
+    public function loadMfaData(string $rpOrigin = '')
     {
-        return [
+        $verifiedMfaOptions = $this->getVerifiedMfaOptions($rpOrigin);
+        $this->mfa = [
             'prompt'  => $this->isPromptForMfa() ? 'yes' : 'no',
             'add'     => $this->getNagState() == NagState::NAG_ADD_MFA ? 'yes' : 'no',
-            'active'  => count($this->getVerifiedMfaOptions()) > 0 ? 'yes' : 'no',
-            'options' => $this->getVerifiedMfaOptions(),
+            'active'  => count($verifiedMfaOptions) > 0 ? 'yes' : 'no',
+            'options' => $verifiedMfaOptions,
         ];
     }
 
     /**
      * @return Mfa[]
      */
-    public function getVerifiedMfaOptions()
+    public function getVerifiedMfaOptions(string $rpOrigin)
     {
         $mfas = [];
         foreach ($this->mfas as $mfaOption) {
             if ($mfaOption->verified === 1) {
                 if ($this->scenario == self::SCENARIO_AUTHENTICATE || $mfaOption->type !== Mfa::TYPE_MANAGER) {
                     $mfaOption->scenario = $this->scenario;
+                    $mfaOption->loadData($rpOrigin);
                     $mfas[] = $mfaOption;
                 }
             }

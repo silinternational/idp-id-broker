@@ -6,6 +6,7 @@ use common\models\User;
 use frontend\components\BaseRestController;
 use Yii;
 use yii\web\BadRequestHttpException;
+use yii\web\ForbiddenHttpException;
 
 class AuthenticationController extends BaseRestController
 {
@@ -14,12 +15,19 @@ class AuthenticationController extends BaseRestController
      *
      * @return User
      * @throws BadRequestHttpException
+     * @throws ForbiddenHttpException
      */
     public function actionCreate(): User
     {
         $username = (string)Yii::$app->request->getBodyParam('username');
         $password = (string)Yii::$app->request->getBodyParam('password');
         $inviteCode = (string)Yii::$app->request->getBodyParam('invite');
+
+        // rpOrigin is needed for WebAuthn authentication
+        $rpOrigin = \Yii::$app->request->get('rpOrigin', '');
+        if ($rpOrigin != '' && !in_array($rpOrigin, \Yii::$app->params['authorizedRPOrigins'])){
+            throw new ForbiddenHttpException("Invalid rpOrigin", 1639169238);
+        }
 
         $authentication = new Authentication(
             $username,
@@ -39,7 +47,7 @@ class AuthenticationController extends BaseRestController
         if ($authenticatedUser !== null) {
             $log['status'] = 'created';
             Yii::info($log, 'application');
-
+            $authenticatedUser->loadMfaData($rpOrigin);
             return $authenticatedUser;
         }
 
