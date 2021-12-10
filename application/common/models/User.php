@@ -33,7 +33,7 @@ class User extends UserBase
     public $password;
 
     /** @var array */
-    public array $mfa;
+    public array $mfa = [];
 
     /** @var NagState */
     protected $nagState = null;
@@ -617,7 +617,7 @@ class User extends UserBase
     /**
      * @return Mfa[]
      */
-    public function getVerifiedMfaOptions(string $rpOrigin)
+    public function getVerifiedMfaOptions(string $rpOrigin = '')
     {
         $mfas = [];
         foreach ($this->mfas as $mfaOption) {
