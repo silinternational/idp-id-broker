@@ -162,7 +162,7 @@ class Password extends PasswordBase
     protected function getMfaExtendedDate($date)
     {
         $dateIso = $date . 'T23:59:59Z';
-        if (count($this->user->getVerifiedMfaOptions()) > 0) {
+        if ($this->user->getVerifiedMfaOptionsCount() > 0) {
             $extended = strtotime(\Yii::$app->params['passwordMfaLifespanExtension'], strtotime($dateIso));
             return Utils::getIso8601($extended);
         }

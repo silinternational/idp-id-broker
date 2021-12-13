@@ -595,7 +595,7 @@ class User extends UserBase
                 $this->nag_for_mfa_after,
                 $this->nag_for_method_after,
                 $this->review_profile_after,
-                count($this->getVerifiedMfaOptions()),
+                $this->getVerifiedMfaOptionsCount(),
                 count($this->getVerifiedMethodOptions())
             );
         }
@@ -615,9 +615,16 @@ class User extends UserBase
     }
 
     /**
+     * WARNING: Every call to this DURING authentication will trigger one or
+     * more calls to our MFA API, to initialize an authentication for each
+     * verified MFA option. If any of those MFAs are WebAuthn, the RP Origin
+     * must be provided for the call to succeed.
+     *
+     * If all you need is a count, use `getVerifiedMfaOptionsCount()` instead.
+     *
      * @return Mfa[]
      */
-    public function getVerifiedMfaOptions(string $rpOrigin = '')
+    public function getVerifiedMfaOptions(string $rpOrigin = ''): array
     {
         $mfas = [];
         foreach ($this->mfas as $mfaOption) {
@@ -630,6 +637,17 @@ class User extends UserBase
             }
         }
         return $mfas;
+    }
+
+    public function getVerifiedMfaOptionsCount(): int
+    {
+        $count = 0;
+        foreach ($this->mfas as $mfaOption) {
+            if ($mfaOption->verified === 1) {
+                $count += 1;
+            }
+        }
+        return $count;
     }
 
     /**
@@ -927,7 +945,7 @@ class User extends UserBase
     public function isPromptForMfa(): bool
     {
         if ($this->scenario == self::SCENARIO_AUTHENTICATE) {
-            if ($this->require_mfa === 'yes' || count($this->getVerifiedMfaOptions()) > 0) {
+            if ($this->require_mfa === 'yes' || $this->getVerifiedMfaOptionsCount() > 0) {
                 return true;
             }
         }
@@ -1102,7 +1120,7 @@ class User extends UserBase
      */
     public function extendGracePeriodIfNeeded()
     {
-        if (count($this->getVerifiedMfaOptions()) > 0) {
+        if ($this->getVerifiedMfaOptionsCount() > 0) {
             return;
         }
 

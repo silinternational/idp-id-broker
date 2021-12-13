@@ -480,7 +480,7 @@ class Emailer extends Component
     public function shouldSendGetBackupCodesMessageTo($user)
     {
         return $this->sendGetBackupCodesEmails
-            && count($user->getVerifiedMfaOptions()) == 1
+            && $user->getVerifiedMfaOptionsCount() === 1
             && ! $user->hasMfaBackupCodes()
             && ! $this->hasReceivedMessageRecently($user->id, EmailLog::MESSAGE_TYPE_GET_BACKUP_CODES);
     }
@@ -560,7 +560,7 @@ class Emailer extends Component
     {
         return $this->sendMfaOptionAddedEmails
             && $mfaEventType === Mfa::EVENT_TYPE_VERIFY
-            && count($user->getVerifiedMfaOptions()) > 1;
+            && $user->getVerifiedMfaOptionsCount() > 1;
     }
 
     /**
@@ -574,7 +574,7 @@ class Emailer extends Component
     {
         return $this->sendMfaEnabledEmails
             && $mfaEventType === Mfa::EVENT_TYPE_VERIFY
-            && count($user->getVerifiedMfaOptions()) == 1;
+            && $user->getVerifiedMfaOptionsCount() == 1;
     }
 
     /**
@@ -590,7 +590,7 @@ class Emailer extends Component
         return $this->sendMfaOptionRemovedEmails
             && $mfaEventType === Mfa::EVENT_TYPE_DELETE
             && $mfa->verified
-            && count($user->getVerifiedMfaOptions()) > 0;
+            && $user->getVerifiedMfaOptionsCount() > 0;
     }
 
     /**
@@ -606,7 +606,7 @@ class Emailer extends Component
         return $this->sendMfaDisabledEmails
             && $mfaEventType === Mfa::EVENT_TYPE_DELETE
             && $mfa->verified
-            && count($user->getVerifiedMfaOptions()) < 1;
+            && $user->getVerifiedMfaOptionsCount() < 1;
     }
     
     /**
