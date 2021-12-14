@@ -12,12 +12,12 @@ Feature: User
       And I create a new user
         And that user has a verified totp mfa record
       And I create a new user
-        And that user has a verified u2f mfa record
-        And that user has another verified u2f mfa record
+        And that user has a verified webauthn mfa record
+        And that user has another verified webauthn mfa record
       And I create a new user
         And that user has an unverified totp mfa record
       And I create a new user
-        And that user has an unverified u2f mfa record
+        And that user has an unverified webauthn mfa record
       And I create a new user
     When I get the count of active users with a verified mfa
     Then the count of active users with a verified mfa should be 3
@@ -28,7 +28,7 @@ Feature: User
       And I create a new user
         And that user has a verified totp mfa record
       And I create a new user
-        And that user has an unverified u2f mfa record
+        And that user has an unverified webauthn mfa record
       And I create a new user
     When I get the count of active users with a backup code mfa
     Then the count of active users with a backup code mfa should be 1
@@ -43,24 +43,24 @@ Feature: User
       And I create a new user
         And that user has an unverified totp mfa record
       And I create a new user
-        And that user has a verified u2f mfa record
+        And that user has a verified webauthn mfa record
       And I create a new user
     When I get the count of active users with a verified totp mfa
     Then the count of active users with a verified totp mfa should be 2
 
-  Scenario: Get a count of active users with a verified u2f mfa
+  Scenario: Get a count of active users with a verified webauthn mfa
     Given I create a new user
         And that user has a backup code mfa record
       And I create a new user
         And that user has a verified totp mfa record
       And I create a new user
-        And that user has a verified u2f mfa record
-        And that user has another verified u2f mfa record
+        And that user has a verified webauthn mfa record
+        And that user has another verified webauthn mfa record
       And I create a new user
-        And that user has an unverified u2f mfa record
+        And that user has an unverified webauthn mfa record
       And I create a new user
-    When I get the count of active users with a verified u2f mfa
-    Then the count of active users with a verified u2f mfa should be 1
+    When I get the count of active users with a verified webauthn mfa
+    Then the count of active users with a verified webauthn mfa should be 1
 
   Scenario: Get a count of active users with a password
     Given I create a new user with a password
@@ -78,11 +78,11 @@ Feature: User
         And that user has a verified totp mfa record
         And that user has a backup code mfa record
       And I create a new user
-        And that user has a verified u2f mfa record
-        And that user has another verified u2f mfa record
+        And that user has a verified webauthn mfa record
+        And that user has another verified webauthn mfa record
         And that user has a backup code mfa record
       And I create a new user
-        And that user has an unverified u2f mfa record
+        And that user has an unverified webauthn mfa record
       And I create a new inactive user
         And that user has a backup code mfa record
       And I create a new user
@@ -98,26 +98,26 @@ Feature: User
     When I get the count of active users with require mfa
     Then the count of active users with require mfa should be 2
 
-  Scenario: Get a count of active users with either u2f or totp but not backupcodes
+  Scenario: Get a count of active users with either webauthn or totp but not backupcodes
     Given I create a new user
       And I create another new user
       And that user has a backup code mfa record
       And I create another new user
       And that user has a verified totp mfa record
       And I create another new user
-      And that user has a verified u2f mfa record
+      And that user has a verified webauthn mfa record
       And I create another new user
       And that user has a verified totp mfa record
-      And that user has a verified u2f mfa record
+      And that user has a verified webauthn mfa record
       And I create another new user
       And that user has a backup code mfa record
       And that user has a verified totp mfa record
       And I create another new user
       And that user has an unverified totp mfa record
       And I create a new inactive user
-      And that user has a verified u2f mfa record
-    When I get the count of active users with u2f or totp but not backupcodes
-    Then the count of active users with u2f or totp but not backupcodes should be 2
+      And that user has a verified webauthn mfa record
+    When I get the count of active users with webauthn or totp but not backupcodes
+    Then the count of active users with webauthn or totp but not backupcodes should be 2
 
     Scenario: Get a count of active users with a personal email but no recovery methods
       Given I create a new user

@@ -14,15 +14,16 @@ class MfaBackendBackupcode extends Component implements MfaBackendInterface
      * Number of backup codes to generate
      * @var int
      */
-    public $numBackupCodes = 10;
+    public int $numBackupCodes = 10;
 
     /**
      * Initialize a new MFA backend registration
      * @param int $userId
+     * @param string $rpOrigin
      * @return array
-     * @throws \Exception
+     * @throws ServerErrorHttpException
      */
-    public function regInit(int $userId): array
+    public function regInit(int $userId, string $rpOrigin = ''): array
     {
         // Get existing MFA record for backupcode to create/update codes for
         $mfa = Mfa::findOne(['user_id' => $userId, 'type' => Mfa::TYPE_BACKUPCODE]);
@@ -44,9 +45,10 @@ class MfaBackendBackupcode extends Component implements MfaBackendInterface
     /**
      * Initialize authentication sequence
      * @param int $mfaId
+     * @param string $rpOrigin
      * @return array
      */
-    public function authInit(int $mfaId): array
+    public function authInit(int $mfaId, string $rpOrigin = ''): array
     {
         return [];
     }
@@ -54,12 +56,12 @@ class MfaBackendBackupcode extends Component implements MfaBackendInterface
     /**
      * Verify response from user is correct for the MFA backend device
      * @param int $mfaId The MFA ID
-     * @param string $value Value provided by user, such as TOTP number or U2F challenge response
+     * @param string $value Value provided by user, such as TOTP number or WebAuthn challenge response
+     * @param string $rpOrigin
      * @return bool
      * @throws ServerErrorHttpException
-     * @throws \Exception
      */
-    public function verify(int $mfaId, $value): bool
+    public function verify(int $mfaId, string $value, string $rpOrigin = ''): bool
     {
         if (MfaBackupcode::validateAndRemove($mfaId, $value)) {
             MfaBackupcode::sendRefreshCodesMessage($mfaId);
@@ -72,7 +74,6 @@ class MfaBackendBackupcode extends Component implements MfaBackendInterface
      * Delete MFA backend configuration
      * @param int $mfaId
      * @return bool
-     * @throws NotFoundHttpException
      * @throws ServerErrorHttpException
      */
     public function delete(int $mfaId): bool

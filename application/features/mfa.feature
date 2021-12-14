@@ -60,8 +60,8 @@ Feature: MFA
     When I request "/mfa" be created
     Then the response status code should be 400
 
-  Scenario: Create new MFA record of type u2f
-#TODO - create a test double for the u2f client
+  Scenario: Create new MFA record of type webauthn
+#TODO - create a test double for the webauthn client
 
   Scenario: Create new MFA record of type totp
 #TODO - create a test double for the totp client

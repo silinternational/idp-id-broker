@@ -1,16 +1,7 @@
-FROM silintl/php7:7.2
-MAINTAINER Phillip Shipley <phillip_shipley@sil.org>
-
-ENV REFRESHED_AT 2020-05-26
+FROM silintl/php7:7.4
 
 RUN apt-get update -y && \
     apt-get install -y make
-
-RUN mkdir -p /data
-
-# get s3-expand
-RUN curl https://raw.githubusercontent.com/silinternational/s3-expand/1.5/s3-expand -o /usr/local/bin/s3-expand
-RUN chmod a+x /usr/local/bin/s3-expand
 
 WORKDIR /data
 
@@ -32,5 +23,4 @@ COPY dockerbuild/vhost.conf /etc/apache2/sites-enabled/
 RUN sed -i -E 's@ErrorLog .*@ErrorLog /proc/self/fd/2@i' /etc/apache2/apache2.conf
 
 EXPOSE 80
-ENTRYPOINT ["/usr/local/bin/s3-expand"]
 CMD ["/data/run.sh"]

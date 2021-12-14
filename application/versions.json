@@ -2,7 +2,7 @@
     "installed": [
         {
             "name": "behat/behat",
-            "version": "v3.8.1",
+            "version": "v3.10.0",
             "description": "Scenario-oriented BDD framework for PHP"
         },
         {
@@ -17,12 +17,12 @@
         },
         {
             "name": "friendsofphp/php-cs-fixer",
-            "version": "v2.18.6",
+            "version": "v2.19.3",
             "description": "A tool to automatically fix PHP code style"
         },
         {
             "name": "google/apiclient",
-            "version": "v2.9.1",
+            "version": "v2.11.0",
             "description": "Client library for Google APIs"
         },
         {
@@ -32,17 +32,17 @@
         },
         {
             "name": "ramsey/uuid",
-            "version": "3.9.3",
+            "version": "3.9.6",
             "description": "Formerly rhumsaa/uuid. A PHP 5.4+ library for generating RFC 4122 version 1, 3, 4, and 5 universally unique identifiers (UUID)."
         },
         {
             "name": "roave/security-advisories",
-            "version": "dev-master db47aac",
+            "version": "dev-master 6f99479",
             "description": "Prevents installation of composer packages with known security vulnerabilities: no API, simply require it"
         },
         {
             "name": "silinternational/email-service-php-client",
-            "version": "2.2.0",
+            "version": "2.3.0",
             "description": "PHP client to interact with our Email Service API: https://github.com/silinternational/email-service"
         },
         {
@@ -82,12 +82,12 @@
         },
         {
             "name": "yiisoft/yii2",
-            "version": "2.0.41.1",
+            "version": "2.0.43",
             "description": "Yii PHP Framework Version 2"
         },
         {
             "name": "yiisoft/yii2-gii",
-            "version": "2.2.1",
+            "version": "2.2.3",
             "description": "The Gii extension for the Yii framework"
         },
         {
