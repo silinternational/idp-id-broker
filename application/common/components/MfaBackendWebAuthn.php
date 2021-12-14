@@ -159,8 +159,15 @@ class MfaBackendWebAuthn extends Component implements MfaBackendInterface
             throw new NotFoundHttpException("MFA record for given ID not found");
         }
 
+        $headers = $this->getWebAuthnHeaders(
+            $mfa->user->username,
+            $mfa->user->getDisplayName(),
+            '',
+            $mfa->external_uuid
+        );
+
         if (!empty($mfa->external_uuid)) {
-            return $this->client->webauthnDelete($mfa->external_uuid);
+            return $this->client->webauthnDelete($headers);
         }
 
         return true;

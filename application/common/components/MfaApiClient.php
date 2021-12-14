@@ -158,13 +158,13 @@ class MfaApiClient
     }
 
     /**
-     * @param string $uuid The external ID for MFA record
+     * @param array $additionalHeaders
      * @return bool
      * @throws GuzzleException
      */
-    public function webauthnDelete(string $uuid): bool
+    public function webauthnDelete(array $additionalHeaders): bool
     {
-        $this->callApi('webauthn/' . $uuid, 'DELETE');
+        $this->callApi('webauthn/user', 'DELETE', [], $additionalHeaders);
         return true;
     }
 
