@@ -18,12 +18,19 @@ use yii\web\TooManyRequestsHttpException;
 class Mfa extends MfaBase
 {
     const TYPE_TOTP = 'totp';
-    const TYPE_U2F = 'u2f';
+    const TYPE_WEBAUTHN = 'webauthn';
     const TYPE_BACKUPCODE = 'backupcode';
     const TYPE_MANAGER = 'manager';
 
     const EVENT_TYPE_VERIFY = 'verify_mfa';
     const EVENT_TYPE_DELETE = 'delete_mfa';
+
+    /**
+     * Holds additional data about method, such as initialized authentication data
+     * needed for WebAuthn methods and number of remaining backup codes
+     * @var array
+     */
+    public array $data = [];
 
     public function rules(): array
     {
@@ -55,18 +62,22 @@ class Mfa extends MfaBase
                 }
                 return null;
             },
-            'data' => function ($model) {
-                $data = [];
-                /** @var Mfa $model */
-                if ($model->verified === 1 && $model->scenario === User::SCENARIO_AUTHENTICATE) {
-                    $data += $model->authInit();
-                }
-                if ($model->type === self::TYPE_BACKUPCODE || $model->type === self::TYPE_MANAGER) {
-                    $data += ['count' => count($model->mfaBackupcodes)];
-                }
-                return $data;
-            }
+            'data',
         ];
+    }
+
+    /**
+     * @param string $rpOrigin The Relying Party Origin, used for WebAuthn and ignored for others
+     */
+    public function loadData(string $rpOrigin = '')
+    {
+        $this->data = [];
+        if ($this->verified === 1 && $this->scenario === User::SCENARIO_AUTHENTICATE) {
+            $this->data += $this->authInit($rpOrigin);
+        }
+        if ($this->type === self::TYPE_BACKUPCODE || $this->type === self::TYPE_MANAGER) {
+            $this->data += ['count' => count($this->mfaBackupcodes)];
+        }
     }
 
     /**
@@ -168,12 +179,13 @@ class Mfa extends MfaBase
     }
 
     /**
+     * @param string $rpOrigin
      * @return array
      */
-    public function authInit()
+    public function authInit(string $rpOrigin = ''): array
     {
         $backend = self::getBackendForType($this->type);
-        $authInit = $backend->authInit($this->id);
+        $authInit = $backend->authInit($this->id, $rpOrigin);
 
         \Yii::warning([
             'action' => 'mfa auth init',
@@ -185,7 +197,7 @@ class Mfa extends MfaBase
         return $authInit;
     }
     
-    protected function hasTooManyRecentFailures()
+    protected function hasTooManyRecentFailures(): bool
     {
         $numRecentFailures = $this->countRecentFailures();
         return ($numRecentFailures >= MfaFailedAttempt::RECENT_FAILURE_LIMIT);
@@ -199,7 +211,7 @@ class Mfa extends MfaBase
      * @throws \Throwable
      * @throws \yii\db\StaleObjectException
      */
-    public function verify($value): bool
+    public function verify($value, string $rpOrigin = ''): bool
     {
         if ($this->hasTooManyRecentFailures()) {
             \Yii::warning([
@@ -215,7 +227,7 @@ class Mfa extends MfaBase
         }
         
         $backend = self::getBackendForType($this->type);
-        if ($backend->verify($this->id, $value) === true) {
+        if ($backend->verify($this->id, $value, $rpOrigin) === true) {
             $this->last_used_utc = MySqlDateTime::now();
             if (! $this->save()) {
                 \Yii::error([
@@ -262,7 +274,7 @@ class Mfa extends MfaBase
      * @throws ServerErrorHttpException
      * @throws ConflictHttpException
      */
-    public static function create(int $userId, string $type, string $label = null): array
+    public static function create(int $userId, string $type, string $label = null, string $rpOrigin = ''): array
     {
         /*
          * Make sure $type is valid
@@ -313,7 +325,7 @@ class Mfa extends MfaBase
         }
 
         $backend = self::getBackendForType($type);
-        $results = $backend->regInit($userId);
+        $results = $backend->regInit($userId, $rpOrigin);
 
         if (isset($results['uuid'])) {
             $mfa->external_uuid = $results['uuid'];
@@ -440,7 +452,7 @@ class Mfa extends MfaBase
             self::TYPE_BACKUPCODE => 'Printable Codes',
             self::TYPE_MANAGER => 'Manager Backup Code',
             self::TYPE_TOTP => 'Smartphone App',
-            self::TYPE_U2F => 'Security Key',
+            self::TYPE_WEBAUTHN => 'Security Key',
         ];
     }
 

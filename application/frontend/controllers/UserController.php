@@ -19,6 +19,7 @@ class UserController extends BaseRestController
         $user = User::findOne(['employee_id' => $employeeId]);
 
         if (isset($user)) {
+            $user->loadMfaData('');
             return $user;
         }
 

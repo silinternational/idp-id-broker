@@ -5,6 +5,7 @@ use common\components\MfaBackendBackupcode;
 use common\components\MfaBackendManager;
 use common\components\MfaBackendTotp;
 use common\components\MfaBackendU2f;
+use common\components\MfaBackendWebAuthn;
 use Sil\JsonLog\target\EmailServiceTarget;
 use Sil\JsonLog\target\JsonStreamTarget;
 use Sil\PhpEnv\Env;
@@ -26,7 +27,7 @@ $mfaNumBackupCodes = Env::get('MFA_NUM_BACKUPCODES', 10);
 $mfaTotpConfig = Env::getArrayFromPrefix('MFA_TOTP_');
 $mfaTotpConfig['issuer'] = $idpDisplayName;
 
-$mfaU2fConfig = Env::getArrayFromPrefix('MFA_U2F_');
+$mfaWebAuthnConfig = Env::getArrayFromPrefix('MFA_WEBAUTHN_');
 
 $emailerClass = Env::get('EMAILER_CLASS', Emailer::class);
 
@@ -139,9 +140,9 @@ return [
             ['class' => MfaBackendTotp::class],
             $mfaTotpConfig
         ),
-        'u2f' => ArrayHelper::merge(
-            ['class' => MfaBackendU2f::class],
-            $mfaU2fConfig
+        'webauthn' => ArrayHelper::merge(
+            ['class' => MfaBackendWebAuthn::class],
+            $mfaWebAuthnConfig
         ),
         'manager' => ['class' => MfaBackendManager::class],
         // http://www.yiiframework.com/doc-2.0/guide-runtime-logging.html
@@ -193,6 +194,7 @@ return [
     ],
     'params' => [
         'authorizedTokens'              => Env::getArray('API_ACCESS_KEYS'),
+        'authorizedRPOrigins'           => Env::getArray('RP_ORIGINS'),
         'idpName'                       => $idpName,
         'idpDisplayName'                => $idpDisplayName,
         'mfaAddInterval'                => Env::get('MFA_ADD_INTERVAL', '+30 days'),

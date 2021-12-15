@@ -154,19 +154,19 @@ class AnalyticsContext extends YiiContext
     }
 
     /**
-     * @Given that user has a(nother) verified u2f mfa record
+     * @Given that user has a(nother) verified webauthn mfa record
      */
-    public function thatUserHasAVerifiedU2fMfaRecord()
+    public function thatUserHasAVerifiedWebAuthnMfaRecord()
     {
-        $this->createMfa($this->tempUser, Mfa::TYPE_U2F);
+        $this->createMfa($this->tempUser, Mfa::TYPE_WEBAUTHN);
     }
 
     /**
-     * @Given that user has an unverified u2f mfa record
+     * @Given that user has an unverified webauthn mfa record
      */
-    public function thatUserHasAnUnverifiedU2fMfaRecord()
+    public function thatUserHasAnUnverifiedWebAuthnMfaRecord()
     {
-        $this->createMfa($this->tempUser, Mfa::TYPE_U2F, false);
+        $this->createMfa($this->tempUser, Mfa::TYPE_WEBAUTHN, false);
     }
 
     /**
@@ -197,11 +197,11 @@ class AnalyticsContext extends YiiContext
     }
 
     /**
-     * @When I get the count of active users with a verified u2f mfa
+     * @When I get the count of active users with a verified WebAuthn mfa
      */
-    public function iGetTheCountOfActiveUsersWithAVerifiedU2fMfa()
+    public function iGetTheCountOfActiveUsersWithAVerifiedWebAuthnMfa()
     {
-        $query = User::getQueryOfUsersWithMfa(Mfa::TYPE_U2F);
+        $query = User::getQueryOfUsersWithMfa(Mfa::TYPE_WEBAUTHN);
         $this->mfaCount = $query->count();
     }
 
@@ -239,9 +239,9 @@ class AnalyticsContext extends YiiContext
     }
 
     /**
-     * @Then the count of active users with a verified u2f mfa should be :arg1
+     * @Then the count of active users with a verified webauthn mfa should be :arg1
      */
-    public function theCountOfActiveUsersWithAVerifiedU2fMfaShouldBe($number)
+    public function theCountOfActiveUsersWithAVerifiedWebAuthnMfaShouldBe($number)
     {
         Assert::same(
             $this->mfaCount,
@@ -307,17 +307,17 @@ class AnalyticsContext extends YiiContext
     }
 
     /**
-     * @When I get the count of active users with u2f or totp but not backupcodes
+     * @When I get the count of active users with webauthn or totp but not backupcodes
      */
-    public function iGetTheCountOfActiveUsersWithUfOrTotpButNotBackupcodes()
+    public function iGetTheCountOfActiveUsersWithWebAuthnOrTotpButNotBackupcodes()
     {
         $this->mfaOnlyTotpOrU2f = User::numberWithOneMfaNotBackupCodes();
     }
 
     /**
-     * @Then the count of active users with u2f or totp but not backupcodes should be :number
+     * @Then the count of active users with webauthn or totp but not backupcodes should be :number
      */
-    public function theCountOfActiveUsersWithUfOrTotpButNotBackupcodesShouldBe($number)
+    public function theCountOfActiveUsersWithWebAuthnOrTotpButNotBackupcodesShouldBe($number)
     {
         Assert::same(
             $this->mfaOnlyTotpOrU2f,

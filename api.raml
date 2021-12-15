@@ -135,8 +135,8 @@ types:
               }
             },
             {
-              "id": 234,
-              "type": "u2f",
+              "id": 432,
+              "type": "webauthn",
               "label": "Blue YubiKey",
               "created_utc": "2017-10-24T20:40:47Z",
               "last_used_utc": null,
@@ -222,7 +222,7 @@ types:
     properties:
       employee_id: string
       type:
-        enum: [ backupcode, totp, u2f, manager ]
+        enum: [ backupcode, totp, webauthn, manager ]
       label?: string
     example: |
       {
@@ -255,7 +255,7 @@ types:
     properties:
       id: integer
       type:
-        enum: [ backupcode, totp, u2f ]
+        enum: [ backupcode, totp, webauthn, manager ]
       label: string
       created_utc: string
       last_used_utc: string?
@@ -273,11 +273,11 @@ types:
                 "count": 10
             }
         }
-      u2f: |
+      webauthn: |
         {
             "id": 8,
-            "type": "u2f",
-            "label": "2SV #2",
+            "type": "webauthn",
+            "label": "2SV #4",
             "created_utc": "2017-10-24T20:40:57Z",
             "last_used_utc": null,
             "data": []
@@ -429,6 +429,12 @@ types:
     /mfa:
       get:
         description: Get a list of configured MFA devices for user
+        queryParameters:
+          rpOrigin?:
+            type: string
+            description: The Relying Party origin url (only needed for WebAuthn)
+            default: ""
+            example: "https://sub.domain.com"
         responses:
           200:
             body:
@@ -529,6 +535,12 @@ types:
 /mfa:
   post:
     description: Create a new mfa record.
+    queryParameters:
+      rpOrigin?:
+        type: string
+        description: The Relying Party origin url (only needed for WebAuthn)
+        default: ""
+        example: "https://sub.domain.com"
     body:
       type: MfaCreation
     responses:
@@ -543,7 +555,7 @@ types:
       409:
         description: >
           An MFA of the requested type already exists. Note that this would only
-          be returned for 'totp' or 'u2f'. The code types ('backupcode' and
+          be returned for 'totp' or 'webauthn'. The code types ('backupcode' and
           'manager') reuse the existing MFA and create new codes.
         body:
           type: Error
@@ -607,6 +619,12 @@ types:
     /verify:
       post:
         description: Verify the value provided for this MFA device.
+        queryParameters:
+          rpOrigin?:
+            type: string
+            description: The Relying Party origin url (only needed for WebAuthn)
+            default: ""
+            example: "https://sub.domain.com"
         body:
           properties:
             employee_id: string
