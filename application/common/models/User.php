@@ -887,7 +887,7 @@ class User extends UserBase
         return $mfaCount / $userCount;
     }
 
-    public static function search($params): ActiveDataProvider
+    public static function search($params): array
     {
         $query = User::find();
 
@@ -917,14 +917,20 @@ class User extends UserBase
             }
         }
 
-        /* NOTE: Return a DataProvider here (rather than an array of Models) so
-         *       that the Serializer can limit the fields returned if a 'fields'
-         *       query string parameter is present requesting only certain
-         *       fields.  */
-        return new ActiveDataProvider([
+        /* NOTE: Use a DataProvider so that the Serializer can limit the fields returned if a 'fields'
+         *       query string parameter is present requesting only certain fields.  */
+        $dataProvider = new ActiveDataProvider([
             'query' => $query,
             'pagination' => false,
         ]);
+
+        $users = [];
+        foreach ($dataProvider->getModels() as $user) {
+            $user->loadMfaData();
+            $users[] = $user;
+        }
+
+        return $users;
     }
 
     public function attributeLabels()
