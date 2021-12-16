@@ -553,7 +553,9 @@ class User extends UserBase
                 $member[] = \Yii::$app->params['idpName'];
                 return $member;
             },
-            'mfa',
+            'mfa' => function (self $model) {
+                return $model->getMfaFields();
+            },
             'method' => function (self $model) {
                 return $model->getMethodFields();
             },
@@ -603,15 +605,23 @@ class User extends UserBase
         return $this->nagState->getState();
     }
 
-    public function loadMfaData(string $rpOrigin = '')
+    /**
+     * @return array MFA related properties
+     */
+    public function getMfaFields(string $rpOrigin = ''): array
     {
         $verifiedMfaOptions = $this->getVerifiedMfaOptions($rpOrigin);
-        $this->mfa = [
+        return [
             'prompt'  => $this->isPromptForMfa() ? 'yes' : 'no',
             'add'     => $this->getNagState() == NagState::NAG_ADD_MFA ? 'yes' : 'no',
             'active'  => count($verifiedMfaOptions) > 0 ? 'yes' : 'no',
             'options' => $verifiedMfaOptions,
         ];
+    }
+
+    public function loadMfaData(string $rpOrigin = '')
+    {
+        $this->mfa = $this->getMfaFields($rpOrigin);
     }
 
     /**
