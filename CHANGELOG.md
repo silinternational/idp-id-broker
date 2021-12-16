@@ -12,7 +12,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 - Add new WebAuthn MFA backend
 ### Changed
-- Update other MFA backends to comply with updated interface
+- Breaking Change: Update other MFA backends to comply with updated interface
 - Update php to 7.4
 - Lots of adding of types to vars and doc block updates based on linter corrections
 
