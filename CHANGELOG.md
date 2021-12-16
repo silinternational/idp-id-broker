@@ -5,10 +5,12 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+
+## [6.0.1] - 2021-12-16
 ### Fixed
 - Fixed the `mfa` property in the UserResponse for GET /user
 
-## [6.0.0]
+## [6.0.0] - 2021-12-15
 ### Added
 - Add new WebAuthn MFA backend
 ### Changed
@@ -261,7 +263,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 - Initial version of ID Broker.
 
-[Unreleased]: https://github.com/silinternational/idp-id-broker/compare/6.0.0...HEAD
+[Unreleased]: https://github.com/silinternational/idp-id-broker/compare/6.0.1...HEAD
+[6.0.1]: https://github.com/silinternational/idp-id-broker/compare/6.0.0...6.0.1
 [6.0.0]: https://github.com/silinternational/idp-id-broker/compare/5.3.3...6.0.0
 [5.3.3]: https://github.com/silinternational/idp-id-broker/compare/5.3.2...5.3.3
 [5.3.2]: https://github.com/silinternational/idp-id-broker/compare/5.3.0...5.3.2
