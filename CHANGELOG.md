@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [6.0.2] - 2022-07-13
+### Fixed
+- Ensure clientExtensionResults is encoded as an object, even if empty
+
 ## [6.0.1] - 2021-12-16
 ### Fixed
 - Fixed the `mfa` property in the UserResponse for GET /user
@@ -263,7 +267,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 - Initial version of ID Broker.
 
-[Unreleased]: https://github.com/silinternational/idp-id-broker/compare/6.0.1...HEAD
+[Unreleased]: https://github.com/silinternational/idp-id-broker/compare/6.0.2...HEAD
+[6.0.2]: https://github.com/silinternational/idp-id-broker/compare/6.0.1...6.0.2
 [6.0.1]: https://github.com/silinternational/idp-id-broker/compare/6.0.0...6.0.1
 [6.0.0]: https://github.com/silinternational/idp-id-broker/compare/5.3.3...6.0.0
 [5.3.3]: https://github.com/silinternational/idp-id-broker/compare/5.3.2...5.3.3
