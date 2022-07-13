@@ -4,6 +4,7 @@ namespace frontend\controllers;
 use common\models\Mfa;
 use common\models\User;
 use frontend\components\BaseRestController;
+use stdClass;
 use yii\web\BadRequestHttpException;
 use yii\web\ConflictHttpException;
 use yii\web\ForbiddenHttpException;
@@ -88,6 +89,13 @@ class MfaController extends BaseRestController
         // Strip spaces from $value if string
         if (is_string($value)) {
             $value = preg_replace('/\D/', '', $value);
+        }
+
+        if (is_array($value)) {
+            if (isset($value['clientExtensionResults']) && empty($value['clientExtensionResults'])) {
+                // Force JSON-encoding to treat this as an empty object, not an empty array.
+                $value['clientExtensionResults'] = new stdClass();
+            }
         }
 
         // rpOrigin is needed for WebAuthn authentication
