@@ -110,4 +110,17 @@ class MfaBackendManager extends Component implements MfaBackendInterface
     {
         return MfaBackupcode::deleteCodesForMfaId($mfaId);
     }
+
+
+    /**
+     * Delete WebAuthn credential
+     * @param int $mfaId
+     * @param string $credId
+     * @param string $rpOrigin
+     * @return bool
+     */
+    public function deleteCredential(int $mfaId, string $credId, string $rpOrigin): bool
+    {
+        return true;
+    }
 }

@@ -117,4 +117,17 @@ class MfaBackendTotp extends Component implements MfaBackendInterface
 
         return true;
     }
+
+
+    /**
+     * Delete WebAuthn credential
+     * @param int $mfaId
+     * @param string $credId
+     * @param string $rpOrigin
+     * @return bool
+     */
+    public function deleteCredential(int $mfaId, string $credId, string $rpOrigin): bool
+    {
+        return true;
+    }
 }

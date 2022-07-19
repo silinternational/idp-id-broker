@@ -169,6 +169,17 @@ class MfaApiClient
     }
 
     /**
+     * @param array $additionalHeaders
+     * @return bool
+     * @throws GuzzleException
+     */
+    public function webauthnDeleteCredential(string $credId, array $additionalHeaders): bool
+    {
+        $this->callApi("webauthn/credential/$credId", 'DELETE', [], $additionalHeaders);
+        return true;
+    }
+
+    /**
      * @param string $path
      * @param string $method
      * @param array $body

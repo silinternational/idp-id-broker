@@ -95,6 +95,12 @@ services:
             EMAIL_SERVICE_assertValidIp: "false"
             EMAIL_SERVICE_baseUrl: dummy
             EMAIL_SIGNATURE: Dummy Signature for Test
+            MFA_WEBAUTHN_apiBaseUrl: https://example-api.com/
+            MFA_WEBAUTHN_apiKey: abc123
+            MFA_WEBAUTHN_apiSecret: abcd1234
+            MFA_WEBAUTHN_appId: ourApp99
+            MFA_WEBAUTHN_rpDisplayName: Our App
+            MFA_WEBAUTHN_rpId: app99
             HELP_CENTER_URL: https://www.example.com/help
             IDP_DISPLAY_NAME: Test
             IDP_NAME: test

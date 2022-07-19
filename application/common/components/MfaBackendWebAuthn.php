@@ -173,6 +173,37 @@ class MfaBackendWebAuthn extends Component implements MfaBackendInterface
         return true;
     }
 
+
+    /**
+     * Delete WebAuthn credential
+     * @param int $mfaId
+     * @param string $credId
+     * @param string $rpOrigin The Replay Party Origin URL (with scheme, without port or path)
+     * @return bool
+     * @throws NotFoundHttpException
+     * @throws GuzzleException
+     */
+    public function deleteCredential(int $mfaId, string $credId, string $rpOrigin): bool
+    {
+        $mfa = Mfa::findOne(['id' => $mfaId]);
+        if ($mfa == null) {
+            throw new NotFoundHttpException("MFA record for given ID not found");
+        }
+
+        $headers = $this->getWebAuthnHeaders(
+            $mfa->user->username,
+            $mfa->user->getDisplayName(),
+            $rpOrigin,
+            $mfa->external_uuid
+        );
+
+        if (!empty($mfa->external_uuid)) {
+            return $this->client->webauthnDeleteCredential($credId, $headers);
+        }
+
+        return true;
+    }
+
     /**
      * The WebAuthn API requires a bunch of headers, this method returns the parameters as an array of
      * headers to be included with API calls.

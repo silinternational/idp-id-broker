@@ -3,6 +3,7 @@ namespace frontend\controllers;
 
 use common\models\Mfa;
 use common\models\User;
+use common\components\MfaBackendWebAuthn;
 use frontend\components\BaseRestController;
 use stdClass;
 use yii\web\BadRequestHttpException;
@@ -209,6 +210,41 @@ class MfaController extends BaseRestController
             ]);
             throw new ServerErrorHttpException("Unable to delete MFA option", 1508877279);
         }
+
+        \Yii::$app->response->statusCode = 204;
+        return null;
+    }
+
+    /**
+     * Delete one u2f/webauthn credential from an MFA record
+     * @param int $mfaId
+     * @param string $credId
+     * @return null
+     * @throws \Throwable
+     * @throws BadRequestHttpException
+     * @throws NotFoundHttpException
+     * @throws ServerErrorHttpException
+     */
+    public function actionDeleteCredential(int $mfaId, string $credId)
+    {
+        $mfa = $this->getRequestedMfa($mfaId);
+
+        if ($mfa->type != Mfa::TYPE_WEBAUTHN) {
+            throw new ForbiddenHttpException("May not delete a credential on a $mfa->type mfa type", 1658237110);
+        }
+
+        $backend = Mfa::getBackendForType($mfa->type);
+        $backend->deleteCredential($mfaId, $credId);
+
+//        if ($mfa->delete() === false) {
+//            \Yii::error([
+//                'action' => 'delete mfa',
+//                'status' => 'error',
+//                'error' => $mfa->getFirstErrors(),
+//                'mfa_id' => $mfa->id,
+//            ]);
+//            throw new ServerErrorHttpException("Unable to delete MFA option", 1508877279);
+//        }
 
         \Yii::$app->response->statusCode = 204;
         return null;

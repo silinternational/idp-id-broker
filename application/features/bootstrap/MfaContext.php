@@ -139,6 +139,22 @@ class MfaContext extends \FeatureContext
         $this->iRequestTheResourceBe('/mfa/' . $this->mfa->id, 'deleted');
     }
 
+
+    /**
+     * @When I request to delete a credential of the MFA with a credential_id of :credId
+     */
+    public function iRequestToDeleteACredentialOfTheMfaWithACredentialIDOf($credId)
+    {
+        $dataForTableNode = [
+            ['property', 'value'],
+            ['employee_id', '123'],
+        ];
+
+        $this->iProvideTheFollowingValidData(new TableNode($dataForTableNode));
+        $this->iRequestTheResourceBe('/mfa/' . $this->mfa->id . '/credential/' . $credId,
+            'deleted');
+    }
+
     /**
      * @Then the MFA record is not stored
      */
