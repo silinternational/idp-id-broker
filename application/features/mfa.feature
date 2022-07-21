@@ -123,6 +123,11 @@ Feature: MFA
   Scenario: Delete the credential of a webauthn MFA option
     Given the user has a verified "webauthn" MFA
     When I request to delete a credential of the MFA with a credential_id of "123"
-    Then the response status code should be 400
-    And 10 codes should be stored
+    Then the response status code should be 204
+
+  Scenario: Exception to delete the credential of a backupcode MFA option
+    Given the user has a verified "backupcode" MFA
+    When I request to delete a credential of the MFA with a credential_id of "123"
+    Then the response status code should be 403
+      And 10 codes should be stored
 

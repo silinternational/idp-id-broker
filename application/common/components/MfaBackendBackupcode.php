@@ -5,6 +5,7 @@ use common\helpers\MySqlDateTime;
 use common\models\Mfa;
 use common\models\MfaBackupcode;
 use yii\base\Component;
+use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
 use yii\web\ServerErrorHttpException;
 
@@ -83,14 +84,15 @@ class MfaBackendBackupcode extends Component implements MfaBackendInterface
 
 
     /**
-     * Delete WebAuthn credential
+     * Delete credential (only for webauthn)
      * @param int $mfaId
      * @param string $credId
      * @param string $rpOrigin
      * @return bool
      */
-    public function deleteCredential(int $mfaId, string $credId, string $rpOrigin): bool
+    public function deleteCredential(int $mfaId, string $credId): bool
     {
-       return true;
+       throw new ForbiddenHttpException("May not delete a credential on a backup code mfa type", 1658237120);
+       return false;
     }
 }

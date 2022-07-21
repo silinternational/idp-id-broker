@@ -14,37 +14,37 @@ class MfaBackendWebAuthn extends Component implements MfaBackendInterface
     /**
      * @var string
      */
-    public string $apiBaseUrl;
+    public string $apiBaseUrl="example.com/";
 
     /**
      * @var string
      */
-    public string $apiKey;
+    public string $apiKey="";
 
     /**
      * @var string
      */
-    public string $apiSecret;
+    public string $apiSecret="";
 
     /**
      * @var MfaApiClient
      */
-    public MfaApiClient $client;
+    public ?MfaApiClient $client=null;
 
     /**
      * @var string
      */
-    public string $appId;
+    public string $appId="";
 
     /**
      * @var string
      */
-    public string $rpDisplayName;
+    public string $rpDisplayName="";
 
     /**
      * @var string
      */
-    public string $rpId;
+    public string $rpId="";
 
     public function init()
     {
@@ -183,7 +183,7 @@ class MfaBackendWebAuthn extends Component implements MfaBackendInterface
      * @throws NotFoundHttpException
      * @throws GuzzleException
      */
-    public function deleteCredential(int $mfaId, string $credId, string $rpOrigin): bool
+    public function deleteCredential(int $mfaId, string $credId): bool
     {
         $mfa = Mfa::findOne(['id' => $mfaId]);
         if ($mfa == null) {
@@ -193,7 +193,7 @@ class MfaBackendWebAuthn extends Component implements MfaBackendInterface
         $headers = $this->getWebAuthnHeaders(
             $mfa->user->username,
             $mfa->user->getDisplayName(),
-            $rpOrigin,
+            '',
             $mfa->external_uuid
         );
 

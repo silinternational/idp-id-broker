@@ -45,6 +45,6 @@ interface MfaBackendInterface
      * @param string $rpOrigin
      * @return bool
      */
-    public function deleteCredential(int $mfaId, string $credId, string $rpOrigin): bool;
+    public function deleteCredential(int $mfaId, string $credId): bool;
 
 }
