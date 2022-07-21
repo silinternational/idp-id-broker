@@ -6,6 +6,7 @@ use common\models\User;
 use GuzzleHttp\Exception\GuzzleException;
 use yii\base\Component;
 use yii\helpers\Json;
+use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
 use yii\web\ServerErrorHttpException;
 
@@ -145,46 +146,21 @@ class MfaBackendWebAuthn extends Component implements MfaBackendInterface
         }
     }
 
-    /**
-     * Delete WebAuthn configuration
-     * @param int $mfaId
-     * @return bool
-     * @throws NotFoundHttpException
-     * @throws GuzzleException
-     */
-    public function delete(int $mfaId): bool
-    {
-        $mfa = Mfa::findOne(['id' => $mfaId]);
-        if ($mfa == null) {
-            throw new NotFoundHttpException("MFA record for given ID not found");
-        }
-
-        $headers = $this->getWebAuthnHeaders(
-            $mfa->user->username,
-            $mfa->user->getDisplayName(),
-            '',
-            $mfa->external_uuid
-        );
-
-        if (!empty($mfa->external_uuid)) {
-            return $this->client->webauthnDelete($headers);
-        }
-
-        return true;
-    }
-
 
     /**
      * Delete WebAuthn credential
      * @param int $mfaId
      * @param string $credId
-     * @param string $rpOrigin The Replay Party Origin URL (with scheme, without port or path)
      * @return bool
      * @throws NotFoundHttpException
      * @throws GuzzleException
      */
-    public function deleteCredential(int $mfaId, string $credId): bool
+    public function delete(int $mfaId, string $credId=''): bool
     {
+        if ($credId == '') {
+            throw new ForbiddenHttpException("May not delete a credential without an ID", 1658237150);
+        }
+
         $mfa = Mfa::findOne(['id' => $mfaId]);
         if ($mfa == null) {
             throw new NotFoundHttpException("MFA record for given ID not found");

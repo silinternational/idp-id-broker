@@ -616,6 +616,6 @@ class Mfa extends MfaBase
     public function deleteCredential(string $credId)
     {
         $backend = Mfa::getBackendForType($this->type);
-        return $backend->deleteCredential($this->id, $credId);
+        return $backend->delete($this->id, $credId);
     }
 }

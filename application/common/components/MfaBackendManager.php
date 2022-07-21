@@ -104,25 +104,15 @@ class MfaBackendManager extends Component implements MfaBackendInterface
     /**
      * Delete MFA backend configuration
      * @param int $mfaId
+     * @param string $credId Credential ID (only used for WebAuthn)
      * @return bool
      * @throws ServerErrorHttpException
      */
-    public function delete(int $mfaId): bool
+    public function delete(int $mfaId, string $credId=''): bool
     {
+        if ($credId != '') {
+            throw new ForbiddenHttpException("May not delete a credential on a manager mfa type", 1658237110);
+        }
         return MfaBackupcode::deleteCodesForMfaId($mfaId);
-    }
-
-
-    /**
-     * Delete credential (only for webauthn)
-     * @param int $mfaId
-     * @param string $credId
-     * @param string $rpOrigin
-     * @return bool
-     */
-    public function deleteCredential(int $mfaId, string $credId): bool
-    {
-        throw new ForbiddenHttpException("May not delete a credential on a manager mfa type", 1658237110);
-        return false;
     }
 }

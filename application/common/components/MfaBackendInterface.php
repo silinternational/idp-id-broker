@@ -32,19 +32,9 @@ interface MfaBackendInterface
     /**
      * Delete MFA backend configuration
      * @param int $mfaId
+     * @param string $credId Credential ID (only used for WebAuthn)
      * @return bool
      */
-    public function delete(int $mfaId): bool;
-
-
-
-    /**
-     * Delete WebAuthn credential
-     * @param int $mfaId
-     * @param string $credId
-     * @param string $rpOrigin
-     * @return bool
-     */
-    public function deleteCredential(int $mfaId, string $credId): bool;
+    public function delete(int $mfaId, string $credId=''): bool;
 
 }
