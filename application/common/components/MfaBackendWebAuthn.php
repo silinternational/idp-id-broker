@@ -107,7 +107,7 @@ class MfaBackendWebAuthn extends Component implements MfaBackendInterface
      * @throws ServerErrorHttpException
      * @throws NotFoundHttpException
      */
-    public function verify(int $mfaId, $value, string $rpOrigin = '')
+    public function verify(int $mfaId, string $value, string $rpOrigin = '')
     {
         $mfa = Mfa::findOne(['id' => $mfaId]);
         if ($mfa == null) {
@@ -157,13 +157,13 @@ class MfaBackendWebAuthn extends Component implements MfaBackendInterface
      */
     public function delete(int $mfaId, string $credId=''): bool
     {
-        if ($credId == '') {
-            throw new ForbiddenHttpException("May not delete a credential without an ID", 1658237150);
-        }
-
         $mfa = Mfa::findOne(['id' => $mfaId]);
         if ($mfa == null) {
             throw new NotFoundHttpException("MFA record for given ID not found");
+        }
+
+        if (empty($mfa->external_uuid)) {
+            throw new ForbiddenHttpException("May not delete a webauthn backend without an external_uuid", 1658237150);;
         }
 
         $headers = $this->getWebAuthnHeaders(
@@ -173,11 +173,11 @@ class MfaBackendWebAuthn extends Component implements MfaBackendInterface
             $mfa->external_uuid
         );
 
-        if (!empty($mfa->external_uuid)) {
-            return $this->client->webauthnDeleteCredential($credId, $headers);
+        if ($credId == '') {
+            return $this->client->webauthnDelete($headers);
         }
 
-        return true;
+        return $this->client->webauthnDeleteCredential($credId, $headers);
     }
 
     /**
