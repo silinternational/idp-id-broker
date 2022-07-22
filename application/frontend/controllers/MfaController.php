@@ -233,8 +233,7 @@ class MfaController extends BaseRestController
             throw new ForbiddenHttpException("May not delete a credential on a $mfa->type mfa type", 1658237110);
         }
 
-
-        if ($mfa->deleteCredential($credId) === false) {
+        if ($mfa->deleteBackendCredential($credId) === false) {
             \Yii::error([
                 'action' => 'delete mfa credential',
                 'status' => 'error',
