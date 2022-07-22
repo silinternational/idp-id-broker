@@ -109,7 +109,10 @@ class MfaBackendTotp extends Component implements MfaBackendInterface
     public function delete(int $mfaId, string $credId=''): bool
     {
         if ($credId != '') {
-            throw new ForbiddenHttpException("May not delete a credential on a totp mfa type", 1658237110);
+            throw new ForbiddenHttpException(
+                sprintf("May not delete a credential on a %s mfa type", Mfa::TYPE_TOTP),
+                1658237130
+            );
         }
 
         $mfa = Mfa::findOne(['id' => $mfaId]);
@@ -124,18 +127,4 @@ class MfaBackendTotp extends Component implements MfaBackendInterface
         return true;
     }
 
-
-    /**
-     * Delete credential (only for webauthn)
-     * @param int $mfaId
-     * @param string $credId
-     * @param string $rpOrigin
-     * @return bool
-     */
-    public function deleteCredential(int $mfaId, string $credId): bool
-    {
-
-        throw new ForbiddenHttpException("May not delete a credential on a totp mfa type", 1658237130);
-        return false;
-    }
 }

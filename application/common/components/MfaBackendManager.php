@@ -111,7 +111,10 @@ class MfaBackendManager extends Component implements MfaBackendInterface
     public function delete(int $mfaId, string $credId=''): bool
     {
         if ($credId != '') {
-            throw new ForbiddenHttpException("May not delete a credential on a manager mfa type", 1658237110);
+            throw new ForbiddenHttpException(
+                sprintf("May not delete a credential on a %s mfa type", Mfa::TYPE_MANAGER),
+                1658237120
+            );
         }
         return MfaBackupcode::deleteCodesForMfaId($mfaId);
     }

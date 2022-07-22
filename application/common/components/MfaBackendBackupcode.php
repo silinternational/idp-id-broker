@@ -81,7 +81,10 @@ class MfaBackendBackupcode extends Component implements MfaBackendInterface
     public function delete(int $mfaId, string $credId=''): bool
     {
         if ($credId != '') {
-            throw new ForbiddenHttpException("May not delete a credential on a backup code mfa type", 1658237110);
+            throw new ForbiddenHttpException(
+                sprintf("May not delete a credential on a %s mfa type", Mfa::TYPE_BACKUPCODE),
+                1658237110
+            );
         }
         return MfaBackupcode::deleteCodesForMfaId($mfaId);
     }
