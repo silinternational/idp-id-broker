@@ -32,6 +32,9 @@ class MfaContext extends \FeatureContext
             'type' => $mfaType,
             'verified' => 1,
         ]);
+        if ($mfaType == mfa::TYPE_WEBAUTHN) {
+            $this->mfa->external_uuid = '097791bf-2385-4ab4-8b06-14561a338d8e';
+        }
         Assert::true($this->mfa->save(), 'Failed to add that MFA record to the database.');
         
         if ($mfaType === 'backupcode') {
