@@ -120,10 +120,12 @@ Feature: MFA
       And 0 codes should be stored
       And the MFA record is not stored
 
+    # TODO build a way to mock the external api
   Scenario: Delete the credential of a webauthn MFA option
     Given the user has a verified "webauthn" MFA
     When I request to delete a credential of the MFA with a credential_id of "123"
-    Then the response status code should be 204
+    # At least check that we got through to the external API call
+    Then the property message should contain "Client error: `DELETE example.com/webauthn/credential/123` resulted"
 
   Scenario: Exception to delete the credential of a backupcode MFA option
     Given the user has a verified "backupcode" MFA
