@@ -3,7 +3,7 @@ start: app
 app: db deps
 	docker-compose up -d app phpmyadmin
 
-appfortests: db deps
+appfortests: appfortestsdb depsfortests
 	docker-compose up -d appfortests
 
 bash:
@@ -11,6 +11,9 @@ bash:
 
 deps:
 	docker-compose run --rm cli composer install
+
+depsfortests:
+	docker-compose run --rm appfortests composer install
 
 depsshow:
 	docker-compose run --rm cli bash -c "composer show -Df json > versions.json"
@@ -22,8 +25,14 @@ depsupdate:
 db:
 	docker-compose up -d db
 
+appfortestsdb:
+	docker-compose up -d appfortestsdb
+
 tables: db
 	docker-compose run --rm cli whenavail db 3306 100 ./yii migrate --interactive=0
+
+tablesfortests: appfortestsdb
+	docker-compose run --rm appfortests whenavail appfortestsdb 3306 100 ./yii migrate --interactive=0
 
 basemodels: db tables
 	docker-compose run --rm cli whenavail db 3306 100 ./rebuildbasemodels.sh
@@ -34,7 +43,7 @@ quicktest:
 test: appfortests
 	docker-compose run --rm test
 
-testcli: appfortests tables
+testcli: appfortests tablesfortests
 	docker-compose run --rm test bash
 
 clean:
