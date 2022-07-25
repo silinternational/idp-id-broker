@@ -3,7 +3,7 @@ start: app
 app: db deps
 	docker-compose up -d app phpmyadmin
 
-appfortests: appfortestsdb depsfortests
+appfortests: testdb depsfortests
 	docker-compose up -d appfortests
 
 bash:
@@ -25,14 +25,14 @@ depsupdate:
 db:
 	docker-compose up -d db
 
-appfortestsdb:
-	docker-compose up -d appfortestsdb
+testdb:
+	docker-compose up -d testdb
 
 tables: db
 	docker-compose run --rm cli whenavail db 3306 100 ./yii migrate --interactive=0
 
-tablesfortests: appfortestsdb
-	docker-compose run --rm appfortests whenavail appfortestsdb 3306 100 ./yii migrate --interactive=0
+tablesfortests: testdb
+	docker-compose run --rm appfortests whenavail testdb 3306 100 ./yii migrate --interactive=0
 
 basemodels: db tables
 	docker-compose run --rm cli whenavail db 3306 100 ./rebuildbasemodels.sh

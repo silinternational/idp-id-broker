@@ -38,7 +38,7 @@ services:
         ports:
             - "80"
         depends_on:
-            - appfortestsdb
+            - testdb
         environment:
             API_ACCESS_KEYS: api-test-NOTASECRET
             APP_ENV: test
@@ -49,13 +49,13 @@ services:
             EMAILER_CLASS: \Sil\SilIdBroker\Behat\Context\fakes\FakeEmailer
             IDP_NAME: test
             MYSQL_ROOT_PASSWORD: r00tp@ss!
-            MYSQL_HOST: appfortestsdb
+            MYSQL_HOST: testdb
             MYSQL_DATABASE: appfortests
             MYSQL_USER: appfortests
             MYSQL_PASSWORD: appfortests
             SUPPORT_EMAIL: support@example.com
 
-    appfortestsdb:
+    testdb:
         image: silintl/mariadb:latest
         ports:
             - "3306"
