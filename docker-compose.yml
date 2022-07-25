@@ -53,6 +53,12 @@ services:
             MYSQL_DATABASE: appfortests
             MYSQL_USER: appfortests
             MYSQL_PASSWORD: appfortests
+            MFA_WEBAUTHN_apiBaseUrl: external_api:8080/
+            MFA_WEBAUTHN_apiKey: EC7C2E16-5028-432F-8AF2-A79A64CF3BC1
+            MFA_WEBAUTHN_apiSecret: 1ED18444-7238-410B-A536-D6C15A3C
+            MFA_WEBAUTHN_appId: ourApp99
+            MFA_WEBAUTHN_rpDisplayName: Our App
+            MFA_WEBAUTHN_rpId: app99
             SUPPORT_EMAIL: support@example.com
 
     testdb:
@@ -78,6 +84,33 @@ services:
             - ./local.env
         command: ["true"]
 
+    dynamo:
+        image: amazon/dynamodb-local
+        ports:
+            - "8000:8000"
+        environment:
+            AWS_ACCESS_KEY_ID: abc123
+            AWS_SECRET_ACCESS_KEY: abc123
+            AWS_DEFAULT_REGION: us-east-1
+        command: "-jar DynamoDBLocal.jar -sharedDb"
+
+    external_api:
+        build: ./serverless-mfa-api
+        ports:
+            - 8080
+        environment:
+            AWS_ENDPOINT: dynamo:8000
+            AWS_DEFAULT_REGION: us-east-1
+            AWS_ACCESS_KEY_ID: abc123
+            AWS_SECRET_ACCESS_KEY: abc123
+            AWS_DISABLE_SSL: "true"
+            API_KEY_TABLE: ApiKey
+            WEBAUTHN_TABLE: WebAuthn
+        depends_on:
+            - dynamo
+        working_dir: /src
+        command: "go run ./server/"
+
     test:
         image: silintl/php7:7.4
         volumes_from:
@@ -86,6 +119,7 @@ services:
         working_dir: /data
         depends_on:
             - appfortests
+            - external_api
         environment:
             TEST_SERVER_HOSTNAME: appfortests
             API_ACCESS_KEYS: api-test-NOTASECRET
@@ -95,7 +129,7 @@ services:
             EMAIL_SERVICE_assertValidIp: "false"
             EMAIL_SERVICE_baseUrl: dummy
             EMAIL_SIGNATURE: Dummy Signature for Test
-            MFA_WEBAUTHN_apiBaseUrl: https://example-api.com/
+            MFA_WEBAUTHN_apiBaseUrl: external_api:8080
             MFA_WEBAUTHN_apiKey: abc123
             MFA_WEBAUTHN_apiSecret: abcd1234
             MFA_WEBAUTHN_appId: ourApp99
@@ -105,7 +139,7 @@ services:
             IDP_DISPLAY_NAME: Test
             IDP_NAME: test
             MYSQL_DATABASE: appfortests
-            MYSQL_HOST: appfortestsdb
+            MYSQL_HOST: testdb
             MYSQL_PASSWORD: appfortests
             MYSQL_USER: appfortests
             PASSWORD_PROFILE_URL: https://www.example.com
