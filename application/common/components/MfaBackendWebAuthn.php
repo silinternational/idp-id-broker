@@ -49,6 +49,9 @@ class MfaBackendWebAuthn extends Component implements MfaBackendInterface
 
     public function init()
     {
+        if ($this->apiBaseUrl == "") {
+            throw new \InvalidArgumentException("MFABackendWebAuthn class must not have a blank apiBaseUrl.");
+        }
         $this->client = new MfaApiClient($this->apiBaseUrl, $this->apiKey, $this->apiSecret);
         parent::init();
     }

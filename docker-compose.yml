@@ -98,6 +98,8 @@ services:
         build: ./serverless-mfa-api
         ports:
             - 8080
+        volumes:
+            - ./serverless-mfa-api/override:/src/override
         environment:
             AWS_ENDPOINT: dynamo:8000
             AWS_DEFAULT_REGION: us-east-1
@@ -109,7 +111,9 @@ services:
         depends_on:
             - dynamo
         working_dir: /src
-        command: "go run ./server/"
+        # Copy files from the override folder to be used for possible troubleshooting (e.g. with extra log statements)
+        # (using bash -c to keep the chown command from ignoring the && and throwing an error)
+        command: bash -c "chown -R 1000:1000 ./ && cp -R ./override/* ./ && go run ./server/"
 
     test:
         image: silintl/php7:7.4

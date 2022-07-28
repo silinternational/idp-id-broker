@@ -19,3 +19,6 @@ vendor/
 api.html
 
 dockercfg
+
+serverless-mfa-api/override/*
+serverless-mfa-api/override/server/*

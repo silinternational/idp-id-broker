@@ -120,12 +120,16 @@ Feature: MFA
       And 0 codes should be stored
       And the MFA record is not stored
 
-    # TODO build a way to mock the external api
-  Scenario: Delete the credential of a webauthn MFA option
+  Scenario: Exception to delete the missing credential of a webauthn MFA option
     Given the user has a verified "webauthn" MFA
-    When I request to delete a credential of the MFA with a credential_id of "123"
-    # At least check that we got through to the external API call
-    Then the property message should contain "Client error: `DELETE example.com/webauthn/credential/123` resulted"
+    When I request to delete a credential of the MFA with a credential_id of "missing_credential"
+    Then the response status code should be 500
+      And the response body should contain "No webauthn credentials available"
+
+  Scenario: Delete the legacy u2f credential of a webauthn MFA option
+    Given the user has a verified "webauthn" MFA
+    When I request to delete a credential of the MFA with a credential_id of "u2f"
+    Then the response status code should be 204
 
   Scenario: Exception to delete the credential of a backupcode MFA option
     Given the user has a verified "backupcode" MFA
