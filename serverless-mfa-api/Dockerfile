@@ -12,15 +12,10 @@ ENV BRANCH=develop
 RUN curl -sSfL https://raw.githubusercontent.com/cosmtrek/air/master/install.sh | sh -s -- -b $(go env GOPATH)/bin
 
 RUN curl -sSfL https://raw.githubusercontent.com/silinternational/serverless-mfa-api-go/$BRANCH/apikey.go -o ./apikey.go \
- && curl -sSfL https://raw.githubusercontent.com/silinternational/serverless-mfa-api-go/$BRANCH/apikey_test.go -o ./apikey_test.go \
  && curl -sSfL https://raw.githubusercontent.com/silinternational/serverless-mfa-api-go/$BRANCH/config.go -o ./config.go \
- && curl -sSfL https://raw.githubusercontent.com/silinternational/serverless-mfa-api-go/$BRANCH/fixtures_test.go -o ./fixtures_test.go \
  && curl -sSfL https://raw.githubusercontent.com/silinternational/serverless-mfa-api-go/$BRANCH/storage.go -o ./storage.go \
- && curl -sSfL https://raw.githubusercontent.com/silinternational/serverless-mfa-api-go/$BRANCH/suit_test.go -o ./suit_test.go \
- && curl -sSfL https://raw.githubusercontent.com/silinternational/serverless-mfa-api-go/$BRANCH/testutils.go -o ./testutils.go \
  && curl -sSfL https://raw.githubusercontent.com/silinternational/serverless-mfa-api-go/$BRANCH/user.go -o ./user.go \
  && curl -sSfL https://raw.githubusercontent.com/silinternational/serverless-mfa-api-go/$BRANCH/webauthn.go -o ./webauthn.go \
- && curl -sSfL https://raw.githubusercontent.com/silinternational/serverless-mfa-api-go/$BRANCH/webauthn_test.go -o ./webauthn_test.go \
  && curl -sSfL https://raw.githubusercontent.com/silinternational/serverless-mfa-api-go/$BRANCH/go.mod -o ./go.mod
 
 RUN curl -sSfL https://raw.githubusercontent.com/silinternational/serverless-mfa-api-go/$BRANCH/server/main.go \
