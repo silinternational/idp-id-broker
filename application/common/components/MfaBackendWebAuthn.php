@@ -184,7 +184,7 @@ class MfaBackendWebAuthn extends Component implements MfaBackendInterface
     }
 
     // Deletes a webauthn entry both in the api backend and in the local database.
-    // If no webauthn entries are left, it attemps to delete the parent mfa object
+    // If no webauthn entries are left, it attempts to delete the parent mfa object
     //   both in the api backend and in the local database.
     private function deleteWebAuthn(Mfa $mfa, string $credId, array $headers): bool
     {
