@@ -2,6 +2,7 @@
 namespace common\components;
 
 use common\models\Mfa;
+use common\models\MfaWebauthn;
 use common\models\User;
 use GuzzleHttp\Exception\GuzzleException;
 use yii\base\Component;
@@ -179,9 +180,71 @@ class MfaBackendWebAuthn extends Component implements MfaBackendInterface
         if ($credId == '') {
             return $this->client->webauthnDelete($headers);
         }
-
-        return $this->client->webauthnDeleteCredential($credId, $headers);
+        return self::deleteWebAuthn($mfa, $credId, $headers);
     }
+
+    // Deletes a webauthn entry both in the api backend and in the local database.
+    // If no webauthn entries are left, it attemps to delete the parent mfa object
+    //   both in the api backend and in the local database.
+    private function deleteWebAuthn(Mfa $mfa, string $credId, array $headers): bool
+    {
+        $existing = MfaWebauthn::findAll(['mfa_id' => $mfa->id, 'key_handle_hash' => $credId]);
+        if (!$existing) {
+            throw new NotFoundHttpException("MfaWebauthn not found with id: $mfa->id and key_handle_hash: $credId");
+        }
+
+        $existingCount = count($existing);
+
+        $didDelete = false;
+
+        // Normally, there should just be one entry. Just to be safe, this assumes
+        // there could be more than one.  It deletes the matching backend entry of the
+        // first one as well as deleting all the local entries.
+        foreach ($existing as $entry) {
+            // Attempt to delete the matching backend entry for this webauthn key
+            // but only once
+            if (!$didDelete) {
+                $didDelete = $this->client->webauthnDelete($headers);
+                if (!$didDelete) {
+                    throw new ServerErrorHttpException(
+                        sprintf("Unable to delete existing backend webauthn key. [id=%s]", $entry->id),
+                        1658237200
+                    );
+                }
+            }
+
+            // Now delete this local webauthn entry
+            if ($entry->delete() === false) {
+                \Yii::error([
+                    'action' => 'mfa-delete-webauthn-for-mfa-id',
+                    'mfa-type' => Mfa::TYPE_WEBAUTHN,
+                    'status' => 'error',
+                    'error' => $entry->getFirstErrors(),
+                ]);
+                throw new ServerErrorHttpException(
+                    sprintf("Unable to delete existing webauthn mfa. [id=%s]", $mfa->id),
+                    1658237300
+                );
+            }
+            $existingCount --;
+        }
+
+        // If there are no more webauthn entries for this mfa, try to delete the backend webauthn container object
+        if ($existingCount < 1) {
+            $mfaBackEnd = mfa::getBackendForType($mfa->type);
+            $didDelete = $mfaBackEnd->delete($mfa->id);
+
+            if ($didDelete) {
+                $mfa->delete();
+            } else {
+                Yii::warning("unable to delete external mfa api webauthn entry with id: $mfa->external_uuid");
+            }
+
+        }
+
+        return true;
+    }
+
 
     /**
      * The WebAuthn API requires a bunch of headers, this method returns the parameters as an array of
