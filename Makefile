@@ -46,7 +46,7 @@ test: appfortests dynamoinit
 testcli: appfortests tablesfortests externalapi
 	docker-compose run --rm test bash
 
-externalapi: dynamoinit
+externalapi:
 	docker-compose up -d external_api
 
 clean:

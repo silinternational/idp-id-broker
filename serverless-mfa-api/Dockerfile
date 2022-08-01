@@ -4,7 +4,13 @@ RUN curl -o- -L https://slss.io/install | VERSION=3.7.5 bash && \
   mv $HOME/.serverless/bin/serverless /usr/local/bin && \
   ln -s /usr/local/bin/serverless /usr/local/bin/sls
 
+
+WORKDIR /initDynamo
+COPY ./initDynamo /initDynamo/
+RUN go get ./... && go mod tidy && go build ./...
+
 WORKDIR /src
+
 RUN mkdir override
 RUN mkdir server
 ENV BRANCH=develop
@@ -30,7 +36,6 @@ ENV AWS_DEFAULT_REGION=us-east-1
 ENV AWS_ACCESS_KEY_ID=abc123
 ENV AWS_SECRET_ACCESS_KEY=abc123
 ENV AWS_DISABLE_SSL="true"
-
 RUN go get ./...  && go mod tidy && go build ./...
 
 EXPOSE 8080
