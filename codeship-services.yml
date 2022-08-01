@@ -70,4 +70,5 @@ externalapi:
     depends_on:
         - dynamo
     working_dir: /src
+    # Create dynamodb tables and data before running the backend mfa api
     command: bash -c "cd /initDynamo && go run main.go && cd - && echo starting server && go run ./server/"

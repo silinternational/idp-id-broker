@@ -169,6 +169,8 @@ class MfaApiClient
     }
 
     /**
+     * Delete one of a user's u2f/webauthn credentials
+     * @param string $credId Credential ID
      * @param array $additionalHeaders
      * @return bool
      * @throws GuzzleException

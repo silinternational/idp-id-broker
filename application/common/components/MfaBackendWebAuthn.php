@@ -20,12 +20,12 @@ class MfaBackendWebAuthn extends Component implements MfaBackendInterface
     /**
      * @var string
      */
-    public string $apiKey="";
+    public string $apiKey;
 
     /**
      * @var string
      */
-    public string $apiSecret="";
+    public string $apiSecret;
 
     /**
      * @var MfaApiClient
@@ -35,17 +35,17 @@ class MfaBackendWebAuthn extends Component implements MfaBackendInterface
     /**
      * @var string
      */
-    public string $appId="";
+    public string $appId;
 
     /**
      * @var string
      */
-    public string $rpDisplayName="";
+    public string $rpDisplayName;
 
     /**
      * @var string
      */
-    public string $rpId="";
+    public string $rpId;
 
     public function init()
     {
