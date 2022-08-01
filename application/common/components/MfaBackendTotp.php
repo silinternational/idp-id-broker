@@ -106,7 +106,7 @@ class MfaBackendTotp extends Component implements MfaBackendInterface
      * @return bool
      * @throws NotFoundHttpException
      */
-    public function delete(int $mfaId, string $credId=''): bool
+    public function delete(int $mfaId, string $credId = ''): bool
     {
         if ($credId != '') {
             throw new ForbiddenHttpException(
