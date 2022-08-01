@@ -5,8 +5,10 @@ use Behat\Gherkin\Node\TableNode;
 use common\models\EmailLog;
 use common\models\Mfa;
 use common\models\MfaBackupcode;
+use common\models\MfaWebauthn;
 use common\models\User;
 use Webmozart\Assert\Assert;
+use yii\base\BaseObject;
 
 class MfaContext extends \FeatureContext
 {
@@ -25,6 +27,8 @@ class MfaContext extends \FeatureContext
      */
     public function iGiveThatUserAVerifiedMfa($mfaType)
     {
+        Assert::notEq($mfaType, mfa::TYPE_WEBAUTHN, "should have called iGiveThatUserAVerifiedWebauthnMfa");
+
         $user = User::findOne(['employee_id' => $this->tempEmployeeId]);
         Assert::notEmpty($user, 'Unable to find that user.');
         $this->mfa = new Mfa([
@@ -32,9 +36,7 @@ class MfaContext extends \FeatureContext
             'type' => $mfaType,
             'verified' => 1,
         ]);
-        if ($mfaType == mfa::TYPE_WEBAUTHN) {
-            $this->mfa->external_uuid = '097791bf-2385-4ab4-8b06-14561a338d8e';
-        }
+
         Assert::true($this->mfa->save(), 'Failed to add that MFA record to the database.');
         
         if ($mfaType === 'backupcode') {
@@ -42,6 +44,25 @@ class MfaContext extends \FeatureContext
         } elseif ($mfaType === 'manager') {
             $this->backupCodes = MfaBackupcode::createBackupCodes($this->mfa->id, 1);
         }
+    }
+
+    /**
+     * @Given the user has a verified webauthn MFA with a key_handle_hash of :keyHandleHash
+     */
+    public function iGiveThatUserAVerifiedWebauthnMfaWithAKeyHandleHashOf($keyHandleHash)
+    {
+        $user = User::findOne(['employee_id' => $this->tempEmployeeId]);
+        Assert::notEmpty($user, 'Unable to find that user.');
+        $this->mfa = new Mfa([
+            'user_id' => $user->id,
+            'type' => mfa::TYPE_WEBAUTHN,
+            'verified' => 1,
+            'external_uuid' => '097791bf-2385-4ab4-8b06-14561a338d8e',
+        ]);
+
+        Assert::true($this->mfa->save(), 'Failed to add that MFA record to the database.');
+
+        MfaWebauthn::createWebauthn($this->mfa->id, $keyHandleHash);
     }
 
     /**

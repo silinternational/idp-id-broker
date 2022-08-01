@@ -61,7 +61,6 @@ Feature: MFA
     Then the response status code should be 400
 
   Scenario: Create new MFA record of type webauthn
-#TODO - create a test double for the webauthn client
 
   Scenario: Create new MFA record of type totp
 #TODO - create a test double for the totp client
@@ -121,15 +120,15 @@ Feature: MFA
       And the MFA record is not stored
 
   Scenario: Exception to delete the missing credential of a webauthn MFA option
-    Given the user has a verified "webauthn" MFA
+    Given the user has a verified webauthn MFA with a key_handle_hash of "u2f"
     When I request to delete a credential of the MFA with a credential_id of "missing_credential"
-    Then the response status code should be 500
-      And the response body should contain "No webauthn credentials available"
+    Then the response status code should be 404
 
   Scenario: Delete the legacy u2f credential of a webauthn MFA option
-    Given the user has a verified "webauthn" MFA
+    Given the user has a verified webauthn MFA with a key_handle_hash of "u2f"
     When I request to delete a credential of the MFA with a credential_id of "u2f"
     Then the response status code should be 204
+      And the MFA record is not stored
 
   Scenario: Exception to delete the credential of a backupcode MFA option
     Given the user has a verified "backupcode" MFA
