@@ -46,7 +46,9 @@ class MfaWebauthn extends MfaWebauthnBase
             // Attempt to delete the matching backend entry for this webauthn key
             // but only once
             if (!$didDelete) {
-                $didDelete = $mfa->deleteBackendCredential($keyHandleHash);
+
+                $backend = Mfa::getBackendForType(Mfa::TYPE_WEBAUTHN);
+                $didDelete = $backend->delete($mfa->id, $keyHandleHash);
 
                 if (!$didDelete) {
                     throw new ServerErrorHttpException(

@@ -612,11 +612,4 @@ class Mfa extends MfaBase
     {
         self::deleteOldRecords('1 week', ['type' => Mfa::TYPE_MANAGER]);
     }
-
-    public function deleteBackendCredential(string $credId)
-    {
-        $backend = Mfa::getBackendForType($this->type);
-
-        return $backend->delete($this->id, $credId);
-    }
 }
