@@ -8,6 +8,7 @@ use common\models\Method;
 use common\models\Mfa;
 use common\models\MfaBackupcode;
 use common\models\MfaFailedAttempt;
+use common\models\MfaWebauthn;
 use common\models\User;
 use common\models\Invite;
 use GuzzleHttp\Client;
@@ -99,6 +100,7 @@ class FeatureContext extends YiiContext
         // functions from being called.
         MfaBackupcode::deleteAll();
         MfaFailedAttempt::deleteAll();
+        MfaWebauthn::deleteAll();
         Mfa::deleteAll();
         Method::deleteAll();
         Invite::deleteAll();
