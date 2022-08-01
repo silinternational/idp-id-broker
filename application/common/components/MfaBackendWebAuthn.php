@@ -189,7 +189,7 @@ class MfaBackendWebAuthn extends Component implements MfaBackendInterface
     private function deleteWebAuthn(Mfa $mfa, string $credId, array $headers): bool
     {
         $existing = MfaWebauthn::findAll(['mfa_id' => $mfa->id, 'key_handle_hash' => $credId]);
-        if (!$existing) {
+        if (empty($existing)) {
             throw new NotFoundHttpException("MfaWebauthn not found with id: $mfa->id and key_handle_hash: $credId");
         }
 
