@@ -78,7 +78,7 @@ class MfaBackendBackupcode extends Component implements MfaBackendInterface
      * @return bool
      * @throws ServerErrorHttpException
      */
-    public function delete(int $mfaId, string $credId=''): bool
+    public function delete(int $mfaId, string $credId = ''): bool
     {
         if ($credId != '') {
             throw new ForbiddenHttpException(

@@ -16,7 +16,7 @@ class MfaBackendWebAuthn extends Component implements MfaBackendInterface
     /**
      * @var string
      */
-    public string $apiBaseUrl="example.com/";
+    public string $apiBaseUrl;
 
     /**
      * @var string
@@ -31,7 +31,7 @@ class MfaBackendWebAuthn extends Component implements MfaBackendInterface
     /**
      * @var MfaApiClient
      */
-    public ?MfaApiClient $client=null;
+    public MfaApiClient $client;
 
     /**
      * @var string
@@ -159,7 +159,7 @@ class MfaBackendWebAuthn extends Component implements MfaBackendInterface
      * @throws NotFoundHttpException
      * @throws GuzzleException
      */
-    public function delete(int $mfaId, string $credId=''): bool
+    public function delete(int $mfaId, string $credId = ''): bool
     {
         $mfa = Mfa::findOne(['id' => $mfaId]);
         if ($mfa == null) {

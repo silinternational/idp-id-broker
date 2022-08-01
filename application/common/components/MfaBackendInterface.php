@@ -35,6 +35,6 @@ interface MfaBackendInterface
      * @param string $credId Credential ID (only used for WebAuthn)
      * @return bool
      */
-    public function delete(int $mfaId, string $credId=''): bool;
+    public function delete(int $mfaId, string $credId = ''): bool;
 
 }

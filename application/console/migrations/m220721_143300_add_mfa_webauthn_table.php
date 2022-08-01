@@ -32,7 +32,7 @@ class m220721_143300_add_mfa_webauthn_table extends Migration
             'mfa_id',
             '{{mfa}}',
             'id',
-            'CASCADE',
+            'NO ACTION',
             'NO ACTION'
         );
 
