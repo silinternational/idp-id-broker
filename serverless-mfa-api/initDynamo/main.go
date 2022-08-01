@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"os"
 
 	"github.com/aws/aws-sdk-go/aws"
@@ -96,6 +97,8 @@ func NewStorage() (*Storage, error) {
 
 func initDb() error {
 
+	log.Println("Creating dynamodb tables.")
+
 	// attempt to delete tables in case already exists
 	tables := map[string]string{WebauthnTable: "uuid", ApiKeyTable: "value"}
 	for name, _ := range tables {
@@ -143,11 +146,13 @@ func initDb() error {
 			return err
 		}
 	}
+	log.Println("Finished creating dynamodb tables.")
 	return nil
 }
 
 func initApiKeys() {
 
+	log.Println("Creating api key(s).")
 	apiKey := ApiKey{
 		Key:          "EC7C2E16-5028-432F-8AF2-A79A64CF3BC1",
 		HashedSecret: "$2y$10$HtvmT/nnfofEhoFNmtk/9OfP4DDJvjzSa5dVhtOKolwb8hc6gJ9LK",
@@ -158,10 +163,15 @@ func initApiKeys() {
 	if err := storage.Store(ApiKeyTable, apiKey); err != nil {
 		panic("error storing new api key: " + err.Error())
 	}
+
+
+	log.Println("Finished creating api key(s).")
+
 }
 
 func initWebauthnEntries() {
 
+	log.Println("Creating webauthn entry.")
 	w := WebauthnEntry{
 		ID:                   "097791bf-2385-4ab4-8b06-14561a338d8e",
 		ApiKeyValue:          "EC7C2E16-5028-432F-8AF2-A79A64CF3BC1",
@@ -172,6 +182,7 @@ func initWebauthnEntries() {
 	if err := storage.Store(WebauthnTable, w); err != nil {
 		panic("error storing new webauthn entry: " + err.Error())
 	}
+	log.Println("Finished creating webauthn entry.")
 }
 
 func main() {
@@ -194,5 +205,4 @@ func main() {
 
 	initApiKeys()
 	initWebauthnEntries()
-
 }
