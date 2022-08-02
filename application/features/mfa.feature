@@ -121,18 +121,18 @@ Feature: MFA
 
   Scenario: Exception to delete the missing credential of a webauthn MFA option
     Given the user has a verified webauthn MFA with a key_handle_hash of "u2f"
-    When I request to delete a credential of the MFA with a credential_id of "missing_credential"
+    When I request to delete the webauthn entry of the MFA with a webauthn_id of 999
     Then the response status code should be 404
 
   Scenario: Delete the legacy u2f credential of a webauthn MFA option
     Given the user has a verified webauthn MFA with a key_handle_hash of "u2f"
-    When I request to delete a credential of the MFA with a credential_id of "u2f"
+    When I request to delete the webauthn entry of the MFA
     Then the response status code should be 204
       And the MFA record is not stored
 
   Scenario: Exception to delete the credential of a backupcode MFA option
     Given the user has a verified "backupcode" MFA
-    When I request to delete a credential of the MFA with a credential_id of "123"
+    When I request to delete the webauthn entry of the MFA with a webauthn_id of 999
     Then the response status code should be 403
       And 10 codes should be stored
 

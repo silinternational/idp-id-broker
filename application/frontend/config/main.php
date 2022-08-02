@@ -65,7 +65,7 @@ return [
                 'PUT    mfa/<id:\d+>'                           => 'mfa/update',
                 'POST   mfa/<id:\d+>/verify'                    => 'mfa/verify',
                 'DELETE mfa/<id:\d+>'                           => 'mfa/delete',
-                'DELETE mfa/<mfaId:\d+>/credential/<credId:.+>' => 'mfa/delete-credential',
+                'DELETE mfa/<mfaId:\d+>/webauthn/<webauthnId:\d+>' => 'mfa/delete-credential',
 
                 /*
                  * Method routes

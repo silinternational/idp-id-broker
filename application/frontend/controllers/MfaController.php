@@ -2,6 +2,7 @@
 namespace frontend\controllers;
 
 use common\models\Mfa;
+use common\models\MfaWebauthn;
 use common\models\User;
 use common\components\MfaBackendWebAuthn;
 use frontend\components\BaseRestController;
@@ -218,14 +219,14 @@ class MfaController extends BaseRestController
     /**
      * Delete one u2f/webauthn credential from an MFA record
      * @param int $mfaId
-     * @param string $credId
+     * @param int $webauthnId
      * @return null
      * @throws \Throwable
      * @throws BadRequestHttpException
      * @throws NotFoundHttpException
      * @throws ServerErrorHttpException
      */
-    public function actionDeleteCredential(int $mfaId, string $credId)
+    public function actionDeleteCredential(int $mfaId, int $webauthnId)
     {
         $mfa = $this->getRequestedMfa($mfaId);
 
@@ -235,7 +236,7 @@ class MfaController extends BaseRestController
 
         $backend = Mfa::getBackendForType(Mfa::TYPE_WEBAUTHN);
 
-        if ($backend->delete($mfa->id, $credId) === false) {
+        if ($backend->delete($mfa->id, $webauthnId) === false) {
             \Yii::error([
                 'action' => 'delete mfa credential',
                 'status' => 'error',

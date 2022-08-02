@@ -18,6 +18,12 @@ class MfaContext extends \FeatureContext
     protected $mfa;
 
     /**
+     * array $mfaWebauthnIds
+     *
+     */
+    protected $mfaWebauthnIds;
+
+    /**
      * array $backupCodes
      */
     protected $backupCodes;
@@ -62,7 +68,9 @@ class MfaContext extends \FeatureContext
 
         Assert::true($this->mfa->save(), 'Failed to add that MFA record to the database.');
 
-        MfaWebauthn::createWebauthn($this->mfa->id, $keyHandleHash);
+        $webauthn = MfaWebauthn::createWebauthn($this->mfa->id, $keyHandleHash);
+        $this->mfaWebauthnIds[] = $webauthn->id;
+
     }
 
     /**
@@ -165,9 +173,9 @@ class MfaContext extends \FeatureContext
 
 
     /**
-     * @When I request to delete a credential of the MFA with a credential_id of :credId
+     * @When I request to delete the webauthn entry of the MFA with a webauthn_id of :webauthnId
      */
-    public function iRequestToDeleteACredentialOfTheMfaWithACredentialIDOf($credId)
+    public function iRequestToDeleteTheWebauthnEntryOfTheMfaWithAWebauthnIDOf($webauthnId)
     {
         $dataForTableNode = [
             ['property', 'value'],
@@ -175,8 +183,18 @@ class MfaContext extends \FeatureContext
         ];
 
         $this->iProvideTheFollowingValidData(new TableNode($dataForTableNode));
-        $this->iRequestTheResourceBe('/mfa/' . $this->mfa->id . '/credential/' . $credId,
+        $this->iRequestTheResourceBe('/mfa/' . $this->mfa->id . '/webauthn/' . $webauthnId,
             'deleted');
+    }
+
+
+    /**
+     * @When I request to delete the webauthn entry of the MFA
+     */
+    public function iRequestToDeleteTheWebauthnEntryOfTheMfa()
+    {
+        $webauthnId = $this->mfaWebauthnIds[0];
+        $this->iRequestToDeleteTheWebauthnEntryOfTheMfaWithAWebauthnIDOf($webauthnId);
     }
 
     /**

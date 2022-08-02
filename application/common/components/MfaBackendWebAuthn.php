@@ -154,12 +154,12 @@ class MfaBackendWebAuthn extends Component implements MfaBackendInterface
     /**
      * Delete WebAuthn credential
      * @param int $mfaId
-     * @param string $credId
+     * @param int $childId the id of the related/child object (only used for the WebAuthn backend)
      * @return bool
      * @throws NotFoundHttpException
      * @throws GuzzleException
      */
-    public function delete(int $mfaId, string $credId = ''): bool
+    public function delete(int $mfaId, int $childId = 0): bool
     {
         $mfa = Mfa::findOne(['id' => $mfaId]);
         if ($mfa == null) {
@@ -177,57 +177,44 @@ class MfaBackendWebAuthn extends Component implements MfaBackendInterface
             $mfa->external_uuid
         );
 
-        if ($credId == '') {
+        if ($childId == 0) {
             return $this->client->webauthnDelete($headers);
         }
-        return self::deleteWebAuthn($mfa, $credId, $headers);
+        return self::deleteWebAuthn($mfa, $childId, $headers);
     }
 
     // Deletes a webauthn entry both in the api backend and in the local database.
     // If no webauthn entries are left, it attempts to delete the parent mfa object
     //   both in the api backend and in the local database.
-    private function deleteWebAuthn(Mfa $mfa, string $credId, array $headers): bool
+    private function deleteWebAuthn(Mfa $mfa, int $webauthnId, array $headers): bool
     {
-        $existing = MfaWebauthn::findAll(['mfa_id' => $mfa->id, 'key_handle_hash' => $credId]);
-        if (empty($existing)) {
-            throw new NotFoundHttpException("MfaWebauthn not found with id: $mfa->id and key_handle_hash: $credId");
+        $webauthn = MfaWebauthn::findOne(['id' => $webauthnId]);
+        if (empty($webauthn) || $webauthn->mfa_id != $mfa->id) {
+            throw new NotFoundHttpException("MfaWebauthn not found with id: $webauthnId and mfa_id: $mfa->id");
         }
 
-        $existingCount = count($existing);
-
-        $didDelete = false;
-
-        // Normally, there should just be one entry. Just to be safe, this assumes
-        // there could be more than one.  It deletes the matching backend entry of the
-        // first one as well as deleting all the local entries.
-        foreach ($existing as $entry) {
-            // Attempt to delete the matching backend entry for this webauthn key
-            // but only once
-            if (!$didDelete) {
-                $didDelete = $this->client->webauthnDelete($headers);
-                if (!$didDelete) {
-                    throw new ServerErrorHttpException(
-                        sprintf("Unable to delete existing backend webauthn key. [id=%s]", $entry->id),
-                        1658237200
-                    );
-                }
-            }
-
-            // Now delete this local webauthn entry
-            if ($entry->delete() === false) {
-                \Yii::error([
-                    'action' => 'mfa-delete-webauthn-for-mfa-id',
-                    'mfa-type' => Mfa::TYPE_WEBAUTHN,
-                    'status' => 'error',
-                    'error' => $entry->getFirstErrors(),
-                ]);
-                throw new ServerErrorHttpException(
-                    sprintf("Unable to delete existing webauthn mfa. [id=%s]", $mfa->id),
-                    1658237300
-                );
-            }
-            $existingCount --;
+        if (! $this->client->webauthnDelete($headers)) {
+            throw new ServerErrorHttpException(
+                sprintf("Unable to delete existing backend webauthn key. [id=%s]", $webauthn->id),
+                1658237200
+            );
         }
+
+        // Now delete this local webauthn entry
+        if ($webauthn->delete() === false) {
+            \Yii::error([
+                'action' => 'mfa-delete-webauthn-for-mfa-id',
+                'mfa-type' => Mfa::TYPE_WEBAUTHN,
+                'status' => 'error',
+                'error' => $webauthn->getFirstErrors(),
+            ]);
+            throw new ServerErrorHttpException(
+                sprintf("Unable to delete existing webauthn mfa. [id=%s]", $webauthn->id),
+                1658237300
+            );
+        }
+
+        $existingCount = MfaWebauthn::find()->where(['mfa_id' => $mfa->id])->Count();
 
         // If there are no more webauthn entries for this mfa, try to delete the backend webauthn container object
         if ($existingCount < 1) {

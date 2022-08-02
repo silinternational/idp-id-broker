@@ -104,15 +104,15 @@ class MfaBackendManager extends Component implements MfaBackendInterface
     /**
      * Delete MFA backend configuration
      * @param int $mfaId
-     * @param string $credId Credential ID (only used for WebAuthn)
+     * @param int $childId the id of the related/child object (only used for the WebAuthn backend)
      * @return bool
      * @throws ServerErrorHttpException
      */
-    public function delete(int $mfaId, string $credId = ''): bool
+    public function delete(int $mfaId, int $childId = 0): bool
     {
-        if ($credId != '') {
+        if ($childId != 0) {
             throw new ForbiddenHttpException(
-                sprintf("May not delete a credential on a %s mfa type", Mfa::TYPE_MANAGER),
+                sprintf("May not delete a MfaWebauthn object on a %s mfa type", Mfa::TYPE_MANAGER),
                 1658237120
             );
         }
