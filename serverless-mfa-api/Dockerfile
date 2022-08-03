@@ -1,9 +1,5 @@
 FROM golang:1.18
 
-WORKDIR /initDynamo
-COPY ./initDynamo /initDynamo/
-RUN go get ./... && go mod tidy && go build ./...
-
 WORKDIR /src
 
 RUN mkdir override
