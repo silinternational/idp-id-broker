@@ -110,10 +110,30 @@ services:
             WEBAUTHN_TABLE: WebAuthn
         depends_on:
             - dynamo
+            - dynamorestart
         working_dir: /src
         # Copy files from the override folder to be used for possible troubleshooting (e.g. with extra log statements)
         # (using bash -c to keep the chown command from ignoring the && and throwing an error)
-        command: bash -c "cd /initDynamo && go run main.go && cd - && cp -R ./override/* ./ && go run ./server/"
+        command: bash -c "cp -R ./override/* ./ && go run ./server/"
+
+    dynamorestart:
+        build: ./dynamorestart
+        ports:
+            - 8080
+        volumes:
+            - ./dynamorestart/:/dynamo
+        environment:
+            AWS_ENDPOINT: dynamo:8000
+            AWS_DEFAULT_REGION: us-east-1
+            AWS_ACCESS_KEY_ID: abc123
+            AWS_SECRET_ACCESS_KEY: abc123
+            AWS_DISABLE_SSL: "true"
+            API_KEY_TABLE: ApiKey
+            WEBAUTHN_TABLE: WebAuthn
+        depends_on:
+            - dynamo
+        working_dir: /dynamo
+        command: bash -c "pwd && ls -al && php restart.php"
 
     test:
         image: silintl/php7:7.4
