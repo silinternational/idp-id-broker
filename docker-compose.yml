@@ -54,8 +54,9 @@ services:
             MYSQL_USER: appfortests
             MYSQL_PASSWORD: appfortests
             MFA_WEBAUTHN_apiBaseUrl: external_api:8080/
-            MFA_WEBAUTHN_apiKey: EC7C2E16-5028-432F-8AF2-A79A64CF3BC1
-            MFA_WEBAUTHN_apiSecret: 1ED18444-7238-410B-A536-D6C15A3C
+            MFA_WEBAUTHN_apiKey: 10345678-1234-1234-1234-123456789012
+            MFA_WEBAUTHN_apiSecret: 11345678-1234-1234-1234-12345678
+            # the corresponding hash: $2a$10$8Bp9PqqfStjLvh1nQJ67JeY3CO/mEXmF1GKfe8Vk0kue1.i7fa2mC
             MFA_WEBAUTHN_appId: ourApp99
             MFA_WEBAUTHN_rpDisplayName: Our App
             MFA_WEBAUTHN_rpId: app99

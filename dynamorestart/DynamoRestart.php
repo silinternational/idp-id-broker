@@ -4,7 +4,7 @@ require './vendor/autoload.php';
 use Aws\DynamoDb\DynamoDbClient as DynamoDbClient;
 
 const ApiKeyTable = "ApiKey";
-const ApiKeyValue = "EC7C2E16-5028-432F-8AF2-A79A64CF3BC1";
+const ApiKeyValue = "10345678-1234-1234-1234-123456789012";
 const WebauthnTable = "WebAuthn";
 
 
@@ -71,16 +71,16 @@ class DynamoRestart
                     'S' => ApiKeyValue,
                 ],
                 'hashedApiSecret' => [
-                    'S' => '$2y$10$HtvmT/nnfofEhoFNmtk/9OfP4DDJvjzSa5dVhtOKolwb8hc6gJ9LK',
+                    'S' => '$2a$10$8Bp9PqqfStjLvh1nQJ67JeY3CO/mEXmF1GKfe8Vk0kue1.i7fa2mC',
                 ],
                 'email' => [
                     'S' => 'example-user@example.com',
                 ],
                 'activatedAt' => [
-                    'N' => '1590518082000',
+                    'N' => '1590518080000',
                 ],
                 'createdAt' => [
-                    'N' => '1590518082000',
+                    'N' => '1590518080000',
                 ],
             ],
             'TableName' => ApiKeyTable,
