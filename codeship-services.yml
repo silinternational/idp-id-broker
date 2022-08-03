@@ -78,8 +78,6 @@ dynamorestart:
     build: ./dynamorestart
     ports:
         - 8080
-    volumes:
-        - ./dynamorestart/:/dynamo
     environment:
         AWS_ENDPOINT: dynamo:8000
         AWS_DEFAULT_REGION: us-east-1

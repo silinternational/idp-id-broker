@@ -9,6 +9,8 @@ ENV AWS_ACCESS_KEY_ID=abc123
 ENV AWS_SECRET_ACCESS_KEY=abc123
 ENV AWS_DISABLE_SSL="true"
 
+COPY DynamoRestart.php /dynamo/DynamoRestart.php
+COPY restart.php /dynamo/restart.php
 COPY composer.json /dynamo/composer.json
 RUN composer self-update && composer upgrade
 
