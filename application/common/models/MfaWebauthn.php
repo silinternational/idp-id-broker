@@ -21,6 +21,9 @@ class MfaWebauthn extends MfaWebauthnBase
             [
                 'created_utc', 'default', 'value' => MySqlDateTime::now(),
             ],
+            [
+                'verified', 'default', 'value' => 0,
+            ],
         ], parent::rules());
     }
 

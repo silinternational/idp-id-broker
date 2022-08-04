@@ -21,6 +21,7 @@ class m220721_143300_add_mfa_webauthn_table extends Migration
                 'mfa_id' => 'int(11) not null',
                 'key_handle_hash' => 'varchar(255) null',
                 'label' => 'varchar(64) not null',
+                'verified' => 'tinyint(1) not null',
                 'created_utc' => 'datetime not null',
                 'last_used_utc' => 'datetime null',
             ],
@@ -38,8 +39,8 @@ class m220721_143300_add_mfa_webauthn_table extends Migration
 
         // Copy the webauthn mfa entries over to the new mfa_webauthn table
         $this->execute("
-INSERT INTO mfa_webauthn (mfa_id, label, key_handle_hash, last_used_utc, created_utc) 
-SELECT id, label, key_handle_hash, last_used_utc, created_utc
+INSERT INTO mfa_webauthn (mfa_id, label, key_handle_hash, verified, last_used_utc, created_utc) 
+SELECT id, label, key_handle_hash, verified, last_used_utc, created_utc
 FROM mfa 
 WHERE 
 type='webauthn'

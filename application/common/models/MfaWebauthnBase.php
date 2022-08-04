@@ -11,6 +11,7 @@ use Yii;
  * @property int $mfa_id
  * @property string|null $key_handle_hash
  * @property string $label
+ * @property int $verified
  * @property string $created_utc
  * @property string|null $last_used_utc
  *
@@ -32,7 +33,7 @@ class MfaWebauthnBase extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['mfa_id', 'label', 'created_utc'], 'required'],
+            [['mfa_id', 'label', 'verified', 'created_utc'], 'required'],
             [['mfa_id'], 'integer'],
             [['created_utc', 'last_used_utc'], 'safe'],
             [['label'], 'string', 'max' => 64],
