@@ -1,9 +1,7 @@
-FROM severless-mfa-api-go:latest
-
+FROM silintl/serverless-mfa-api-go:develop
 WORKDIR /src
 
 RUN mkdir override
-RUN mkdir server
 
 ENV AWS_ENDPOINT=dynamo:8000
 ENV AWS_DEFAULT_REGION=us-east-1

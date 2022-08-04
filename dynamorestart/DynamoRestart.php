@@ -106,7 +106,8 @@ class DynamoRestart
                     'S' => 'SomeEncryptedKeyHandle',
                 ],
 //                'encryptedCredentials' => [
-//                    'B' => '0x11',
+            //  This doesn't work. What binary representation would work here?
+//                    'B' => 'ed634d2c138412f0e5d0f85ac8bceac9264df24a0bf597e75038caf9bb7cb6363beb7b8e9c660475b730fa4f29222b481cc76231d79ea8f8e8a4b0b2ebca3c315e9309db62c07ef0d4264073f1f6741b600086af6fa2d8657f660a1d415fc65ac907e2828865940fe2bfcc977577df1b35463dd04432dc2a746ca712e326ede06e3fa9d72f0a274d',
 //                ],
             ],
             'TableName' => WebauthnTable,

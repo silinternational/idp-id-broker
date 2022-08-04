@@ -193,7 +193,7 @@ class MfaBackendWebAuthn extends Component implements MfaBackendInterface
             throw new NotFoundHttpException("MfaWebauthn not found with id: $webauthnId and mfa_id: $mfa->id");
         }
 
-        if (! $this->client->webauthnDelete($headers)) {
+        if (! $this->client->webauthnDeleteCredential($webauthn->key_handle_hash, $headers)) {
             throw new ServerErrorHttpException(
                 sprintf("Unable to delete existing backend webauthn key. [id=%s]", $webauthn->id),
                 1658237200
