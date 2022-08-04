@@ -1,27 +1,7 @@
-FROM golang:1.18
-
+FROM silintl/serverless-mfa-api-go:develop
 WORKDIR /src
 
 RUN mkdir override
-RUN mkdir server
-ENV BRANCH=develop
-
-RUN curl -sSfL https://raw.githubusercontent.com/cosmtrek/air/master/install.sh | sh -s -- -b $(go env GOPATH)/bin
-
-# Download the necessary serverless-mfa-api-go files for running the api in a local container
-RUN curl -sSfL https://raw.githubusercontent.com/silinternational/serverless-mfa-api-go/$BRANCH/apikey.go -o ./apikey.go \
- && curl -sSfL https://raw.githubusercontent.com/silinternational/serverless-mfa-api-go/$BRANCH/config.go -o ./config.go \
- && curl -sSfL https://raw.githubusercontent.com/silinternational/serverless-mfa-api-go/$BRANCH/storage.go -o ./storage.go \
- && curl -sSfL https://raw.githubusercontent.com/silinternational/serverless-mfa-api-go/$BRANCH/user.go -o ./user.go \
- && curl -sSfL https://raw.githubusercontent.com/silinternational/serverless-mfa-api-go/$BRANCH/webauthn.go -o ./webauthn.go \
- && curl -sSfL https://raw.githubusercontent.com/silinternational/serverless-mfa-api-go/$BRANCH/go.mod -o ./go.mod
-
-RUN curl -sSfL https://raw.githubusercontent.com/silinternational/serverless-mfa-api-go/$BRANCH/server/main.go \
-  -o ./server/main.go  \
- && curl -sSfL https://raw.githubusercontent.com/silinternational/serverless-mfa-api-go/$BRANCH/server/authentication_middleware.go \
-  -o ./server/authentication_middleware.go  \
- && curl -sSfL https://raw.githubusercontent.com/silinternational/serverless-mfa-api-go/$BRANCH/server/cors_middleware.go \
-  -o ./server/cors_middleware.go
 
 ENV AWS_ENDPOINT=dynamo:8000
 ENV AWS_DEFAULT_REGION=us-east-1

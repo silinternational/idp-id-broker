@@ -4,7 +4,7 @@ require './vendor/autoload.php';
 use Aws\DynamoDb\DynamoDbClient as DynamoDbClient;
 
 const ApiKeyTable = "ApiKey";
-const ApiKeyValue = "EC7C2E16-5028-432F-8AF2-A79A64CF3BC1";
+const ApiKeyValue = "10345678-1234-1234-1234-123456789012";
 const WebauthnTable = "WebAuthn";
 
 
@@ -71,16 +71,16 @@ class DynamoRestart
                     'S' => ApiKeyValue,
                 ],
                 'hashedApiSecret' => [
-                    'S' => '$2y$10$HtvmT/nnfofEhoFNmtk/9OfP4DDJvjzSa5dVhtOKolwb8hc6gJ9LK',
+                    'S' => '$2a$10$8Bp9PqqfStjLvh1nQJ67JeY3CO/mEXmF1GKfe8Vk0kue1.i7fa2mC',
                 ],
                 'email' => [
                     'S' => 'example-user@example.com',
                 ],
                 'activatedAt' => [
-                    'N' => '1590518082000',
+                    'N' => '1590518080000',
                 ],
                 'createdAt' => [
-                    'N' => '1590518082000',
+                    'N' => '1590518080000',
                 ],
             ],
             'TableName' => ApiKeyTable,
@@ -106,7 +106,8 @@ class DynamoRestart
                     'S' => 'SomeEncryptedKeyHandle',
                 ],
 //                'encryptedCredentials' => [
-//                    'B' => '0x11',
+            //  This doesn't work. What binary representation would work here?
+//                    'B' => 'ed634d2c138412f0e5d0f85ac8bceac9264df24a0bf597e75038caf9bb7cb6363beb7b8e9c660475b730fa4f29222b481cc76231d79ea8f8e8a4b0b2ebca3c315e9309db62c07ef0d4264073f1f6741b600086af6fa2d8657f660a1d415fc65ac907e2828865940fe2bfcc977577df1b35463dd04432dc2a746ca712e326ede06e3fa9d72f0a274d',
 //                ],
             ],
             'TableName' => WebauthnTable,
