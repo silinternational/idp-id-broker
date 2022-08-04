@@ -38,8 +38,8 @@ app:
         ABANDONED_USER_bestPracticeUrl: http://www.example.com/best-practices.html
         ABANDONED_USER_deactivateInstructionsUrl: http://www.example.com/deactivate-instructions.html
         MFA_WEBAUTHN_apiBaseUrl: externalapi:8080/
-        MFA_WEBAUTHN_apiKey: EC7C2E16-5028-432F-8AF2-A79A64CF3BC1
-        MFA_WEBAUTHN_apiSecret: 1ED18444-7238-410B-A536-D6C15A3C
+        MFA_WEBAUTHN_apiKey: 10345678-1234-1234-1234-123456789012
+        MFA_WEBAUTHN_apiSecret: 11345678-1234-1234-1234-12345678
         MFA_WEBAUTHN_appId: ourApp99
         MFA_WEBAUTHN_rpDisplayName: Our App
         MFA_WEBAUTHN_rpId: app99
@@ -69,6 +69,24 @@ externalapi:
         WEBAUTHN_TABLE: WebAuthn
     depends_on:
         - dynamo
+        - dynamorestart
     working_dir: /src
-    # Create dynamodb tables and data before running the backend mfa api
-    command: bash -c "cd /initDynamo && go run main.go && cd - && echo starting server && go run ./server/"
+    command: bash -c "echo starting server && go run ./server/"
+
+# Create dynamodb tables and data before running the backend mfa api
+dynamorestart:
+    build: ./dynamorestart
+    ports:
+        - 8080
+    environment:
+        AWS_ENDPOINT: dynamo:8000
+        AWS_DEFAULT_REGION: us-east-1
+        AWS_ACCESS_KEY_ID: abc123
+        AWS_SECRET_ACCESS_KEY: abc123
+        AWS_DISABLE_SSL: "true"
+        API_KEY_TABLE: ApiKey
+        WEBAUTHN_TABLE: WebAuthn
+    depends_on:
+        - dynamo
+    working_dir: /dynamo
+    command: bash -c "php restart.php"

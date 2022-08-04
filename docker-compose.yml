@@ -54,8 +54,9 @@ services:
             MYSQL_USER: appfortests
             MYSQL_PASSWORD: appfortests
             MFA_WEBAUTHN_apiBaseUrl: external_api:8080/
-            MFA_WEBAUTHN_apiKey: EC7C2E16-5028-432F-8AF2-A79A64CF3BC1
-            MFA_WEBAUTHN_apiSecret: 1ED18444-7238-410B-A536-D6C15A3C
+            MFA_WEBAUTHN_apiKey: 10345678-1234-1234-1234-123456789012
+            MFA_WEBAUTHN_apiSecret: 11345678-1234-1234-1234-12345678
+            # the corresponding hash: $2a$10$8Bp9PqqfStjLvh1nQJ67JeY3CO/mEXmF1GKfe8Vk0kue1.i7fa2mC
             MFA_WEBAUTHN_appId: ourApp99
             MFA_WEBAUTHN_rpDisplayName: Our App
             MFA_WEBAUTHN_rpId: app99
@@ -110,10 +111,30 @@ services:
             WEBAUTHN_TABLE: WebAuthn
         depends_on:
             - dynamo
+            - dynamorestart
         working_dir: /src
         # Copy files from the override folder to be used for possible troubleshooting (e.g. with extra log statements)
         # (using bash -c to keep the chown command from ignoring the && and throwing an error)
-        command: bash -c "cd /initDynamo && go run main.go && cd - && cp -R ./override/* ./ && go run ./server/"
+        command: bash -c "cp -R ./override/* ./ && go run ./server/"
+
+    dynamorestart:
+        build: ./dynamorestart
+        ports:
+            - 8080
+        volumes:
+            - ./dynamorestart/:/dynamo
+        environment:
+            AWS_ENDPOINT: dynamo:8000
+            AWS_DEFAULT_REGION: us-east-1
+            AWS_ACCESS_KEY_ID: abc123
+            AWS_SECRET_ACCESS_KEY: abc123
+            AWS_DISABLE_SSL: "true"
+            API_KEY_TABLE: ApiKey
+            WEBAUTHN_TABLE: WebAuthn
+        depends_on:
+            - dynamo
+        working_dir: /dynamo
+        command: bash -c "pwd && ls -al && php restart.php"
 
     test:
         image: silintl/php7:7.4

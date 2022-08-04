@@ -3,7 +3,9 @@ namespace common\models;
 
 use common\helpers\MySqlDateTime;
 use common\components\Emailer;
+use yii\base\BaseObject;
 use yii\helpers\ArrayHelper;
+use yii\web\NotFoundHttpException;
 use yii\web\ServerErrorHttpException;
 
 /**
@@ -24,62 +26,32 @@ class MfaWebauthn extends MfaWebauthnBase
 
 
     /**
+     * Create a new webauthn entry locally
      * @param int $mfaId
      * @param string $keyHandleHash
-     * @return bool
+     * @return array
      * @throws ServerErrorHttpException
      */
-    public static function deleteCredentialForMfaId(int $mfaId, string $keyHandleHash): bool
+    public static function createWebauthn(int $mfaId, string $keyHandleHash, string $label=""): MfaWebauthn
     {
-        $existing = self::find()->where(['mfa_id' => $mfaId, 'key_handle_hash' => $keyHandleHash])->all();
-        if (!$existing) {
-            return false;
+        $label = $label ?: Mfa::DEFAULT_WEBAUTHN_LABEL;
+        $webauthn = new MfaWebauthn();
+        $webauthn->mfa_id = $mfaId;
+        $webauthn->label = $label;
+        $webauthn->key_handle_hash = $keyHandleHash;
+        if (! $webauthn->save()) {
+            \Yii::error([
+                'action' => 'mfa-create-webauthn',
+                'mfa-type' => Mfa::TYPE_WEBAUTHN,
+                'status' => 'error',
+                'error' => $webauthn->getFirstErrors(),
+            ]);
+            throw new ServerErrorHttpException(
+                "Unable to save new webauthn entry, error: " . print_r($webauthn->getFirstErrors(), true),
+                1659374000
+            );
         }
 
-        $mfa = Mfa::findOne($mfaId);
-        $didDelete = false;
-
-        // Normally, there should just be one entry. Just to be safe, this assumes
-        // there could be more than one.  It deletes the matching backend entry of the
-        // first one as well as deleting all the local entries.
-        foreach ($existing as $entry) {
-            // Attempt to delete the matching backend entry for this webauthn key
-            // but only once
-            if (!$didDelete) {
-
-                $backend = Mfa::getBackendForType(Mfa::TYPE_WEBAUTHN);
-                $didDelete = $backend->delete($mfa->id, $keyHandleHash);
-
-                if (!$didDelete) {
-                    throw new ServerErrorHttpException(
-                        sprintf("Unable to delete existing backend webauthn key. [id=%s]", $entry->id),
-                        1658237200
-                    );
-                }
-            }
-
-            // Now delete this local webauthn entry
-            if ($entry->delete() === false) {
-                \Yii::error([
-                    'action' => 'mfa-delete-webauthn-for-mfa-id',
-                    'mfa-type' => Mfa::TYPE_WEBAUTHN,
-                    'status' => 'error',
-                    'error' => $entry->getFirstErrors(),
-                ]);
-                throw new ServerErrorHttpException(
-                    sprintf("Unable to delete existing webauthn mfa. [id=%s]", $mfaId),
-                    1658237300
-                );
-            }
-        }
-
-        // If there are no more webauthn entries for this mfa, try to delete the backend webauthn container object
-        $existing = self::find()->where(['mfa_id' => $mfaId])->all();
-        if (!$existing) {
-            $mfaBackEnd = mfa::getBackendForType($mfa->type);
-            return $mfaBackEnd->delete($mfaId);
-        }
-
-        return true;
+        return $webauthn;
     }
 }
