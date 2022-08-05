@@ -70,6 +70,10 @@ class DynamoRestart
                 'value' => [
                     'S' => ApiKeyValue,
                 ],
+                // This assumes the MFA_WEBAUTHN_apiSecret env var is "11345678-1234-1234-1234-12345678"
+                // The value below comes from using this go code to match what happens in serverless-mfa-api-go
+                // 	a := "11345678-1234-1234-1234-12345678"
+                //	hashedApiSecret, err := bcrypt.GenerateFromPassword([]byte(a), bcrypt.DefaultCost)
                 'hashedApiSecret' => [
                     'S' => '$2a$10$8Bp9PqqfStjLvh1nQJ67JeY3CO/mEXmF1GKfe8Vk0kue1.i7fa2mC',
                 ],
@@ -105,10 +109,10 @@ class DynamoRestart
                 'encryptedKeyHandle' => [
                     'S' => 'SomeEncryptedKeyHandle',
                 ],
-//                'encryptedCredentials' => [
-            //  This doesn't work. What binary representation would work here?
-//                    'B' => 'ed634d2c138412f0e5d0f85ac8bceac9264df24a0bf597e75038caf9bb7cb6363beb7b8e9c660475b730fa4f29222b481cc76231d79ea8f8e8a4b0b2ebca3c315e9309db62c07ef0d4264073f1f6741b600086af6fa2d8657f660a1d415fc65ac907e2828865940fe2bfcc977577df1b35463dd04432dc2a746ca712e326ede06e3fa9d72f0a274d',
-//                ],
+                // This is from a serverless-mfa-api-go test user
+                'encryptedCredentials' => [
+                    'B' => hex2bin('ed634d2c138412f0e5d0f85ac8bceac9264df24a0bf597e75038caf9bb7cb6363beb7b8e9c660475b730fa4f29222b481cc76231d79ea8f8e8a4b0b2ebca3c315e9309db62c07ef0d4264073f1f6741b600086af6fa2d8657f660a1d415fc65ac907e2828865940fe2bfcc977577df1b35463dd04432dc2a746ca712e326ede06e3fa9d72f0a274d'),
+                ],
             ],
             'TableName' => WebauthnTable,
         ]);

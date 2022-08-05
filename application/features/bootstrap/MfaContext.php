@@ -8,7 +8,6 @@ use common\models\MfaBackupcode;
 use common\models\MfaWebauthn;
 use common\models\User;
 use Webmozart\Assert\Assert;
-use yii\base\BaseObject;
 
 class MfaContext extends \FeatureContext
 {
@@ -59,18 +58,19 @@ class MfaContext extends \FeatureContext
     {
         $user = User::findOne(['employee_id' => $this->tempEmployeeId]);
         Assert::notEmpty($user, 'Unable to find that user.');
-        $this->mfa = new Mfa([
-            'user_id' => $user->id,
-            'type' => mfa::TYPE_WEBAUTHN,
-            'verified' => 1,
-            'external_uuid' => '097791bf-2385-4ab4-8b06-14561a338d8e',
-        ]);
 
-        Assert::true($this->mfa->save(), 'Failed to add that MFA record to the database.');
+        if (empty($this->mfa)) {
+            $this->mfa = new Mfa([
+                'user_id' => $user->id,
+                'type' => mfa::TYPE_WEBAUTHN,
+                'verified' => 1,
+                'external_uuid' => '097791bf-2385-4ab4-8b06-14561a338d8e',
+            ]);
+            Assert::true($this->mfa->save(), 'Failed to add that MFA record to the database.');
+        }
 
-        $webauthn = MfaWebauthn::createWebauthn($this->mfa->id, $keyHandleHash);
+        $webauthn = MfaWebauthn::createWebauthn($this->mfa, $keyHandleHash);
         $this->mfaWebauthnIds[] = $webauthn->id;
-
     }
 
     /**
@@ -204,5 +204,14 @@ class MfaContext extends \FeatureContext
     {
         $this->mfa = Mfa::findOne(['id' => $this->mfa->id]);
         Assert::null($this->mfa, 'A matching record was found in the database');
+    }
+
+    /**
+     * @Then the MFA record is still stored
+     */
+    public function theMfaRecordIsStillStored()
+    {
+        $this->mfa = Mfa::findOne(['id' => $this->mfa->id]);
+        Assert::notNull($this->mfa, 'A matching record was not found in the database');
     }
 }
