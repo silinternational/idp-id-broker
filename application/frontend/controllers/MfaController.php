@@ -64,6 +64,76 @@ class MfaController extends BaseRestController
      */
     public function actionVerify(int $id)
     {
+        list($req, $mfa, $value) = $this->getVerifyData($id);
+
+        if (! $mfa->verify($value, '')) {
+            throw new BadRequestHttpException();
+        }
+
+        return $mfa;
+    }
+
+    /**
+     * Verify registration with MFA backend
+     * @param int $id
+     * @throws BadRequestHttpException
+     * @throws NotFoundHttpException
+     * @throws TooManyRequestsHttpException
+     * @return null
+     */
+    public function actionVerifyRegistration(int $id)
+    {
+        list($req, $mfa, $value) = $this->getVerifyData($id);
+
+        // rpOrigin is needed for WebAuthn authentication
+        $rpOrigin = $req->get('rpOrigin', '');
+        if ($rpOrigin != '' && !in_array($rpOrigin, \Yii::$app->params['authorizedRPOrigins'])){
+            throw new ForbiddenHttpException("Invalid rpOrigin", 1638539443);
+        }
+
+        if (! $mfa->verify($value, $rpOrigin)) {
+            throw new BadRequestHttpException();
+        }
+
+        return $mfa;
+    }
+
+    /**
+     * Verify login with MFA backend
+     * @param int $id
+     * @throws BadRequestHttpException
+     * @throws NotFoundHttpException
+     * @throws TooManyRequestsHttpException
+     * @return null
+     */
+    public function actionVerifyLogin(int $id)
+    {
+        list($req, $mfa, $value) = $this->getVerifyData($id);
+
+        // rpOrigin is needed for WebAuthn authentication
+        $rpOrigin = $req->get('rpOrigin', '');
+        if ($rpOrigin != '' && !in_array($rpOrigin, \Yii::$app->params['authorizedRPOrigins'])){
+            throw new ForbiddenHttpException("Invalid rpOrigin", 1638539443);
+        }
+
+        if (! $mfa->verify($value, $rpOrigin)) {
+            throw new BadRequestHttpException();
+        }
+
+        return $mfa;
+    }
+
+
+    /**
+     * Verify value with MFA backend
+     * @param int $id
+     * @throws BadRequestHttpException
+     * @throws NotFoundHttpException
+     * @throws TooManyRequestsHttpException
+     * @return [Request, Mfa, string]
+     */
+    private function getVerifyData(int $id)
+    {
         $req = \Yii::$app->request;
         $value = $req->getBodyParam('value');
         if ($value === null) {
@@ -100,17 +170,7 @@ class MfaController extends BaseRestController
             }
         }
 
-        // rpOrigin is needed for WebAuthn authentication
-        $rpOrigin = $req->get('rpOrigin', '');
-        if ($rpOrigin != '' && !in_array($rpOrigin, \Yii::$app->params['authorizedRPOrigins'])){
-            throw new ForbiddenHttpException("Invalid rpOrigin", 1638539443);
-        }
-
-        if (! $mfa->verify($value, $rpOrigin)) {
-            throw new BadRequestHttpException();
-        }
-
-        return $mfa;
+        return [$req, $mfa, $value];
     }
 
     /**

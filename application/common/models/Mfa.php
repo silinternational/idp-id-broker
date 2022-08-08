@@ -267,6 +267,75 @@ class Mfa extends MfaBase
         return false;
     }
 
+
+
+    /**
+     * @param string|array $value
+     * @return bool
+     * @throws ServerErrorHttpException
+     * @throws TooManyRequestsHttpException
+     * @throws \Throwable
+     * @throws \yii\db\StaleObjectException
+     */
+    public function verifyRegistration($value, string $rpOrigin = ''): bool
+    {
+        if ($this->type != Mfa::TYPE_WEBAUTHN) {
+            throw new BadRequestHttpException("verification of a registration is only for type: " . Mfa::TYPE_WEBAUTHN);
+        }
+
+        if ($this->hasTooManyRecentFailures()) {
+            \Yii::warning([
+                'action' => 'verify mfa',
+                'type' => $this->type,
+                'username' => $this->user->username,
+                'status' => 'error',
+                'error' => 'too many recent failures'
+            ]);
+            throw new TooManyRequestsHttpException(
+                'Too many recent failed attempts for this MFA'
+            );
+        }
+
+        $backend = self::getBackendForType($this->type);
+        if ($backend->verifyRegistration($this->id, $value, $rpOrigin) === true) {
+            $this->last_used_utc = MySqlDateTime::now();
+            if (! $this->save()) {
+                \Yii::error([
+                    'action' => 'update last_used_utc on mfa after verification',
+                    'status' => 'error',
+                    'username' => $this->user->username,
+                    'mfa_id' => $this->id,
+                    'error' => $this->getFirstErrors(),
+                ]);
+            }
+            $this->clearFailedAttempts('after successful verification');
+
+            \Yii::warning([
+                'action' => 'verify mfa',
+                'type' => $this->type,
+                'username' => $this->user->username,
+                'status' => 'success',
+            ]);
+
+            $this->user->removeManagerCodes();
+
+            return true;
+        }
+
+        $this->recordFailedAttempt();
+
+        \Yii::warning([
+            'action' => 'verify mfa',
+            'type' => $this->type,
+            'username' => $this->user->username,
+            'status' => 'error',
+            'error' => 'verify mfa failed'
+        ]);
+
+        return false;
+    }
+
+
     /**
      * @param int $userId
      * @param string $type
@@ -300,7 +369,7 @@ class Mfa extends MfaBase
         $existing = self::findOne(['user_id' => $userId, 'type' => $type, 'verified' => 1]);
 
         if ($existing instanceof Mfa) {
-            if ($type == self::TYPE_BACKUPCODE || $type == self::TYPE_MANAGER) {
+            if ($type == self::TYPE_BACKUPCODE || $type == self::TYPE_MANAGER || $type == self::TYPE_WEBAUTHN) {
                 $mfa = $existing;
             } else {
                 throw new ConflictHttpException('An MFA of type ' . $type . ' already exists.', 1551190694);
@@ -332,6 +401,7 @@ class Mfa extends MfaBase
         if (isset($results['uuid'])) {
             $mfa->external_uuid = $results['uuid'];
             unset($results['uuid']);
+
             if (! $mfa->save()) {
                 \Yii::error([
                     'action' => 'update mfa',
@@ -342,6 +412,8 @@ class Mfa extends MfaBase
                 ]);
                 throw new ServerErrorHttpException("Unable to update MFA record", 1507904194);
             }
+
+            $mfa->createWebauthn($results, $user);
         }
 
         \Yii::warning([
@@ -355,6 +427,35 @@ class Mfa extends MfaBase
             'id' => $mfa->id,
             'data' => $results,
         ];
+    }
+
+    /**
+     * @param array $regResults
+     * @param User $user
+     * @return null|MfaWebauthn
+     * @throws BadRequestHttpException
+     * @throws ServerErrorHttpException
+     */
+    private function createWebauthn(array $regResults, user $user) {
+        if ($this->type != self::TYPE_WEBAUTHN) {
+            return null;
+        }
+        $webauthn = new MfaWebauthn();
+        $webauthn->mfa_id = $this->id;
+        $webauthn->label =  $this->label;
+        $webauthn->verified = false;
+
+        if (! $webauthn->save()) {
+            \Yii::error([
+                'action' => 'create mfa_webauthn',
+                'type' => $this->type,
+                'username' => $user->username,
+                'status' => 'error',
+                'error' => $this->getFirstErrors(),
+            ]);
+            throw new ServerErrorHttpException("Unable to save new MFA Webauthn record", 1659634931);
+        }
+        return $webauthn;
     }
 
     /**

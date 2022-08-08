@@ -152,6 +152,97 @@ class MfaBackendWebAuthn extends Component implements MfaBackendInterface
 
 
     /**
+     * Verify response from user is correct for the MFA backend device
+     * @param int $mfaId The MFA ID
+     * @param string|array $value The stringified JSON response from the browser credential api
+     * @param string $rpOrigin The Replay Party Origin URL (with scheme, without port or path)
+     * @return bool|string
+     * @throws GuzzleException
+     * @throws ServerErrorHttpException
+     * @throws NotFoundHttpException
+     */
+    public function verifyRegistration(int $mfaId, string $value, string $rpOrigin = '')
+    {
+        $mfa = Mfa::findOne(['id' => $mfaId]);
+        if ($mfa == null) {
+            throw new NotFoundHttpException("MFA record for given ID not found");
+        }
+
+        // Get latest unverified webauthn entry for this mfa
+        $webauthn = MfaWebauthn::find()->where(['mfa_id' => $mfa->id,'verified' => 0])->orderBy(['created_at_utc' => SORT_DESC])->one();
+        if ($webauthn === null) {
+            throw new NotFoundHttpException("Unverified MFA Webauthn record not found for MFA ID: " . $mfa->id, 1659637860);
+        }
+
+        [$headers, $value] = $this->getVerifyHeadersAndValue($mfa, $value, $rpOrigin);
+
+        // Not yet verified, so validate registration
+        $results = $this->client->webauthnValidateRegistration($headers, $value);
+
+        if (! isset($results['key_handle_hash'])) {
+            return false;
+        }
+
+        $webauthn->verified = 1;
+        $webauthn->key_handle_hash = $results['key_handle_hash'];
+        if (! $webauthn->save()) {
+            throw new ServerErrorHttpException(
+                "Unable to save WebAuthn record after verification. Error: " . print_r($mfa->getFirstErrors(), true)
+            );
+        }
+        return true;
+    }
+
+
+
+    /**
+     * Verify response from user is correct for the MFA backend device
+     * @param int $mfaId The MFA ID
+     * @param string|array $value The stringified JSON response from the browser credential api
+     * @param string $rpOrigin The Replay Party Origin URL (with scheme, without port or path)
+     * @return bool|string
+     * @throws GuzzleException
+     * @throws ServerErrorHttpException
+     * @throws NotFoundHttpException
+     */
+    public function verifyLogin(int $mfaId, string $value, string $rpOrigin = '')
+    {
+        $mfa = Mfa::findOne(['id' => $mfaId]);
+        if ($mfa == null) {
+            throw new NotFoundHttpException("MFA record for given ID not found");
+        }
+
+        // Ensure there is a verified webauthn entry for this mfa
+        $webauthn = MfaWebauthn::findOne(['mfa_id' => $mfa->id,'verified' => 1]);
+        if ($webauthn === null) {
+            throw new NotFoundHttpException("No verified MFA Webauthn record found for MFA ID: " . $mfa->id, 1659637860);
+        }
+
+        [$headers, $value] = $this->getVerifyHeadersAndValue($mfa, $value, $rpOrigin);
+
+        return $this->client->webauthnValidateAuthentication($headers, $value);
+    }
+
+    private function getVerifyHeadersAndValue(MFA $mfa, string $value, string $rpOrigin)
+    {
+        $headers = $this->getWebAuthnHeaders(
+            $mfa->user->username,
+            $mfa->user->getDisplayName(),
+            $rpOrigin,
+            $mfa->external_uuid
+        );
+
+        if (!is_array($value)) {
+            $value = Json::decode($value);
+            if ($value == null) {
+                throw new ServerErrorHttpException("Missing data or unable to decode as JSON", 1638447364);
+            }
+        }
+
+        return [$headers, $value];
+    }
+
+    /**
      * Delete WebAuthn credential
      * @param int $mfaId
      * @param int $childId the id of the related/child object (only used for the WebAuthn backend)
