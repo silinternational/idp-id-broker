@@ -4,7 +4,9 @@ namespace common\components;
 use common\helpers\MySqlDateTime;
 use common\models\Mfa;
 use common\models\MfaBackupcode;
+use common\models\MfaWebauthn;
 use yii\base\Component;
+use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
 use yii\web\ServerErrorHttpException;
 
@@ -73,11 +75,19 @@ class MfaBackendBackupcode extends Component implements MfaBackendInterface
     /**
      * Delete MFA backend configuration
      * @param int $mfaId
+     * @param int $childId the id of the related/child object (only used for the WebAuthn backend)
      * @return bool
      * @throws ServerErrorHttpException
      */
-    public function delete(int $mfaId): bool
+    public function delete(int $mfaId, int $childId = 0): bool
     {
+        if ($childId != 0) {
+            throw new ForbiddenHttpException(
+                sprintf("May not delete a MfaWebauthn object on a %s mfa type", Mfa::TYPE_BACKUPCODE),
+                1658237140
+            );
+        }
         return MfaBackupcode::deleteCodesForMfaId($mfaId);
     }
+
 }

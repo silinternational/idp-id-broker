@@ -654,6 +654,39 @@ types:
               Too many failed attempts for this MFA record recently.
             body:
               type: Error
+
+  /{mfaId}:
+    /webauthn:
+      /{webauthnId}:
+        delete:
+          description: Delete a webauthn credential from an MFA. If it is the last credential, the whole MFA will be deleted.
+          body:
+            properties:
+              employee_id: string
+            example: |
+              {
+                "employee_id": "12345"
+              }
+          responses:
+            204:
+              description: Successful deletion of record
+            400:
+              description: >
+                `employee_id` was not provided or it did not match an employee record.
+              body:
+                type: Error
+            403:
+              description: The MFA record was not of type webauthn
+              body:
+                type: Error
+            404:
+              description: The matching webauthn credential or the (parent) MFA were not found
+              body:
+                type: Error
+            500:
+              description: Unable to delete the webauthn credential or the MFA record
+              body:
+                type: Error
 /method:
   post:
     description: >
