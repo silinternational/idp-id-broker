@@ -25,8 +25,6 @@ class Mfa extends MfaBase
     const EVENT_TYPE_VERIFY = 'verify_mfa';
     const EVENT_TYPE_DELETE = 'delete_mfa';
 
-    const DEFAULT_WEBAUTHN_LABEL = 'My webauthn key';
-
     /**
      * Holds additional data about method, such as initialized authentication data
      * needed for WebAuthn methods and number of remaining backup codes
