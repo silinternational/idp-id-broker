@@ -53,7 +53,7 @@ services:
             MYSQL_DATABASE: appfortests
             MYSQL_USER: appfortests
             MYSQL_PASSWORD: appfortests
-            MFA_WEBAUTHN_apiBaseUrl: external_api:8080/
+            MFA_WEBAUTHN_apiBaseUrl: mfaapi:8080/
             MFA_WEBAUTHN_apiKey: 10345678-1234-1234-1234-123456789012
             MFA_WEBAUTHN_apiSecret: 11345678-1234-1234-1234-12345678
             # the corresponding hash: $2a$10$8Bp9PqqfStjLvh1nQJ67JeY3CO/mEXmF1GKfe8Vk0kue1.i7fa2mC
@@ -95,7 +95,7 @@ services:
             AWS_DEFAULT_REGION: us-east-1
         command: "-jar DynamoDBLocal.jar -sharedDb"
 
-    external_api:
+    mfaapi:
         build: ./serverless-mfa-api
         ports:
             - 8080
@@ -144,7 +144,7 @@ services:
         working_dir: /data
         depends_on:
             - appfortests
-            - external_api
+            - mfaapi
         environment:
             TEST_SERVER_HOSTNAME: appfortests
             API_ACCESS_KEYS: api-test-NOTASECRET
@@ -154,7 +154,7 @@ services:
             EMAIL_SERVICE_assertValidIp: "false"
             EMAIL_SERVICE_baseUrl: dummy
             EMAIL_SIGNATURE: Dummy Signature for Test
-            MFA_WEBAUTHN_apiBaseUrl: external_api:8080
+            MFA_WEBAUTHN_apiBaseUrl: mfaapi:8080
             MFA_WEBAUTHN_apiKey: abc123
             MFA_WEBAUTHN_apiSecret: abcd1234
             MFA_WEBAUTHN_appId: ourApp99
@@ -195,7 +195,7 @@ services:
         volumes:
             - ./api.raml:/api.raml
             - ./api.html:/api.html
-        command: -i api.raml -o api.html
+        command: mattjtodd/raml2html -i api.raml -o api.html
 
 networks:
     default:

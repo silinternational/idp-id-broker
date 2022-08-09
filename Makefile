@@ -43,19 +43,17 @@ quicktest:
 test: appfortests
 	docker-compose run --rm test
 
-testcli: appfortests tablesfortests externalapi
+testcli: appfortests tablesfortests mfaapi
 	docker-compose run --rm test bash
 
-externalapi:
-	docker-compose up -d external_api
+mfaapi:
+	docker-compose up -d mfaapi
 
 clean:
 	docker-compose kill
 	docker system prune -f
 
-raml2html: api.html
-
-api.html: api.raml
+raml2html:
 	docker-compose run --rm raml2html
 
 psr2:

@@ -13,7 +13,7 @@ app:
     cached: true
     depends_on:
         - testdb
-        - externalapi
+        - mfaapi
     working_dir: /data
     command: /data/run-tests.sh
     environment:
@@ -37,7 +37,7 @@ app:
         HR_NOTIFICATIONS_EMAIL: hr@example.com
         ABANDONED_USER_bestPracticeUrl: http://www.example.com/best-practices.html
         ABANDONED_USER_deactivateInstructionsUrl: http://www.example.com/deactivate-instructions.html
-        MFA_WEBAUTHN_apiBaseUrl: externalapi:8080/
+        MFA_WEBAUTHN_apiBaseUrl: mfaapi:8080/
         MFA_WEBAUTHN_apiKey: 10345678-1234-1234-1234-123456789012
         MFA_WEBAUTHN_apiSecret: 11345678-1234-1234-1234-12345678
         MFA_WEBAUTHN_appId: ourApp99
@@ -55,7 +55,7 @@ dynamo:
     command: "-jar DynamoDBLocal.jar -sharedDb"
 
 # Don't use underscores in service names
-externalapi:
+mfaapi:
     build: ./serverless-mfa-api
     ports:
         - 8080
