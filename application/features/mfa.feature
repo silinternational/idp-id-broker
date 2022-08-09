@@ -61,6 +61,7 @@ Feature: MFA
     Then the response status code should be 400
 
   Scenario: Create new MFA record of type webauthn
+#TODO - create tests that make use of the webauthn client
 
   Scenario: Create new MFA record of type totp
 #TODO - create a test double for the totp client
