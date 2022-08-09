@@ -660,9 +660,21 @@ types:
       /{webauthnId}:
         delete:
           description: Delete a webauthn credential from an MFA. If it is the last credential, the whole MFA will be deleted.
+          body:
+            properties:
+              employee_id: string
+            example: |
+              {
+                "employee_id": "12345"
+              }
           responses:
             204:
               description: Successful deletion of record
+            400:
+              description: >
+                `employee_id` was not provided or it did not match an employee record.
+              body:
+                type: Error
             403:
               description: The MFA record was not of type webauthn
               body:
