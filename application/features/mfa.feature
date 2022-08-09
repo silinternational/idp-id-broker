@@ -124,7 +124,7 @@ Feature: MFA
     When I request to delete the webauthn entry of the MFA with a webauthn_id of 999
     Then the response status code should be 404
 
-  Scenario: Delete the legacy u2f credential of a webauthn MFA option
+  Scenario: Delete a webauthn credential of a webauthn MFA option
     Given the user has a verified webauthn MFA with a key_handle_hash of "u2f"
     # This value is from a serverless-mfa-api-go test user that has a credential id of "C10"
     # which gets hashed and base64 encoded to provide the "kI1ykA4kdZIbWA6XHmA-8iTxmVzfR-MCLRLuiK4-boo" value
@@ -133,8 +133,14 @@ Feature: MFA
     Then the response status code should be 204
       And the MFA record is still stored
 
-  Scenario: Delete the legacy u2f credential of a webauthn MFA option
+  Scenario: Delete a webauthn credential of a webauthn MFA option
     Given the user has a verified webauthn MFA with a key_handle_hash of "kI1ykA4kdZIbWA6XHmA-8iTxmVzfR-MCLRLuiK4-boo"
+    When I request to delete the webauthn entry of the MFA
+    Then the response status code should be 204
+      And the MFA record is not stored
+
+  Scenario: Delete the legacy u2f credential of a webauthn MFA option
+    Given the user has a verified webauthn MFA with a key_handle_hash of "u2f"
     When I request to delete the webauthn entry of the MFA
     Then the response status code should be 204
       And the MFA record is not stored
