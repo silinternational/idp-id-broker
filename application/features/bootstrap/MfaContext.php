@@ -5,7 +5,6 @@ use Behat\Gherkin\Node\TableNode;
 use common\models\EmailLog;
 use common\models\Mfa;
 use common\models\MfaBackupcode;
-use common\models\MfaWebauthn;
 use common\models\User;
 use Webmozart\Assert\Assert;
 
@@ -17,12 +16,6 @@ class MfaContext extends \FeatureContext
     protected $mfa;
 
     /**
-     * array $mfaWebauthnIds
-     *
-     */
-    protected $mfaWebauthnIds;
-
-    /**
      * array $backupCodes
      */
     protected $backupCodes;
@@ -32,8 +25,6 @@ class MfaContext extends \FeatureContext
      */
     public function iGiveThatUserAVerifiedMfa($mfaType)
     {
-        Assert::notEq($mfaType, mfa::TYPE_WEBAUTHN, "should have called iGiveThatUserAVerifiedWebauthnMfa");
-
         $user = User::findOne(['employee_id' => $this->tempEmployeeId]);
         Assert::notEmpty($user, 'Unable to find that user.');
         $this->mfa = new Mfa([
@@ -41,7 +32,6 @@ class MfaContext extends \FeatureContext
             'type' => $mfaType,
             'verified' => 1,
         ]);
-
         Assert::true($this->mfa->save(), 'Failed to add that MFA record to the database.');
         
         if ($mfaType === 'backupcode') {
@@ -49,28 +39,6 @@ class MfaContext extends \FeatureContext
         } elseif ($mfaType === 'manager') {
             $this->backupCodes = MfaBackupcode::createBackupCodes($this->mfa->id, 1);
         }
-    }
-
-    /**
-     * @Given the user has a verified webauthn MFA with a key_handle_hash of :keyHandleHash
-     */
-    public function iGiveThatUserAVerifiedWebauthnMfaWithAKeyHandleHashOf($keyHandleHash)
-    {
-        $user = User::findOne(['employee_id' => $this->tempEmployeeId]);
-        Assert::notEmpty($user, 'Unable to find that user.');
-
-        if (empty($this->mfa)) {
-            $this->mfa = new Mfa([
-                'user_id' => $user->id,
-                'type' => mfa::TYPE_WEBAUTHN,
-                'verified' => 1,
-                'external_uuid' => '097791bf-2385-4ab4-8b06-14561a338d8e',
-            ]);
-            Assert::true($this->mfa->save(), 'Failed to add that MFA record to the database.');
-        }
-
-        $webauthn = MfaWebauthn::createWebauthn($this->mfa, $keyHandleHash);
-        $this->mfaWebauthnIds[] = $webauthn->id;
     }
 
     /**
@@ -154,7 +122,7 @@ class MfaContext extends \FeatureContext
      */
     public function codesShouldBeStored($num)
     {
-        Assert::eq(count($this->mfa->mfaBackupcodes), $num);
+        Assert::eq($num, count($this->mfa->mfaBackupcodes));
     }
 
     /**
@@ -171,32 +139,6 @@ class MfaContext extends \FeatureContext
         $this->iRequestTheResourceBe('/mfa/' . $this->mfa->id, 'deleted');
     }
 
-
-    /**
-     * @When I request to delete the webauthn entry of the MFA with a webauthn_id of :webauthnId
-     */
-    public function iRequestToDeleteTheWebauthnEntryOfTheMfaWithAWebauthnIDOf($webauthnId)
-    {
-        $dataForTableNode = [
-            ['property', 'value'],
-            ['employee_id', '123'],
-        ];
-
-        $this->iProvideTheFollowingValidData(new TableNode($dataForTableNode));
-        $this->iRequestTheResourceBe('/mfa/' . $this->mfa->id . '/webauthn/' . $webauthnId,
-            'deleted');
-    }
-
-
-    /**
-     * @When I request to delete the webauthn entry of the MFA
-     */
-    public function iRequestToDeleteTheWebauthnEntryOfTheMfa()
-    {
-        $webauthnId = $this->mfaWebauthnIds[0];
-        $this->iRequestToDeleteTheWebauthnEntryOfTheMfaWithAWebauthnIDOf($webauthnId);
-    }
-
     /**
      * @Then the MFA record is not stored
      */
@@ -204,14 +146,5 @@ class MfaContext extends \FeatureContext
     {
         $this->mfa = Mfa::findOne(['id' => $this->mfa->id]);
         Assert::null($this->mfa, 'A matching record was found in the database');
-    }
-
-    /**
-     * @Then the MFA record is still stored
-     */
-    public function theMfaRecordIsStillStored()
-    {
-        $this->mfa = Mfa::findOne(['id' => $this->mfa->id]);
-        Assert::notNull($this->mfa, 'A matching record was not found in the database');
     }
 }

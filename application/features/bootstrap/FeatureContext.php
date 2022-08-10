@@ -8,7 +8,6 @@ use common\models\Method;
 use common\models\Mfa;
 use common\models\MfaBackupcode;
 use common\models\MfaFailedAttempt;
-use common\models\MfaWebauthn;
 use common\models\User;
 use common\models\Invite;
 use GuzzleHttp\Client;
@@ -100,7 +99,6 @@ class FeatureContext extends YiiContext
         // functions from being called.
         MfaBackupcode::deleteAll();
         MfaFailedAttempt::deleteAll();
-        MfaWebauthn::deleteAll();
         Mfa::deleteAll();
         Method::deleteAll();
         Invite::deleteAll();
@@ -189,22 +187,6 @@ class FeatureContext extends YiiContext
             sprintf(
                 "Unexpected response. status=%d, body=%s",
                 $this->response->getStatusCode(),
-                var_export($this->resBody, true)
-            )
-        );
-    }
-
-    /**
-     * @Then the response body should contain :containsText
-     */
-    public function theResponseBodyShouldContain($containsText)
-    {
-        Assert::contains(
-            var_export($this->resBody, true),
-            $containsText,
-            sprintf(
-                "Unexpected response body. Does not contain: %s, body=%s",
-                $containsText,
                 var_export($this->resBody, true)
             )
         );

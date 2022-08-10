@@ -19,7 +19,3 @@ vendor/
 api.html
 
 dockercfg
-
-# These folders are intended to offer a way to add logging for toubleshooting purposes
-serverless-mfa-api/override/*
-serverless-mfa-api/override/server/*

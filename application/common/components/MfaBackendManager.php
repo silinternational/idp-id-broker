@@ -7,7 +7,6 @@ use common\models\Mfa;
 use common\models\MfaBackupcode;
 use Sil\EmailService\Client\EmailServiceClientException;
 use yii\base\Component;
-use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
 use yii\web\ServerErrorHttpException;
 
@@ -104,18 +103,11 @@ class MfaBackendManager extends Component implements MfaBackendInterface
     /**
      * Delete MFA backend configuration
      * @param int $mfaId
-     * @param int $childId the id of the related/child object (only used for the WebAuthn backend)
      * @return bool
      * @throws ServerErrorHttpException
      */
-    public function delete(int $mfaId, int $childId = 0): bool
+    public function delete(int $mfaId): bool
     {
-        if ($childId != 0) {
-            throw new ForbiddenHttpException(
-                sprintf("May not delete a MfaWebauthn object on a %s mfa type", Mfa::TYPE_MANAGER),
-                1658237120
-            );
-        }
         return MfaBackupcode::deleteCodesForMfaId($mfaId);
     }
 }

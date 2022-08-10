@@ -4,7 +4,6 @@ namespace common\components;
 use common\models\Mfa;
 use common\models\User;
 use yii\base\Component;
-use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
 use yii\web\ServerErrorHttpException;
 
@@ -102,19 +101,11 @@ class MfaBackendTotp extends Component implements MfaBackendInterface
     /**
      * Delete MFA backend configuration
      * @param int $mfaId
-     * @param int $childId the id of the related/child object (only used for the WebAuthn backend)
      * @return bool
      * @throws NotFoundHttpException
      */
-    public function delete(int $mfaId, int $childId = 0): bool
+    public function delete(int $mfaId): bool
     {
-        if ($childId != 0) {
-            throw new ForbiddenHttpException(
-                sprintf("May not delete a MfaWebauthn object on a %s mfa type", Mfa::TYPE_TOTP),
-                1658237130
-            );
-        }
-
         $mfa = Mfa::findOne(['id' => $mfaId]);
         if ($mfa == null) {
             throw new NotFoundHttpException('MFA configuration not found');
@@ -126,5 +117,4 @@ class MfaBackendTotp extends Component implements MfaBackendInterface
 
         return true;
     }
-
 }
