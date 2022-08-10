@@ -205,14 +205,23 @@ class Mfa extends MfaBase
 
     /**
      * @param string|array $value
+     * @param string $rpOrigin Optional
+     * @param int $webauthnId Optional. If non-zero indicates that a particular webauthn credential is being registered
      * @return bool
      * @throws ServerErrorHttpException
      * @throws TooManyRequestsHttpException
      * @throws \Throwable
      * @throws \yii\db\StaleObjectException
      */
-    public function verify($value, string $rpOrigin = ''): bool
+    public function verify($value, string $rpOrigin = '', int $webauthnId = 0): bool
     {
+
+        if ($this->type != self::TYPE_WEBAUTHN && $webauthnId != 0) {
+            throw new BadRequestHttpException(
+                'A non-zero webauthnId is not allowed when verifying a mfa of type ' . $this->type
+            );
+        }
+
         if ($this->hasTooManyRecentFailures()) {
             \Yii::warning([
                 'action' => 'verify mfa',
@@ -225,7 +234,7 @@ class Mfa extends MfaBase
                 'Too many recent failed attempts for this MFA'
             );
         }
-        
+
         $backend = self::getBackendForType($this->type);
         if ($backend->verify($this->id, $value, $rpOrigin) === true) {
             $this->last_used_utc = MySqlDateTime::now();

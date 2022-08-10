@@ -57,12 +57,13 @@ class MfaController extends BaseRestController
     /**
      * Verify value with MFA backend
      * @param int $id
+     * @param int $webauthnId (optional) If non-zero indicates that a particular webauthn credential is being registered
      * @throws BadRequestHttpException
      * @throws NotFoundHttpException
      * @throws TooManyRequestsHttpException
      * @return null
      */
-    public function actionVerify(int $id)
+    public function actionVerify(int $id, int $webauthnId = 0)
     {
         $req = \Yii::$app->request;
         $value = $req->getBodyParam('value');
@@ -106,7 +107,7 @@ class MfaController extends BaseRestController
             throw new ForbiddenHttpException("Invalid rpOrigin", 1638539443);
         }
 
-        if (! $mfa->verify($value, $rpOrigin)) {
+        if (! $mfa->verify($value, $rpOrigin, $webauthnId)) {
             throw new BadRequestHttpException();
         }
 
