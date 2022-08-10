@@ -127,6 +127,61 @@ class MfaContext extends \FeatureContext
     }
 
     /**
+     * @Given the user has requested a new webauthn MFA
+     */
+    public function theUserHasRequestedANewWebauthnMfa()
+    {
+        $user = User::findOne(['employee_id' => $this->tempEmployeeId]);
+        Assert::notEmpty($user, 'Unable to find that user.');
+        $this->setRequestBody('type', Mfa::TYPE_WEBAUTHN);
+        $this->iRequestTheResourceBe('/mfa', 'created');
+
+        $id = $this->getResponseProperty('id');
+        Assert::notEmpty($id, 'Unable to get id of new Webauthn MFA');
+        $mfa = Mfa::FindOne(['id'=>$id]);
+        Assert::notEmpty($mfa, 'Unable to find that MFA.');
+
+
+        $resData = $this->getResponseProperty('data');
+        Assert::notEmpty($resData, "unable to find 'data' entry in the response");
+
+        $publicKey = $resData['publicKey'];
+        Assert::notEmpty($publicKey, "unable to find 'publicKey' entry in the reponse");
+
+        // It is too complicated at this point to come up with completely correct values
+        // These should get as far as producing a 400 status code with
+        // "error":"unable to create credential: Error validating challenge"
+
+        // These values are from the constants and tests in serverless-mfa-api-go/webauthn_test.go
+
+        $reqValue = [
+            'id' => 'dmlydEtleTExLTA',
+            'rawId' => 'dmlydEtleTExLTA',
+            'type' => 'public-key',
+            'response' => [
+                'authenticatorData' => 'dKbqkhPJnC90siSSsyDPQCYqlMGpUKA5fyklC2CEHvBFXJJiGa3OAAI1vMYKZIsLJfHwVQMANwCOw-atj9C0vhWpfWU-whzNjeQS21Lpxfdk_G-omAtffWztpGoErlNOfuXWRqm9Uj9ANJck1p6lAQIDJiABIVggKAhfsdHcBIc0KPgAcRyAIK_-Vi-nCXHkRHPNaCMBZ-4iWCBxB8fGYQSBONi9uvq0gv95dGWlhJrBwCsj_a4LJQKVHQ',
+                'clientDataJSON' => 'eyJjaGFsbGVuZ2UiOiJXOEd6RlU4cEdqaG9SYldyTERsYW1BZnFfeTRTMUNaRzFWdW9lUkxBUnJFIiwib3JpZ2luIjoiaHR0cHM6Ly93ZWJhdXRobi5pbyIsInR5cGUiOiJ3ZWJhdXRobi5jcmVhdGUifQ',
+                'attestationObject' => 'o2NmbXRkbm9uZWdhdHRTdG10oGhhdXRoRGF0YVjEdKbqkhPJnC90siSSsyDPQCYqlMGpUKA5fyklC2CEHvBBAAAAAAAAAAAAAAAAAAAAAAAAAAAAQOsa7QYSUFukFOLTmgeK6x2ktirNMgwy_6vIwwtegxI2flS1X-JAkZL5dsadg-9bEz2J7PnsbB0B08txvsyUSvKlAQIDJiABIVggLKF5xS0_BntttUIrm2Z2tgZ4uQDwllbdIfrrBMABCNciWCDHwin8Zdkr56iSIh0MrB5qZiEzYLQpEOREhMUkY6q4Vw',
+            ],
+            'user' => [
+                'displayName' => $user->display_name,
+                'id' => $user->id,
+                'name' => $user->username,
+            ],
+            'transports' => ['usb'],
+        ];
+
+        $reqJson = json_encode($reqValue);
+
+//        print_r(PHP_EOL . "GGGGGGGGG  " . $reqJson . PHP_EOL);
+
+        $this->setRequestBody('value', $reqJson);
+
+        $this->mfa = $mfa;
+    }
+
+
+    /**
      * @When I update the MFA
      */
     public function iUpdateTheMfa()
@@ -146,6 +201,14 @@ class MfaContext extends \FeatureContext
         ];
 
         $this->iProvideTheFollowingValidData(new TableNode($dataForTableNode));
+        $this->iRequestTheResourceBe('/mfa/' . $this->mfa->id . '/verify', 'created');
+    }
+
+    /**
+     * @When I request to verify the webauthn Mfa
+     */
+    public function iRequestToVerifyTheWebauthnMfa()
+    {
         $this->iRequestTheResourceBe('/mfa/' . $this->mfa->id . '/verify', 'created');
     }
 
@@ -196,6 +259,20 @@ class MfaContext extends \FeatureContext
         $webauthnId = $this->mfaWebauthnIds[0];
         $this->iRequestToDeleteTheWebauthnEntryOfTheMfaWithAWebauthnIDOf($webauthnId);
     }
+
+
+    /**
+     * @When the user requests a new webauthn MFA
+     */
+    public function theUserRequestsANewWebauthnMfa()
+    {
+        $user = User::findOne(['employee_id' => $this->tempEmployeeId]);
+        Assert::notEmpty($user, 'Unable to find that user.');
+        $this->setRequestBody('type', Mfa::TYPE_WEBAUTHN);
+        $this->iRequestTheResourceBe('/mfa', 'created');
+        print_r(PHP_EOL . "RRRRRR  " . var_export($this->getResponseBody(), true) . PHP_EOL);
+    }
+
 
     /**
      * @Then the MFA record is not stored

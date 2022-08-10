@@ -61,7 +61,19 @@ Feature: MFA
     Then the response status code should be 400
 
   Scenario: Create new MFA record of type webauthn
-#TODO - create tests that make use of the webauthn client
+    When the user requests a new webauthn MFA
+    Then the response status code should be 200
+    And the response body should contain 'publicKey'
+    And the response body should contain 'challenge'
+
+  Scenario: Verify a webauthn MFA using the old generic method
+    Given the user has requested a new webauthn MFA
+    When I request to verify the webauthn Mfa
+    # Normally this would return a 200. However, we're not using completely correct
+    # webauthn data, due to its complexity.
+    Then the response status code should be 500
+    And the response body should contain '400 Bad Request'
+    And the response body should contain '"error":"unable to create credential: Error validating challenge"'
 
   Scenario: Create new MFA record of type totp
 #TODO - create a test double for the totp client

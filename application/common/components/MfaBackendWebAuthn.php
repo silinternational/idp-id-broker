@@ -101,8 +101,10 @@ class MfaBackendWebAuthn extends Component implements MfaBackendInterface
         return $this->client->webauthnCreateAuthentication($headers);
     }
 
+
+
     /**
-     * Verify response from user is correct for the MFA backend device
+     * Verify response from user is correct for the MFA backend device.
      * @param int $mfaId The MFA ID
      * @param string|array $value The stringified JSON response from the browser credential api
      * @param string $rpOrigin The Replay Party Origin URL (with scheme, without port or path)
@@ -125,6 +127,7 @@ class MfaBackendWebAuthn extends Component implements MfaBackendInterface
             $mfa->external_uuid
         );
 
+
         if (!is_array($value)) {
             $value = Json::decode($value);
             if ($value == null) {
@@ -132,22 +135,35 @@ class MfaBackendWebAuthn extends Component implements MfaBackendInterface
             }
         }
 
-        if ($mfa->verified === 1) {
-            return $this->client->webauthnValidateAuthentication($headers, $value);
-        } else {
-            $results = $this->client->webauthnValidateRegistration($headers, $value);
-            if (isset($results['key_handle_hash'])) {
-                $mfa->verified = 1;
-                $mfa->key_handle_hash = $results['key_handle_hash'];
-                if (! $mfa->save()) {
-                    throw new ServerErrorHttpException(
-                        "Unable to save WebAuthn record after verification. Error: " . print_r($mfa->getFirstErrors(), true)
-                    );
-                }
-                return true;
+        // Get latest unverified webauthn entry for this mfa
+        $webauthn = MfaWebauthn::find()->where(['mfa_id' => $mfa->id,'verified' => 0])->orderBy(['created_utc' => SORT_DESC])->one();
+
+        // If there is no unverified webauthn entry, ensure there is a verified entry and then finish the
+        // login process.
+        if ($webauthn === null) {
+            $webauthn = MfaWebauthn::findOne(['mfa_id' => $mfa->id,'verified' => 1]);
+            if ($webauthn === null) {
+                throw new NotFoundHttpException("Verified MFA Webauthn record not found for MFA ID: " . $mfa->id, 1659637860);
             }
+            return $this->client->webauthnValidateAuthentication($headers, $value);
+        }
+//            throw new ServerErrorHttpException("HHHHHHHHHHH " . var_export($headers, true), 1699999999);
+
+        //If there is an unverified webauthn entry, finish its registration process
+        $results = $this->client->webauthnValidateRegistration($headers, $value);
+
+        if (! isset($results['key_handle_hash'])) {
             return false;
         }
+
+        $webauthn->verified = 1;
+        $webauthn->key_handle_hash = $results['key_handle_hash'];
+        if (! $webauthn->save()) {
+            throw new ServerErrorHttpException(
+                "Unable to save WebAuthn record after verification. Error: " . print_r($mfa->getFirstErrors(), true)
+            );
+        }
+        return true;
     }
 
 

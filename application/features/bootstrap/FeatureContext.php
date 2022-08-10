@@ -591,6 +591,24 @@ class FeatureContext extends YiiContext
     }
 
     /**
+     * @param $property
+     * @return mixed
+     */
+    public function setRequestBody(string $key, string $value)
+    {
+        $this->reqBody[$key] = $value;
+    }
+
+    /**
+     * @param $property
+     * @return mixed
+     */
+    public function getResponseBody()
+    {
+        return $this->resBody;
+    }
+
+    /**
      * @Then /^a method record exists with (?:a|an) (.*) of "?([^"]*)"?$/
      */
     public function aMethodRecordExistsForThisKey($lookupKey, $lookupValue)

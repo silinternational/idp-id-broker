@@ -91,7 +91,7 @@ class MfaController extends BaseRestController
 
         // Strip spaces from $value if string
         if (is_string($value)) {
-            $value = preg_replace('/\D/', '', $value);
+            $value = preg_replace('/\s+/', '', $value);
         }
 
         if (is_array($value)) {

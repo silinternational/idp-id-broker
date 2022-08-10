@@ -307,7 +307,7 @@ class Mfa extends MfaBase
         $existing = self::findOne(['user_id' => $userId, 'type' => $type, 'verified' => 1]);
 
         if ($existing instanceof Mfa) {
-            if ($type == self::TYPE_BACKUPCODE || $type == self::TYPE_MANAGER) {
+            if ($type == self::TYPE_BACKUPCODE || $type == self::TYPE_MANAGER || $type == self::TYPE_WEBAUTHN) {
                 $mfa = $existing;
             } else {
                 throw new ConflictHttpException('An MFA of type ' . $type . ' already exists.', 1551190694);
@@ -349,6 +349,8 @@ class Mfa extends MfaBase
                 ]);
                 throw new ServerErrorHttpException("Unable to update MFA record", 1507904194);
             }
+
+            $mfa->createWebauthn($results, $user);
         }
 
         \Yii::warning([
@@ -362,6 +364,35 @@ class Mfa extends MfaBase
             'id' => $mfa->id,
             'data' => $results,
         ];
+    }
+
+    /**
+     * @param array $regResults
+     * @param User $user
+     * @return null|MfaWebauthn
+     * @throws BadRequestHttpException
+     * @throws ServerErrorHttpException
+     */
+    private function createWebauthn(array $regResults, user $user) {
+        if ($this->type != self::TYPE_WEBAUTHN) {
+            return null;
+        }
+        $webauthn = new MfaWebauthn();
+        $webauthn->mfa_id = $this->id;
+        $webauthn->label =  $this->label;
+        $webauthn->verified = false;
+
+        if (! $webauthn->save()) {
+            \Yii::error([
+                'action' => 'create mfa_webauthn',
+                'type' => $this->type,
+                'username' => $user->username,
+                'status' => 'error',
+                'error' => $this->getFirstErrors(),
+            ]);
+            throw new ServerErrorHttpException("Unable to save new MFA Webauthn record", 1659634931);
+        }
+        return $webauthn;
     }
 
     /**
