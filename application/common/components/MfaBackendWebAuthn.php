@@ -111,7 +111,7 @@ class MfaBackendWebAuthn extends Component implements MfaBackendInterface
      * @throws ServerErrorHttpException
      * @throws NotFoundHttpException
      */
-    public function verify(int $mfaId, string $value, string $rpOrigin = '')
+    public function verify(int $mfaId, $value, string $rpOrigin = '')
     {
         $mfa = Mfa::findOne(['id' => $mfaId]);
         if ($mfa == null) {
