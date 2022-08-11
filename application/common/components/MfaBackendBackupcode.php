@@ -60,10 +60,11 @@ class MfaBackendBackupcode extends Component implements MfaBackendInterface
      * @param int $mfaId The MFA ID
      * @param string $value Value provided by user, such as TOTP number or WebAuthn challenge response
      * @param string $rpOrigin
+     * @param string $verifyType Only used for WebAuthn
      * @return bool
      * @throws ServerErrorHttpException
      */
-    public function verify(int $mfaId, string $value, string $rpOrigin = ''): bool
+    public function verify(int $mfaId, string $value, string $rpOrigin = '', string $verifyType = ''): bool
     {
         if (MfaBackupcode::validateAndRemove($mfaId, $value)) {
             MfaBackupcode::sendRefreshCodesMessage($mfaId);
