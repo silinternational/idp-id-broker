@@ -654,6 +654,44 @@ types:
               Too many failed attempts for this MFA record recently.
             body:
               type: Error
+      /registration:
+        post:
+          description: Verify the registration of a new mfa webauthn credential.
+          queryParameters:
+            rpOrigin:
+              type: string
+              description: The Relying Party origin url (only needed for WebAuthn)
+              default: ""
+              example: "https://sub.domain.com"
+          body:
+            properties:
+              employee_id: string
+              value: string
+            example: |
+              {
+                "employee_id": "12345",
+                "value": "01234987"
+              }
+          responses:
+            200:
+              description: Value provided passed verification
+              body:
+                type: MfaResponse
+            400:
+              description: >
+                Value provided failed verification or was unacceptable for some
+                other reason (such as an invalid `employee_id`).
+              body:
+                type: Error
+            404:
+              description: No MFA record found with that `id` and `employee_id`.
+              body:
+                type: Error
+            429:
+              description: >
+                Too many failed attempts for this MFA record recently.
+              body:
+                type: Error
 
   /{mfaId}:
     /webauthn:
