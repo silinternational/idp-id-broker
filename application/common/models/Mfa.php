@@ -215,7 +215,7 @@ class Mfa extends MfaBase
      * @throws \Throwable
      * @throws \yii\db\StaleObjectException
      */
-    public function verify($value, string $rpOrigin = '', string $verifyType): bool
+    public function verify($value, string $rpOrigin = '', string $verifyType = ""): bool
     {
         if ($verifyType != "") {
             if ($this->type != self::TYPE_WEBAUTHN) {

@@ -106,7 +106,7 @@ Feature: MFA
       | property  | value           |
       | label     | Printable Codes |
 
-  Scenario: Update a webauthn label
+  Scenario: Update a MfaWebauthn label
     Given the user has a verified mfaWebauthn with a key_handle_hash of "KHH"
     And I provide the following valid data:
       | property    | value        |
