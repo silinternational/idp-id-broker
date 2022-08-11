@@ -145,6 +145,7 @@ class MfaController extends BaseRestController
         $mfaOptions = Mfa::findAll(['user_id' => $user->id, 'verified' => 1]);
         foreach ($mfaOptions as $opt) {
             $opt->loadData($rpOrigin);
+            $opt->loadMfaWebauthns();
         }
 
         return $mfaOptions;

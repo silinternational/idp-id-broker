@@ -305,7 +305,6 @@ class MfaContext extends \FeatureContext
         Assert::notEmpty($user, 'Unable to find that user.');
         $this->setRequestBody('type', Mfa::TYPE_WEBAUTHN);
         $this->iRequestTheResourceBe('/mfa', 'created');
-        print_r(PHP_EOL . "RRRRRR  " . var_export($this->getResponseBody(), true) . PHP_EOL);
     }
 
 

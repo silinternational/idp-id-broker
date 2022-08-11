@@ -81,6 +81,28 @@ class FeatureContext extends YiiContext
     }
 
     /**
+     * @Then that record should have a data item with the following elements:
+     */
+    public function thatRecordShouldHaveADataItemWithTheFollowingElements(TableNode $table)
+    {
+        Assert::minCount($this->resBody, 1);
+        $item = $this->resBody[0];
+        Assert::minCount($item['data'], 1);
+        $data = $item['data'];
+
+        foreach ($table as $row) {
+            $property = $row['property'];
+            $expectedValue = $row['value'];
+
+            if ($expectedValue == '*') {
+                Assert::minLength($data[$property], 1);
+            } else {
+                Assert::eq($data[$property], $this->transformNULLs($expectedValue));
+            }
+        }
+    }
+
+    /**
      * @Given the requester is not authorized
      */
     public function theRequesterIsNotAuthorized()

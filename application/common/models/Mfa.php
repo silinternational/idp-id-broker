@@ -83,6 +83,26 @@ class Mfa extends MfaBase
     }
 
     /**
+     * Adds ['id' => MfaWebauthn->id, 'label' => MfaWebauthn->label] to the Mfa's data property
+     *  for each of a webauthn type MFA's MfaWebauthn children
+     */
+    public function loadMfaWebauthns()
+    {
+        if ($this->type != self::TYPE_WEBAUTHN) {
+            return;
+        }
+
+        if (! isset($this->data)) {
+            $this->data = [];
+        }
+
+        $webauthns = MfaWebauthn::findAll(['mfa_id' => $this-> id]);
+        foreach ($webauthns as $webauthn) {
+            $this->data += ['id' => $webauthn->id, 'label' => $webauthn->label];
+        }
+    }
+
+    /**
      * Whether this is both a new Mfa instance and already verified
      *   (basically just for a new backup code Mfa option)
      *  -- OR --
