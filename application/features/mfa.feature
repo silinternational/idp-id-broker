@@ -10,11 +10,11 @@ Feature: MFA
     Then the response status code should be 200
       And I should receive 0 records
 
-#  Scenario: Retrieve MFA records for a User with a backupcode MFA record
-#    Given the user has a verified "backupcode" MFA
-#    When I request "/user/123/mfa" be retrieved
-#    Then the response status code should be 200
-#      And I should receive 1 record
+  Scenario: Retrieve MFA records for a User with a backupcode MFA record
+    Given the user has a verified "backupcode" MFA
+    When I request "/user/123/mfa" be retrieved
+    Then the response status code should be 200
+      And I should receive 1 record
 
   Scenario: Retrieve MFA records for a User with a MfaWebauthn record
     Given the user has a verified mfaWebauthn with a key_handle_hash of "KHH"

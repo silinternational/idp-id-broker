@@ -228,14 +228,14 @@ class Mfa extends MfaBase
     /**
      * @param string|array $value
      * @param string $rpOrigin Optional
-     * @param string $verifyType Optional. If not blank, it must be `registration`, referring to verifying a webauthn registration
+     * @param string $verifyType Optional. If not blank, it must be 'registration', referring to verifying a webauthn registration
      * @return bool
      * @throws ServerErrorHttpException
      * @throws TooManyRequestsHttpException
      * @throws \Throwable
      * @throws \yii\db\StaleObjectException
      */
-    public function verify($value, string $rpOrigin = '', string $verifyType = ""): bool
+    public function verify($value, string $rpOrigin = '', string $verifyType = ''): bool
     {
         if ($verifyType != "") {
             if ($this->type != self::TYPE_WEBAUTHN) {

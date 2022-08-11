@@ -144,7 +144,7 @@ class MfaBackendWebAuthn extends Component implements MfaBackendInterface
             return $this->client->webauthnValidateAuthentication($headers, $value);
         }
 
-        //If there is an unverified webauthn entry, finish its registration process
+        // Assume a new webauthn was requested and finish its registration process
         $results = $this->client->webauthnValidateRegistration($headers, $value);
 
         if (! isset($results['key_handle_hash'])) {

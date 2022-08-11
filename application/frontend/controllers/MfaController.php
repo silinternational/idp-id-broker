@@ -209,6 +209,7 @@ class MfaController extends BaseRestController
             throw new ForbiddenHttpException("Invalid rpOrigin", 1638539680);
         }
         $mfa->loadData($rpOrigin);
+        $mfa->loadMfaWebauthns();
 
         return $mfa;
     }
