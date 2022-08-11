@@ -25,6 +25,8 @@ class Mfa extends MfaBase
     const EVENT_TYPE_VERIFY = 'verify_mfa';
     const EVENT_TYPE_DELETE = 'delete_mfa';
 
+    const VERIFY_REGISTRATION = 'registration';
+
     /**
      * Holds additional data about method, such as initialized authentication data
      * needed for WebAuthn methods and number of remaining backup codes
@@ -206,20 +208,27 @@ class Mfa extends MfaBase
     /**
      * @param string|array $value
      * @param string $rpOrigin Optional
-     * @param int $webauthnId Optional. If non-zero indicates that a particular webauthn credential is being registered
+     * @param string $verifyType Optional. If not blank, it must be `registration`, referring to verifying a webauthn registration
      * @return bool
      * @throws ServerErrorHttpException
      * @throws TooManyRequestsHttpException
      * @throws \Throwable
      * @throws \yii\db\StaleObjectException
      */
-    public function verify($value, string $rpOrigin = '', int $webauthnId = 0): bool
+    public function verify($value, string $rpOrigin = '', string $verifyType): bool
     {
+        if ($verifyType != "") {
+            if ($this->type != self::TYPE_WEBAUTHN) {
+                throw new BadRequestHttpException(
+                    'A non-blank verification type is not allowed when verifying a mfa of type ' . $this->type
+                );
+            }
 
-        if ($this->type != self::TYPE_WEBAUTHN && $webauthnId != 0) {
-            throw new BadRequestHttpException(
-                'A non-zero webauthnId is not allowed when verifying a mfa of type ' . $this->type
-            );
+            if ($verifyType != Mfa::VERIFY_REGISTRATION) {
+                throw new BadRequestHttpException(
+                    'A non-blank verification type for a ' . self::TYPE_WEBAUTHN . " may only be: " . self::VERIFY_REGISTRATION
+                );
+            }
         }
 
         if ($this->hasTooManyRecentFailures()) {
@@ -236,7 +245,7 @@ class Mfa extends MfaBase
         }
 
         $backend = self::getBackendForType($this->type);
-        if ($backend->verify($this->id, $value, $rpOrigin) === true) {
+        if ($backend->verify($this->id, $value, $rpOrigin, $verifyType) === true) {
             $this->last_used_utc = MySqlDateTime::now();
             if (! $this->save()) {
                 \Yii::error([
@@ -349,8 +358,6 @@ class Mfa extends MfaBase
                 ]);
                 throw new ServerErrorHttpException("Unable to update MFA record", 1507904194);
             }
-
-            $mfa->createWebauthn($results, $user);
         }
 
         \Yii::warning([
@@ -367,32 +374,32 @@ class Mfa extends MfaBase
     }
 
     /**
-     * @param array $regResults
-     * @param User $user
+     * @param string $label
+     * @param string $keyHandleHash
      * @return null|MfaWebauthn
-     * @throws BadRequestHttpException
      * @throws ServerErrorHttpException
      */
-    private function createWebauthn(array $regResults, user $user) {
+    public function createWebauthn(string $label, string $keyHandleHash): void {
         if ($this->type != self::TYPE_WEBAUTHN) {
-            return null;
+            return;
         }
         $webauthn = new MfaWebauthn();
         $webauthn->mfa_id = $this->id;
-        $webauthn->label =  $this->label;
-        $webauthn->verified = false;
+        $webauthn->label =  $label;
+        $webauthn->key_handle_hash =  $keyHandleHash;
+        $webauthn->verified = true;
 
         if (! $webauthn->save()) {
             \Yii::error([
                 'action' => 'create mfa_webauthn',
                 'type' => $this->type,
-                'username' => $user->username,
+                'username' => $this->user->username,
                 'status' => 'error',
                 'error' => $this->getFirstErrors(),
             ]);
             throw new ServerErrorHttpException("Unable to save new MFA Webauthn record", 1659634931);
         }
-        return $webauthn;
+        return;
     }
 
     /**

@@ -102,18 +102,18 @@ class MfaBackendWebAuthn extends Component implements MfaBackendInterface
     }
 
 
-
     /**
      * Verify response from user is correct for the MFA backend device.
      * @param int $mfaId The MFA ID
      * @param string|array $value The stringified JSON response from the browser credential api
      * @param string $rpOrigin The Replay Party Origin URL (with scheme, without port or path)
+     * @param string $verifyType The type of verification: either "registration" or assumed to be for login
      * @return bool|string
      * @throws GuzzleException
      * @throws ServerErrorHttpException
      * @throws NotFoundHttpException
      */
-    public function verify(int $mfaId, $value, string $rpOrigin = '')
+    public function verify(int $mfaId, $value, string $rpOrigin = '', string $verifyType = '')
     {
         $mfa = Mfa::findOne(['id' => $mfaId]);
         if ($mfa == null) {
@@ -135,19 +135,14 @@ class MfaBackendWebAuthn extends Component implements MfaBackendInterface
             }
         }
 
-        // Get latest unverified webauthn entry for this mfa
-        $webauthn = MfaWebauthn::find()->where(['mfa_id' => $mfa->id,'verified' => 0])->orderBy(['created_utc' => SORT_DESC])->one();
-
-        // If there is no unverified webauthn entry, ensure there is a verified entry and then finish the
-        // login process.
-        if ($webauthn === null) {
+        // If the verifyType is not registration, finish the login process.
+        if ($verifyType != Mfa::VERIFY_REGISTRATION) {
             $webauthn = MfaWebauthn::findOne(['mfa_id' => $mfa->id,'verified' => 1]);
             if ($webauthn === null) {
                 throw new NotFoundHttpException("Verified MFA Webauthn record not found for MFA ID: " . $mfa->id, 1659637860);
             }
             return $this->client->webauthnValidateAuthentication($headers, $value);
         }
-//            throw new ServerErrorHttpException("HHHHHHHHHHH " . var_export($headers, true), 1699999999);
 
         //If there is an unverified webauthn entry, finish its registration process
         $results = $this->client->webauthnValidateRegistration($headers, $value);
@@ -156,13 +151,9 @@ class MfaBackendWebAuthn extends Component implements MfaBackendInterface
             return false;
         }
 
-        $webauthn->verified = 1;
-        $webauthn->key_handle_hash = $results['key_handle_hash'];
-        if (! $webauthn->save()) {
-            throw new ServerErrorHttpException(
-                "Unable to save WebAuthn record after verification. Error: " . print_r($mfa->getFirstErrors(), true)
-            );
-        }
+        $label = $mfa->getReadableType();
+        $mfa->createWebauthn($label, $results['key_handle_hash']);
+
         return true;
     }
 
