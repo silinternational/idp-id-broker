@@ -150,6 +150,8 @@ class MfaController extends BaseRestController
         return $mfaOptions;
     }
 
+
+
     /**
      * Find an MFA by id and employee_id
      *
@@ -158,7 +160,7 @@ class MfaController extends BaseRestController
      * @throws BadRequestHttpException
      * @throws NotFoundHttpException
      */
-    protected function getRequestedMfa($id)
+    protected function getAuthorizedMfa($id)
     {
         $employeeId = \Yii::$app->request->getBodyParam('employee_id');
         if ($employeeId == null) {
@@ -184,6 +186,21 @@ class MfaController extends BaseRestController
                 1506697614
             );
         }
+
+        return $mfa;
+    }
+
+    /**
+     * Find an MFA by id and employee_id and call its loadData method
+     *
+     * @param int $id
+     * @return Mfa|null
+     * @throws BadRequestHttpException
+     * @throws NotFoundHttpException
+     */
+    protected function getRequestedMfa($id): Mfa
+    {
+        $mfa = $this->getAuthorizedMfa($id);
 
         // rpOrigin is needed for WebAuthn authentication
         $rpOrigin = \Yii::$app->request->get('rpOrigin', '');
@@ -267,7 +284,7 @@ class MfaController extends BaseRestController
      */
     public function actionUpdate(int $id)
     {
-        $mfa = $this->getRequestedMfa($id);
+        $mfa = $this->getAuthorizedMfa($id);
 
         $label = \Yii::$app->request->getBodyParam('label');
         if ($label === null) {
@@ -287,5 +304,49 @@ class MfaController extends BaseRestController
         }
 
         return $mfa;
+    }
+
+
+    /**
+     * @param int $mfaId
+     * @param int $webauthnId
+     * @return MfaWebauthn
+     * @throws BadRequestHttpException
+     * @throws NotFoundHttpException
+     * @throws ServerErrorHttpException
+     * @throws \Throwable
+     * @throws \yii\db\StaleObjectException
+     */
+    public function actionUpdateWebauthn(int $mfaId, int $webauthnId)
+    {
+        // check authorization
+        $this->getAuthorizedMfa($mfaId);
+
+        $label = \Yii::$app->request->getBodyParam('label');
+        if (empty($label)) {
+            throw new BadRequestHttpException('"label" must have a value in calls to update-webauthn', 1660233368);
+        }
+
+        $webauthn = MfaWebauthn::findOne(['id' => $webauthnId, 'mfa_id' => $mfaId]);
+        if ($webauthn === null) {
+            throw new NotFoundHttpException(
+               "MfaWebauthn not found with id: $webauthnId and mfa_id: $mfaId",
+                1660232933
+            );
+        }
+
+        $webauthn->label = $label;
+
+        if ($webauthn->update() === false) {
+            \Yii::error([
+                'action' => 'update mfa webauthn',
+                'status' => 'error',
+                'error' => $webauthn->getFirstErrors(),
+                'mfa_id' => $webauthn->id,
+            ]);
+            throw new ServerErrorHttpException("Unable to update MfaWebauthn label", 1660233472);
+        }
+
+        return $webauthn;
     }
 }

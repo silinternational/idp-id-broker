@@ -60,12 +60,13 @@ return [
                 /*
                  * MFA routes
                  */
-                'GET    user/<employeeId:\w+>/mfa'              => 'mfa/list',
-                'POST   mfa'                                    => 'mfa/create',
-                'PUT    mfa/<id:\d+>'                           => 'mfa/update',
-                'POST   mfa/<id:\d+>/verify'                    => 'mfa/verify',
-                'POST   mfa/<id:\d+>/verify/<type>'             => 'mfa/verify',
-                'DELETE mfa/<id:\d+>'                           => 'mfa/delete',
+                'GET    user/<employeeId:\w+>/mfa'                 => 'mfa/list',
+                'POST   mfa'                                       => 'mfa/create',
+                'PUT    mfa/<id:\d+>'                              => 'mfa/update',
+                'PUT    mfa/<mfaId:\d+>/webauthn/<webauthnId:\d+>' => 'mfa/update-webauthn',
+                'POST   mfa/<id:\d+>/verify'                       => 'mfa/verify',
+                'POST   mfa/<id:\d+>/verify/<type>'                => 'mfa/verify',
+                'DELETE mfa/<id:\d+>'                              => 'mfa/delete',
                 'DELETE mfa/<mfaId:\d+>/webauthn/<webauthnId:\d+>' => 'mfa/delete-credential',
 
                 /*

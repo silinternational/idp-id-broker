@@ -106,6 +106,36 @@ Feature: MFA
       | property  | value           |
       | label     | Printable Codes |
 
+  Scenario: Update a webauthn label
+    Given the user has a verified mfaWebauthn with a key_handle_hash of "KHH"
+    And I provide the following valid data:
+      | property    | value        |
+      | employee_id | 123          |
+      | label       | A New Label  |
+    When I update the mfaWebauthn
+    Then the response status code should be 200
+      And the property label should contain "A New Label"
+      And the mfaWebauthn record exists
+      And the following mfaWebauthn data should be stored:
+        | property            | value           |
+        | label               | A New Label     |
+        | key_handle_hash     | KHH             |
+
+  Scenario: Update a mfaWebauthn label to be blank
+    Given the user has a verified mfaWebauthn with a key_handle_hash of "KHH"
+    And I provide the following valid data:
+      | property    | value        |
+      | employee_id | 123          |
+      | label       |              |
+    When I update the mfaWebauthn
+    Then the response status code should be 400
+      And the response body should contain '"label" must have a value in calls to update-webauthn'
+      And the mfaWebauthn record exists
+      And the following mfaWebauthn data should be stored:
+        | property            | value           |
+        | label               | Security Key    |
+        | key_handle_hash     | KHH             |
+
   Scenario: Verify a backupcode MFA code
     Given the user has a verified "backupcode" MFA
     When I request to verify one of the codes
@@ -133,27 +163,27 @@ Feature: MFA
       And the MFA record is not stored
 
   Scenario: Exception to delete the missing credential of a webauthn MFA option
-    Given the user has a verified webauthn MFA with a key_handle_hash of "u2f"
+    Given the user has a verified mfaWebauthn with a key_handle_hash of "u2f"
     When I request to delete the webauthn entry of the MFA with a webauthn_id of 999
     Then the response status code should be 404
 
   Scenario: Delete a webauthn credential of a webauthn MFA option
-    Given the user has a verified webauthn MFA with a key_handle_hash of "u2f"
+    Given the user has a verified mfaWebauthn with a key_handle_hash of "u2f"
     # This value is from a serverless-mfa-api-go test user that has a credential id of "C10"
     # which gets hashed and base64 encoded to provide the "kI1ykA4kdZIbWA6XHmA-8iTxmVzfR-MCLRLuiK4-boo" value
-      And the user has a verified webauthn MFA with a key_handle_hash of "kI1ykA4kdZIbWA6XHmA-8iTxmVzfR-MCLRLuiK4-boo"
+      And the user has a verified mfaWebauthn with a key_handle_hash of "kI1ykA4kdZIbWA6XHmA-8iTxmVzfR-MCLRLuiK4-boo"
     When I request to delete the webauthn entry of the MFA
     Then the response status code should be 204
       And the MFA record is still stored
 
   Scenario: Delete a webauthn credential of a webauthn MFA option
-    Given the user has a verified webauthn MFA with a key_handle_hash of "kI1ykA4kdZIbWA6XHmA-8iTxmVzfR-MCLRLuiK4-boo"
+    Given the user has a verified mfaWebauthn with a key_handle_hash of "kI1ykA4kdZIbWA6XHmA-8iTxmVzfR-MCLRLuiK4-boo"
     When I request to delete the webauthn entry of the MFA
     Then the response status code should be 204
       And the MFA record is not stored
 
   Scenario: Delete the legacy u2f credential of a webauthn MFA option
-    Given the user has a verified webauthn MFA with a key_handle_hash of "u2f"
+    Given the user has a verified mfaWebauthn with a key_handle_hash of "u2f"
     When I request to delete the webauthn entry of the MFA
     Then the response status code should be 204
       And the MFA record is not stored

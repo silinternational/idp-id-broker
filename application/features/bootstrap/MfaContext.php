@@ -17,6 +17,12 @@ class MfaContext extends \FeatureContext
     protected $mfa;
 
     /**
+     * array $mfaWebauthn
+     *
+     */
+    protected $mfaWebauthn;
+
+    /**
      * array $mfaWebauthnIds
      *
      */
@@ -52,9 +58,9 @@ class MfaContext extends \FeatureContext
     }
 
     /**
-     * @Given the user has a verified webauthn MFA with a key_handle_hash of :keyHandleHash
+     * @Given the user has a verified mfaWebauthn with a key_handle_hash of :keyHandleHash
      */
-    public function iGiveThatUserAVerifiedWebauthnMfaWithAKeyHandleHashOf($keyHandleHash)
+    public function iGiveThatUserAVerifiedMfaWebauthnMfaWithAKeyHandleHashOf($keyHandleHash)
     {
         $user = User::findOne(['employee_id' => $this->tempEmployeeId]);
         Assert::notEmpty($user, 'Unable to find that user.');
@@ -70,6 +76,7 @@ class MfaContext extends \FeatureContext
         }
 
         $webauthn = MfaWebauthn::createWebauthn($this->mfa, $keyHandleHash);
+        $this->mfaWebauthn = $webauthn;
         $this->mfaWebauthnIds[] = $webauthn->id;
     }
 
@@ -95,6 +102,28 @@ class MfaContext extends \FeatureContext
             $expectedValue = $row['value'];
 
             Assert::eq($this->mfa->$property, $this->transformNULLs($expectedValue));
+        }
+    }
+
+    /**
+     * @Then the mfaWebauthn record exists
+     */
+    public function theMfaWebauthnRecordExists()
+    {
+        $this->mfaWebauthn = MfaWebauthn::findOne(['id' => $this->mfaWebauthn->id]);
+        Assert::notEmpty($this->mfaWebauthn, 'No MfaWebauthn record found with that id.');
+    }
+
+    /**
+     * @Then the following mfaWebauthn data should be stored:
+     */
+    public function theFollowingMfaWebauthnDataShouldBeStored(TableNode $table)
+    {
+        foreach ($table as $row) {
+            $property = $row['property'];
+            $expectedValue = $row['value'];
+
+            Assert::eq($this->mfaWebauthn->$property, $this->transformNULLs($expectedValue));
         }
     }
 
@@ -176,6 +205,15 @@ class MfaContext extends \FeatureContext
     public function iUpdateTheMfa()
     {
         $this->iRequestTheResourceBe('/mfa/' . $this->mfa->id, 'updated');
+    }
+
+
+    /**
+     * @When I update the mfaWebauthn
+     */
+    public function iUpdateTheMfaWebauthn()
+    {
+        $this->iRequestTheResourceBe('/mfa/' . $this->mfa->id . '/webauthn/' . $this->mfaWebauthn->id, 'updated');
     }
 
     /**
