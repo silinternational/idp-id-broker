@@ -141,27 +141,19 @@ class MfaContext extends \FeatureContext
         $mfa = Mfa::FindOne(['id'=>$id]);
         Assert::notEmpty($mfa, 'Unable to find that MFA.');
 
-
-        $resData = $this->getResponseProperty('data');
-        Assert::notEmpty($resData, "unable to find 'data' entry in the response");
-
-        $publicKey = $resData['publicKey'];
-        Assert::notEmpty($publicKey, "unable to find 'publicKey' entry in the reponse");
-
         // It is too complicated at this point to come up with completely correct values
         // These should get as far as producing a 400 status code with
         // "error":"unable to create credential: Error validating challenge"
 
-        // These values are from the constants and tests in serverless-mfa-api-go/webauthn_test.go
-
+        // These values are from values produced in serverless-mfa-api-go/webauthn_test.go Test_FinishRegistration
         $reqValue = [
             'id' => 'dmlydEtleTExLTA',
             'rawId' => 'dmlydEtleTExLTA',
             'type' => 'public-key',
             'response' => [
-                'authenticatorData' => 'dKbqkhPJnC90siSSsyDPQCYqlMGpUKA5fyklC2CEHvBFXJJiGa3OAAI1vMYKZIsLJfHwVQMANwCOw-atj9C0vhWpfWU-whzNjeQS21Lpxfdk_G-omAtffWztpGoErlNOfuXWRqm9Uj9ANJck1p6lAQIDJiABIVggKAhfsdHcBIc0KPgAcRyAIK_-Vi-nCXHkRHPNaCMBZ-4iWCBxB8fGYQSBONi9uvq0gv95dGWlhJrBwCsj_a4LJQKVHQ',
-                'clientDataJSON' => 'eyJjaGFsbGVuZ2UiOiJXOEd6RlU4cEdqaG9SYldyTERsYW1BZnFfeTRTMUNaRzFWdW9lUkxBUnJFIiwib3JpZ2luIjoiaHR0cHM6Ly93ZWJhdXRobi5pbyIsInR5cGUiOiJ3ZWJhdXRobi5jcmVhdGUifQ',
-                'attestationObject' => 'o2NmbXRkbm9uZWdhdHRTdG10oGhhdXRoRGF0YVjEdKbqkhPJnC90siSSsyDPQCYqlMGpUKA5fyklC2CEHvBBAAAAAAAAAAAAAAAAAAAAAAAAAAAAQOsa7QYSUFukFOLTmgeK6x2ktirNMgwy_6vIwwtegxI2flS1X-JAkZL5dsadg-9bEz2J7PnsbB0B08txvsyUSvKlAQIDJiABIVggLKF5xS0_BntttUIrm2Z2tgZ4uQDwllbdIfrrBMABCNciWCDHwin8Zdkr56iSIh0MrB5qZiEzYLQpEOREhMUkY6q4Vw',
+                'authenticatorData' => 'hgW4ugjCDUL55FUVGHGJbQ4N6YBZYob7c20R7sAT4qRBAAAAAAAAAAAAAAAAAAAAAAAAAAAADHZpcnR1YWxrZXkxMaQBAgMmIVggBtYaQhitMvmuvKeeUZmuh96TmXTRGxB_6bfslWmTVF4iWCCK1h-O_T8R6MjkIWCsX-Pry8RJhuOxbDwovnYJBu0SZw',
+                'clientDataJSON' => 'eyJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIiwiY2hhbGxlbmdlIjoidXdGS2ZyRTk3Qm1yWWFmUjhUZW5kUjJKbWxkekVlQ3paRTFnL0FhYm03bz0iLCJvcmlnaW4iOiJodHRwOi8vbG9jYWxob3N0IiwiY2lkX3B1YmtleSI6bnVsbH0=',
+                'attestationObject' => 'pGNmbXRoZmlkby11MmZnYXR0U3RtdKJjc2lnWEgwRgIhAL2a2xVBg_4Ooc-m27dxItzeUsROR7PLh2wHa0ZTerhYAiEA9trBQ8Yr6MPPdeNaN4BE8fuR4aV2iL8UL95JfB4F-khjeDVjgVkBJzCCASMwgcmgAwIBAgIhARDyEPt8s80lRZ3lTdjXIo0Dp3dfBJd1nOqwKNDeOPNOMAoGCCqGSM49BAMCMAAwIBcNMjIwMTAxMDEwMTAxWhgPMjEyMjAxMDEwMTAxMDFaMAAwWTATBgcqhkjOPQIBBggqhkjOPQMBBwNCAAQG1hpCGK0y-a68p55Rma6H3pOZdNEbEH_pt-yVaZNUXorWH479PxHoyOQhYKxf4-vLxEmG47FsPCi-dgkG7RJnoxIwEDAOBgNVHQ8BAf8EBAMCAqQwCgYIKoZIzj0EAwIDSQAwRgIhAIXIqNEsaurdLaUiLG5_srVUw8fZZyJ268Hh8iFp3Xb2AiEA-v_2ik8SC8_EhQzN4RkgHRseGr-y0DymcIbdrpODjYpoQXV0aERhdGGlZHJwaWT2ZWZsYWdzAGhhdHRfZGF0YaNmYWFndWlk9mpwdWJsaWNfa2V59m1jcmVkZW50aWFsX2lk9mhleHRfZGF0YfZqc2lnbl9jb3VudABoYXV0aERhdGFYjoYFuLoIwg1C-eRVFRhxiW0ODemAWWKG-3NtEe7AE-KkQQAAAAAAAAAAAAAAAAAAAAAAAAAAAAx2aXJ0dWFsa2V5MTGkAQIDJiFYIAbWGkIYrTL5rrynnlGZrofek5l00RsQf-m37JVpk1ReIlggitYfjv0_EejI5CFgrF_j68vESYbjsWw8KL52CQbtEmc',
             ],
             'user' => [
                 'displayName' => $user->display_name,
@@ -172,9 +164,6 @@ class MfaContext extends \FeatureContext
         ];
 
         $reqJson = json_encode($reqValue);
-
-//        print_r(PHP_EOL . "GGGGGGGGG  " . $reqJson . PHP_EOL);
-
         $this->setRequestBody('value', $reqJson);
 
         $this->mfa = $mfa;
@@ -202,6 +191,14 @@ class MfaContext extends \FeatureContext
 
         $this->iProvideTheFollowingValidData(new TableNode($dataForTableNode));
         $this->iRequestTheResourceBe('/mfa/' . $this->mfa->id . '/verify', 'created');
+    }
+
+    /**
+     * @When I request to verify the webauthn Mfa registration
+     */
+    public function iRequestToVerifyTheWebauthnMfaRegistration()
+    {
+        $this->iRequestTheResourceBe('/mfa/' . $this->mfa->id . '/verify/registration', 'created');
     }
 
     /**

@@ -60,17 +60,17 @@ Feature: MFA
     When I request "/mfa" be created
     Then the response status code should be 400
 
-  Scenario: Create new MFA record of type webauthn
+  Scenario: Request a MFA record of type webauthn
     When the user requests a new webauthn MFA
     Then the response status code should be 200
     And the response body should contain 'publicKey'
     And the response body should contain 'challenge'
 
-  Scenario: Verify a webauthn MFA using the old generic method
+  Scenario: Verify a new MFA webauthn registration
     Given the user has requested a new webauthn MFA
-    When I request to verify the webauthn Mfa
+    When I request to verify the webauthn Mfa registration
     # Normally this would return a 200. However, we're not using completely correct
-    # webauthn data, due to its complexity.
+    # webauthn data, due to its complexity and lack of predictability.
     Then the response status code should be 500
     And the response body should contain '400 Bad Request'
     And the response body should contain '"error":"unable to create credential: Error validating challenge"'
