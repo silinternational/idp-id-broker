@@ -195,7 +195,8 @@ services:
         volumes:
             - ./api.raml:/api.raml
             - ./api.html:/api.html
-        command: mattjtodd/raml2html -i api.raml -o api.html
+        # The ENTRYPOINT in the the Dockerfile is "raml2html"
+        command: -i api.raml -o api.html
 
 networks:
     default:
