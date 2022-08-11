@@ -64,7 +64,7 @@ return [
                 'POST   mfa'                                    => 'mfa/create',
                 'PUT    mfa/<id:\d+>'                           => 'mfa/update',
                 'POST   mfa/<id:\d+>/verify'                    => 'mfa/verify',
-                'POST   mfa/<id:\d+>/verify/<webauthnId:\d+>'   => 'mfa/verify',
+                'POST   mfa/<id:\d+>/verify/<type>'             => 'mfa/verify',
                 'DELETE mfa/<id:\d+>'                           => 'mfa/delete',
                 'DELETE mfa/<mfaId:\d+>/webauthn/<webauthnId:\d+>' => 'mfa/delete-credential',
 
