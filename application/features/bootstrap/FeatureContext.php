@@ -88,7 +88,7 @@ class FeatureContext extends YiiContext
         Assert::minCount($this->resBody, 1);
         $item = $this->resBody[0];
         Assert::minCount($item['data'], 1);
-        $data = $item['data'];
+        $data = $item['data'][0];
 
         foreach ($table as $row) {
             $property = $row['property'];

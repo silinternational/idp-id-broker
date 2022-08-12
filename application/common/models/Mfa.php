@@ -98,7 +98,7 @@ class Mfa extends MfaBase
 
         $webauthns = MfaWebauthn::findAll(['mfa_id' => $this-> id]);
         foreach ($webauthns as $webauthn) {
-            $this->data += ['id' => $webauthn->id, 'label' => $webauthn->label];
+            $this->data[] = ['id' => $webauthn->id, 'label' => $webauthn->label];
         }
     }
 
