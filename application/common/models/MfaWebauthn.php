@@ -19,6 +19,9 @@ class MfaWebauthn extends MfaWebauthnBase
     {
         return ArrayHelper::merge([
             [
+                'label', 'required'
+            ],
+            [
                 'created_utc', 'default', 'value' => MySqlDateTime::now(),
             ],
             [
@@ -41,6 +44,7 @@ class MfaWebauthn extends MfaWebauthnBase
         $webauthn = new MfaWebauthn();
         $webauthn->mfa_id = $mfa->id;
         $webauthn->label = $label;
+        $webauthn->verified = 1;
         $webauthn->key_handle_hash = $keyHandleHash;
         if (! $webauthn->save()) {
             \Yii::error([

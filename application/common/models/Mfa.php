@@ -96,7 +96,7 @@ class Mfa extends MfaBase
             $this->data = [];
         }
 
-        $webauthns = MfaWebauthn::findAll(['mfa_id' => $this-> id]);
+        $webauthns = MfaWebauthn::findAll(['mfa_id' => $this-> id, 'verified' => 1]);
         foreach ($webauthns as $webauthn) {
             $this->data[] = ['id' => $webauthn->id, 'label' => $webauthn->label];
         }
@@ -237,20 +237,6 @@ class Mfa extends MfaBase
      */
     public function verify($value, string $rpOrigin = '', string $verifyType = ''): bool
     {
-        if ($verifyType != "") {
-            if ($this->type != self::TYPE_WEBAUTHN) {
-                throw new BadRequestHttpException(
-                    'A non-blank verification type is not allowed when verifying a mfa of type ' . $this->type
-                );
-            }
-
-            if ($verifyType != Mfa::VERIFY_REGISTRATION) {
-                throw new BadRequestHttpException(
-                    'A non-blank verification type for a ' . self::TYPE_WEBAUTHN . " may only be: " . self::VERIFY_REGISTRATION
-                );
-            }
-        }
-
         if ($this->hasTooManyRecentFailures()) {
             \Yii::warning([
                 'action' => 'verify mfa',
@@ -391,35 +377,6 @@ class Mfa extends MfaBase
             'id' => $mfa->id,
             'data' => $results,
         ];
-    }
-
-    /**
-     * @param string $label
-     * @param string $keyHandleHash
-     * @return null|MfaWebauthn
-     * @throws ServerErrorHttpException
-     */
-    public function createWebauthn(string $label, string $keyHandleHash): void {
-        if ($this->type != self::TYPE_WEBAUTHN) {
-            return;
-        }
-        $webauthn = new MfaWebauthn();
-        $webauthn->mfa_id = $this->id;
-        $webauthn->label =  $label;
-        $webauthn->key_handle_hash =  $keyHandleHash;
-        $webauthn->verified = true;
-
-        if (! $webauthn->save()) {
-            \Yii::error([
-                'action' => 'create mfa_webauthn',
-                'type' => $this->type,
-                'username' => $this->user->username,
-                'status' => 'error',
-                'error' => $this->getFirstErrors(),
-            ]);
-            throw new ServerErrorHttpException("Unable to save new MFA Webauthn record", 1659634931);
-        }
-        return;
     }
 
     /**

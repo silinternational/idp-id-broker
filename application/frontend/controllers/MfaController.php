@@ -65,11 +65,6 @@ class MfaController extends BaseRestController
      */
     public function actionVerify(int $id, string $type = "")
     {
-
-        if ($type != "" && $type != Mfa::VERIFY_REGISTRATION) {
-            throw new BadRequestHttpException('Verify type can only be: ' . Mfa::VERIFY_REGISTRATION . " Got: $type." , 1660222364);
-        }
-
         $req = \Yii::$app->request;
         $value = $req->getBodyParam('value');
         if ($value === null) {
@@ -199,7 +194,7 @@ class MfaController extends BaseRestController
      * @throws BadRequestHttpException
      * @throws NotFoundHttpException
      */
-    protected function getRequestedMfa($id): Mfa
+    protected function getAuthorizedMfaWithExtras(int $id): Mfa
     {
         $mfa = $this->getAuthorizedMfa($id);
 
@@ -225,7 +220,7 @@ class MfaController extends BaseRestController
      */
     public function actionDelete(int $id)
     {
-        $mfa = $this->getRequestedMfa($id);
+        $mfa = $this->getAuthorizedMfaWithExtras($id);
 
         if ($mfa->delete() === false) {
             \Yii::error([
@@ -253,7 +248,7 @@ class MfaController extends BaseRestController
      */
     public function actionDeleteCredential(int $mfaId, int $webauthnId)
     {
-        $mfa = $this->getRequestedMfa($mfaId);
+        $mfa = $this->getAuthorizedMfaWithExtras($mfaId);
 
         if ($mfa->type != Mfa::TYPE_WEBAUTHN) {
             throw new ForbiddenHttpException("May not delete a credential on a $mfa->type mfa type", 1658237110);

@@ -7,6 +7,7 @@ use common\models\User;
 use GuzzleHttp\Exception\GuzzleException;
 use yii\base\Component;
 use yii\helpers\Json;
+use yii\web\BadRequestHttpException;
 use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
 use yii\web\ServerErrorHttpException;
@@ -110,11 +111,18 @@ class MfaBackendWebAuthn extends Component implements MfaBackendInterface
      * @param string $verifyType The type of verification: either "registration" or assumed to be for login
      * @return bool|string
      * @throws GuzzleException
+     * @throws BadRequestHttpException
      * @throws ServerErrorHttpException
      * @throws NotFoundHttpException
      */
     public function verify(int $mfaId, $value, string $rpOrigin = '', string $verifyType = '')
     {
+        if ($verifyType != "" && $verifyType != Mfa::VERIFY_REGISTRATION) {
+            throw new BadRequestHttpException(
+                'A non-blank verification type for a ' . Mfa::TYPE_WEBAUTHN . " may only be: " . Mfa::VERIFY_REGISTRATION
+            );
+        }
+
         $mfa = Mfa::findOne(['id' => $mfaId]);
         if ($mfa == null) {
             throw new NotFoundHttpException("MFA record for given ID not found");
@@ -137,9 +145,10 @@ class MfaBackendWebAuthn extends Component implements MfaBackendInterface
 
         // If the verifyType is not registration, finish the login process.
         if ($verifyType != Mfa::VERIFY_REGISTRATION) {
-            $webauthn = MfaWebauthn::findOne(['mfa_id' => $mfa->id,'verified' => 1]);
-            if ($webauthn === null) {
-                throw new NotFoundHttpException("Verified MFA Webauthn record not found for MFA ID: " . $mfa->id, 1659637860);
+            // Ensure there is at least one verified MfaWebauthn for that Mfa
+            $webauthnCount = MfaWebauthn::find()->where(['mfa_id' => $mfa->id,'verified' => 1])->count();
+            if ($webauthnCount < 1) {
+                throw new NotFoundHttpException("No verified MFA Webauthn record found for MFA ID: " . $mfa->id, 1659637860);
             }
             return $this->client->webauthnValidateAuthentication($headers, $value);
         }
@@ -152,9 +161,39 @@ class MfaBackendWebAuthn extends Component implements MfaBackendInterface
         }
 
         $label = $mfa->getReadableType();
-        $mfa->createWebauthn($label, $results['key_handle_hash']);
+        self::createWebauthn($mfa, $results['key_handle_hash']);
 
         return true;
+    }
+
+
+
+    /**
+     * @param string $label
+     * @param string $keyHandleHash
+     * @return void
+     * @throws ServerErrorHttpException
+     */
+    public static function createWebauthn(Mfa $mfa, string $keyHandleHash): void {
+        if ($mfa->type != self::TYPE_WEBAUTHN) {
+            return;
+        }
+        $webauthn = new MfaWebauthn();
+        $webauthn->mfa_id = $mfa->id;
+        $webauthn->label = $mfa->getReadableType();
+        $webauthn->key_handle_hash =  $keyHandleHash;
+        $webauthn->verified = true;
+
+        if (! $webauthn->save()) {
+            \Yii::error([
+                'action' => 'create mfa_webauthn',
+                'type' => $mfa->type,
+                'username' => $mfa->user->username,
+                'status' => 'error',
+                'error' => $mfa->getFirstErrors(),
+            ]);
+            throw new ServerErrorHttpException("Unable to save new MFA Webauthn record", 1659634931);
+        }
     }
 
 
