@@ -233,7 +233,7 @@ class MfaBackendWebAuthn extends Component implements MfaBackendInterface
             );
         }
 
-        $existingCount = MfaWebauthn::find()->where(['mfa_id' => $mfa->id])->Count();
+        $existingCount = $mfa->getMfaWebauthns()->Count();
 
         // If there are no more webauthn entries for this mfa, try to delete the backend webauthn container object
         if ($existingCount < 1) {
