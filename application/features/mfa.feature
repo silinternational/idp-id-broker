@@ -136,8 +136,8 @@ Feature: MFA
       | employee_id | 123          |
       | label       |              |
     When I update the mfaWebauthn
-    Then the response status code should be 500
-      And the response body should contain 'Unable to update MfaWebauthn label'
+    Then the response status code should be 400
+      And the response body should contain 'Invalid data updating MfaWebauthn label'
       And the mfaWebauthn record exists
       And the following mfaWebauthn data should be stored:
         | property            | value           |

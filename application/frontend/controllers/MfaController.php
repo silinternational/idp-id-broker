@@ -183,10 +183,6 @@ class MfaController extends BaseRestController
             );
         }
 
-        if ($mfa->type != Mfa::TYPE_WEBAUTHN) {
-            return $mfa;
-        }
-
         // rpOrigin is needed for WebAuthn authentication
         $rpOrigin = \Yii::$app->request->get('rpOrigin', '');
         if ($rpOrigin != '' && !in_array($rpOrigin, \Yii::$app->params['authorizedRPOrigins'])){
@@ -304,9 +300,7 @@ class MfaController extends BaseRestController
      */
     public function actionUpdateWebauthn(int $mfaId, int $webauthnId)
     {
-        // check authorization
         $this->getRequestedMfa($mfaId);
-
 
         $webauthn = MfaWebauthn::findOne(['id' => $webauthnId, 'mfa_id' => $mfaId]);
         if ($webauthn === null) {
@@ -318,6 +312,16 @@ class MfaController extends BaseRestController
 
         $label = \Yii::$app->request->getBodyParam('label');
         $webauthn->label = $label?:"";
+
+        if ($webauthn->validate() === false) {
+            \Yii::error([
+                'action' => 'update mfa webauthn',
+                'status' => 'error',
+                'error' => $webauthn->getFirstErrors(),
+                'mfa_id' => $webauthn->id,
+            ]);
+            throw new BadRequestHttpException("Invalid data updating MfaWebauthn label", 1660233470);
+        }
 
         if ($webauthn->update() === false) {
             \Yii::error([
