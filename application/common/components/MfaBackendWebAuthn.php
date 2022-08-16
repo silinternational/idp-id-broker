@@ -160,40 +160,8 @@ class MfaBackendWebAuthn extends Component implements MfaBackendInterface
             return false;
         }
 
-        $label = $mfa->getReadableType();
-        self::createWebauthn($mfa, $results['key_handle_hash']);
-
+        MfaWebauthn::createWebauthn($mfa, $results['key_handle_hash']);
         return true;
-    }
-
-
-
-    /**
-     * @param string $label
-     * @param string $keyHandleHash
-     * @return void
-     * @throws ServerErrorHttpException
-     */
-    public static function createWebauthn(Mfa $mfa, string $keyHandleHash): void {
-        if ($mfa->type != self::TYPE_WEBAUTHN) {
-            return;
-        }
-        $webauthn = new MfaWebauthn();
-        $webauthn->mfa_id = $mfa->id;
-        $webauthn->label = $mfa->getReadableType();
-        $webauthn->key_handle_hash =  $keyHandleHash;
-        $webauthn->verified = true;
-
-        if (! $webauthn->save()) {
-            \Yii::error([
-                'action' => 'create mfa_webauthn',
-                'type' => $mfa->type,
-                'username' => $mfa->user->username,
-                'status' => 'error',
-                'error' => $mfa->getFirstErrors(),
-            ]);
-            throw new ServerErrorHttpException("Unable to save new MFA Webauthn record", 1659634931);
-        }
     }
 
 
