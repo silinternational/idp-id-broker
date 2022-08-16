@@ -36,6 +36,40 @@ class MfaBackendTotp extends Component implements MfaBackendInterface
      */
     public MfaApiClient $client;
 
+    public function init()
+    {
+        $this->client = new MfaApiClient($this->apiBaseUrl, $this->apiKey, $this->apiSecret);
+        parent::init();
+    }
+
+    /**
+     * Initialize a new MFA backend registration
+     * @param int $userId
+     * @param string $rpOrigin
+     * @return array
+     * @throws NotFoundHttpException
+     */
+    public function regInit(int $userId, string $rpOrigin = ''): array
+    {
+        $user = User::findOne(['id' => $userId]);
+        if ($user == null) {
+            throw new NotFoundHttpException("User not found when trying to create new TOTP configuration");
+        }
+
+        return $this->client->createTotp($user->username, \Yii::$app->params['idpDisplayName']);
+    }
+
+    /**
+     * Initialize authentication sequence
+     * @param int $mfaId
+     * @param string $rpOrigin
+     * @return array
+     */
+    public function authInit(int $mfaId, string $rpOrigin = ''): array
+    {
+        return [];
+    }
+
     /**
      * Verify response from user is correct for the MFA backend device
      * @param int $mfaId The MFA ID
@@ -72,40 +106,6 @@ class MfaBackendTotp extends Component implements MfaBackendInterface
             return true;
         }
         return false;
-    }
-
-    public function init()
-    {
-        $this->client = new MfaApiClient($this->apiBaseUrl, $this->apiKey, $this->apiSecret);
-        parent::init();
-    }
-
-    /**
-     * Initialize a new MFA backend registration
-     * @param int $userId
-     * @param string $rpOrigin
-     * @return array
-     * @throws NotFoundHttpException
-     */
-    public function regInit(int $userId, string $rpOrigin = ''): array
-    {
-        $user = User::findOne(['id' => $userId]);
-        if ($user == null) {
-            throw new NotFoundHttpException("User not found when trying to create new TOTP configuration");
-        }
-
-        return $this->client->createTotp($user->username, \Yii::$app->params['idpDisplayName']);
-    }
-
-    /**
-     * Initialize authentication sequence
-     * @param int $mfaId
-     * @param string $rpOrigin
-     * @return array
-     */
-    public function authInit(int $mfaId, string $rpOrigin = ''): array
-    {
-        return [];
     }
 
     /**
