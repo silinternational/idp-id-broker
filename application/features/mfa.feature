@@ -10,11 +10,21 @@ Feature: MFA
     Then the response status code should be 200
       And I should receive 0 records
 
-  Scenario: Retrieve MFA records for a User with 1 MFA record
+  Scenario: Retrieve MFA records for a User with a backupcode MFA record
     Given the user has a verified "backupcode" MFA
     When I request "/user/123/mfa" be retrieved
     Then the response status code should be 200
       And I should receive 1 record
+
+  Scenario: Retrieve MFA records for a User with a MfaWebauthn record
+    Given the user has a mfaWebauthn with a key_handle_hash of "KHH"
+    When I request "/user/123/mfa" be retrieved
+    Then the response status code should be 200
+    And I should receive 1 record
+    And that record should have a data item with the following elements:
+      | property  | value          |
+      | label     | Security Key   |
+      | id        | *              |
 
   Scenario: Create new MFA record of type backupcode
     Given I provide the following valid data:
@@ -60,8 +70,19 @@ Feature: MFA
     When I request "/mfa" be created
     Then the response status code should be 400
 
-  Scenario: Create new MFA record of type webauthn
-#TODO - create tests that make use of the webauthn client
+  Scenario: Request a MFA record of type webauthn
+    When the user requests a new webauthn MFA
+    Then the response status code should be 200
+    And the response body should contain 'publicKey'
+    And the response body should contain 'challenge'
+
+  # We're not using completely correct webauthn data, due to its complexity and lack of predictability.
+  Scenario: Attempt to verify a new but invalid MFA webauthn registration
+    Given the user has requested a new webauthn MFA with all the required fields but invalid values
+    When I request to verify the webauthn Mfa registration
+    Then the response status code should be 400
+    And the response body should contain '400 Bad Request'
+    And the response body should contain '"error":"unable to create credential: Error validating challenge"'
 
   Scenario: Create new MFA record of type totp
 #TODO - create a test double for the totp client
@@ -94,6 +115,34 @@ Feature: MFA
       | property  | value           |
       | label     | Printable Codes |
 
+  Scenario: Update a MfaWebauthn label
+    Given the user has a mfaWebauthn with a key_handle_hash of "KHH"
+    And I provide the following valid data:
+      | property    | value        |
+      | employee_id | 123          |
+      | label       | A New Label  |
+    When I update the mfaWebauthn
+    Then the response status code should be 200
+      And the property label should contain "A New Label"
+      And the mfaWebauthn record exists
+      And the following mfaWebauthn data should be stored:
+        | property            | value           |
+        | label               | A New Label     |
+
+  Scenario: Update a mfaWebauthn label to be blank
+    Given the user has a mfaWebauthn with a key_handle_hash of "KHH"
+    And I provide the following valid data:
+      | property    | value        |
+      | employee_id | 123          |
+      | label       |              |
+    When I update the mfaWebauthn
+    Then the response status code should be 400
+      And the response body should contain 'Invalid data updating MfaWebauthn label'
+      And the mfaWebauthn record exists
+      And the following mfaWebauthn data should be stored:
+        | property            | value           |
+        | label               | Security Key    |
+
   Scenario: Verify a backupcode MFA code
     Given the user has a verified "backupcode" MFA
     When I request to verify one of the codes
@@ -121,27 +170,27 @@ Feature: MFA
       And the MFA record is not stored
 
   Scenario: Exception to delete the missing credential of a webauthn MFA option
-    Given the user has a verified webauthn MFA with a key_handle_hash of "u2f"
+    Given the user has a mfaWebauthn with a key_handle_hash of "u2f"
     When I request to delete the webauthn entry of the MFA with a webauthn_id of 999
     Then the response status code should be 404
 
   Scenario: Delete a webauthn credential of a webauthn MFA option
-    Given the user has a verified webauthn MFA with a key_handle_hash of "u2f"
+    Given the user has a mfaWebauthn with a key_handle_hash of "u2f"
     # This value is from a serverless-mfa-api-go test user that has a credential id of "C10"
     # which gets hashed and base64 encoded to provide the "kI1ykA4kdZIbWA6XHmA-8iTxmVzfR-MCLRLuiK4-boo" value
-      And the user has a verified webauthn MFA with a key_handle_hash of "kI1ykA4kdZIbWA6XHmA-8iTxmVzfR-MCLRLuiK4-boo"
+      And the user has a mfaWebauthn with a key_handle_hash of "kI1ykA4kdZIbWA6XHmA-8iTxmVzfR-MCLRLuiK4-boo"
     When I request to delete the webauthn entry of the MFA
     Then the response status code should be 204
       And the MFA record is still stored
 
   Scenario: Delete a webauthn credential of a webauthn MFA option
-    Given the user has a verified webauthn MFA with a key_handle_hash of "kI1ykA4kdZIbWA6XHmA-8iTxmVzfR-MCLRLuiK4-boo"
+    Given the user has a mfaWebauthn with a key_handle_hash of "kI1ykA4kdZIbWA6XHmA-8iTxmVzfR-MCLRLuiK4-boo"
     When I request to delete the webauthn entry of the MFA
     Then the response status code should be 204
       And the MFA record is not stored
 
   Scenario: Delete the legacy u2f credential of a webauthn MFA option
-    Given the user has a verified webauthn MFA with a key_handle_hash of "u2f"
+    Given the user has a mfaWebauthn with a key_handle_hash of "u2f"
     When I request to delete the webauthn entry of the MFA
     Then the response status code should be 204
       And the MFA record is not stored

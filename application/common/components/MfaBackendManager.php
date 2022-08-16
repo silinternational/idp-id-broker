@@ -7,6 +7,7 @@ use common\models\Mfa;
 use common\models\MfaBackupcode;
 use Sil\EmailService\Client\EmailServiceClientException;
 use yii\base\Component;
+use yii\web\BadRequestHttpException;
 use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
 use yii\web\ServerErrorHttpException;
@@ -84,11 +85,19 @@ class MfaBackendManager extends Component implements MfaBackendInterface
      * @param int $mfaId The MFA ID
      * @param string $value Value provided by user, such as TOTP number or WebAuthn challenge response
      * @param string $rpOrigin
+     * @param string $verifyType Only used for WebAuthn
      * @return bool
+     * @throws BadRequestHttpException
      * @throws ServerErrorHttpException
      */
-    public function verify(int $mfaId, string $value, string $rpOrigin = ''): bool
+    public function verify(int $mfaId, string $value, string $rpOrigin = '', string $verifyType = ''): bool
     {
+        if ($verifyType != "") {
+            throw new BadRequestHttpException(
+                'A non-blank verification type is not allowed when verifying a mfa of type ' . Mfa::TYPE_MANAGER
+            );
+        }
+
         if (! MfaBackupcode::validateAndRemove($mfaId, $value)) {
             return false;
         }
