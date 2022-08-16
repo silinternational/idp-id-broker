@@ -9,6 +9,7 @@ use yii\base\Component;
 use yii\helpers\Json;
 use yii\web\BadRequestHttpException;
 use yii\web\ForbiddenHttpException;
+use yii\web\HttpException;
 use yii\web\NotFoundHttpException;
 use yii\web\ServerErrorHttpException;
 
@@ -154,7 +155,11 @@ class MfaBackendWebAuthn extends Component implements MfaBackendInterface
         }
 
         // Assume a new webauthn was requested and finish its registration process
-        $results = $this->client->webauthnValidateRegistration($headers, $value);
+        try {
+            $results = $this->client->webauthnValidateRegistration($headers, $value);
+        } catch (GuzzleException $e) {
+            throw new HttpException($e->getCode(), $e->getMessage(), 1660660611);
+        }
 
         if (! isset($results['key_handle_hash'])) {
             return false;

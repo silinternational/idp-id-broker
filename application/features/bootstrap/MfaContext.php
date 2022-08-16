@@ -156,9 +156,9 @@ class MfaContext extends \FeatureContext
     }
 
     /**
-     * @Given the user has requested a new webauthn MFA
+     * @Given the user has requested a new webauthn MFA with all the required fields but invalid values
      */
-    public function theUserHasRequestedANewWebauthnMfa()
+    public function theUserHasRequestedANewWebauthnMfaWithAllTheRequiredFieldsButInvalidValues()
     {
         $user = User::findOne(['employee_id' => $this->tempEmployeeId]);
         Assert::notEmpty($user, 'Unable to find that user.');
@@ -192,9 +192,7 @@ class MfaContext extends \FeatureContext
             'transports' => ['usb'],
         ];
 
-        $reqJson = json_encode($reqValue);
-        $this->setRequestBody('value', $reqJson);
-
+        $this->setRequestBody('value', $reqValue);
         $this->mfa = $mfa;
     }
 

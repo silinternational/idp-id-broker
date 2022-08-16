@@ -616,7 +616,7 @@ class FeatureContext extends YiiContext
      * @param $property
      * @return mixed
      */
-    public function setRequestBody(string $key, string $value)
+    public function setRequestBody(string $key, $value)
     {
         $this->reqBody[$key] = $value;
     }

@@ -76,12 +76,11 @@ Feature: MFA
     And the response body should contain 'publicKey'
     And the response body should contain 'challenge'
 
-  Scenario: Verify a new MFA webauthn registration
-    Given the user has requested a new webauthn MFA
+  # We're not using completely correct webauthn data, due to its complexity and lack of predictability.
+  Scenario: Attempt to verify a new but invalid MFA webauthn registration
+    Given the user has requested a new webauthn MFA with all the required fields but invalid values
     When I request to verify the webauthn Mfa registration
-    # Normally this would return a 200. However, we're not using completely correct
-    # webauthn data, due to its complexity and lack of predictability.
-    Then the response status code should be 500
+    Then the response status code should be 400
     And the response body should contain '400 Bad Request'
     And the response body should contain '"error":"unable to create credential: Error validating challenge"'
 
@@ -129,7 +128,6 @@ Feature: MFA
       And the following mfaWebauthn data should be stored:
         | property            | value           |
         | label               | A New Label     |
-        | key_handle_hash     | KHH             |
 
   Scenario: Update a mfaWebauthn label to be blank
     Given the user has a verified mfaWebauthn with a key_handle_hash of "KHH"
@@ -138,13 +136,12 @@ Feature: MFA
       | employee_id | 123          |
       | label       |              |
     When I update the mfaWebauthn
-    Then the response status code should be 400
-      And the response body should contain '"label" must have a value in calls to update-webauthn'
+    Then the response status code should be 500
+      And the response body should contain 'Unable to update MfaWebauthn label'
       And the mfaWebauthn record exists
       And the following mfaWebauthn data should be stored:
         | property            | value           |
         | label               | Security Key    |
-        | key_handle_hash     | KHH             |
 
   Scenario: Verify a backupcode MFA code
     Given the user has a verified "backupcode" MFA

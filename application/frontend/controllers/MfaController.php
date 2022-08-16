@@ -89,9 +89,10 @@ class MfaController extends BaseRestController
             );
         }
 
-        // Strip spaces from $value if string
+        // Only TOTP should provide a string $value, in which case it should just have digits.
+        // This removes any non-digits.
         if (is_string($value)) {
-            $value = preg_replace('/\s+/', '', $value);
+            $value = preg_replace('/\D/', '', $value);
         }
 
         if (is_array($value)) {
@@ -140,7 +141,6 @@ class MfaController extends BaseRestController
         $mfaOptions = Mfa::findAll(['user_id' => $user->id, 'verified' => 1]);
         foreach ($mfaOptions as $opt) {
             $opt->loadData($rpOrigin);
-            $opt->loadMfaWebauthns();
         }
 
         return $mfaOptions;
@@ -156,7 +156,7 @@ class MfaController extends BaseRestController
      * @throws BadRequestHttpException
      * @throws NotFoundHttpException
      */
-    protected function getAuthorizedMfa($id)
+    protected function getRequestedMfa($id)
     {
         $employeeId = \Yii::$app->request->getBodyParam('employee_id');
         if ($employeeId == null) {
@@ -183,20 +183,9 @@ class MfaController extends BaseRestController
             );
         }
 
-        return $mfa;
-    }
-
-    /**
-     * Find an MFA by id and employee_id and call its loadData method
-     *
-     * @param int $id
-     * @return Mfa|null
-     * @throws BadRequestHttpException
-     * @throws NotFoundHttpException
-     */
-    protected function getAuthorizedMfaWithExtras(int $id): Mfa
-    {
-        $mfa = $this->getAuthorizedMfa($id);
+        if ($mfa->type != Mfa::TYPE_WEBAUTHN) {
+            return $mfa;
+        }
 
         // rpOrigin is needed for WebAuthn authentication
         $rpOrigin = \Yii::$app->request->get('rpOrigin', '');
@@ -204,7 +193,6 @@ class MfaController extends BaseRestController
             throw new ForbiddenHttpException("Invalid rpOrigin", 1638539680);
         }
         $mfa->loadData($rpOrigin);
-        $mfa->loadMfaWebauthns();
 
         return $mfa;
     }
@@ -220,7 +208,7 @@ class MfaController extends BaseRestController
      */
     public function actionDelete(int $id)
     {
-        $mfa = $this->getAuthorizedMfaWithExtras($id);
+        $mfa = $this->getRequestedMfa($id);
 
         if ($mfa->delete() === false) {
             \Yii::error([
@@ -248,7 +236,7 @@ class MfaController extends BaseRestController
      */
     public function actionDeleteCredential(int $mfaId, int $webauthnId)
     {
-        $mfa = $this->getAuthorizedMfaWithExtras($mfaId);
+        $mfa = $this->getRequestedMfa($mfaId);
 
         if ($mfa->type != Mfa::TYPE_WEBAUTHN) {
             throw new ForbiddenHttpException("May not delete a credential on a $mfa->type mfa type", 1658237110);
@@ -281,7 +269,7 @@ class MfaController extends BaseRestController
      */
     public function actionUpdate(int $id)
     {
-        $mfa = $this->getAuthorizedMfa($id);
+        $mfa = $this->getRequestedMfa($id);
 
         $label = \Yii::$app->request->getBodyParam('label');
         if ($label === null) {
@@ -317,12 +305,8 @@ class MfaController extends BaseRestController
     public function actionUpdateWebauthn(int $mfaId, int $webauthnId)
     {
         // check authorization
-        $this->getAuthorizedMfa($mfaId);
+        $this->getRequestedMfa($mfaId);
 
-        $label = \Yii::$app->request->getBodyParam('label');
-        if (empty($label)) {
-            throw new BadRequestHttpException('"label" must have a value in calls to update-webauthn', 1660233368);
-        }
 
         $webauthn = MfaWebauthn::findOne(['id' => $webauthnId, 'mfa_id' => $mfaId]);
         if ($webauthn === null) {
@@ -332,7 +316,8 @@ class MfaController extends BaseRestController
             );
         }
 
-        $webauthn->label = $label;
+        $label = \Yii::$app->request->getBodyParam('label');
+        $webauthn->label = $label?:"";
 
         if ($webauthn->update() === false) {
             \Yii::error([

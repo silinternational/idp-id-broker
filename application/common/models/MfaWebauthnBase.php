@@ -5,7 +5,7 @@ namespace common\models;
 use Yii;
 
 /**
- * This is the model class for table "mfa_webauthn.
+ * This is the model class for table "mfa_webauthn".
  *
  * @property int $id
  * @property int $mfa_id
@@ -34,8 +34,9 @@ class MfaWebauthnBase extends \yii\db\ActiveRecord
     {
         return [
             [['mfa_id', 'label', 'verified', 'created_utc'], 'required'],
-            [['mfa_id'], 'integer'],
+            [['mfa_id', 'verified'], 'integer'],
             [['created_utc', 'last_used_utc'], 'safe'],
+            [['key_handle_hash'], 'string', 'max' => 255],
             [['label'], 'string', 'max' => 64],
             [['mfa_id'], 'exist', 'skipOnError' => true, 'targetClass' => Mfa::className(), 'targetAttribute' => ['mfa_id' => 'id']],
         ];
@@ -49,7 +50,9 @@ class MfaWebauthnBase extends \yii\db\ActiveRecord
         return [
             'id' => Yii::t('app', 'ID'),
             'mfa_id' => Yii::t('app', 'Mfa ID'),
+            'key_handle_hash' => Yii::t('app', 'Key Handle Hash'),
             'label' => Yii::t('app', 'Label'),
+            'verified' => Yii::t('app', 'Verified'),
             'created_utc' => Yii::t('app', 'Created Utc'),
             'last_used_utc' => Yii::t('app', 'Last Used Utc'),
         ];
