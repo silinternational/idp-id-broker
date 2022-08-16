@@ -166,6 +166,7 @@ class MfaBackendWebAuthn extends Component implements MfaBackendInterface
         }
 
         MfaWebauthn::createWebauthn($mfa, $results['key_handle_hash']);
+        $mfa->setVerified();
         return true;
     }
 
