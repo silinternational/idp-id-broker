@@ -58,9 +58,9 @@ class MfaContext extends \FeatureContext
     }
 
     /**
-     * @Given the user has a verified mfaWebauthn with a key_handle_hash of :keyHandleHash
+     * @Given the user has a mfaWebauthn with a key_handle_hash of :keyHandleHash
      */
-    public function iGiveThatUserAVerifiedMfaWebauthnMfaWithAKeyHandleHashOf($keyHandleHash)
+    public function iGiveThatUserAMfaWebauthnMfaWithAKeyHandleHashOf($keyHandleHash)
     {
         $user = User::findOne(['employee_id' => $this->tempEmployeeId]);
         Assert::notEmpty($user, 'Unable to find that user.');

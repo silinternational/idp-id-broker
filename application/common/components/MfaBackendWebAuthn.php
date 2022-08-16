@@ -146,10 +146,9 @@ class MfaBackendWebAuthn extends Component implements MfaBackendInterface
 
         // If the verifyType is not registration, finish the login process.
         if ($verifyType != Mfa::VERIFY_REGISTRATION) {
-            // Ensure there is at least one verified MfaWebauthn for that Mfa
-            $webauthnCount = MfaWebauthn::find()->where(['mfa_id' => $mfa->id,'verified' => 1])->count();
+            $webauthnCount = $mfa->getMfaWebauthns()->count();
             if ($webauthnCount < 1) {
-                throw new NotFoundHttpException("No verified MFA Webauthn record found for MFA ID: " . $mfa->id, 1659637860);
+                throw new NotFoundHttpException("No MFA Webauthn record found for MFA ID: " . $mfa->id, 1659637860);
             }
             return $this->client->webauthnValidateAuthentication($headers, $value);
         }
