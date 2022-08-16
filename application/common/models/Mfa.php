@@ -25,6 +25,8 @@ class Mfa extends MfaBase
     const EVENT_TYPE_VERIFY = 'verify_mfa';
     const EVENT_TYPE_DELETE = 'delete_mfa';
 
+    const VERIFY_REGISTRATION = 'registration';
+
     /**
      * Holds additional data about method, such as initialized authentication data
      * needed for WebAuthn methods and number of remaining backup codes
@@ -77,8 +79,14 @@ class Mfa extends MfaBase
         }
         if ($this->type === self::TYPE_BACKUPCODE || $this->type === self::TYPE_MANAGER) {
             $this->data += ['count' => count($this->mfaBackupcodes)];
+        } elseif ($this->type === self::TYPE_WEBAUTHN) {
+            $webauthns = $this->mfaWebauthns;
+            foreach ($webauthns as $webauthn) {
+                $this->data[] = ['id' => $webauthn->id, 'label' => $webauthn->label];
+            }
         }
     }
+
 
     /**
      * Whether this is both a new Mfa instance and already verified
@@ -205,13 +213,15 @@ class Mfa extends MfaBase
 
     /**
      * @param string|array $value
+     * @param string $rpOrigin Optional
+     * @param string $verifyType Optional. If not blank, it must be 'registration', referring to verifying a webauthn registration
      * @return bool
      * @throws ServerErrorHttpException
      * @throws TooManyRequestsHttpException
      * @throws \Throwable
      * @throws \yii\db\StaleObjectException
      */
-    public function verify($value, string $rpOrigin = ''): bool
+    public function verify($value, string $rpOrigin = '', string $verifyType = ''): bool
     {
         if ($this->hasTooManyRecentFailures()) {
             \Yii::warning([
@@ -225,9 +235,9 @@ class Mfa extends MfaBase
                 'Too many recent failed attempts for this MFA'
             );
         }
-        
+
         $backend = self::getBackendForType($this->type);
-        if ($backend->verify($this->id, $value, $rpOrigin) === true) {
+        if ($backend->verify($this->id, $value, $rpOrigin, $verifyType) === true) {
             $this->last_used_utc = MySqlDateTime::now();
             if (! $this->save()) {
                 \Yii::error([
@@ -298,7 +308,7 @@ class Mfa extends MfaBase
         $existing = self::findOne(['user_id' => $userId, 'type' => $type, 'verified' => 1]);
 
         if ($existing instanceof Mfa) {
-            if ($type == self::TYPE_BACKUPCODE || $type == self::TYPE_MANAGER) {
+            if ($type == self::TYPE_BACKUPCODE || $type == self::TYPE_MANAGER || $type == self::TYPE_WEBAUTHN) {
                 $mfa = $existing;
             } else {
                 throw new ConflictHttpException('An MFA of type ' . $type . ' already exists.', 1551190694);

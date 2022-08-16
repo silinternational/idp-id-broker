@@ -4,6 +4,7 @@ namespace common\components;
 use common\models\Mfa;
 use common\models\User;
 use yii\base\Component;
+use yii\web\BadRequestHttpException;
 use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
 use yii\web\ServerErrorHttpException;
@@ -74,13 +75,21 @@ class MfaBackendTotp extends Component implements MfaBackendInterface
      * @param int $mfaId The MFA ID
      * @param string $value Value provided by user, such as TOTP number or WebAuthn challenge response
      * @param string $rpOrigin
+     * @param string $verifyType Only used for WebAuthn
      * @return bool
+     * @throws BadRequestHttpException
      * @throws NotFoundHttpException
      * @throws ServerErrorHttpException
      * @throws \Exception
      */
-    public function verify(int $mfaId, string $value, string $rpOrigin = ''): bool
+    public function verify(int $mfaId, string $value, string $rpOrigin = '', string $verifyType = ''): bool
     {
+        if ($verifyType != "") {
+            throw new BadRequestHttpException(
+                'A non-blank verification type is not allowed when verifying a mfa of type ' . Mfa::TYPE_TOTP
+            );
+        }
+
         $mfa = Mfa::findOne(['id' => $mfaId]);
         if ($mfa == null) {
             throw new NotFoundHttpException('MFA configuration not found');

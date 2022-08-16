@@ -5,6 +5,7 @@ use common\helpers\MySqlDateTime;
 use common\components\Emailer;
 use yii\base\BaseObject;
 use yii\helpers\ArrayHelper;
+use yii\web\BadRequestHttpException;
 use yii\web\NotFoundHttpException;
 use yii\web\ServerErrorHttpException;
 
@@ -19,10 +20,10 @@ class MfaWebauthn extends MfaWebauthnBase
     {
         return ArrayHelper::merge([
             [
-                'created_utc', 'default', 'value' => MySqlDateTime::now(),
+                'label', 'required'
             ],
             [
-                'verified', 'default', 'value' => 0,
+                'created_utc', 'default', 'value' => MySqlDateTime::now(),
             ],
         ], parent::rules());
     }
@@ -33,10 +34,18 @@ class MfaWebauthn extends MfaWebauthnBase
      * @param Mfa $mfa
      * @param string $keyHandleHash
      * @return array
+     * @throws BadRequestHttpException
      * @throws ServerErrorHttpException
      */
     public static function createWebauthn(Mfa $mfa, string $keyHandleHash, string $label=""): MfaWebauthn
     {
+        if ($mfa->type != Mfa::TYPE_WEBAUTHN) {
+            throw new BadRequestHttpException(
+                "Only a Webauthn type Mfa may create a MfaWebauthn child object, not " . $mfa->type,
+                1660656677
+            );
+        }
+
         $label =  $label ?: $mfa->getReadableType();
         $webauthn = new MfaWebauthn();
         $webauthn->mfa_id = $mfa->id;

@@ -7,7 +7,9 @@ use common\models\User;
 use GuzzleHttp\Exception\GuzzleException;
 use yii\base\Component;
 use yii\helpers\Json;
+use yii\web\BadRequestHttpException;
 use yii\web\ForbiddenHttpException;
+use yii\web\HttpException;
 use yii\web\NotFoundHttpException;
 use yii\web\ServerErrorHttpException;
 
@@ -101,18 +103,27 @@ class MfaBackendWebAuthn extends Component implements MfaBackendInterface
         return $this->client->webauthnCreateAuthentication($headers);
     }
 
+
     /**
-     * Verify response from user is correct for the MFA backend device
+     * Verify response from user is correct for the MFA backend device.
      * @param int $mfaId The MFA ID
      * @param string|array $value The stringified JSON response from the browser credential api
      * @param string $rpOrigin The Replay Party Origin URL (with scheme, without port or path)
+     * @param string $verifyType The type of verification: either "registration" or assumed to be for login
      * @return bool|string
      * @throws GuzzleException
+     * @throws BadRequestHttpException
      * @throws ServerErrorHttpException
      * @throws NotFoundHttpException
      */
-    public function verify(int $mfaId, $value, string $rpOrigin = '')
+    public function verify(int $mfaId, $value, string $rpOrigin = '', string $verifyType = '')
     {
+        if ($verifyType != "" && $verifyType != Mfa::VERIFY_REGISTRATION) {
+            throw new BadRequestHttpException(
+                'A non-blank verification type for a ' . Mfa::TYPE_WEBAUTHN . " may only be: " . Mfa::VERIFY_REGISTRATION
+            );
+        }
+
         $mfa = Mfa::findOne(['id' => $mfaId]);
         if ($mfa == null) {
             throw new NotFoundHttpException("MFA record for given ID not found");
@@ -125,6 +136,7 @@ class MfaBackendWebAuthn extends Component implements MfaBackendInterface
             $mfa->external_uuid
         );
 
+
         if (!is_array($value)) {
             $value = Json::decode($value);
             if ($value == null) {
@@ -132,22 +144,29 @@ class MfaBackendWebAuthn extends Component implements MfaBackendInterface
             }
         }
 
-        if ($mfa->verified === 1) {
-            return $this->client->webauthnValidateAuthentication($headers, $value);
-        } else {
-            $results = $this->client->webauthnValidateRegistration($headers, $value);
-            if (isset($results['key_handle_hash'])) {
-                $mfa->verified = 1;
-                $mfa->key_handle_hash = $results['key_handle_hash'];
-                if (! $mfa->save()) {
-                    throw new ServerErrorHttpException(
-                        "Unable to save WebAuthn record after verification. Error: " . print_r($mfa->getFirstErrors(), true)
-                    );
-                }
-                return true;
+        // If the verifyType is not registration, finish the login process.
+        if ($verifyType != Mfa::VERIFY_REGISTRATION) {
+            $webauthnCount = $mfa->getMfaWebauthns()->count();
+            if ($webauthnCount < 1) {
+                throw new NotFoundHttpException("No MFA Webauthn record found for MFA ID: " . $mfa->id, 1659637860);
             }
+            return $this->client->webauthnValidateAuthentication($headers, $value);
+        }
+
+        // Assume a new webauthn was requested and finish its registration process
+        try {
+            $results = $this->client->webauthnValidateRegistration($headers, $value);
+        } catch (GuzzleException $e) {
+            throw new HttpException($e->getCode(), $e->getMessage(), 1660660611);
+        }
+
+        if (! isset($results['key_handle_hash'])) {
             return false;
         }
+
+        MfaWebauthn::createWebauthn($mfa, $results['key_handle_hash']);
+        $mfa->setVerified();
+        return true;
     }
 
 
@@ -214,7 +233,7 @@ class MfaBackendWebAuthn extends Component implements MfaBackendInterface
             );
         }
 
-        $existingCount = MfaWebauthn::find()->where(['mfa_id' => $mfa->id])->Count();
+        $existingCount = $mfa->getMfaWebauthns()->Count();
 
         // If there are no more webauthn entries for this mfa, try to delete the backend webauthn container object
         if ($existingCount < 1) {

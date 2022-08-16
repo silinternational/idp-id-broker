@@ -49,6 +49,11 @@ testcli: appfortests tablesfortests mfaapi
 mfaapi:
 	docker-compose up -d mfaapi
 
+# This is needed to re-run certain feature tests in testcli without stopping that container.
+dynamoclean:
+	docker-compose kill dynamorestart
+	docker-compose up -d dynamorestart
+
 clean:
 	docker-compose kill
 	docker system prune -f
