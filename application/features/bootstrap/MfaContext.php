@@ -156,9 +156,9 @@ class MfaContext extends \FeatureContext
     }
 
     /**
-     * @Given the user has requested a new webauthn MFA with all the required fields but invalid values
+     * @Given the user has requested a new webauthn MFA
      */
-    public function theUserHasRequestedANewWebauthnMfaWithAllTheRequiredFieldsButInvalidValues()
+    public function theUserHasRequestedANewWebauthnMfa()
     {
         $rpId = getenv('MFA_WEBAUTHN_rpId');
         $user = User::findOne(['employee_id' => $this->tempEmployeeId]);
