@@ -42,7 +42,7 @@ app:
         MFA_WEBAUTHN_apiSecret: 11345678-1234-1234-1234-12345678
         MFA_WEBAUTHN_appId: ourApp99
         MFA_WEBAUTHN_rpDisplayName: Our App
-        MFA_WEBAUTHN_rpId: app99
+        MFA_WEBAUTHN_rpId: http://app99
 
 dynamo:
     image: amazon/dynamodb-local
