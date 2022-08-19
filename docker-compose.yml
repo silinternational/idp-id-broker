@@ -116,7 +116,6 @@ services:
         # Copy files from the override folder to be used for possible troubleshooting (e.g. with extra log statements)
         # (using bash -c to keep the chown command from ignoring the && and throwing an error)
         command: bash -c "cp -R ./override/* ./ && go run ./server/"
-#        command: bash -c "cp ./override/u2fsimulator.go ./u2fsimulator.go && cp ./override/attestation_u2f.go /go/pkg/mod/github.com/duo-labs/webauthn@v0.0.0-20220330035159-03696f3d4499/protocol/attestation_u2f.go && go run ./server/"
 
     dynamorestart:
         build: ./dynamorestart
