@@ -156,6 +156,40 @@ class FeatureContext extends YiiContext
         ]);
     }
 
+
+    public function callU2fSimulator($resource, $action, User $user, string $externalId)
+    {
+        $webConfig = Yii::$app->components['webauthn'];
+
+        $this->reqHeaders = array_merge($this->reqHeaders, [
+            'X-MFA-APIKey' => $webConfig['apiKey'],
+            'X-MFA-APISecret' => $webConfig['apiSecret'],
+            'x-mfa-RPDisplayName' => $webConfig['rpDisplayName'],
+            'x-mfa-RPID' => $webConfig['rpId'],
+            'x-mfa-RPOrigin' => $webConfig['rpId'],
+            'x-mfa-Username' => $user->username,
+            'x-mfa-UserDisplayName' => $user->display_name,
+            'x-mfa-UserUUID' => $externalId,
+            'Content-type' => 'application/json',
+        ]);
+
+        $client = $this->buildU2fClient();
+        $this->response = $this->sendRequest($client, $action, $resource);
+
+        $this->now = MySqlDateTime::now();
+        $this->resBody = $this->extractBody($this->response);
+    }
+
+    private function buildU2fClient(): Client
+    {
+        return new Client([
+            'base_uri' => "mfaapi:8080",
+            'http_errors' => false, // don't throw exceptions on 4xx/5xx so responses can be inspected.
+            'headers' => $this->reqHeaders,
+            'json' => $this->reqBody,
+        ]);
+    }
+
     private function sendRequest(Client $client, string $action, string $resource): ResponseInterface
     {
         switch ($action) {
@@ -619,6 +653,15 @@ class FeatureContext extends YiiContext
     public function setRequestBody(string $key, $value)
     {
         $this->reqBody[$key] = $value;
+    }
+
+    /**
+     * @param $property
+     * @return mixed
+     */
+    public function cleanRequestBody()
+    {
+        $this->reqBody = [];
     }
 
     /**

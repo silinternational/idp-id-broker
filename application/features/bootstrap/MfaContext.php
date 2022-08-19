@@ -160,6 +160,7 @@ class MfaContext extends \FeatureContext
      */
     public function theUserHasRequestedANewWebauthnMfaWithAllTheRequiredFieldsButInvalidValues()
     {
+        $rpId = getenv('MFA_WEBAUTHN_rpId');
         $user = User::findOne(['employee_id' => $this->tempEmployeeId]);
         Assert::notEmpty($user, 'Unable to find that user.');
         $this->setRequestBody('type', Mfa::TYPE_WEBAUTHN);
@@ -170,28 +171,48 @@ class MfaContext extends \FeatureContext
         $mfa = Mfa::FindOne(['id'=>$id]);
         Assert::notEmpty($mfa, 'Unable to find that MFA.');
 
-        // It is too complicated at this point to come up with completely correct values
-        // These should get as far as producing a 400 status code with
-        // "error":"unable to create credential: Error validating challenge"
+        // Ensure we're getting a challenge in the response
+        $responseData = $this->getResponseProperty('data');
+        Assert::notEmpty($responseData['publicKey'], 'response data is missing publicKey entry');
+        $publicKey = $responseData['publicKey'];
+        Assert::notEmpty($publicKey['challenge'], 'publicKey entry is missing challenge entry');
 
-        // These values are from values produced in serverless-mfa-api-go/webauthn_test.go Test_FinishRegistration
+        $this->cleanRequestBody();
+        $this->setRequestBody('challenge', $publicKey['challenge']);
+        $this->setRequestBody('relying_party_id', $rpId);
+
+        // now call the u2f-simulator to get the values to send to the finish registration endpoint
+        $this->callU2fSimulator('/u2f/registration', 'created', $user, $mfa->external_uuid);
+
+        $respBody = $this->getResponseBody();
+        Assert::notEmpty($respBody['id'], "registration response is missing an id entry");
+        Assert::notEmpty($respBody['rawId'], "registration response is missing an rawId entry");
+        Assert::notEmpty($respBody['response'], "registration response is missing a response entry");
+        Assert::notEmpty($respBody['response']['authenticatorData'], "registration response is missing a authenticatorData entry");
+        Assert::notEmpty($respBody['response']['attestationObject'], "registration response is missing a attestationObject entry");
+        Assert::notEmpty($respBody['response']['clientDataJSON'], "registration response is missing a clientDataJSON entry");
+        Assert::notEmpty($respBody['type'], "registration response is missing an type entry");
+        Assert::notEmpty($respBody['transports'], "registration response is missing an transports entry");
+
         $reqValue = [
-            'id' => 'dmlydEtleTExLTA',
-            'rawId' => 'dmlydEtleTExLTA',
-            'type' => 'public-key',
+            'id' => $respBody['id'],
+            'rawId' => $respBody['rawId'],
+            'type' => $respBody['type'],
             'response' => [
-                'authenticatorData' => 'hgW4ugjCDUL55FUVGHGJbQ4N6YBZYob7c20R7sAT4qRBAAAAAAAAAAAAAAAAAAAAAAAAAAAADHZpcnR1YWxrZXkxMaQBAgMmIVggBtYaQhitMvmuvKeeUZmuh96TmXTRGxB_6bfslWmTVF4iWCCK1h-O_T8R6MjkIWCsX-Pry8RJhuOxbDwovnYJBu0SZw',
-                'clientDataJSON' => 'eyJ0eXBlIjoid2ViYXV0aG4uY3JlYXRlIiwiY2hhbGxlbmdlIjoidXdGS2ZyRTk3Qm1yWWFmUjhUZW5kUjJKbWxkekVlQ3paRTFnL0FhYm03bz0iLCJvcmlnaW4iOiJodHRwOi8vbG9jYWxob3N0IiwiY2lkX3B1YmtleSI6bnVsbH0=',
-                'attestationObject' => 'pGNmbXRoZmlkby11MmZnYXR0U3RtdKJjc2lnWEgwRgIhAL2a2xVBg_4Ooc-m27dxItzeUsROR7PLh2wHa0ZTerhYAiEA9trBQ8Yr6MPPdeNaN4BE8fuR4aV2iL8UL95JfB4F-khjeDVjgVkBJzCCASMwgcmgAwIBAgIhARDyEPt8s80lRZ3lTdjXIo0Dp3dfBJd1nOqwKNDeOPNOMAoGCCqGSM49BAMCMAAwIBcNMjIwMTAxMDEwMTAxWhgPMjEyMjAxMDEwMTAxMDFaMAAwWTATBgcqhkjOPQIBBggqhkjOPQMBBwNCAAQG1hpCGK0y-a68p55Rma6H3pOZdNEbEH_pt-yVaZNUXorWH479PxHoyOQhYKxf4-vLxEmG47FsPCi-dgkG7RJnoxIwEDAOBgNVHQ8BAf8EBAMCAqQwCgYIKoZIzj0EAwIDSQAwRgIhAIXIqNEsaurdLaUiLG5_srVUw8fZZyJ268Hh8iFp3Xb2AiEA-v_2ik8SC8_EhQzN4RkgHRseGr-y0DymcIbdrpODjYpoQXV0aERhdGGlZHJwaWT2ZWZsYWdzAGhhdHRfZGF0YaNmYWFndWlk9mpwdWJsaWNfa2V59m1jcmVkZW50aWFsX2lk9mhleHRfZGF0YfZqc2lnbl9jb3VudABoYXV0aERhdGFYjoYFuLoIwg1C-eRVFRhxiW0ODemAWWKG-3NtEe7AE-KkQQAAAAAAAAAAAAAAAAAAAAAAAAAAAAx2aXJ0dWFsa2V5MTGkAQIDJiFYIAbWGkIYrTL5rrynnlGZrofek5l00RsQf-m37JVpk1ReIlggitYfjv0_EejI5CFgrF_j68vESYbjsWw8KL52CQbtEmc',
+                'authenticatorData' => $respBody['response']['authenticatorData'],
+                'clientDataJSON' => $respBody['response']['clientDataJSON'],
+                'attestationObject' => $respBody['response']['attestationObject'],
             ],
             'user' => [
                 'displayName' => $user->display_name,
                 'id' => $user->id,
                 'name' => $user->username,
             ],
-            'transports' => ['usb'],
+            'transports' => $respBody['transports'],
         ];
 
+        $this->cleanRequestBody();
+        $this->setRequestBody('employee_id', $this->tempEmployeeId);
         $this->setRequestBody('value', $reqValue);
         $this->mfa = $mfa;
     }

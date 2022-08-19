@@ -48,7 +48,7 @@ class MfaController extends BaseRestController
         // rpOrigin is needed for WebAuthn authentication
         $rpOrigin = urldecode($req->get('rpOrigin', ''));
         if ($rpOrigin != '' && !in_array($rpOrigin, \Yii::$app->params['authorizedRPOrigins'])){
-            throw new ForbiddenHttpException("Invalid rpOrigin", 1638539433);
+            throw new ForbiddenHttpException("Invalid rpOrigin: " . $rpOrigin, 1638539433);
         }
 
         return Mfa::create($user->id, $type, $label, $rpOrigin);
