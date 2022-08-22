@@ -44,6 +44,7 @@ app:
         MFA_WEBAUTHN_appId: ourApp99
         MFA_WEBAUTHN_rpDisplayName: Our App
         MFA_WEBAUTHN_rpId: http://app99
+        U2F_SIM_HOST_AND_PORT: u2fsim:8080
 
 dynamo:
     image: amazon/dynamodb-local

@@ -162,13 +162,8 @@ class FeatureContext extends YiiContext
         $webConfig = Yii::$app->components['webauthn'];
 
         $this->reqHeaders = array_merge($this->reqHeaders, [
-            'X-MFA-APIKey' => $webConfig['apiKey'],
-            'X-MFA-APISecret' => $webConfig['apiSecret'],
-            'x-mfa-RPDisplayName' => $webConfig['rpDisplayName'],
             'x-mfa-RPID' => $webConfig['rpId'],
             'x-mfa-RPOrigin' => $webConfig['rpId'],
-            'x-mfa-Username' => $user->username,
-            'x-mfa-UserDisplayName' => $user->display_name,
             'x-mfa-UserUUID' => $externalId,
             'Content-type' => 'application/json',
         ]);
@@ -182,8 +177,9 @@ class FeatureContext extends YiiContext
 
     private function buildU2fClient(): Client
     {
+        $u2fSimAndPort = getenv('U2F_SIM_HOST_AND_PORT') ?: 'u2fsim:8080';
         return new Client([
-            'base_uri' => "u2fsim:8080",
+            'base_uri' => $u2fSimAndPort,
             'http_errors' => false, // don't throw exceptions on 4xx/5xx so responses can be inspected.
             'headers' => $this->reqHeaders,
             'json' => $this->reqBody,
