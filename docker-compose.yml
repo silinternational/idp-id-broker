@@ -125,7 +125,6 @@ services:
             - ./u2f-simulator/override:/src/override
         working_dir: /src
         # Copy files from the override folder to be used for possible troubleshooting (e.g. with extra log statements)
-        # (using bash -c to keep the chown command from ignoring the && and throwing an error)
         command: bash -c "cp -R ./override/* ./ && go run ./u2fserver/"
 
     dynamorestart:
