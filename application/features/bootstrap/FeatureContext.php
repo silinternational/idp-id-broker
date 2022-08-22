@@ -183,7 +183,7 @@ class FeatureContext extends YiiContext
     private function buildU2fClient(): Client
     {
         return new Client([
-            'base_uri' => "mfaapi:8080",
+            'base_uri' => "u2fsim:8080",
             'http_errors' => false, // don't throw exceptions on 4xx/5xx so responses can be inspected.
             'headers' => $this->reqHeaders,
             'json' => $this->reqBody,

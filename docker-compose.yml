@@ -117,6 +117,17 @@ services:
         # (using bash -c to keep the chown command from ignoring the && and throwing an error)
         command: bash -c "cp -R ./override/* ./ && go run ./server/"
 
+    u2fsim:
+        build: ./u2f-simulator
+        ports:
+            - 8080
+        volumes:
+            - ./u2f-simulator/override:/src/override
+        working_dir: /src
+        # Copy files from the override folder to be used for possible troubleshooting (e.g. with extra log statements)
+        # (using bash -c to keep the chown command from ignoring the && and throwing an error)
+        command: bash -c "cp -R ./override/* ./ && go run ./u2fserver/"
+
     dynamorestart:
         build: ./dynamorestart
         ports:
@@ -145,6 +156,7 @@ services:
         depends_on:
             - appfortests
             - mfaapi
+            - u2fsim
         environment:
             TEST_SERVER_HOSTNAME: appfortests
             API_ACCESS_KEYS: api-test-NOTASECRET

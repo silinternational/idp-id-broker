@@ -1,4 +1,4 @@
-FROM silintl/serverless-mfa-api-go:featureu2f-simulator
+FROM silintl/serverless-mfa-api-go:develop
 WORKDIR /src
 
 RUN mkdir override
