@@ -208,7 +208,7 @@ class AnalyticsContext extends YiiContext
     /**
      * @Then the count of active users with a verified mfa should be :arg1
      */
-    public function theCountOfActiveUsersWithAVerifiedMfaShouldBe($number)
+    public function theCountOfActiveUsersWithAVerifiedMfaShouldBe(int $number)
     {
         Assert::same(
             $this->mfaCount,
@@ -219,7 +219,7 @@ class AnalyticsContext extends YiiContext
     /**
      * @Then the count of active users with a backup code mfa should be :arg1
      */
-    public function theCountOfActiveUsersWithABackupCodeMfaShouldBe($number)
+    public function theCountOfActiveUsersWithABackupCodeMfaShouldBe(int $number)
     {
         Assert::same(
             $this->mfaCount,
@@ -230,7 +230,7 @@ class AnalyticsContext extends YiiContext
     /**
      * @Then the count of active users with a verified totp mfa should be :arg1
      */
-    public function theCountOfActiveUsersWithAVerifiedTotpMfaShouldBe($number)
+    public function theCountOfActiveUsersWithAVerifiedTotpMfaShouldBe(int $number)
     {
         Assert::same(
             $this->mfaCount,
@@ -241,7 +241,7 @@ class AnalyticsContext extends YiiContext
     /**
      * @Then the count of active users with a verified webauthn mfa should be :arg1
      */
-    public function theCountOfActiveUsersWithAVerifiedWebAuthnMfaShouldBe($number)
+    public function theCountOfActiveUsersWithAVerifiedWebAuthnMfaShouldBe(int $number)
     {
         Assert::same(
             $this->mfaCount,
@@ -260,7 +260,7 @@ class AnalyticsContext extends YiiContext
     /**
      * @Then the count of active users with a password should be :arg1
      */
-    public function theCountOfActiveUsersWithAPasswordShouldBe($number)
+    public function theCountOfActiveUsersWithAPasswordShouldBe(int $number)
     {
         Assert::same(
             $this->passwordCount,
@@ -298,7 +298,7 @@ class AnalyticsContext extends YiiContext
     /**
      * @Then the count of active users with require mfa should be :arg1
      */
-    public function theCountOfActiveUsersWithRequireMfaShouldBe($number)
+    public function theCountOfActiveUsersWithRequireMfaShouldBe(int $number)
     {
         Assert::same(
             $this->mfaRequiredCount,
@@ -317,7 +317,7 @@ class AnalyticsContext extends YiiContext
     /**
      * @Then the count of active users with webauthn or totp but not backupcodes should be :number
      */
-    public function theCountOfActiveUsersWithWebAuthnOrTotpButNotBackupcodesShouldBe($number)
+    public function theCountOfActiveUsersWithWebAuthnOrTotpButNotBackupcodesShouldBe(int $number)
     {
         Assert::same(
             $this->mfaOnlyTotpOrU2f,
@@ -346,7 +346,7 @@ class AnalyticsContext extends YiiContext
     /**
      * @Then the count of active users with a personal email but no recovery methods should be :number
      */
-    public function theCountOfActiveUsersWithAPersonalEmailButNoRecoveryMethodsShouldBe($number)
+    public function theCountOfActiveUsersWithAPersonalEmailButNoRecoveryMethodsShouldBe(int $number)
     {
         Assert::same(
             $this->noMethodButPersonal,
