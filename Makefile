@@ -13,6 +13,7 @@ deps:
 	docker-compose run --rm cli composer install
 
 depsfortests:
+	docker-compose run --rm appfortests composer update
 	docker-compose run --rm appfortests composer install
 
 depsshow:

@@ -2,98 +2,155 @@
     "installed": [
         {
             "name": "behat/behat",
-            "version": "v3.10.0",
-            "description": "Scenario-oriented BDD framework for PHP"
+            "homepage": "http://behat.org/",
+            "source": "https://github.com/Behat/Behat/tree/v3.11.0",
+            "version": "v3.11.0",
+            "description": "Scenario-oriented BDD framework for PHP",
+            "abandoned": false
         },
         {
             "name": "codemix/yii2-streamlog",
+            "homepage": null,
+            "source": "https://github.com/codemix/yii2-streamlog.git",
             "version": "1.3.1",
-            "description": "A Yii 2 log target for streams in URL format"
+            "description": "A Yii 2 log target for streams in URL format",
+            "abandoned": false
         },
         {
             "name": "fillup/fake-bower-assets",
+            "homepage": null,
+            "source": "https://github.com/fillup/fake-bower-assets.git",
             "version": "2.0.9",
-            "description": "Use Composer \"replace\" to fake out installing bower-asset dependencies that aren't really needed"
+            "description": "Use Composer \"replace\" to fake out installing bower-asset dependencies that aren't really needed",
+            "abandoned": false
         },
         {
             "name": "friendsofphp/php-cs-fixer",
+            "homepage": null,
+            "source": "https://github.com/FriendsOfPHP/PHP-CS-Fixer/tree/v2.19.3",
             "version": "v2.19.3",
-            "description": "A tool to automatically fix PHP code style"
+            "description": "A tool to automatically fix PHP code style",
+            "abandoned": false
         },
         {
             "name": "google/apiclient",
-            "version": "v2.11.0",
-            "description": "Client library for Google APIs"
+            "homepage": "http://developers.google.com/api-client-library/php",
+            "source": "https://github.com/googleapis/google-api-php-client/tree/v2.12.6",
+            "version": "v2.12.6",
+            "description": "Client library for Google APIs",
+            "abandoned": false
         },
         {
             "name": "guzzlehttp/guzzle",
-            "version": "6.5.5",
-            "description": "Guzzle is a PHP HTTP client library"
+            "homepage": "http://guzzlephp.org/",
+            "source": "https://github.com/guzzle/guzzle/tree/6.5.8",
+            "version": "6.5.8",
+            "description": "Guzzle is a PHP HTTP client library",
+            "abandoned": false
         },
         {
             "name": "ramsey/uuid",
+            "homepage": "https://github.com/ramsey/uuid",
+            "source": "https://github.com/ramsey/uuid",
             "version": "3.9.6",
-            "description": "Formerly rhumsaa/uuid. A PHP 5.4+ library for generating RFC 4122 version 1, 3, 4, and 5 universally unique identifiers (UUID)."
+            "description": "Formerly rhumsaa/uuid. A PHP 5.4+ library for generating RFC 4122 version 1, 3, 4, and 5 universally unique identifiers (UUID).",
+            "abandoned": false
         },
         {
             "name": "roave/security-advisories",
-            "version": "dev-master 6f99479",
-            "description": "Prevents installation of composer packages with known security vulnerabilities: no API, simply require it"
+            "homepage": null,
+            "source": "https://github.com/Roave/SecurityAdvisories/tree/latest",
+            "version": "dev-master bd4a45f",
+            "description": "Prevents installation of composer packages with known security vulnerabilities: no API, simply require it",
+            "abandoned": false
         },
         {
             "name": "silinternational/email-service-php-client",
-            "version": "2.3.0",
-            "description": "PHP client to interact with our Email Service API: https://github.com/silinternational/email-service"
+            "homepage": null,
+            "source": "https://github.com/silinternational/email-service-php-client/tree/2.3.1",
+            "version": "2.3.1",
+            "description": "PHP client to interact with our Email Service API: https://github.com/silinternational/email-service",
+            "abandoned": false
         },
         {
             "name": "silinternational/php-array-dot-notation",
+            "homepage": null,
+            "source": "https://github.com/silinternational/php-array-dot-notation.git",
             "version": "0.1.0",
-            "description": "PHP library for using dot notation in arrays"
+            "description": "PHP library for using dot notation in arrays",
+            "abandoned": false
         },
         {
             "name": "silinternational/php-env",
+            "homepage": null,
+            "source": "https://github.com/silinternational/php-env.git",
             "version": "2.1.1",
-            "description": "Simple PHP library for getting (or requiring) environment variables, designed to handle true, false, and null more intelligently. If desired, an environment variable's value can be split into an array automatically."
+            "description": "Simple PHP library for getting (or requiring) environment variables, designed to handle true, false, and null more intelligently. If desired, an environment variable's value can be split into an array automatically.",
+            "abandoned": false
         },
         {
             "name": "silinternational/psr3-adapters",
-            "version": "1.1.0",
-            "description": "Various PSR3-compatible logging adapters."
+            "homepage": null,
+            "source": "https://github.com/silinternational/psr3-adapters/tree/3.1.0",
+            "version": "3.1.0",
+            "description": "Various PSR3-compatible logging adapters.",
+            "abandoned": false
         },
         {
             "name": "silinternational/yii2-email-log-target",
+            "homepage": null,
+            "source": "https://github.com/silinternational/yii2-email-log-target.git",
             "version": "1.0.1",
-            "description": "Yii2 log target for sending data to email without trace information"
+            "description": "Yii2 log target for sending data to email without trace information",
+            "abandoned": false
         },
         {
             "name": "silinternational/yii2-json-log-targets",
+            "homepage": null,
+            "source": "https://github.com/silinternational/yii2-json-log-targets.git",
             "version": "2.0.0",
-            "description": "A collection of Yii2 log targets that format the log message as a JSON string."
+            "description": "A collection of Yii2 log targets that format the log message as a JSON string.",
+            "abandoned": false
         },
         {
             "name": "theiconic/php-ga-measurement-protocol",
+            "homepage": null,
+            "source": "https://github.com/theiconic/php-ga-measurement-protocol.git",
             "version": "v2.9.0",
-            "description": "Send data to Google Analytics from the server using PHP. This library fully implements GA measurement protocol."
+            "description": "Send data to Google Analytics from the server using PHP. This library fully implements GA measurement protocol.",
+            "abandoned": false
         },
         {
             "name": "webmozart/assert",
-            "version": "1.10.0",
-            "description": "Assertions to validate method input/output with nice error messages."
+            "homepage": null,
+            "source": "https://github.com/webmozarts/assert/tree/1.11.0",
+            "version": "1.11.0",
+            "description": "Assertions to validate method input/output with nice error messages.",
+            "abandoned": false
         },
         {
             "name": "yiisoft/yii2",
-            "version": "2.0.43",
-            "description": "Yii PHP Framework Version 2"
+            "homepage": "https://www.yiiframework.com/",
+            "source": "https://github.com/yiisoft/yii2",
+            "version": "2.0.46",
+            "description": "Yii PHP Framework Version 2",
+            "abandoned": false
         },
         {
             "name": "yiisoft/yii2-gii",
-            "version": "2.2.3",
-            "description": "The Gii extension for the Yii framework"
+            "homepage": null,
+            "source": "https://github.com/yiisoft/yii2-gii",
+            "version": "2.2.4",
+            "description": "The Gii extension for the Yii framework",
+            "abandoned": false
         },
         {
             "name": "yiisoft/yii2-swiftmailer",
-            "version": "2.1.2",
-            "description": "The SwiftMailer integration for the Yii framework"
+            "homepage": null,
+            "source": "https://github.com/yiisoft/yii2-swiftmailer",
+            "version": "2.1.3",
+            "description": "The SwiftMailer integration for the Yii framework",
+            "abandoned": false
         }
     ]
 }
