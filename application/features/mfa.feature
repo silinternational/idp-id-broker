@@ -76,13 +76,12 @@ Feature: MFA
     And the response body should contain 'publicKey'
     And the response body should contain 'challenge'
 
-  # We're not using completely correct webauthn data, due to its complexity and lack of predictability.
-  Scenario: Attempt to verify a new but invalid MFA webauthn registration
-    Given the user has requested a new webauthn MFA with all the required fields but invalid values
+  Scenario: Verify a new MFA webauthn registration
+    Given the user has requested a new webauthn MFA
     When I request to verify the webauthn Mfa registration
-    Then the response status code should be 400
-    And the response body should contain '400 Bad Request'
-    And the response body should contain '"error":"unable to create credential: Error validating challenge"'
+    Then the response status code should be 200
+    And the response body should contain "'type' => 'webauthn'"
+    And the response body should contain "'label' => 'Security Key'"
 
   Scenario: Create new MFA record of type totp
 #TODO - create a test double for the totp client

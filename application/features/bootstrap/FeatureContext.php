@@ -156,6 +156,36 @@ class FeatureContext extends YiiContext
         ]);
     }
 
+
+    public function callU2fSimulator($resource, $action, User $user, string $externalId)
+    {
+        $webConfig = Yii::$app->components['webauthn'];
+
+        $this->reqHeaders = array_merge($this->reqHeaders, [
+            'x-mfa-RPID' => $webConfig['rpId'],
+            'x-mfa-RPOrigin' => $webConfig['rpId'],
+            'x-mfa-UserUUID' => $externalId,
+            'Content-type' => 'application/json',
+        ]);
+
+        $client = $this->buildU2fClient();
+        $this->response = $this->sendRequest($client, $action, $resource);
+
+        $this->now = MySqlDateTime::now();
+        $this->resBody = $this->extractBody($this->response);
+    }
+
+    private function buildU2fClient(): Client
+    {
+        $u2fSimAndPort = getenv('U2F_SIM_HOST_AND_PORT') ?: 'u2fsim:8080';
+        return new Client([
+            'base_uri' => $u2fSimAndPort,
+            'http_errors' => false, // don't throw exceptions on 4xx/5xx so responses can be inspected.
+            'headers' => $this->reqHeaders,
+            'json' => $this->reqBody,
+        ]);
+    }
+
     private function sendRequest(Client $client, string $action, string $resource): ResponseInterface
     {
         switch ($action) {
@@ -619,6 +649,15 @@ class FeatureContext extends YiiContext
     public function setRequestBody(string $key, $value)
     {
         $this->reqBody[$key] = $value;
+    }
+
+    /**
+     * @param $property
+     * @return mixed
+     */
+    public function cleanRequestBody()
+    {
+        $this->reqBody = [];
     }
 
     /**

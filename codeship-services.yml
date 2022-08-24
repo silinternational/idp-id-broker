@@ -14,6 +14,7 @@ app:
     depends_on:
         - testdb
         - mfaapi
+        - u2fsim
     working_dir: /data
     command: /data/run-tests.sh
     environment:
@@ -42,7 +43,8 @@ app:
         MFA_WEBAUTHN_apiSecret: 11345678-1234-1234-1234-12345678
         MFA_WEBAUTHN_appId: ourApp99
         MFA_WEBAUTHN_rpDisplayName: Our App
-        MFA_WEBAUTHN_rpId: app99
+        MFA_WEBAUTHN_rpId: http://app99
+        U2F_SIM_HOST_AND_PORT: u2fsim:8080
 
 dynamo:
     image: amazon/dynamodb-local
@@ -72,6 +74,13 @@ mfaapi:
         - dynamorestart
     working_dir: /src
     command: bash -c "echo starting server && go run ./server/"
+
+u2fsim:
+    build: ./u2f-simulator
+    ports:
+        - 8080
+    working_dir: /src
+    command: bash -c "echo starting u2f server && go run ./u2fserver/"
 
 # Create dynamodb tables and data before running the backend mfa api
 dynamorestart:
