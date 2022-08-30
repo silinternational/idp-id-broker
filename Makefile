@@ -13,11 +13,10 @@ deps:
 	docker-compose run --rm cli composer install
 
 depsfortests:
-	docker-compose run --rm appfortests composer update
 	docker-compose run --rm appfortests composer install
 
 depsshow:
-	docker-compose run --rm cli bash -c "composer show -Df json > versions.json"
+	docker-compose run --rm cli bash -c "composer show -D > versions.json"
 
 depsupdate:
 	docker-compose run --rm cli composer update
