@@ -73,7 +73,7 @@ services:
             MYSQL_PASSWORD: appfortests
 
     cli:
-        image: silintl/php7:7.4
+        image: silintl/php8:8.1
         volumes:
             - ${COMPOSER_CACHE_DIR}:/composer
         volumes_from:
@@ -147,7 +147,7 @@ services:
         command: bash -c "pwd && ls -al && php restart.php"
 
     test:
-        image: silintl/php7:7.4
+        image: silintl/php8:8.1
         volumes_from:
             - data
         mem_limit: 200m
