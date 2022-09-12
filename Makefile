@@ -14,9 +14,10 @@ deps:
 
 depsfortests:
 	docker-compose run --rm appfortests composer install
+	docker-compose run --rm dynamorestart composer install
 
 depsshow:
-	docker-compose run --rm cli bash -c "composer show -D > versions.json"
+	docker-compose run --rm cli bash -c "composer show -D > versions.txt"
 
 depsupdate:
 	docker-compose run --rm cli composer update

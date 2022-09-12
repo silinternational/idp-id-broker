@@ -21,7 +21,7 @@ api.html
 dockercfg
 
 # These folders are intended to offer a way to add logging for toubleshooting purposes
-serverless-mfa-api/override/*
-serverless-mfa-api/override/server/*
-u2f-simulator/override/*
-u2f-simulator/override/u2fserver/*
+serverless-mfa-api/override/*.go
+serverless-mfa-api/override/server/*.go
+u2f-simulator/override/*.go
+u2f-simulator/override/u2fserver/*.go
