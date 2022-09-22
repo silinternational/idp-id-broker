@@ -42,6 +42,7 @@ quicktest:
 	docker-compose run --rm test bash -c "vendor/bin/behat --stop-on-failure --strict --append-snippets"
 
 test: appfortests
+	sleep 3 # let other containers get settled
 	docker-compose run --rm test
 
 testcli: appfortests tablesfortests mfaapi
