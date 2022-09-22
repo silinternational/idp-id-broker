@@ -7,12 +7,18 @@ composer install --no-interaction --no-scripts --no-progress
 # If that failed, exit.
 rc=$?; if [[ $rc != 0 ]]; then exit $rc; fi
 
-# avoid having issues here due to the random sleep on the appfortests container
+# avoid having issues here due to the random sleep on the app/appfortests container
 i=10
 while [ "$i" -ne 0 ]
 do
   want='Page not found.'
   cRes="$(curl appfortests)"
+  if [[ "$cRes" == *"$want"* ]]; then
+    break
+  fi
+
+  # This applies to codeship tests
+  cRes="$(curl localhost)"
   if [[ "$cRes" == *"$want"* ]]; then
     break
   fi
