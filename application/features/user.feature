@@ -90,6 +90,7 @@ Feature: User
         | display_name    | Shep Clark            |
         | username        | shep_clark            |
         | email           | shep_clark@example.org|
+        | manager_email   | w_clark@example.org   |
         | hide            | yes                   |
       And I request "/user" be created
       And the response status code should be 200
@@ -101,6 +102,7 @@ Feature: User
         | display_name        | Shep Clark            |
         | username            | shep_clark            |
         | email               | shep_clark@example.org|
+        | manager_email       | w_clark@example.org   |
         | current_password_id | NULL                  |
         | active              | yes                   |
         | locked              | no                    |
@@ -121,6 +123,7 @@ Feature: User
       | display_name    | DISPLAY            |
       | username        | USER               |
       | email           | chg@example.org    |
+      | manager_email   |                    |
       | active          | no                 |
       | active          | yes                |
       | locked          | no                 |
