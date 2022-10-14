@@ -38,7 +38,7 @@ services:
         ports:
             - "80"
         depends_on:
-            - appfortestsdb
+            - testdb
         environment:
             API_ACCESS_KEYS: api-test-NOTASECRET
             APP_ENV: test
@@ -49,13 +49,13 @@ services:
             EMAILER_CLASS: \Sil\SilIdBroker\Behat\Context\fakes\FakeEmailer
             IDP_NAME: test
             MYSQL_ROOT_PASSWORD: r00tp@ss!
-            MYSQL_HOST: appfortestsdb
+            MYSQL_HOST: testdb
             MYSQL_DATABASE: appfortests
             MYSQL_USER: appfortests
             MYSQL_PASSWORD: appfortests
             SUPPORT_EMAIL: support@example.com
 
-    appfortestsdb:
+    testdb:
         image: silintl/mariadb:latest
         ports:
             - "3306"
@@ -66,7 +66,7 @@ services:
             MYSQL_PASSWORD: appfortests
 
     cli:
-        image: silintl/php7:7.4
+        image: silintl/php8:8.1
         volumes:
             - ${COMPOSER_CACHE_DIR}:/composer
         volumes_from:
@@ -79,7 +79,7 @@ services:
         command: ["true"]
 
     test:
-        image: silintl/php7:7.4
+        image: silintl/php8:8.1
         volumes_from:
             - data
         mem_limit: 200m
@@ -99,7 +99,7 @@ services:
             IDP_DISPLAY_NAME: Test
             IDP_NAME: test
             MYSQL_DATABASE: appfortests
-            MYSQL_HOST: appfortestsdb
+            MYSQL_HOST: testdb
             MYSQL_PASSWORD: appfortests
             MYSQL_USER: appfortests
             PASSWORD_PROFILE_URL: https://www.example.com
@@ -130,6 +130,7 @@ services:
         volumes:
             - ./api.raml:/api.raml
             - ./api.html:/api.html
+        # The ENTRYPOINT in the the Dockerfile is "raml2html"
         command: -i api.raml -o api.html
 
 networks:

@@ -13,6 +13,10 @@ class MfaBackendWebAuthn extends Component implements MfaBackendInterface
 {
     /**
      * @var string
+     * This and most of the following attributes are hydrated by application/common/config/main.php
+     *   based on the entry: 'webauthn' => ArrayHelper::merge(...
+     *   which pulls in the environment variables with the prefix `MFA_WEBAUTHN_`,
+     *   e.g. MFA_WEBAUTHN_apiBaseUrl*
      */
     public string $apiBaseUrl;
 
@@ -48,6 +52,9 @@ class MfaBackendWebAuthn extends Component implements MfaBackendInterface
 
     public function init()
     {
+        if ($this->apiBaseUrl == "") {
+            throw new \InvalidArgumentException("MFABackendWebAuthn class must not have a blank apiBaseUrl.");
+        }
         $this->client = new MfaApiClient($this->apiBaseUrl, $this->apiKey, $this->apiSecret);
         parent::init();
     }
