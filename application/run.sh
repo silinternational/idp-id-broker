@@ -21,6 +21,7 @@ chown -R www-data:www-data \
 echo 'sleeping a random number of seconds up to 9 to avoid migration runs clash'
 sleep $[ ( $RANDOM % 10 ) ]s
 
+
 # Run database migrations
 /data/yii migrate --interactive=0
 
