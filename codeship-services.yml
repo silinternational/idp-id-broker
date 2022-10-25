@@ -1,4 +1,4 @@
-db:
+testdb:
     image: silintl/mariadb:latest
     environment:
         MYSQL_ROOT_PASSWORD: r00tp@ss!
@@ -12,7 +12,7 @@ app:
         dockerfile: ./Dockerfile
     cached: true
     depends_on:
-        - db
+        - testdb
     working_dir: /data
     command: /data/run-tests.sh
     environment:
@@ -25,7 +25,7 @@ app:
         EMAILER_CLASS: \Sil\SilIdBroker\Behat\Context\fakes\FakeEmailer
         HELP_CENTER_URL: https://help-center
         IDP_NAME: Test
-        MYSQL_HOST: db
+        MYSQL_HOST: testdb
         MYSQL_DATABASE: test
         MYSQL_USER: idbroker
         MYSQL_PASSWORD: idbroker

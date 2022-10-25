@@ -131,7 +131,7 @@ class MfaRateLimitContext extends YiiContext
     /**
      * @Then that MFA method should have :number recent failure(s)
      */
-    public function thatMfaMethodShouldHaveRecentFailure($number)
+    public function thatMfaMethodShouldHaveRecentFailure(int $number)
     {
         $mfa = Mfa::findOne($this->mfaId);
         Assert::notNull($mfa);
@@ -162,7 +162,7 @@ class MfaRateLimitContext extends YiiContext
             $mfa->recordFailedAttempt();
         }
         
-        Assert::same($mfa->countRecentFailures(), (string)$desiredCount);
+        Assert::same($mfa->countRecentFailures(), $desiredCount);
     }
 
     /**
@@ -178,7 +178,7 @@ class MfaRateLimitContext extends YiiContext
         
         Assert::same(
             $mfa->countRecentFailures(),
-            (string) MfaFailedAttempt::RECENT_FAILURE_LIMIT
+            MfaFailedAttempt::RECENT_FAILURE_LIMIT
         );
     }
 

@@ -122,7 +122,7 @@ class MfaContext extends \FeatureContext
      */
     public function codesShouldBeStored($num)
     {
-        Assert::eq($num, count($this->mfa->mfaBackupcodes));
+        Assert::eq(count($this->mfa->mfaBackupcodes), $num);
     }
 
     /**
