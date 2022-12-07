@@ -22,9 +22,11 @@ Feature: MFA
     Then the response status code should be 200
     And I should receive 1 record
     And that record should have a data item with the following elements:
-      | property  | value          |
-      | label     | Security Key   |
-      | id        | *              |
+      | property      | value          |
+      | label         | Security Key   |
+      | id            | *              |
+      | last_used_utc | null           |
+      | created_utc   | *              |
 
   Scenario: Create new MFA record of type backupcode
     Given I provide the following valid data:
