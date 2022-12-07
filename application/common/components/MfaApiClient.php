@@ -203,7 +203,7 @@ class MfaApiClient
         } catch (\Exception $e) {
             if ($e instanceof ConnectException || $e instanceof ServerException) {
                 \Yii::error([
-                    'action' => 'calling totp api',
+                    'action' => 'calling 2sv api',
                     'status' => 'error',
                     'error' => 'connection error: ' . $e->getMessage()
                 ]);
