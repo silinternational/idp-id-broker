@@ -28,15 +28,15 @@ class MfaWebauthn extends MfaWebauthnBase
         ], parent::rules());
     }
 
-    // Add a new integer on to the end of "Security Key-", i.e. ensure that a related
-    // webauthn doesn't already have that label
+    // Adds a new integer on to the end of "Security Key-" while ensuring that a related
+    // webauthn doesn't already have that label.
     private static function getDefaultLabel(Mfa $mfa): string
     {
         $nextIndex = count($mfa->mfaWebauthns) + 1;
         $defaultText = $mfa->getReadableType();
         $label = sprintf("%s-%s", $defaultText, $nextIndex);
 
-        for ($i = $nextIndex; $i<1000; $i++) {
+        for ($i = $nextIndex; $i < 1000; $i++) {
             $label = sprintf("%s-%s", $defaultText, $nextIndex);
             $foundMatch = false;
             foreach ($mfa->mfaWebauthns as $webauthn) {
@@ -46,7 +46,7 @@ class MfaWebauthn extends MfaWebauthnBase
                 }
             }
             if (!$foundMatch) {
-                break;
+                return $label;
             }
         }
 
