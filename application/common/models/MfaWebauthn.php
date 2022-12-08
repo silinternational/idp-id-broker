@@ -37,7 +37,7 @@ class MfaWebauthn extends MfaWebauthnBase
         $label = sprintf("%s-%s", $defaultText, $nextIndex);
 
         for ($i = $nextIndex; $i < 1000; $i++) {
-            $label = sprintf("%s-%s", $defaultText, $nextIndex);
+            $label = sprintf("%s-%s", $defaultText, $i);
             $foundMatch = false;
             foreach ($mfa->mfaWebauthns as $webauthn) {
                 if ($webauthn->label == $label) {
