@@ -23,7 +23,7 @@ Feature: MFA
     And I should receive 1 record
     And that record should have a data item with the following elements:
       | property      | value          |
-      | label         | Security Key   |
+      | label         | Security Key-1 |
       | id            | *              |
       | last_used_utc | null           |
       | created_utc   | *              |
@@ -142,7 +142,7 @@ Feature: MFA
       And the mfaWebauthn record exists
       And the following mfaWebauthn data should be stored:
         | property            | value           |
-        | label               | Security Key    |
+        | label               | Security Key-1  |
 
   Scenario: Verify a backupcode MFA code
     Given the user has a verified "backupcode" MFA

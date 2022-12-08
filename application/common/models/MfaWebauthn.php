@@ -46,7 +46,8 @@ class MfaWebauthn extends MfaWebauthnBase
             );
         }
 
-        $label =  $label ?: $mfa->getReadableType();
+        $num = count($mfa->mfaWebauthns) + 1;
+        $label =  $label ?: $mfa->getReadableType() . '-' . $num;
         $webauthn = new MfaWebauthn();
         $webauthn->mfa_id = $mfa->id;
         $webauthn->label = $label;
