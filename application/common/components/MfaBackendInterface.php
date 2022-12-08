@@ -10,7 +10,7 @@ interface MfaBackendInterface
      * @param string $rpOrigin Relying Party Origin (only used for WebAuthn)
      * @return array
      */
-    public function regInit(int $userId, string $rpOrigin): array;
+    public function regInit(int $userId, string $mfaExternalUuid, string $rpOrigin): array;
 
     /**
      * Initialize authentication sequence

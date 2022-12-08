@@ -26,7 +26,7 @@ class MfaBackendBackupcode extends Component implements MfaBackendInterface
      * @return array
      * @throws ServerErrorHttpException
      */
-    public function regInit(int $userId, string $rpOrigin = ''): array
+    public function regInit(int $userId, string $mfaExternalUuid = null, string $rpOrigin = ''): array
     {
         // Get existing MFA record for backupcode to create/update codes for
         $mfa = Mfa::findOne(['user_id' => $userId, 'type' => Mfa::TYPE_BACKUPCODE]);

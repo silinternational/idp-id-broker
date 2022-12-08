@@ -4,6 +4,7 @@ namespace common\components;
 use common\models\Mfa;
 use common\models\MfaWebauthn;
 use common\models\User;
+use Google\Service\PeopleService\ExternalId;
 use GuzzleHttp\Exception\GuzzleException;
 use yii\base\Component;
 use yii\helpers\Json;
@@ -70,14 +71,14 @@ class MfaBackendWebAuthn extends Component implements MfaBackendInterface
      * @return array JSON decoded object to be passed to browser credential create API for WebAuthn dance
      * @throws GuzzleException
      */
-    public function regInit(int $userId, string $rpOrigin = ''): array
+    public function regInit(int $userId, string $mfaExternalUuid = null, string $rpOrigin = ''): array
     {
         $user = User::findOne(['id' => $userId]);
         if ($user == null) {
             return [];
         }
 
-        $headers = $this->getWebAuthnHeaders($user->username, $user->getDisplayName(), $rpOrigin);
+        $headers = $this->getWebAuthnHeaders($user->username, $user->getDisplayName(), $rpOrigin, $mfaExternalUuid);
 
         return $this->client->webauthnCreateRegistration($headers);
     }

@@ -49,7 +49,7 @@ class MfaBackendTotp extends Component implements MfaBackendInterface
      * @return array
      * @throws NotFoundHttpException
      */
-    public function regInit(int $userId, string $rpOrigin = ''): array
+    public function regInit(int $userId, string $mfaExternalUuid = null, string $rpOrigin = ''): array
     {
         $user = User::findOne(['id' => $userId]);
         if ($user == null) {
