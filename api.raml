@@ -719,9 +719,11 @@ types:
           description: Update the label of a MFA webauthn credential.
           body:
             properties:
+              employee_id: string
               label: string
             example: |
               {
+                "employee_id": "12345",
                 "label": "My First Security Key"
               }
           responses:
@@ -730,7 +732,7 @@ types:
               body:
                 type: WebauthnResponse
             400:
-              description: Missing or blank label value
+              description: Missing or blank label value or invalid employee_id
               body:
                 type: Error
             404:
@@ -747,9 +749,20 @@ types:
           description: >
             Delete a webauthn credential from an MFA. If it is the last credential,
             the whole MFA will be deleted.
+          body:
+            properties:
+              employee_id: string
+            example: |
+              {
+                "employee_id": "abc123"
+              }
           responses:
             204:
               description: Successful deletion of record
+            400:
+              description: invalid employee_id
+              body:
+                type: Error
             403:
               description: The MFA record was not of type webauthn
               body:
