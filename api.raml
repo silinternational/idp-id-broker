@@ -293,6 +293,24 @@ types:
             "last_used_utc": null,
             "data": []
         }
+  WebauthnResponse:
+    type: object
+    properties:
+      id: integer
+      mfa_id: integer
+      key_handle_hash: string
+      label: string
+      created_utc: string
+      last_used_utc: string?
+    example: |
+      {
+        "id": 81,
+        "mfa_id": 8,
+        "key_handle_hash": "1234567890123456789012345678901234567890ABC",
+        "label": "My First Security Key",
+        "created_utc": "2017-10-24T20:40:57Z",
+        "last_used_utc": null,
+      }
   Method:
     type: object
     properties:
@@ -694,33 +712,52 @@ types:
                 Too many failed attempts for this MFA record recently.
               body:
                 type: Error
-
   /{mfaId}:
     /webauthn:
       /{webauthnId}:
-        delete:
-          description: Delete a webauthn credential from an MFA. If it is the last credential, the whole MFA will be deleted.
+        put:
+          description: Update the label of a MFA webauthn credential.
           body:
             properties:
-              employee_id: string
+              label: string
             example: |
               {
-                "employee_id": "12345"
+                "label": "My First Security Key"
               }
+          responses:
+            200:
+              description: Webauthn label successfully updated
+              body:
+                type: WebauthnResponse
+            400:
+              description: Missing or blank label value
+              body:
+                type: Error
+            404:
+              description: >
+                No MFA record found with that `mfa_id` or no webauthn
+                record found with that `id` and that `mfa_id`.
+              body:
+                type: Error
+            500:
+              description: Internal server error
+              body:
+                type: Error
+        delete:
+          description: >
+            Delete a webauthn credential from an MFA. If it is the last credential,
+            the whole MFA will be deleted.
           responses:
             204:
               description: Successful deletion of record
-            400:
-              description: >
-                `employee_id` was not provided or it did not match an employee record.
-              body:
-                type: Error
             403:
               description: The MFA record was not of type webauthn
               body:
                 type: Error
             404:
-              description: The matching webauthn credential or the (parent) MFA were not found
+              description: >
+                No MFA record found with that `mfa_id` or no webauthn
+                record found with that `id` and that `mfa_id`.
               body:
                 type: Error
             500:
