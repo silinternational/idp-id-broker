@@ -86,7 +86,8 @@ class MfaBackendTotp extends Component implements MfaBackendInterface
     {
         if ($verifyType != "") {
             throw new BadRequestHttpException(
-                'A non-blank verification type is not allowed when verifying a mfa of type ' . Mfa::TYPE_TOTP
+                'A non-blank verification type is not allowed when verifying a mfa of type ' . Mfa::TYPE_TOTP,
+                1670950780
             );
         }
 

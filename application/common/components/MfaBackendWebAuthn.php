@@ -125,7 +125,8 @@ class MfaBackendWebAuthn extends Component implements MfaBackendInterface
     {
         if ($verifyType != "" && $verifyType != Mfa::VERIFY_REGISTRATION) {
             throw new BadRequestHttpException(
-                'A non-blank verification type for a ' . Mfa::TYPE_WEBAUTHN . " may only be: " . Mfa::VERIFY_REGISTRATION
+                'A non-blank verification type for a ' . Mfa::TYPE_WEBAUTHN . " may only be: " . Mfa::VERIFY_REGISTRATION,
+                1671016320
             );
         }
 
@@ -214,7 +215,8 @@ class MfaBackendWebAuthn extends Component implements MfaBackendInterface
     {
         $webauthn = MfaWebauthn::findOne(['id' => $webauthnId]);
         if (empty($webauthn) || $webauthn->mfa_id != $mfa->id) {
-            throw new NotFoundHttpException("MfaWebauthn not found with id: $webauthnId and mfa_id: $mfa->id");
+            throw new NotFoundHttpException("MfaWebauthn not found with id: $webauthnId and mfa_id: $mfa->id",
+                1670950790);
         }
 
         if (! $this->client->webauthnDeleteCredential($webauthn->key_handle_hash, $headers)) {

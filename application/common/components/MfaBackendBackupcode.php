@@ -70,7 +70,8 @@ class MfaBackendBackupcode extends Component implements MfaBackendInterface
     {
         if ($verifyType != "") {
             throw new BadRequestHttpException(
-                    'A non-blank verification type is not allowed when verifying a mfa of type ' . Mfa::TYPE_BACKUPCODE
+                'A non-blank verification type is not allowed when verifying a mfa of type ' . Mfa::TYPE_BACKUPCODE,
+                1670950767
             );
         }
 
