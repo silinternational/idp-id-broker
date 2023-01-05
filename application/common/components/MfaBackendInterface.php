@@ -7,6 +7,7 @@ interface MfaBackendInterface
     /**
      * Initialize a new MFA backend registration
      * @param int $userId
+     * @param string $mfaExternalUuid (only used for WebAuthn)
      * @param string $rpOrigin Relying Party Origin (only used for WebAuthn)
      * @return array
      */

@@ -14,14 +14,6 @@ use yii\web\ServerErrorHttpException;
 
 class MfaBackendManager extends Component implements MfaBackendInterface
 {
-    /**
-     * Initialize a new MFA backend registration
-     * @param int $userId
-     * @param string $rpOrigin
-     * @return array
-     * @throws ServerErrorHttpException
-     * @throws \Exception
-     */
     public function regInit(int $userId, string $mfaExternalUuid = null, string $rpOrigin = ''): array
     {
         // Get existing MFA record for manager to create/update codes for

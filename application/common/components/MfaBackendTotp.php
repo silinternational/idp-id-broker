@@ -42,13 +42,6 @@ class MfaBackendTotp extends Component implements MfaBackendInterface
         parent::init();
     }
 
-    /**
-     * Initialize a new MFA backend registration
-     * @param int $userId
-     * @param string $rpOrigin
-     * @return array
-     * @throws NotFoundHttpException
-     */
     public function regInit(int $userId, string $mfaExternalUuid = null, string $rpOrigin = ''): array
     {
         $user = User::findOne(['id' => $userId]);

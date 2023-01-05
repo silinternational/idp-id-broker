@@ -19,13 +19,6 @@ class MfaBackendBackupcode extends Component implements MfaBackendInterface
      */
     public int $numBackupCodes = 10;
 
-    /**
-     * Initialize a new MFA backend registration
-     * @param int $userId
-     * @param string $rpOrigin
-     * @return array
-     * @throws ServerErrorHttpException
-     */
     public function regInit(int $userId, string $mfaExternalUuid = null, string $rpOrigin = ''): array
     {
         // Get existing MFA record for backupcode to create/update codes for
