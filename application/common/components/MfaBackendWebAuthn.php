@@ -203,6 +203,7 @@ class MfaBackendWebAuthn extends Component implements MfaBackendInterface
             $mfa->external_uuid
         );
 
+        // No child Id was provided, so try to delete the backend webauthn container object
         if ($childId == 0) {
             return $this->client->webauthnDelete($headers);
         }
@@ -214,8 +215,11 @@ class MfaBackendWebAuthn extends Component implements MfaBackendInterface
     //   both in the api backend and in the local database.
     private function deleteWebAuthn(Mfa $mfa, int $webauthnId, array $headers): bool
     {
-        $webauthn = MfaWebauthn::findOne(['id' => $webauthnId]);
-        if (empty($webauthn) || $webauthn->mfa_id != $mfa->id) {
+        $webauthn = MfaWebauthn::findOne([
+            'mfa_id' => $mfa->id,
+            'id' => $webauthnId,
+        ]);
+        if (empty($webauthn)) {
             throw new NotFoundHttpException("MfaWebauthn not found with id: $webauthnId and mfa_id: $mfa->id",
                 1670950790);
         }

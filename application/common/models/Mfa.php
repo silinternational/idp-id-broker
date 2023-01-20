@@ -339,7 +339,7 @@ class Mfa extends MfaBase
             }
         }
 
-        $mfaExtId = $mfa->external_uuid?:null;
+        $mfaExtId = $mfa->external_uuid ?: null;
         $backend = self::getBackendForType($type);
         $results = $backend->regInit($userId, $mfaExtId, $rpOrigin);
 
