@@ -125,7 +125,6 @@ Feature: MFA
     When I update the mfaWebauthn
     Then the response status code should be 200
       And the property label should contain "A New Label"
-      And the mfaWebauthn record exists
       And the following mfaWebauthn data should be stored:
         | property            | value           |
         | label               | A New Label     |
@@ -139,7 +138,6 @@ Feature: MFA
     When I update the mfaWebauthn
     Then the response status code should be 400
       And the response body should contain 'Invalid data updating MfaWebauthn label'
-      And the mfaWebauthn record exists
       And the following mfaWebauthn data should be stored:
         | property            | value           |
         | label               | Security Key-1  |
@@ -170,7 +168,7 @@ Feature: MFA
       And 0 codes should be stored
       And the MFA record is not stored
 
-  Scenario: Exception to delete the missing credential of a webauthn MFA option
+  Scenario: Try to delete a non-existent WebAuthn MFA record
     Given the user has a mfaWebauthn with a key_handle_hash of "u2f"
     When I request to delete the webauthn entry of the MFA with a webauthn_id of 999
     Then the response status code should be 404

@@ -105,20 +105,15 @@ class MfaContext extends \FeatureContext
         }
     }
 
-    /**
-     * @Then the mfaWebauthn record exists
-     */
-    public function theMfaWebauthnRecordExists()
-    {
-        $this->mfaWebauthn = MfaWebauthn::findOne(['id' => $this->mfaWebauthn->id]);
-        Assert::notEmpty($this->mfaWebauthn, 'No MfaWebauthn record found with that id.');
-    }
 
     /**
      * @Then the following mfaWebauthn data should be stored:
      */
     public function theFollowingMfaWebauthnDataShouldBeStored(TableNode $table)
     {
+        $this->mfaWebauthn = MfaWebauthn::findOne(['id' => $this->mfaWebauthn->id]);
+        Assert::notEmpty($this->mfaWebauthn, 'No MfaWebauthn record found with that id.');
+
         foreach ($table as $row) {
             $property = $row['property'];
             $expectedValue = $row['value'];
