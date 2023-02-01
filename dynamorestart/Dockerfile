@@ -1,7 +1,6 @@
-FROM composer:latest
+FROM composer:2
 
 WORKDIR /dynamo
-
 
 ENV AWS_ENDPOINT=dynamo:8000
 ENV AWS_DEFAULT_REGION=us-east-1

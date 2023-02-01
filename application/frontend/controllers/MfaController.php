@@ -300,6 +300,7 @@ class MfaController extends BaseRestController
      */
     public function actionUpdateWebauthn(int $mfaId, int $webauthnId)
     {
+        // validate that the parent MFA records exists and has the Employee ID provided in the request
         $this->getRequestedMfa($mfaId);
 
         $webauthn = MfaWebauthn::findOne(['id' => $webauthnId, 'mfa_id' => $mfaId]);
