@@ -169,6 +169,19 @@ class MfaApiClient
     }
 
     /**
+     * Delete one of a user's u2f/webauthn credentials
+     * @param string $credId Credential ID
+     * @param array $additionalHeaders
+     * @return bool
+     * @throws GuzzleException
+     */
+    public function webauthnDeleteCredential(string $credId, array $additionalHeaders): bool
+    {
+        $this->callApi("webauthn/credential/$credId", 'DELETE', [], $additionalHeaders);
+        return true;
+    }
+
+    /**
      * @param string $path
      * @param string $method
      * @param array $body
@@ -190,7 +203,7 @@ class MfaApiClient
         } catch (\Exception $e) {
             if ($e instanceof ConnectException || $e instanceof ServerException) {
                 \Yii::error([
-                    'action' => 'calling totp api',
+                    'action' => 'calling 2sv api',
                     'status' => 'error',
                     'error' => 'connection error: ' . $e->getMessage()
                 ]);

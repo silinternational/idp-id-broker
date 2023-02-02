@@ -4,7 +4,10 @@ namespace common\components;
 use common\helpers\MySqlDateTime;
 use common\models\Mfa;
 use common\models\MfaBackupcode;
+use common\models\MfaWebauthn;
 use yii\base\Component;
+use yii\web\BadRequestHttpException;
+use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
 use yii\web\ServerErrorHttpException;
 
@@ -16,14 +19,7 @@ class MfaBackendBackupcode extends Component implements MfaBackendInterface
      */
     public int $numBackupCodes = 10;
 
-    /**
-     * Initialize a new MFA backend registration
-     * @param int $userId
-     * @param string $rpOrigin
-     * @return array
-     * @throws ServerErrorHttpException
-     */
-    public function regInit(int $userId, string $rpOrigin = ''): array
+    public function regInit(int $userId, string $mfaExternalUuid = null, string $rpOrigin = ''): array
     {
         // Get existing MFA record for backupcode to create/update codes for
         $mfa = Mfa::findOne(['user_id' => $userId, 'type' => Mfa::TYPE_BACKUPCODE]);
@@ -58,11 +54,20 @@ class MfaBackendBackupcode extends Component implements MfaBackendInterface
      * @param int $mfaId The MFA ID
      * @param string $value Value provided by user, such as TOTP number or WebAuthn challenge response
      * @param string $rpOrigin
+     * @param string $verifyType Only used for WebAuthn
      * @return bool
+     * @throws BadRequestHttpException
      * @throws ServerErrorHttpException
      */
-    public function verify(int $mfaId, string $value, string $rpOrigin = ''): bool
+    public function verify(int $mfaId, string $value, string $rpOrigin = '', string $verifyType = ''): bool
     {
+        if ($verifyType != "") {
+            throw new BadRequestHttpException(
+                'A non-blank verification type is not allowed when verifying a mfa of type ' . Mfa::TYPE_BACKUPCODE,
+                1670950767
+            );
+        }
+
         if (MfaBackupcode::validateAndRemove($mfaId, $value)) {
             MfaBackupcode::sendRefreshCodesMessage($mfaId);
             return true;
@@ -73,11 +78,19 @@ class MfaBackendBackupcode extends Component implements MfaBackendInterface
     /**
      * Delete MFA backend configuration
      * @param int $mfaId
+     * @param int $childId the id of the related/child object (only used for the WebAuthn backend)
      * @return bool
      * @throws ServerErrorHttpException
      */
-    public function delete(int $mfaId): bool
+    public function delete(int $mfaId, int $childId = 0): bool
     {
+        if ($childId != 0) {
+            throw new ForbiddenHttpException(
+                sprintf("May not delete a MfaWebauthn object on a %s mfa type", Mfa::TYPE_BACKUPCODE),
+                1658237140
+            );
+        }
         return MfaBackupcode::deleteCodesForMfaId($mfaId);
     }
+
 }

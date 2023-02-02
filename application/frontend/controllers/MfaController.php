@@ -2,7 +2,9 @@
 namespace frontend\controllers;
 
 use common\models\Mfa;
+use common\models\MfaWebauthn;
 use common\models\User;
+use common\components\MfaBackendWebAuthn;
 use frontend\components\BaseRestController;
 use stdClass;
 use yii\web\BadRequestHttpException;
@@ -55,12 +57,13 @@ class MfaController extends BaseRestController
     /**
      * Verify value with MFA backend
      * @param int $id
+     * @param string $type (optional) If not blank, it must be `registration`, referring to verifying a webauthn registration
      * @throws BadRequestHttpException
      * @throws NotFoundHttpException
      * @throws TooManyRequestsHttpException
      * @return null
      */
-    public function actionVerify(int $id)
+    public function actionVerify(int $id, string $type = "")
     {
         $req = \Yii::$app->request;
         $value = $req->getBodyParam('value');
@@ -86,7 +89,8 @@ class MfaController extends BaseRestController
             );
         }
 
-        // Strip spaces from $value if string
+        // Only TOTP should provide a string $value, in which case it should just have digits.
+        // This removes any non-digits.
         if (is_string($value)) {
             $value = preg_replace('/\D/', '', $value);
         }
@@ -104,7 +108,7 @@ class MfaController extends BaseRestController
             throw new ForbiddenHttpException("Invalid rpOrigin", 1638539443);
         }
 
-        if (! $mfa->verify($value, $rpOrigin)) {
+        if (! $mfa->verify($value, $rpOrigin, $type)) {
             throw new BadRequestHttpException();
         }
 
@@ -141,6 +145,8 @@ class MfaController extends BaseRestController
 
         return $mfaOptions;
     }
+
+
 
     /**
      * Find an MFA by id and employee_id
@@ -215,6 +221,40 @@ class MfaController extends BaseRestController
     }
 
     /**
+     * Delete one u2f/webauthn credential from an MFA record
+     * @param int $mfaId
+     * @param int $webauthnId
+     * @return null
+     * @throws \Throwable
+     * @throws BadRequestHttpException
+     * @throws NotFoundHttpException
+     * @throws ServerErrorHttpException
+     */
+    public function actionDeleteCredential(int $mfaId, int $webauthnId)
+    {
+        $mfa = $this->getRequestedMfa($mfaId);
+
+        if ($mfa->type != Mfa::TYPE_WEBAUTHN) {
+            throw new ForbiddenHttpException("May not delete a credential on a $mfa->type mfa type", 1658237110);
+        }
+
+        $backend = Mfa::getBackendForType(Mfa::TYPE_WEBAUTHN);
+
+        if ($backend->delete($mfa->id, $webauthnId) === false) {
+            \Yii::error([
+                'action' => 'delete mfa credential',
+                'status' => 'error',
+                'error' => $mfa->getFirstErrors(),
+                'mfa_id' => $mfa->id,
+            ]);
+            throw new ServerErrorHttpException("Unable to delete MFA credential", 1658239000);
+        }
+
+        \Yii::$app->response->statusCode = 204;
+        return null;
+    }
+
+    /**
      * @param int $id
      * @return Mfa|null
      * @throws BadRequestHttpException
@@ -245,5 +285,55 @@ class MfaController extends BaseRestController
         }
 
         return $mfa;
+    }
+
+
+    /**
+     * @param int $mfaId
+     * @param int $webauthnId
+     * @return MfaWebauthn
+     * @throws BadRequestHttpException
+     * @throws NotFoundHttpException
+     * @throws ServerErrorHttpException
+     * @throws \Throwable
+     * @throws \yii\db\StaleObjectException
+     */
+    public function actionUpdateWebauthn(int $mfaId, int $webauthnId)
+    {
+        // validate that the parent MFA records exists and has the Employee ID provided in the request
+        $this->getRequestedMfa($mfaId);
+
+        $webauthn = MfaWebauthn::findOne(['id' => $webauthnId, 'mfa_id' => $mfaId]);
+        if ($webauthn === null) {
+            throw new NotFoundHttpException(
+               "MfaWebauthn not found with id: $webauthnId and mfa_id: $mfaId",
+                1660232933
+            );
+        }
+
+        $label = \Yii::$app->request->getBodyParam('label');
+        $webauthn->label = $label?:"";
+
+        if ($webauthn->validate() === false) {
+            \Yii::error([
+                'action' => 'update mfa webauthn',
+                'status' => 'error',
+                'error' => $webauthn->getFirstErrors(),
+                'mfa_id' => $webauthn->id,
+            ]);
+            throw new BadRequestHttpException("Invalid data updating MfaWebauthn label", 1660233470);
+        }
+
+        if ($webauthn->update() === false) {
+            \Yii::error([
+                'action' => 'update mfa webauthn',
+                'status' => 'error',
+                'error' => $webauthn->getFirstErrors(),
+                'mfa_id' => $webauthn->id,
+            ]);
+            throw new ServerErrorHttpException("Unable to update MfaWebauthn label", 1660233472);
+        }
+
+        return $webauthn;
     }
 }

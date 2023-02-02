@@ -1,0 +1,9 @@
+{
+    "name": "silinternational/dynamorestart",
+    "description": "Just gets some basic dynamodb tables recreated and populated in a docker environment",
+    "type": "project",
+    "license": "MIT",
+    "require": {
+        "aws/aws-sdk-php": "~3.242.0"
+    }
+}
