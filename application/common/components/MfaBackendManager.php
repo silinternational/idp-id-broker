@@ -78,11 +78,12 @@ class MfaBackendManager extends Component implements MfaBackendInterface
      * @param string $value Value provided by user, such as TOTP number or WebAuthn challenge response
      * @param string $rpOrigin
      * @param string $verifyType Only used for WebAuthn
+     * @param string $label Only used for WebAuthn
      * @return bool
      * @throws BadRequestHttpException
      * @throws ServerErrorHttpException
      */
-    public function verify(int $mfaId, string $value, string $rpOrigin = '', string $verifyType = ''): bool
+    public function verify(int $mfaId, string $value, string $rpOrigin = '', string $verifyType = '', string $label = ''): bool
     {
         if ($verifyType != "") {
             throw new BadRequestHttpException(

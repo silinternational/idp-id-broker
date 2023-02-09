@@ -226,7 +226,7 @@ class Mfa extends MfaBase
      * @throws \Throwable
      * @throws \yii\db\StaleObjectException
      */
-    public function verify($value, string $rpOrigin = '', string $verifyType = ''): bool
+    public function verify($value, string $rpOrigin = '', string $verifyType = '', string $label = ''): bool
     {
         if ($this->hasTooManyRecentFailures()) {
             \Yii::warning([
@@ -242,7 +242,7 @@ class Mfa extends MfaBase
         }
 
         $backend = self::getBackendForType($this->type);
-        if ($backend->verify($this->id, $value, $rpOrigin, $verifyType) === true) {
+        if ($backend->verify($this->id, $value, $rpOrigin, $verifyType, $label) === true) {
             $this->last_used_utc = MySqlDateTime::now();
             if (! $this->save()) {
                 \Yii::error([
