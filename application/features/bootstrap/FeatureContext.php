@@ -8,6 +8,7 @@ use common\models\Method;
 use common\models\Mfa;
 use common\models\MfaBackupcode;
 use common\models\MfaFailedAttempt;
+use common\models\MfaWebauthn;
 use common\models\User;
 use common\models\Invite;
 use GuzzleHttp\Client;
@@ -80,6 +81,28 @@ class FeatureContext extends YiiContext
     }
 
     /**
+     * @Then that record should have a data item with the following elements:
+     */
+    public function thatRecordShouldHaveADataItemWithTheFollowingElements(TableNode $table)
+    {
+        Assert::minCount($this->resBody, 1);
+        $item = $this->resBody[0];
+        Assert::minCount($item['data'], 1);
+        $data = $item['data'][0];
+
+        foreach ($table as $row) {
+            $property = $row['property'];
+            $expectedValue = $row['value'];
+
+            if ($expectedValue == '*') {
+                Assert::minLength($data[$property], 1);
+            } else {
+                Assert::eq($data[$property], $this->transformNULLs($expectedValue));
+            }
+        }
+    }
+
+    /**
      * @Given the requester is not authorized
      */
     public function theRequesterIsNotAuthorized()
@@ -99,6 +122,7 @@ class FeatureContext extends YiiContext
         // functions from being called.
         MfaBackupcode::deleteAll();
         MfaFailedAttempt::deleteAll();
+        MfaWebauthn::deleteAll();
         Mfa::deleteAll();
         Method::deleteAll();
         Invite::deleteAll();
@@ -126,6 +150,36 @@ class FeatureContext extends YiiContext
 
         return new Client([
             'base_uri' => "http://$hostname",
+            'http_errors' => false, // don't throw exceptions on 4xx/5xx so responses can be inspected.
+            'headers' => $this->reqHeaders,
+            'json' => $this->reqBody,
+        ]);
+    }
+
+
+    public function callU2fSimulator($resource, $action, User $user, string $externalId)
+    {
+        $webConfig = Yii::$app->components['webauthn'];
+
+        $this->reqHeaders = array_merge($this->reqHeaders, [
+            'x-mfa-RPID' => $webConfig['rpId'],
+            'x-mfa-RPOrigin' => $webConfig['rpId'],
+            'x-mfa-UserUUID' => $externalId,
+            'Content-type' => 'application/json',
+        ]);
+
+        $client = $this->buildU2fClient();
+        $this->response = $this->sendRequest($client, $action, $resource);
+
+        $this->now = MySqlDateTime::now();
+        $this->resBody = $this->extractBody($this->response);
+    }
+
+    private function buildU2fClient(): Client
+    {
+        $u2fSimAndPort = getenv('U2F_SIM_HOST_AND_PORT') ?: 'u2fsim:8080';
+        return new Client([
+            'base_uri' => $u2fSimAndPort,
             'http_errors' => false, // don't throw exceptions on 4xx/5xx so responses can be inspected.
             'headers' => $this->reqHeaders,
             'json' => $this->reqBody,
@@ -187,6 +241,22 @@ class FeatureContext extends YiiContext
             sprintf(
                 "Unexpected response. status=%d, body=%s",
                 $this->response->getStatusCode(),
+                var_export($this->resBody, true)
+            )
+        );
+    }
+
+    /**
+     * @Then the response body should contain :containsText
+     */
+    public function theResponseBodyShouldContain($containsText)
+    {
+        Assert::contains(
+            var_export($this->resBody, true),
+            $containsText,
+            sprintf(
+                "Unexpected response body. Does not contain: %s, body=%s",
+                $containsText,
                 var_export($this->resBody, true)
             )
         );
@@ -570,6 +640,33 @@ class FeatureContext extends YiiContext
     public function getResponseProperty($property)
     {
         return $this->resBody[$property];
+    }
+
+    /**
+     * @param $property
+     * @return mixed
+     */
+    public function setRequestBody(string $key, $value)
+    {
+        $this->reqBody[$key] = $value;
+    }
+
+    /**
+     * @param $property
+     * @return mixed
+     */
+    public function cleanRequestBody()
+    {
+        $this->reqBody = [];
+    }
+
+    /**
+     * @param $property
+     * @return mixed
+     */
+    public function getResponseBody()
+    {
+        return $this->resBody;
     }
 
     /**

@@ -66,7 +66,7 @@ class UserController extends BaseRestController
         }
 
         $user->scenario = User::SCENARIO_UPDATE_USER;
-
+        
         $user->attributes = Yii::$app->request->getBodyParams();
 
         $this->save($user);

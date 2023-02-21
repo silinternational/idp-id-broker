@@ -14,6 +14,7 @@ deps:
 
 depsfortests:
 	docker-compose run --rm appfortests composer install
+	docker-compose run --rm dynamorestart composer install
 
 depsshow:
 	docker-compose run --rm cli bash -c "composer show -D > versions.txt"
@@ -43,8 +44,16 @@ quicktest:
 test: appfortests
 	docker-compose run --rm test
 
-testcli: appfortests tablesfortests
+testcli: appfortests tablesfortests mfaapi
 	docker-compose run --rm test bash
+
+mfaapi:
+	docker-compose up -d mfaapi
+
+# This is needed to re-run certain feature tests in testcli without stopping that container.
+dynamoclean:
+	docker-compose kill dynamorestart
+	docker-compose up -d dynamorestart
 
 clean:
 	docker-compose kill
@@ -55,3 +64,4 @@ raml2html:
 
 psr2:
 	docker-compose run --rm cli bash -c "vendor/bin/php-cs-fixer fix ."
+

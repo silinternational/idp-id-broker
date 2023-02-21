@@ -11,14 +11,15 @@ use Yii;
  * @property int $user_id
  * @property string $type
  * @property string|null $external_uuid
- * @property string|null $key_handle_hash
  * @property string|null $label
  * @property int $verified
  * @property string $created_utc
  * @property string|null $last_used_utc
+ * @property string|null $key_handle_hash
  *
  * @property MfaBackupcode[] $mfaBackupcodes
  * @property MfaFailedAttempt[] $mfaFailedAttempts
+ * @property MfaWebauthn[] $mfaWebauthns
  * @property User $user
  */
 class MfaBase extends \yii\db\ActiveRecord
@@ -57,11 +58,11 @@ class MfaBase extends \yii\db\ActiveRecord
             'user_id' => Yii::t('app', 'User ID'),
             'type' => Yii::t('app', 'Type'),
             'external_uuid' => Yii::t('app', 'External Uuid'),
-            'key_handle_hash' => Yii::t('app', 'Key Handle Hash'),
             'label' => Yii::t('app', 'Label'),
             'verified' => Yii::t('app', 'Verified'),
             'created_utc' => Yii::t('app', 'Created Utc'),
             'last_used_utc' => Yii::t('app', 'Last Used Utc'),
+            'key_handle_hash' => Yii::t('app', 'Key Handle Hash'),
         ];
     }
 
@@ -83,6 +84,16 @@ class MfaBase extends \yii\db\ActiveRecord
     public function getMfaFailedAttempts()
     {
         return $this->hasMany(MfaFailedAttempt::className(), ['mfa_id' => 'id']);
+    }
+
+    /**
+     * Gets query for [[MfaWebauthns]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getMfaWebauthns()
+    {
+        return $this->hasMany(MfaWebauthn::className(), ['mfa_id' => 'id']);
     }
 
     /**

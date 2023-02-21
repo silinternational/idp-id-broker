@@ -2,10 +2,15 @@
 namespace common\components;
 
 use common\models\Mfa;
+use common\models\MfaWebauthn;
 use common\models\User;
+use Google\Service\PeopleService\ExternalId;
 use GuzzleHttp\Exception\GuzzleException;
 use yii\base\Component;
 use yii\helpers\Json;
+use yii\web\BadRequestHttpException;
+use yii\web\ForbiddenHttpException;
+use yii\web\HttpException;
 use yii\web\NotFoundHttpException;
 use yii\web\ServerErrorHttpException;
 
@@ -16,7 +21,7 @@ class MfaBackendWebAuthn extends Component implements MfaBackendInterface
      * This and most of the following attributes are hydrated by application/common/config/main.php
      *   based on the entry: 'webauthn' => ArrayHelper::merge(...
      *   which pulls in the environment variables with the prefix `MFA_WEBAUTHN_`,
-     *   e.g. MFA_WEBAUTHN_apiBaseUrl*
+     *   e.g. MFA_WEBAUTHN_apiBaseUrl
      */
     public string $apiBaseUrl;
 
@@ -62,18 +67,19 @@ class MfaBackendWebAuthn extends Component implements MfaBackendInterface
     /**
      * Initialize a new WebAuthn registration
      * @param int $userId The User ID
+     * @param string $mfaExternalUuid The User ID
      * @param string $rpOrigin The Relying Party Origin URL (with scheme, without port or path)
      * @return array JSON decoded object to be passed to browser credential create API for WebAuthn dance
      * @throws GuzzleException
      */
-    public function regInit(int $userId, string $rpOrigin = ''): array
+    public function regInit(int $userId, string $mfaExternalUuid = null, string $rpOrigin = ''): array
     {
         $user = User::findOne(['id' => $userId]);
         if ($user == null) {
             return [];
         }
 
-        $headers = $this->getWebAuthnHeaders($user->username, $user->getDisplayName(), $rpOrigin);
+        $headers = $this->getWebAuthnHeaders($user->username, $user->getDisplayName(), $rpOrigin, $mfaExternalUuid);
 
         return $this->client->webauthnCreateRegistration($headers);
     }
@@ -103,18 +109,28 @@ class MfaBackendWebAuthn extends Component implements MfaBackendInterface
         return $this->client->webauthnCreateAuthentication($headers);
     }
 
+
     /**
-     * Verify response from user is correct for the MFA backend device
+     * Verify response from user is correct for the MFA backend device.
      * @param int $mfaId The MFA ID
      * @param string|array $value The stringified JSON response from the browser credential api
      * @param string $rpOrigin The Replay Party Origin URL (with scheme, without port or path)
+     * @param string $verifyType The type of verification: either "registration" or assumed to be for login
      * @return bool|string
      * @throws GuzzleException
+     * @throws BadRequestHttpException
      * @throws ServerErrorHttpException
      * @throws NotFoundHttpException
      */
-    public function verify(int $mfaId, $value, string $rpOrigin = '')
+    public function verify(int $mfaId, $value, string $rpOrigin = '', string $verifyType = '')
     {
+        if ($verifyType != "" && $verifyType != Mfa::VERIFY_REGISTRATION) {
+            throw new BadRequestHttpException(
+                'A non-blank verification type for a ' . Mfa::TYPE_WEBAUTHN . " may only be: " . Mfa::VERIFY_REGISTRATION,
+                1671016320
+            );
+        }
+
         $mfa = Mfa::findOne(['id' => $mfaId]);
         if ($mfa == null) {
             throw new NotFoundHttpException("MFA record for given ID not found");
@@ -127,6 +143,7 @@ class MfaBackendWebAuthn extends Component implements MfaBackendInterface
             $mfa->external_uuid
         );
 
+
         if (!is_array($value)) {
             $value = Json::decode($value);
             if ($value == null) {
@@ -134,36 +151,49 @@ class MfaBackendWebAuthn extends Component implements MfaBackendInterface
             }
         }
 
-        if ($mfa->verified === 1) {
-            return $this->client->webauthnValidateAuthentication($headers, $value);
-        } else {
-            $results = $this->client->webauthnValidateRegistration($headers, $value);
-            if (isset($results['key_handle_hash'])) {
-                $mfa->verified = 1;
-                $mfa->key_handle_hash = $results['key_handle_hash'];
-                if (! $mfa->save()) {
-                    throw new ServerErrorHttpException(
-                        "Unable to save WebAuthn record after verification. Error: " . print_r($mfa->getFirstErrors(), true)
-                    );
-                }
-                return true;
+        // If the verifyType is not registration, finish the login process.
+        if ($verifyType != Mfa::VERIFY_REGISTRATION) {
+            $webauthnCount = $mfa->getMfaWebauthns()->count();
+            if ($webauthnCount < 1) {
+                throw new NotFoundHttpException("No MFA Webauthn record found for MFA ID: " . $mfa->id, 1659637860);
             }
+            return $this->client->webauthnValidateAuthentication($headers, $value);
+        }
+
+        // Assume a new webauthn was requested and finish its registration process
+        try {
+            $results = $this->client->webauthnValidateRegistration($headers, $value);
+        } catch (GuzzleException $e) {
+            throw new HttpException($e->getCode(), $e->getMessage(), 1660660611);
+        }
+
+        if (! isset($results['key_handle_hash'])) {
             return false;
         }
+
+        MfaWebauthn::createWebauthn($mfa, $results['key_handle_hash']);
+        $mfa->setVerified();
+        return true;
     }
 
+
     /**
-     * Delete WebAuthn configuration
+     * Delete WebAuthn credential
      * @param int $mfaId
+     * @param int $childId the id of the related/child object (only used for the WebAuthn backend)
      * @return bool
      * @throws NotFoundHttpException
      * @throws GuzzleException
      */
-    public function delete(int $mfaId): bool
+    public function delete(int $mfaId, int $childId = 0): bool
     {
         $mfa = Mfa::findOne(['id' => $mfaId]);
         if ($mfa == null) {
             throw new NotFoundHttpException("MFA record for given ID not found");
+        }
+
+        if (empty($mfa->external_uuid)) {
+            throw new ForbiddenHttpException("May not delete a webauthn backend without an external_uuid", 1658237150);;
         }
 
         $headers = $this->getWebAuthnHeaders(
@@ -173,12 +203,66 @@ class MfaBackendWebAuthn extends Component implements MfaBackendInterface
             $mfa->external_uuid
         );
 
-        if (!empty($mfa->external_uuid)) {
+        // No child Id was provided, so try to delete the backend webauthn container object
+        if ($childId == 0) {
             return $this->client->webauthnDelete($headers);
+        }
+        return self::deleteWebAuthn($mfa, $childId, $headers);
+    }
+
+    // Deletes a webauthn entry both in the api backend and in the local database.
+    // If no webauthn entries are left, it attempts to delete the parent mfa object
+    //   both in the api backend and in the local database.
+    private function deleteWebAuthn(Mfa $mfa, int $webauthnId, array $headers): bool
+    {
+        $webauthn = MfaWebauthn::findOne([
+            'mfa_id' => $mfa->id,
+            'id' => $webauthnId,
+        ]);
+        if (empty($webauthn)) {
+            throw new NotFoundHttpException("MfaWebauthn not found with id: $webauthnId and mfa_id: $mfa->id",
+                1670950790);
+        }
+
+        if (! $this->client->webauthnDeleteCredential($webauthn->key_handle_hash, $headers)) {
+            throw new ServerErrorHttpException(
+                sprintf("Unable to delete existing backend webauthn key. [id=%s]", $webauthn->id),
+                1658237200
+            );
+        }
+
+        // Now delete this local webauthn entry
+        if ($webauthn->delete() === false) {
+            \Yii::error([
+                'action' => 'mfa-delete-webauthn-for-mfa-id',
+                'mfa-type' => Mfa::TYPE_WEBAUTHN,
+                'status' => 'error',
+                'error' => $webauthn->getFirstErrors(),
+            ]);
+            throw new ServerErrorHttpException(
+                sprintf("Unable to delete existing webauthn mfa. [id=%s]", $webauthn->id),
+                1658237300
+            );
+        }
+
+        $existingCount = $mfa->getMfaWebauthns()->Count();
+
+        // If there are no more webauthn entries for this mfa, try to delete the backend webauthn container object
+        if ($existingCount < 1) {
+            $mfaBackEnd = mfa::getBackendForType($mfa->type);
+            $didDelete = $mfaBackEnd->delete($mfa->id);
+
+            if ($didDelete) {
+                $mfa->delete();
+            } else {
+                Yii::warning("unable to delete external mfa api webauthn entry with id: $mfa->external_uuid");
+            }
+
         }
 
         return true;
     }
+
 
     /**
      * The WebAuthn API requires a bunch of headers, this method returns the parameters as an array of

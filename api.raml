@@ -261,7 +261,7 @@ types:
       last_used_utc: string?
       data:
         type: object|array
-    examples:
+    examples: |
       backupcode: |
         {
             "id": 7,
@@ -277,10 +277,17 @@ types:
         {
             "id": 8,
             "type": "webauthn",
-            "label": "2SV #4",
+            "label": "",
             "created_utc": "2017-10-24T20:40:57Z",
             "last_used_utc": null,
-            "data": []
+            "data": [
+                {
+                    "id": 88,
+                    "label": "My Webauthn Key",
+                    "last_used_utc": null,
+                    "created_utc": "2022-12-15 19:42:37"
+                }
+            ]
         }
       totp: |
         {
@@ -291,6 +298,24 @@ types:
             "last_used_utc": null,
             "data": []
         }
+  WebauthnResponse:
+    type: object
+    properties:
+      id: integer
+      mfa_id: integer
+      key_handle_hash: string
+      label: string
+      created_utc: string
+      last_used_utc: string?
+    example: |
+      {
+        "id": 81,
+        "mfa_id": 8,
+        "key_handle_hash": "1234567890123456789012345678901234567890ABC",
+        "label": "My First Security Key",
+        "created_utc": "2017-10-24T20:40:57Z",
+        "last_used_utc": null,
+      }
   Method:
     type: object
     properties:
@@ -654,6 +679,109 @@ types:
               Too many failed attempts for this MFA record recently.
             body:
               type: Error
+      /registration:
+        post:
+          description: Verify the registration of a new mfa webauthn credential.
+          queryParameters:
+            rpOrigin:
+              type: string
+              description: The Relying Party origin url (only needed for WebAuthn)
+              default: ""
+              example: "https://sub.domain.com"
+          body:
+            properties:
+              employee_id: string
+              value: string
+            example: |
+              {
+                "employee_id": "12345",
+                "value": "01234987"
+              }
+          responses:
+            200:
+              description: Value provided passed verification
+              body:
+                type: MfaResponse
+            400:
+              description: >
+                Value provided failed verification or was unacceptable for some
+                other reason (such as an invalid `employee_id`).
+              body:
+                type: Error
+            404:
+              description: No MFA record found with that `id` and `employee_id`.
+              body:
+                type: Error
+            429:
+              description: >
+                Too many failed attempts for this MFA record recently.
+              body:
+                type: Error
+  /{mfaId}:
+    /webauthn:
+      /{webauthnId}:
+        put:
+          description: Update the label of a MFA webauthn credential.
+          body:
+            properties:
+              employee_id: string
+              label: string
+            example: |
+              {
+                "employee_id": "12345",
+                "label": "My First Security Key"
+              }
+          responses:
+            200:
+              description: Webauthn label successfully updated
+              body:
+                type: WebauthnResponse
+            400:
+              description: Missing or blank label value or invalid employee_id
+              body:
+                type: Error
+            404:
+              description: >
+                No MFA record found with that `mfa_id` or no webauthn
+                record found with that `id` and that `mfa_id`.
+              body:
+                type: Error
+            500:
+              description: Internal server error
+              body:
+                type: Error
+        delete:
+          description: >
+            Delete a webauthn credential from an MFA. If it is the last credential,
+            the whole MFA will be deleted.
+          body:
+            properties:
+              employee_id: string
+            example: |
+              {
+                "employee_id": "abc123"
+              }
+          responses:
+            204:
+              description: Successful deletion of record
+            400:
+              description: invalid employee_id
+              body:
+                type: Error
+            403:
+              description: The MFA record was not of type webauthn
+              body:
+                type: Error
+            404:
+              description: >
+                No MFA record found with that `mfa_id` or no webauthn
+                record found with that `id` and that `mfa_id`.
+              body:
+                type: Error
+            500:
+              description: Unable to delete the webauthn credential or the MFA record
+              body:
+                type: Error
 /method:
   post:
     description: >

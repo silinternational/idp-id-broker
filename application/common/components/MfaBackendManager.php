@@ -7,20 +7,14 @@ use common\models\Mfa;
 use common\models\MfaBackupcode;
 use Sil\EmailService\Client\EmailServiceClientException;
 use yii\base\Component;
+use yii\web\BadRequestHttpException;
+use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
 use yii\web\ServerErrorHttpException;
 
 class MfaBackendManager extends Component implements MfaBackendInterface
 {
-    /**
-     * Initialize a new MFA backend registration
-     * @param int $userId
-     * @param string $rpOrigin
-     * @return array
-     * @throws ServerErrorHttpException
-     * @throws \Exception
-     */
-    public function regInit(int $userId, string $rpOrigin = ''): array
+    public function regInit(int $userId, string $mfaExternalUuid = null, string $rpOrigin = ''): array
     {
         // Get existing MFA record for manager to create/update codes for
         $mfa = Mfa::findOne(['user_id' => $userId, 'type' => Mfa::TYPE_MANAGER]);
@@ -83,11 +77,20 @@ class MfaBackendManager extends Component implements MfaBackendInterface
      * @param int $mfaId The MFA ID
      * @param string $value Value provided by user, such as TOTP number or WebAuthn challenge response
      * @param string $rpOrigin
+     * @param string $verifyType Only used for WebAuthn
      * @return bool
+     * @throws BadRequestHttpException
      * @throws ServerErrorHttpException
      */
-    public function verify(int $mfaId, string $value, string $rpOrigin = ''): bool
+    public function verify(int $mfaId, string $value, string $rpOrigin = '', string $verifyType = ''): bool
     {
+        if ($verifyType != "") {
+            throw new BadRequestHttpException(
+                'A non-blank verification type is not allowed when verifying a mfa of type ' . Mfa::TYPE_MANAGER,
+                1670950770
+            );
+        }
+
         if (! MfaBackupcode::validateAndRemove($mfaId, $value)) {
             return false;
         }
@@ -103,11 +106,18 @@ class MfaBackendManager extends Component implements MfaBackendInterface
     /**
      * Delete MFA backend configuration
      * @param int $mfaId
+     * @param int $childId the id of the related/child object (only used for the WebAuthn backend)
      * @return bool
      * @throws ServerErrorHttpException
      */
-    public function delete(int $mfaId): bool
+    public function delete(int $mfaId, int $childId = 0): bool
     {
+        if ($childId != 0) {
+            throw new ForbiddenHttpException(
+                sprintf("May not delete a MfaWebauthn object on a %s mfa type", Mfa::TYPE_MANAGER),
+                1658237120
+            );
+        }
         return MfaBackupcode::deleteCodesForMfaId($mfaId);
     }
 }

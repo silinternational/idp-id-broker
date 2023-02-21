@@ -5,6 +5,7 @@ use Behat\Gherkin\Node\TableNode;
 use common\models\EmailLog;
 use common\models\Mfa;
 use common\models\MfaBackupcode;
+use common\models\MfaWebauthn;
 use common\models\User;
 use Webmozart\Assert\Assert;
 
@@ -16,6 +17,18 @@ class MfaContext extends \FeatureContext
     protected $mfa;
 
     /**
+     * array $mfaWebauthn
+     *
+     */
+    protected $mfaWebauthn;
+
+    /**
+     * array $mfaWebauthnIds
+     *
+     */
+    protected $mfaWebauthnIds;
+
+    /**
      * array $backupCodes
      */
     protected $backupCodes;
@@ -25,6 +38,8 @@ class MfaContext extends \FeatureContext
      */
     public function iGiveThatUserAVerifiedMfa($mfaType)
     {
+        Assert::notEq($mfaType, mfa::TYPE_WEBAUTHN, "should have called iGiveThatUserAVerifiedWebauthnMfa");
+
         $user = User::findOne(['employee_id' => $this->tempEmployeeId]);
         Assert::notEmpty($user, 'Unable to find that user.');
         $this->mfa = new Mfa([
@@ -32,6 +47,7 @@ class MfaContext extends \FeatureContext
             'type' => $mfaType,
             'verified' => 1,
         ]);
+
         Assert::true($this->mfa->save(), 'Failed to add that MFA record to the database.');
         
         if ($mfaType === 'backupcode') {
@@ -39,6 +55,29 @@ class MfaContext extends \FeatureContext
         } elseif ($mfaType === 'manager') {
             $this->backupCodes = MfaBackupcode::createBackupCodes($this->mfa->id, 1);
         }
+    }
+
+    /**
+     * @Given the user has a mfaWebauthn with a key_handle_hash of :keyHandleHash
+     */
+    public function iGiveThatUserAMfaWebauthnMfaWithAKeyHandleHashOf($keyHandleHash)
+    {
+        $user = User::findOne(['employee_id' => $this->tempEmployeeId]);
+        Assert::notEmpty($user, 'Unable to find that user.');
+
+        if (empty($this->mfa)) {
+            $this->mfa = new Mfa([
+                'user_id' => $user->id,
+                'type' => mfa::TYPE_WEBAUTHN,
+                'verified' => 1,
+                'external_uuid' => '097791bf-2385-4ab4-8b06-14561a338d8e',
+            ]);
+            Assert::true($this->mfa->save(), 'Failed to add that MFA record to the database.');
+        }
+
+        $webauthn = MfaWebauthn::createWebauthn($this->mfa, $keyHandleHash);
+        $this->mfaWebauthn = $webauthn;
+        $this->mfaWebauthnIds[] = $webauthn->id;
     }
 
     /**
@@ -63,6 +102,23 @@ class MfaContext extends \FeatureContext
             $expectedValue = $row['value'];
 
             Assert::eq($this->mfa->$property, $this->transformNULLs($expectedValue));
+        }
+    }
+
+
+    /**
+     * @Then the following mfaWebauthn data should be stored:
+     */
+    public function theFollowingMfaWebauthnDataShouldBeStored(TableNode $table)
+    {
+        $this->mfaWebauthn = MfaWebauthn::findOne(['id' => $this->mfaWebauthn->id]);
+        Assert::notEmpty($this->mfaWebauthn, 'No MfaWebauthn record found with that id.');
+
+        foreach ($table as $row) {
+            $property = $row['property'];
+            $expectedValue = $row['value'];
+
+            Assert::eq($this->mfaWebauthn->$property, $this->transformNULLs($expectedValue));
         }
     }
 
@@ -95,11 +151,83 @@ class MfaContext extends \FeatureContext
     }
 
     /**
+     * @Given the user has requested a new webauthn MFA
+     */
+    public function theUserHasRequestedANewWebauthnMfa()
+    {
+        $rpId = getenv('MFA_WEBAUTHN_rpId');
+        $user = User::findOne(['employee_id' => $this->tempEmployeeId]);
+        Assert::notEmpty($user, 'Unable to find that user.');
+        $this->setRequestBody('type', Mfa::TYPE_WEBAUTHN);
+        $this->iRequestTheResourceBe('/mfa', 'created');
+
+        $id = $this->getResponseProperty('id');
+        Assert::notEmpty($id, 'Unable to get id of new Webauthn MFA');
+        $mfa = Mfa::FindOne(['id'=>$id]);
+        Assert::notEmpty($mfa, 'Unable to find that MFA.');
+
+        // Ensure we're getting a challenge in the response
+        $responseData = $this->getResponseProperty('data');
+        Assert::notEmpty($responseData['publicKey'], 'response data is missing publicKey entry');
+        $publicKey = $responseData['publicKey'];
+        Assert::notEmpty($publicKey['challenge'], 'publicKey entry is missing challenge entry');
+
+        $this->cleanRequestBody();
+        $this->setRequestBody('challenge', $publicKey['challenge']);
+        $this->setRequestBody('relying_party_id', $rpId);
+
+        // now call the u2f-simulator to get the values to send to the finish registration endpoint
+        $this->callU2fSimulator('/u2f/registration', 'created', $user, $mfa->external_uuid);
+
+        $respBody = $this->getResponseBody();
+        Assert::notEmpty($respBody['id'], "registration response is missing an id entry");
+        Assert::notEmpty($respBody['rawId'], "registration response is missing an rawId entry");
+        Assert::notEmpty($respBody['response'], "registration response is missing a response entry");
+        Assert::notEmpty($respBody['response']['authenticatorData'], "registration response is missing a authenticatorData entry");
+        Assert::notEmpty($respBody['response']['attestationObject'], "registration response is missing a attestationObject entry");
+        Assert::notEmpty($respBody['response']['clientDataJSON'], "registration response is missing a clientDataJSON entry");
+        Assert::notEmpty($respBody['type'], "registration response is missing an type entry");
+        Assert::notEmpty($respBody['transports'], "registration response is missing an transports entry");
+
+        $reqValue = [
+            'id' => $respBody['id'],
+            'rawId' => $respBody['rawId'],
+            'type' => $respBody['type'],
+            'response' => [
+                'authenticatorData' => $respBody['response']['authenticatorData'],
+                'clientDataJSON' => $respBody['response']['clientDataJSON'],
+                'attestationObject' => $respBody['response']['attestationObject'],
+            ],
+            'user' => [
+                'displayName' => $user->display_name,
+                'id' => $user->id,
+                'name' => $user->username,
+            ],
+            'transports' => $respBody['transports'],
+        ];
+
+        $this->cleanRequestBody();
+        $this->setRequestBody('employee_id', $this->tempEmployeeId);
+        $this->setRequestBody('value', $reqValue);
+        $this->mfa = $mfa;
+    }
+
+
+    /**
      * @When I update the MFA
      */
     public function iUpdateTheMfa()
     {
         $this->iRequestTheResourceBe('/mfa/' . $this->mfa->id, 'updated');
+    }
+
+
+    /**
+     * @When I update the mfaWebauthn
+     */
+    public function iUpdateTheMfaWebauthn()
+    {
+        $this->iRequestTheResourceBe('/mfa/' . $this->mfa->id . '/webauthn/' . $this->mfaWebauthn->id, 'updated');
     }
 
     /**
@@ -114,6 +242,22 @@ class MfaContext extends \FeatureContext
         ];
 
         $this->iProvideTheFollowingValidData(new TableNode($dataForTableNode));
+        $this->iRequestTheResourceBe('/mfa/' . $this->mfa->id . '/verify', 'created');
+    }
+
+    /**
+     * @When I request to verify the webauthn Mfa registration
+     */
+    public function iRequestToVerifyTheWebauthnMfaRegistration()
+    {
+        $this->iRequestTheResourceBe('/mfa/' . $this->mfa->id . '/verify/registration', 'created');
+    }
+
+    /**
+     * @When I request to verify the webauthn Mfa
+     */
+    public function iRequestToVerifyTheWebauthnMfa()
+    {
         $this->iRequestTheResourceBe('/mfa/' . $this->mfa->id . '/verify', 'created');
     }
 
@@ -139,6 +283,45 @@ class MfaContext extends \FeatureContext
         $this->iRequestTheResourceBe('/mfa/' . $this->mfa->id, 'deleted');
     }
 
+
+    /**
+     * @When I request to delete the webauthn entry of the MFA with a webauthn_id of :webauthnId
+     */
+    public function iRequestToDeleteTheWebauthnEntryOfTheMfaWithAWebauthnIDOf($webauthnId)
+    {
+        $dataForTableNode = [
+            ['property', 'value'],
+            ['employee_id', '123'],
+        ];
+
+        $this->iProvideTheFollowingValidData(new TableNode($dataForTableNode));
+        $this->iRequestTheResourceBe('/mfa/' . $this->mfa->id . '/webauthn/' . $webauthnId,
+            'deleted');
+    }
+
+
+    /**
+     * @When I request to delete the webauthn entry of the MFA
+     */
+    public function iRequestToDeleteTheWebauthnEntryOfTheMfa()
+    {
+        $webauthnId = $this->mfaWebauthnIds[0];
+        $this->iRequestToDeleteTheWebauthnEntryOfTheMfaWithAWebauthnIDOf($webauthnId);
+    }
+
+
+    /**
+     * @When the user requests a new webauthn MFA
+     */
+    public function theUserRequestsANewWebauthnMfa()
+    {
+        $user = User::findOne(['employee_id' => $this->tempEmployeeId]);
+        Assert::notEmpty($user, 'Unable to find that user.');
+        $this->setRequestBody('type', Mfa::TYPE_WEBAUTHN);
+        $this->iRequestTheResourceBe('/mfa', 'created');
+    }
+
+
     /**
      * @Then the MFA record is not stored
      */
@@ -146,5 +329,14 @@ class MfaContext extends \FeatureContext
     {
         $this->mfa = Mfa::findOne(['id' => $this->mfa->id]);
         Assert::null($this->mfa, 'A matching record was found in the database');
+    }
+
+    /**
+     * @Then the MFA record is still stored
+     */
+    public function theMfaRecordIsStillStored()
+    {
+        $this->mfa = Mfa::findOne(['id' => $this->mfa->id]);
+        Assert::notNull($this->mfa, 'A matching record was not found in the database');
     }
 }
