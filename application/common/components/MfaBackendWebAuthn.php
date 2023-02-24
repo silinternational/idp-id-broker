@@ -116,13 +116,14 @@ class MfaBackendWebAuthn extends Component implements MfaBackendInterface
      * @param string|array $value The stringified JSON response from the browser credential api
      * @param string $rpOrigin The Replay Party Origin URL (with scheme, without port or path)
      * @param string $verifyType The type of verification: either "registration" or assumed to be for login
+     * @param string $label The label of the new webauthn
      * @return bool|string
      * @throws GuzzleException
      * @throws BadRequestHttpException
      * @throws ServerErrorHttpException
      * @throws NotFoundHttpException
      */
-    public function verify(int $mfaId, $value, string $rpOrigin = '', string $verifyType = '')
+    public function verify(int $mfaId, $value, string $rpOrigin = '', string $verifyType = '', string $label = '')
     {
         if ($verifyType != "" && $verifyType != Mfa::VERIFY_REGISTRATION) {
             throw new BadRequestHttpException(
@@ -171,7 +172,7 @@ class MfaBackendWebAuthn extends Component implements MfaBackendInterface
             return false;
         }
 
-        MfaWebauthn::createWebauthn($mfa, $results['key_handle_hash']);
+        MfaWebauthn::createWebauthn($mfa, $results['key_handle_hash'], $label);
         $mfa->setVerified();
         return true;
     }

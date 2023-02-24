@@ -57,11 +57,12 @@ class MfaWebauthn extends MfaWebauthnBase
      * Create a new webauthn entry locally
      * @param Mfa $mfa
      * @param string $keyHandleHash
+     * @param string $label
      * @return array
      * @throws BadRequestHttpException
      * @throws ServerErrorHttpException
      */
-    public static function createWebauthn(Mfa $mfa, string $keyHandleHash, string $label=""): MfaWebauthn
+    public static function createWebauthn(Mfa $mfa, string $keyHandleHash, string $label = ''): MfaWebauthn
     {
         if ($mfa->type != Mfa::TYPE_WEBAUTHN) {
             throw new BadRequestHttpException(
@@ -70,7 +71,8 @@ class MfaWebauthn extends MfaWebauthnBase
             );
         }
 
-        $label = $label ?: self::getDefaultLabel($mfa);
+        $label = (!empty($label)) ? $label : self::getDefaultLabel($mfa);
+
         $webauthn = new MfaWebauthn();
         $webauthn->mfa_id = $mfa->id;
         $webauthn->label = $label;

@@ -85,6 +85,13 @@ Feature: MFA
     And the response body should contain "'type' => 'webauthn'"
     And the response body should contain "'label' => 'Security Key'"
 
+  Scenario: Verify a new MFA webauthn registration with a label
+    Given the user has requested a new webauthn MFA
+    When I request to verify the webauthn Mfa registration with a label of "Yubikey"
+    Then the response status code should be 200
+    And the response body should contain "'type' => 'webauthn'"
+    And the response body should contain "'label' => 'Yubikey'"
+
   Scenario: Create new MFA record of type totp
 #TODO - create a test double for the totp client
 
