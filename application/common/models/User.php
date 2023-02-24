@@ -94,8 +94,7 @@ class User extends UserBase
         foreach ($this->mfas as $mfa) {
             // first delete the children and then the parent to avoid foreign key constraint error
             if ($mfa->type == MFA::TYPE_WEBAUTHN) {
-                $didDelete = self::deleteWebauthns($mfa);
-                if (!$didDelete) {
+                if (!self::deleteWebauthns($mfa)) {
                     return false;
                 }
             }
@@ -1223,7 +1222,6 @@ class User extends UserBase
                     $numDeleted += 1;
                 }
             } catch (\Exception $e) {
-                print_r(PHP_EOL . "EEEEEEEEEE: " . $e->getMessage() . PHP_EOL);
                 \Yii::error([
                     'action' => 'delete inactive users',
                     'status' => 'failed',
