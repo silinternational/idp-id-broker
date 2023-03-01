@@ -148,7 +148,21 @@ class Mfa extends MfaBase
     public function beforeDelete()
     {
         $this->clearFailedAttempts('when deleting mfa record');
-        
+
+        // first delete the webauthn children to avoid a foreign key constraint error
+        foreach ($this->mfaWebauthns as $child) {
+            if (!$child->delete()) {
+                \Yii::error([
+                    'action' => 'delete mfa webauthn child record before deleting mfa',
+                    'status' => 'error',
+                    'error' => $child->getFirstErrors(),
+                    'mfa_id' => $this->id,
+                    'child_id' => $child->id,
+                ]);
+                return false;
+            }
+        }
+
         $backend = self::getBackendForType($this->type);
         return $backend->delete($this->id);
     }

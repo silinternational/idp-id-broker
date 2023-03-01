@@ -7,6 +7,7 @@ use common\models\Invite;
 use common\models\Method;
 use common\models\Mfa;
 use common\models\MfaBackupcode;
+use common\models\MfaWebauthn;
 use common\models\User;
 use Webmozart\Assert\Assert;
 
@@ -108,6 +109,42 @@ class UnitTestsContext extends YiiContext
         $mfa->verified = $verified;
 
         Assert::true($mfa->save(), "Could not create new mfa.");
+        $user->refresh();
+        $this->mfaId = $mfa['id'];
+        $this->mfa = $mfa;
+    }
+
+    protected function createMfaBackupCodes($user = null)
+    {
+        $user = $user ?? $this->tempUser;
+
+        $mfa = new Mfa();
+        $mfa->user_id = $user->id;
+        $mfa->type = MFA::TYPE_BACKUPCODE;
+        $mfa->verified = 1;
+
+        Assert::true($mfa->save(), "Could not create new mfa.");
+
+        MfaBackupcode::createBackupCodes($mfa->id, 3);
+
+        $user->refresh();
+        $this->mfaId = $mfa['id'];
+        $this->mfa = $mfa;
+    }
+
+    protected function createMfaWebauthn($user = null)
+    {
+        $user = $user ?? $this->tempUser;
+
+        $mfa = new Mfa();
+        $mfa->user_id = $user->id;
+        $mfa->type = MFA::TYPE_WEBAUTHN;
+        $mfa->verified = 1;
+        $mfa->external_uuid = 'abc123'; // Just to avoid an exception on delete
+
+        Assert::true($mfa->save(), "Could not create new mfa.");
+        MfaWebauthn::createWebauthn($mfa, 'abc123');
+
         $user->refresh();
         $this->mfaId = $mfa['id'];
         $this->mfa = $mfa;
@@ -282,6 +319,22 @@ class UnitTestsContext extends YiiContext
     }
 
     /**
+     * @Given that user has a verified backup code mfa
+     */
+    public function thatUserHasAVerifiedBackupCodeMfa()
+    {
+        $this->createMfaBackupCodes();
+    }
+
+    /**
+     * @Given that user has a verified webauthn mfa
+     */
+    public function thatUserHasAVerifiedWebauthnMfa()
+    {
+        $this->createMfaWebauthn();
+    }
+
+    /**
      * @When I create a new user with a :property property of :value
      */
     public function iCreateANewUserWithAPropertyOf($property, $value)
@@ -399,4 +452,30 @@ class UnitTestsContext extends YiiContext
             Assert::false($isIncluded);
         }
     }
+
+    /**
+     * @When I delete inactive users
+     */
+    public function iDeleteInactiveUsers()
+    {
+        // Temporarily set the configs to something that will allow
+        // newly created users to be considered for deletion
+        $originalPeriod = \Yii::$app->params['inactiveUserPeriod'];
+        \Yii::$app->params['inactiveUserPeriod'] = '-2 days';
+        \Yii::$app->params['inactiveUserDeletionEnable'] = true;
+        User::deleteInactiveUsers();
+
+        // Put configs back as they were
+        \Yii::$app->params['inactiveUserDeletionEnable'] = false;
+        \Yii::$app->params['inactiveUserPeriod'] = $originalPeriod;
+    }
+
+    /**
+     * @When I retrieve the remaining users
+     */
+    public function IRetrieveTheRemainingUsers()
+    {
+        $this->dataToVerify = User::find()->all();
+    }
+
 }
