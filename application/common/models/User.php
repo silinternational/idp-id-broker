@@ -92,12 +92,6 @@ class User extends UserBase
         }
 
         foreach ($this->mfas as $mfa) {
-            // first delete the children and then the parent to avoid foreign key constraint error
-            if ($mfa->type == MFA::TYPE_WEBAUTHN) {
-                if (!self::deleteWebauthns($mfa)) {
-                    return false;
-                }
-            }
             if (! $mfa->delete()) {
                 \Yii::error([
                     'action' => 'delete mfa record before deleting user',
@@ -152,26 +146,6 @@ class User extends UserBase
             }
         }
 
-        return true;
-    }
-
-    // The MfaBackend code for deleting a webauthn type MFA
-    // isn't designed to do this so easily.
-    private static function deleteWebauthns(MFA $mfa)
-    {
-        $children = $mfa->mfaWebauthns;
-        foreach ($children as $child) {
-            if (!$child->delete()) {
-                \Yii::error([
-                    'action' => 'delete mfa webauthn child record before deleting mfa',
-                    'status' => 'error',
-                    'error' => $child->getFirstErrors(),
-                    'mfa_id' => $mfa->id,
-                    'child_id' => $child->id,
-                ]);
-                return false;
-            }
-        }
         return true;
     }
 
