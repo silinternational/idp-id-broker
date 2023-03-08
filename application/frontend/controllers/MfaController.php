@@ -71,6 +71,9 @@ class MfaController extends BaseRestController
             throw new BadRequestHttpException('Value is required for verification', 1506697678);
         }
 
+        $label = $req->getBodyParam('label');
+        $label = $label?:'';
+
         $employeeId = $req->getBodyParam('employee_id');
         if ($employeeId == null) {
             throw new BadRequestHttpException("employee_id is required");
@@ -108,10 +111,10 @@ class MfaController extends BaseRestController
             throw new ForbiddenHttpException("Invalid rpOrigin", 1638539443);
         }
 
-        if (! $mfa->verify($value, $rpOrigin, $type)) {
+        if (! $mfa->verify($value, $rpOrigin, $type, $label)) {
             throw new BadRequestHttpException();
         }
-
+        $mfa->loadData($rpOrigin);
         return $mfa;
     }
 

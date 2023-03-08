@@ -254,6 +254,15 @@ class MfaContext extends \FeatureContext
     }
 
     /**
+     * @When I request to verify the webauthn Mfa registration with a label of :label
+     */
+    public function iRequestToVerifyTheWebauthnMfaRegistrationWithALabelOf($label)
+    {
+        $this->setRequestBody('label', $label);
+        $this->iRequestTheResourceBe('/mfa/' . $this->mfa->id . '/verify/registration', 'created');
+    }
+
+    /**
      * @When I request to verify the webauthn Mfa
      */
     public function iRequestToVerifyTheWebauthnMfa()

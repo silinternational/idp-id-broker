@@ -741,3 +741,16 @@ Feature: User
       | no     | 7 months  | is NOT    |
       | yes    | 5 months  | is NOT    |
       | yes    | 7 months  | is        |
+
+  Scenario Outline: Delete inactive users even with webauthns
+    Given I create a new user with a "active" property of "<active>"
+      And that user has a verified backup code mfa
+      And that user has a verified webauthn mfa
+    When I delete inactive users
+     And I retrieve the remaining users
+    Then the user <isOrIsNot> included in the data
+
+    Examples:
+      | active | isOrIsNot |
+      | no     | is NOT    |
+      | yes    | is        |
