@@ -2,6 +2,9 @@
 
 namespace common\models;
 
+use Br33f\Ga4\MeasurementProtocol\Dto\Event\BaseEvent;
+use Br33f\Ga4\MeasurementProtocol\Dto\Request\BaseRequest;
+use Br33f\Ga4\MeasurementProtocol\Service;
 use Closure;
 use common\components\Emailer;
 use common\components\HIBP;
@@ -387,6 +390,7 @@ class User extends UserBase
                 \Yii::warning(['google-analytics' => "Aborting GA pwned since the config has no GA clientId"]);
                 return;
             }
+
             $analytics = new Analytics();
             $analytics->setProtocolVersion('1')
                 ->setTrackingId($trackingId)
@@ -395,6 +399,36 @@ class User extends UserBase
                 ->setEventAction('login')
                 ->setEventLabel('pwned')
                 ->sendEvent();
+
+            $ga4ApiSecret = \Yii::$app->params['googleAnalytics4']['apiSecret']; // 'aB-abcdef7890123456789'
+            if ($ga4ApiSecret === null) {
+                \Yii::warning(['google-analytics4' => "Aborting GA4 pwned since the config has no GA4 apiSecret"]);
+                return;
+            }
+
+            $ga4MeasurementID = \Yii::$app->params['googleAnalytics4']['measurementId']; // 'G-ABCDE67890'
+            if ($ga4MeasurementID === null) {
+                \Yii::warning(['google-analytics4' => "Aborting GA4 pwned since the config has no GA4 measurementId"]);
+                return;
+            }
+
+            $ga4ClientId = \Yii::$app->params['googleAnalytics4']['clientId']; // 'IDP_ID_BROKER_LOCALHOST'
+            if ($ga4ClientId === null) {
+                \Yii::warning(['google-analytics' => "Aborting GA4 pwned since the config has no GA4 clientId"]);
+                return;
+            }
+
+            $ga4Service = new Service($ga4ApiSecret, $ga4MeasurementID);
+            $ga4Request = new BaseRequest($ga4ClientId);
+
+            $ga4Event = new BaseEvent('pwned_password');
+            $ga4Event->setCategory('password')
+                ->setAction('login')
+                ->setLabel('pwned');
+
+            $ga4Request->addEvent($ga4Event);
+            $ga4Service->send($ga4Request);
+
         } catch (\Exception $e) {
             \Yii::warning([
                 'action' => 'track password pwned event',
