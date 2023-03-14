@@ -54,7 +54,7 @@ Feature: User Unit Tests
 # User->registerPwnedPasswordGAEvent() method is working
 # Note: this doesn't do any asserting on your behalf. Go check the results yourself.
 # Also note: Google Analytics fails silently if you use the wrong GA4_API_SECRET
-  Scenario: Attempt to make a Google Analytics 4 call
-    Given the database contains a user
-     When I call Google Analytics
-     Then I need to check the GA website for the results
+#  Scenario: Attempt to make a Google Analytics 4 call
+#    Given the database contains a user
+#     When I call Google Analytics
+#     Then I need to check the GA website for the results
