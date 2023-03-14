@@ -1,6 +1,8 @@
 <?php
 namespace common\helpers;
 
+use Br33f\Ga4\MeasurementProtocol\Dto\Request\BaseRequest;
+use Br33f\Ga4\MeasurementProtocol\Service;
 use yii\base\Security;
 use yii\helpers\Html;
 use yii\validators\EmailValidator;
@@ -134,5 +136,32 @@ class Utils
         $newEmail .= str_repeat('*', strlen($nextPart) - 1);
 
         return $newEmail;
+    }
+
+    /**
+     * @param string $name the name of the event
+     */
+    public static function GoogleAnalyticsServiceAndRequest(string $callerName)
+    {
+        $ga4ApiSecret = \Yii::$app->params['googleAnalytics4']['apiSecret']; // 'aB-abcdef7890123456789'
+        if ($ga4ApiSecret === null) {
+            \Yii::warning(['google-analytics4' => "Aborting GA4 $callerName since the config has no GA4 apiSecret"]);
+            return [null, null];
+        }
+
+        $ga4MeasurementID = \Yii::$app->params['googleAnalytics4']['measurementId']; // 'G-ABCDE67890'
+        if ($ga4MeasurementID === null) {
+            \Yii::warning(['google-analytics4' => "Aborting GA4 $callerName since the config has no GA4 measurementId"]);
+            return [null, null];
+        }
+
+        $ga4ClientId = \Yii::$app->params['googleAnalytics4']['clientId']; // 'IDP_ID_BROKER_LOCALHOST'
+        if ($ga4ClientId === null) {
+            \Yii::warning(['google-analytics4' => "Aborting GA4 $callerName since the config has no GA4 clientId"]);
+            return [null, null];
+        }
+        $ga4Service = new Service($ga4ApiSecret, $ga4MeasurementID);
+        $ga4Request = new BaseRequest($ga4ClientId);
+        return [$ga4Service, $ga4Request];
     }
 }
