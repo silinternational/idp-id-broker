@@ -414,7 +414,7 @@ class User extends UserBase
 
             $ga4ClientId = \Yii::$app->params['googleAnalytics4']['clientId']; // 'IDP_ID_BROKER_LOCALHOST'
             if ($ga4ClientId === null) {
-                \Yii::warning(['google-analytics' => "Aborting GA4 pwned since the config has no GA4 clientId"]);
+                \Yii::warning(['google-analytics4' => "Aborting GA4 pwned since the config has no GA4 clientId"]);
                 return;
             }
 
@@ -427,8 +427,18 @@ class User extends UserBase
                 ->setLabel('pwned');
 
             $ga4Request->addEvent($ga4Event);
-            $ga4Service->send($ga4Request);
 
+            $debugResponse = $ga4Service->sendDebug($ga4Request);
+            $ga4Messages = $debugResponse->getValidationMessages();
+            if (empty($ga4Messages)) {
+                $ga4Service->send($ga4Request);
+            } else {
+                \Yii::warning([
+                    'google-analytics4' => "Aborting GA4 pwned since the request was not accepted: " .
+                        var_export($ga4Messages, true)
+                ]);
+                return;
+            }
         } catch (\Exception $e) {
             \Yii::warning([
                 'action' => 'track password pwned event',
