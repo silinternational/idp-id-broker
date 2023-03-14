@@ -49,3 +49,12 @@ Feature: User Unit Tests
       And the mfaAllowDisable config parameter is false
     When I add backup codes for that user
     Then I see the user's require_mfa property is yes
+
+# Uncomment the following, if you want to manually test whether the
+# User->registerPwnedPasswordGAEvent() method is working
+# Note: this doesn't do any asserting on your behalf. Go check the results yourself.
+# Also note: Google Analytics fails silently if you use the wrong GA4_API_SECRET
+  Scenario: Attempt to make a Google Analytics 4 call
+    Given the database contains a user
+     When I call Google Analytics
+     Then I need to check the GA website for the results

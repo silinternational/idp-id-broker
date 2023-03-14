@@ -478,4 +478,20 @@ class UnitTestsContext extends YiiContext
         $this->dataToVerify = User::find()->all();
     }
 
+    /**
+     * @When I call Google Analytics
+     */
+    public function iCallGoogleAnalytics()
+    {
+        $this->tempUser->registerPwnedPasswordGAEvent();
+    }
+
+    /**
+     * @Then I need to check the GA website for the results
+     */
+    public function iNeedToCheckTheGaWebsiteForTheResults()
+    {
+        print_r("Go check your Google Analytics data stream's real time " .
+            "report for the results");
+    }
 }
