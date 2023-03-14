@@ -139,7 +139,8 @@ class Utils
     }
 
     /**
-     * @param string $name the name of the event
+     * @param string $callerName the name of the calling event (just for the warning logs)
+     * @return [?Br33f\Ga4\MeasurementProtocol\Service, ?Br33f\Ga4\MeasurementProtocol\Dto\Request\BaseRequest]
      */
     public static function GoogleAnalyticsServiceAndRequest(string $callerName)
     {
