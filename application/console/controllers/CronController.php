@@ -8,6 +8,9 @@ use common\models\User;
 use common\components\Emailer;
 use yii\console\Controller;
 
+use Br33f\Ga4\MeasurementProtocol\Dto\Event\BaseEvent;
+use Br33f\Ga4\MeasurementProtocol\Dto\Request\BaseRequest;
+use Br33f\Ga4\MeasurementProtocol\Service;
 use TheIconic\Tracking\GoogleAnalytics\Analytics;
 
 class CronController extends Controller
@@ -79,10 +82,50 @@ class CronController extends Controller
             ->setClientId($clientId)
             ->setEventCategory($eventCategory);
 
+        $ga4ApiSecret = \Yii::$app->params['googleAnalytics4']['apiSecret']; // 'aB-abcdef7890123456789'
+        if ($ga4ApiSecret === null) {
+            \Yii::warning(['google-analytics4' => "Aborting GA4 cron since the config has no GA4 apiSecret"]);
+            return;
+        }
+
+        $ga4MeasurementID = \Yii::$app->params['googleAnalytics4']['measurementId']; // 'G-ABCDE67890'
+        if ($ga4MeasurementID === null) {
+            \Yii::warning(['google-analytics4' => "Aborting GA4 cron since the config has no GA4 measurementId"]);
+            return;
+        }
+
+        $ga4ClientId = \Yii::$app->params['googleAnalytics4']['clientId']; // 'IDP_ID_BROKER_LOCALHOST'
+        if ($ga4ClientId === null) {
+            \Yii::warning(['google-analytics' => "Aborting GA4 cron since the config has no GA4 clientId"]);
+            return;
+        }
+
+        $ga4Service = new Service($ga4ApiSecret, $ga4MeasurementID);
+        $ga4Request = new BaseRequest($ga4ClientId);
+
         foreach ($gaEvents as $label => $value) {
             $analytics->setEventLabel($label)
                 ->setEventValue($value)
                 ->sendEvent();
+
+            $ga4Event = new BaseEvent($label);
+            $ga4Event->setCategory($eventCategory)
+                ->setLabel($label)
+                ->setValue($value);
+
+            $ga4Request->addEvent($ga4Event);
+        }
+
+        $debugResponse = $ga4Service->sendDebug($ga4Request);
+        $ga4Messages = $debugResponse->getValidationMessages();
+        if (empty($ga4Messages)) {
+            $ga4Service->send($ga4Request);
+        } else {
+            \Yii::warning([
+                'google-analytics4' => "Aborting GA4 cron since the request was not accepted: " .
+                    var_export($ga4Messages, true)
+            ]);
+            return;
         }
 
         $gaEvents['action'] = 'completed posting to Google Analytics';
