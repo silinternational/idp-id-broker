@@ -334,7 +334,7 @@ class User extends UserBase
             return;
         }
 
-        $this->trackPwnedPasswordGAEvent();
+        $this->registerPwnedPasswordGAEvent();
 
         if (\Yii::$app->params['hibpTrackingOnly']) {
             // extend check after date to only track user once per checking period
@@ -376,7 +376,7 @@ class User extends UserBase
         return false;
     }
 
-    public function trackPwnedPasswordGAEvent(): void
+    public function registerPwnedPasswordGAEvent(): void
     {
         try {
             $trackingId = \Yii::$app->params['googleAnalytics']['trackingId']; // 'UA-12345678-12'
