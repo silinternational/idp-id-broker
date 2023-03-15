@@ -54,3 +54,9 @@ The API is described by [api.raml](api.raml), and an auto-generated [api.html](a
 ## Running tests interactively locally
 1. Run `make testcli` to build and start needed containers and drop you in a shell
 2. Run desired tests, example: `./vendor/bin/behat features/authentication.feature`
+
+## Google Analytics Calls
+Calls are made to Google Analytics regarding users' mfas and whether a password has been pwned.
+
+If you want to have an indication that those calls are likely to succeed, run 
+`$ make callGA`.
