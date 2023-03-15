@@ -65,7 +65,7 @@ raml2html:
 psr2:
 	docker-compose run --rm cli bash -c "vendor/bin/php-cs-fixer fix ."
 
-callGA4: app
-	docker-compose exec app bash -c "./yii ga4/register_event"
+callGA: app
+	docker-compose exec app bash -c "./yii ga/register_event"
 
 

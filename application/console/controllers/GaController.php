@@ -6,13 +6,13 @@ use yii\console\Controller;
 
 use Br33f\Ga4\MeasurementProtocol\Dto\Event\BaseEvent;
 
-class Ga4Controller extends Controller
+class GaController extends Controller
 {
 
     /**
      * Send test event to Google Analytics 4
      * Call it with this command
-     * $ ./yii ga4/register_event
+     * $ ./yii ga/register_event
      */
     public function actionRegister_event()
     {
