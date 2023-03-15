@@ -44,9 +44,12 @@ class Ga4Controller extends Controller
         $ga4Id = \Yii::$app->params['googleAnalytics4']['measurementId'];
 
         print_r(PHP_EOL .
-            "Now go to Google Analytics data stream $ga4Id, to the reports:realtime page " .
-            " and make sure the events are appearing in the " .
-            "'Event count by Event name' widget." . PHP_EOL);
+            "Now go to the Google Analytics data stream $ga4Id, " . PHP_EOL .
+            "to the reports:realtime page " .
+            " and make sure the events are appearing in the " . PHP_EOL .
+            "'Event count by Event name' widget." . PHP_EOL .
+            "  Note: The GA4 API fails silently if you use the wrong API secret." . PHP_EOL
+        );
     }
 
 }
