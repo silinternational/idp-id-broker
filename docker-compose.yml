@@ -39,10 +39,7 @@ services:
             - "80"
         depends_on:
             - testdb
-        env_file:
-            - ./local.env
         environment:
-            TEST_SERVER_HOSTNAME: appfortests
             API_ACCESS_KEYS: api-test-NOTASECRET
             APP_ENV: test
             EMAIL_SERVICE_accessToken: dummy
