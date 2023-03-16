@@ -144,25 +144,25 @@ class Utils
      */
     public static function GoogleAnalyticsServiceAndRequest(string $callerName)
     {
-        $ga4ApiSecret = \Yii::$app->params['googleAnalytics4']['apiSecret']; // 'aB-abcdef7890123456789'
-        if ($ga4ApiSecret === null) {
-            \Yii::warning(['google-analytics4' => "Aborting GA4 $callerName since the config has no GA4 apiSecret"]);
+        $gaApiSecret = \Yii::$app->params['googleAnalytics']['apiSecret']; // 'aB-abcdef7890123456789'
+        if ($gaApiSecret === null) {
+            \Yii::warning(['google-analytics' => "Aborting GA $callerName since the config has no GA apiSecret"]);
             return [null, null];
         }
 
-        $ga4MeasurementID = \Yii::$app->params['googleAnalytics4']['measurementId']; // 'G-ABCDE67890'
-        if ($ga4MeasurementID === null) {
-            \Yii::warning(['google-analytics4' => "Aborting GA4 $callerName since the config has no GA4 measurementId"]);
+        $gaMeasurementID = \Yii::$app->params['googleAnalytics']['measurementId']; // 'G-ABCDE67890'
+        if ($gaMeasurementID === null) {
+            \Yii::warning(['google-analytics' => "Aborting GA $callerName since the config has no GA measurementId"]);
             return [null, null];
         }
 
-        $ga4ClientId = \Yii::$app->params['googleAnalytics4']['clientId']; // 'IDP_ID_BROKER_LOCALHOST'
-        if ($ga4ClientId === null) {
-            \Yii::warning(['google-analytics4' => "Aborting GA4 $callerName since the config has no GA4 clientId"]);
+        $gaClientId = \Yii::$app->params['googleAnalytics']['clientId']; // 'IDP_ID_BROKER_LOCALHOST'
+        if ($gaClientId === null) {
+            \Yii::warning(['google-analytics' => "Aborting GA $callerName since the config has no GA clientId"]);
             return [null, null];
         }
-        $ga4Service = new Service($ga4ApiSecret, $ga4MeasurementID);
-        $ga4Request = new BaseRequest($ga4ClientId);
-        return [$ga4Service, $ga4Request];
+        $gaService = new Service($gaApiSecret, $gaMeasurementID);
+        $gaRequest = new BaseRequest($gaClientId);
+        return [$gaService, $gaRequest];
     }
 }
