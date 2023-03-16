@@ -2,6 +2,7 @@
 
 namespace common\models;
 
+use Br33f\Ga4\MeasurementProtocol\Dto\Event\BaseEvent;
 use Closure;
 use common\components\Emailer;
 use common\components\HIBP;
@@ -331,7 +332,7 @@ class User extends UserBase
             return;
         }
 
-        $this->trackPwnedPasswordGAEvent();
+        $this->registerPwnedPasswordGAEvent();
 
         if (\Yii::$app->params['hibpTrackingOnly']) {
             // extend check after date to only track user once per checking period
@@ -373,7 +374,7 @@ class User extends UserBase
         return false;
     }
 
-    public function trackPwnedPasswordGAEvent(): void
+    public function registerPwnedPasswordGAEvent(): void
     {
         try {
             $trackingId = \Yii::$app->params['googleAnalytics']['trackingId']; // 'UA-12345678-12'
@@ -387,6 +388,7 @@ class User extends UserBase
                 \Yii::warning(['google-analytics' => "Aborting GA pwned since the config has no GA clientId"]);
                 return;
             }
+
             $analytics = new Analytics();
             $analytics->setProtocolVersion('1')
                 ->setTrackingId($trackingId)
@@ -395,6 +397,31 @@ class User extends UserBase
                 ->setEventAction('login')
                 ->setEventLabel('pwned')
                 ->sendEvent();
+
+            // Now call Google Analytics 4
+            list($ga4Service, $ga4Request) = Utils::GoogleAnalyticsServiceAndRequest("pwned");
+            if ($ga4Service === null) {
+                return;
+            }
+
+            $ga4Event = new BaseEvent('pwned_password');
+            $ga4Event->setCategory('password')
+                ->setAction('login')
+                ->setLabel('pwned');
+
+            $ga4Request->addEvent($ga4Event);
+
+            $debugResponse = $ga4Service->sendDebug($ga4Request);
+            $ga4Messages = $debugResponse->getValidationMessages();
+            if (empty($ga4Messages)) {
+                $ga4Service->send($ga4Request);
+            } else {
+                \Yii::warning([
+                    'google-analytics4' => "Aborting GA4 pwned since the request was not accepted: " .
+                        var_export($ga4Messages, true)
+                ]);
+                return;
+            }
         } catch (\Exception $e) {
             \Yii::warning([
                 'action' => 'track password pwned event',

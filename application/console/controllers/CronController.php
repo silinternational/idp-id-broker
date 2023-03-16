@@ -1,6 +1,7 @@
 <?php
 namespace console\controllers;
 
+use common\helpers\Utils;
 use common\models\Invite;
 use common\models\Method;
 use common\models\Mfa;
@@ -8,6 +9,7 @@ use common\models\User;
 use common\components\Emailer;
 use yii\console\Controller;
 
+use Br33f\Ga4\MeasurementProtocol\Dto\Event\BaseEvent;
 use TheIconic\Tracking\GoogleAnalytics\Analytics;
 
 class CronController extends Controller
@@ -79,10 +81,35 @@ class CronController extends Controller
             ->setClientId($clientId)
             ->setEventCategory($eventCategory);
 
+        // Now call Google Analytics 4
+        list($ga4Service, $ga4Request) = Utils::GoogleAnalyticsServiceAndRequest("cron");
+        if ($ga4Service === null) {
+            return;
+        }
+
         foreach ($gaEvents as $label => $value) {
             $analytics->setEventLabel($label)
                 ->setEventValue($value)
                 ->sendEvent();
+
+            $ga4Event = new BaseEvent($label);
+            $ga4Event->setCategory($eventCategory)
+                ->setLabel($label)
+                ->setValue($value);
+
+            $ga4Request->addEvent($ga4Event);
+        }
+
+        $debugResponse = $ga4Service->sendDebug($ga4Request);
+        $ga4Messages = $debugResponse->getValidationMessages();
+        if (empty($ga4Messages)) {
+            $ga4Service->send($ga4Request);
+        } else {
+            \Yii::warning([
+                'google-analytics4' => "Aborting GA4 cron since the request was not accepted: " .
+                    var_export($ga4Messages, true)
+            ]);
+            return;
         }
 
         $gaEvents['action'] = 'completed posting to Google Analytics';
