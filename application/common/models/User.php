@@ -377,48 +377,26 @@ class User extends UserBase
     public function registerPwnedPasswordGAEvent(): void
     {
         try {
-            $trackingId = \Yii::$app->params['googleAnalytics']['trackingId']; // 'UA-12345678-12'
-            if ($trackingId === null) {
-                \Yii::warning(['google-analytics' => "Aborting GA pwned since the config has no GA trackingId"]);
+            list($gaService, $gaRequest) = Utils::GoogleAnalyticsServiceAndRequest("pwned");
+            if ($gaService === null) {
                 return;
             }
 
-            $clientId = \Yii::$app->params['googleAnalytics']['clientId']; // 'IDP_ID_BROKER_LOCALHOST'
-            if ($clientId === null) {
-                \Yii::warning(['google-analytics' => "Aborting GA pwned since the config has no GA clientId"]);
-                return;
-            }
-
-            $analytics = new Analytics();
-            $analytics->setProtocolVersion('1')
-                ->setTrackingId($trackingId)
-                ->setClientId($clientId)
-                ->setEventCategory('password')
-                ->setEventAction('login')
-                ->setEventLabel('pwned')
-                ->sendEvent();
-
-            // Now call Google Analytics 4
-            list($ga4Service, $ga4Request) = Utils::GoogleAnalyticsServiceAndRequest("pwned");
-            if ($ga4Service === null) {
-                return;
-            }
-
-            $ga4Event = new BaseEvent('pwned_password');
-            $ga4Event->setCategory('password')
+            $gaEvent = new BaseEvent('pwned_password');
+            $gaEvent->setCategory('password')
                 ->setAction('login')
                 ->setLabel('pwned');
 
-            $ga4Request->addEvent($ga4Event);
+            $gaRequest->addEvent($gaEvent);
 
-            $debugResponse = $ga4Service->sendDebug($ga4Request);
-            $ga4Messages = $debugResponse->getValidationMessages();
-            if (empty($ga4Messages)) {
-                $ga4Service->send($ga4Request);
+            $debugResponse = $gaService->sendDebug($gaRequest);
+            $gaMessages = $debugResponse->getValidationMessages();
+            if (empty($gaMessages)) {
+                $gaService->send($gaRequest);
             } else {
                 \Yii::warning([
-                    'google-analytics4' => "Aborting GA4 pwned since the request was not accepted: " .
-                        var_export($ga4Messages, true)
+                    'google-analytics' => "Aborting GA pwned since the request was not accepted: " .
+                        var_export($gaMessages, true)
                 ]);
                 return;
             }

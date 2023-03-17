@@ -220,13 +220,9 @@ return [
             Env::getArrayFromPrefix('ABANDONED_USER_')
         ),
         'googleAnalytics'               => [
-            'trackingId' => Env::get('GA_TRACKING_ID'),
+            'apiSecret' => Env::get('GA_API_SECRET'),
+            'measurementId' => Env::get('GA_MEASUREMENT_ID'),
             'clientId'   => Env::get('GA_CLIENT_ID'),
-        ],
-        'googleAnalytics4'               => [
-            'apiSecret' => Env::get('GA4_API_SECRET'),
-            'measurementId' => Env::get('GA4_MEASUREMENT_ID'),
-            'clientId'   => Env::get('GA4_CLIENT_ID'),
         ],
         'method'                        => ArrayHelper::merge(
             [
