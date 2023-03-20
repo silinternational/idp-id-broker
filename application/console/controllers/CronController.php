@@ -50,17 +50,17 @@ class CronController extends Controller
         $eventCategory = 'mfa-usage';
 
         $gaEvents = [
-            'active-users' => User::find()->where(['active' => 'yes'])->count(),
-            'active-users-with-require-mfa' => User::countUsersWithRequireMfa(),
-            'active-users-with-mfas' => User::getQueryOfUsersWithMfa()->count(),
-            'active-users-with-backup-codes' => User::getQueryOfUsersWithMfa(Mfa::TYPE_BACKUPCODE)->count(),
-            'active-users-with-totp' => User::getQueryOfUsersWithMfa(Mfa::TYPE_TOTP)->count(),
-            'active-users-with-u2f' => User::getQueryOfUsersWithMfa(Mfa::TYPE_WEBAUTHN)->count(),
-            'active-users-with-password' => User::countUsersWithPassword(),
+            'active_users' => User::find()->where(['active' => 'yes'])->count(),
+            'active_users_with_require_mfa' => User::countUsersWithRequireMfa(),
+            'active_users_with_mfas' => User::getQueryOfUsersWithMfa()->count(),
+            'active_users_with_backup_codes' => User::getQueryOfUsersWithMfa(Mfa::TYPE_BACKUPCODE)->count(),
+            'active_users_with_totp' => User::getQueryOfUsersWithMfa(Mfa::TYPE_TOTP)->count(),
+            'active_users_with_u2f' => User::getQueryOfUsersWithMfa(Mfa::TYPE_WEBAUTHN)->count(),
+            'active_users_with_password' => User::countUsersWithPassword(),
             // Since GA doesn't accept event values as floats, multiply this by 10 and round it
-            'average-mfas-per-user-with-mfas-times-ten' => round(User::getAverageNumberOfMfasPerUserWithMfas() * 10.0),
-            'active-users-personal-email-no-methods' => User::numberWithPersonalEmailButNoMethods(),
-            'active-users-only-2sv-or-u2f' => User::numberWithOneMfaNotBackupCodes()
+            'average_mfas_per_user_with_mfas_times_ten' => round(User::getAverageNumberOfMfasPerUserWithMfas() * 10.0),
+            'active_users_personal_email_no_methods' => User::numberWithPersonalEmailButNoMethods(),
+            'active_users_only_2sv_or_u2f' => User::numberWithOneMfaNotBackupCodes()
         ];
 
         list($gaService, $gaRequest) = Utils::GoogleAnalyticsServiceAndRequest("cron");
