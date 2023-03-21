@@ -49,3 +49,4 @@ Feature: User Unit Tests
       And the mfaAllowDisable config parameter is false
     When I add backup codes for that user
     Then I see the user's require_mfa property is yes
+

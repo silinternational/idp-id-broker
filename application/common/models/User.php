@@ -2,6 +2,7 @@
 
 namespace common\models;
 
+use Br33f\Ga4\MeasurementProtocol\Dto\Event\BaseEvent;
 use Closure;
 use common\components\Emailer;
 use common\components\HIBP;
@@ -331,7 +332,7 @@ class User extends UserBase
             return;
         }
 
-        $this->trackPwnedPasswordGAEvent();
+        $this->registerPwnedPasswordGAEvent();
 
         if (\Yii::$app->params['hibpTrackingOnly']) {
             // extend check after date to only track user once per checking period
@@ -373,28 +374,32 @@ class User extends UserBase
         return false;
     }
 
-    public function trackPwnedPasswordGAEvent(): void
+    public function registerPwnedPasswordGAEvent(): void
     {
         try {
-            $trackingId = \Yii::$app->params['googleAnalytics']['trackingId']; // 'UA-12345678-12'
-            if ($trackingId === null) {
-                \Yii::warning(['google-analytics' => "Aborting GA pwned since the config has no GA trackingId"]);
+            list($gaService, $gaRequest) = Utils::GoogleAnalyticsServiceAndRequest("pwned");
+            if ($gaService === null) {
                 return;
             }
 
-            $clientId = \Yii::$app->params['googleAnalytics']['clientId']; // 'IDP_ID_BROKER_LOCALHOST'
-            if ($clientId === null) {
-                \Yii::warning(['google-analytics' => "Aborting GA pwned since the config has no GA clientId"]);
+            $gaEvent = new BaseEvent('pwned_password');
+            $gaEvent->setCategory('password')
+                ->setAction('login')
+                ->setLabel('pwned');
+
+            $gaRequest->addEvent($gaEvent);
+
+            $debugResponse = $gaService->sendDebug($gaRequest);
+            $gaMessages = $debugResponse->getValidationMessages();
+            if (empty($gaMessages)) {
+                $gaService->send($gaRequest);
+            } else {
+                \Yii::warning([
+                    'google-analytics' => "Aborting GA pwned since the request was not accepted: " .
+                        var_export($gaMessages, true)
+                ]);
                 return;
             }
-            $analytics = new Analytics();
-            $analytics->setProtocolVersion('1')
-                ->setTrackingId($trackingId)
-                ->setClientId($clientId)
-                ->setEventCategory('password')
-                ->setEventAction('login')
-                ->setEventLabel('pwned')
-                ->sendEvent();
         } catch (\Exception $e) {
             \Yii::warning([
                 'action' => 'track password pwned event',
