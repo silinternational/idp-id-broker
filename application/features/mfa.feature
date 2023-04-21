@@ -45,7 +45,7 @@ Feature: MFA
         | verified  | 1              |
       And 10 codes should be stored
 
-  Scenario: Create new MFA record of type manager
+  Scenario: Create new MFA record of type manager but only once
     Given the user has a manager email address
       And I provide the following valid data:
         | property    | value          |
@@ -55,12 +55,21 @@ Feature: MFA
     When I request "/mfa" be created
     Then the response status code should be 200
       And the response should contain a data array with 0 items
-      And an MFA record exists for an employee_id of "123"
+      And an MFA record exists for an employee_id of "123" and has a backup code
       And the following MFA data should be stored:
         | property  | value          |
         | type      | manager        |
         | label     | A Label        |
         | verified  | 1              |
+    When I request "/mfa" be created
+     And I provide the following valid data:
+       | property    | value          |
+       | employee_id | 123            |
+       | type        | manager        |
+       | label       | A Label        |
+    Then the response status code should be 200
+     And the response should contain a data array with 0 items
+     And the same MFA record exists with the same backup code
 
   Scenario: Create new MFA record of type manager with no manager email
     Given the user does not have a manager email address

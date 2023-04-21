@@ -34,6 +34,11 @@ class MfaContext extends \FeatureContext
     protected $backupCodes;
 
     /**
+     * MfaBackupcode $managerBackupCode
+     */
+    protected $managerBackupCode;
+
+    /**
      * @Given the user has a verified :mfaType MFA
      */
     public function iGiveThatUserAVerifiedMfa($mfaType)
@@ -90,6 +95,40 @@ class MfaContext extends \FeatureContext
 
         $this->mfa = Mfa::findOne(['user_id' => $user->id]);
         Assert::notEmpty($this->mfa, 'No MFA record found for that user.');
+    }
+
+    /**
+     * @Then an MFA record exists for an employee_id of :employeeId and has a backup code
+     */
+    public function anMfaRecordExistsForAnEmployeeIdOfAndHasABackupCode($employeeId)
+    {
+        $user = User::findOne(['employee_id' => $this->tempEmployeeId]);
+        Assert::notEmpty($user, 'Unable to find that user.');
+
+        $this->mfa = Mfa::findOne(['user_id' => $user->id]);
+        Assert::notEmpty($this->mfa, 'No MFA record found for that user.');
+
+        $buCode = MfaBackupcode::findOne(['mfa_id' => $this->mfa->id]);
+        Assert::notEmpty($buCode, 'Unable to find a backup code for that mfa.');
+
+        $this->managerBackupCode = $buCode;
+    }
+
+    /**
+     * @Then the same MFA record exists with the same backup code
+     */
+    public function theSameMfaRecordExistsWithTheSameBackupCode()
+    {
+        $user = User::findOne(['employee_id' => $this->tempEmployeeId]);
+        Assert::notEmpty($user, 'Unable to find that user.');
+
+        $mfas = Mfa::findAll(['user_id' => $user->id, 'type' => Mfa::TYPE_MANAGER]);
+        Assert::eq( count($mfas), 1, "There should be exactly one manager mfa, but got " . count($mfas));
+        Assert::eq($mfas[0]->id, $this->mfa->id, 'The wrong mfa exists');
+
+        $buCodes = MfaBackupcode::findAll(['mfa_id' => $this->mfa->id]);
+        Assert::eq(count($buCodes), 1, "There should be exactly one backup code, but got " . count($buCodes));
+        Assert::eq($buCodes[0]->value, $this->managerBackupCode->value, 'The wrong backup code exists');
     }
 
     /**
