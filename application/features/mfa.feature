@@ -55,12 +55,26 @@ Feature: MFA
     When I request "/mfa" be created
     Then the response status code should be 200
       And the response should contain a data array with 0 items
-      And an MFA record exists for an employee_id of "123"
+      And an MFA record exists for an employee_id of "123" and has a backup code
       And the following MFA data should be stored:
         | property  | value          |
         | type      | manager        |
         | label     | A Label        |
         | verified  | 1              |
+
+  Scenario: Creating a repeat MFA record of type manager leaves the old backup code in place
+    Given the user has a manager email address
+      And I provide the following valid data:
+        | property    | value          |
+        | employee_id | 123            |
+        | type        | manager        |
+        | label       | A Label        |
+    When I request "/mfa" be created
+     And I save a copy of the backup code for that manager MFA
+     And I request "/mfa" be created
+    Then the response status code should be 200
+     And the response should contain a data array with 0 items
+     And an MFA backup code with the same value should exist
 
   Scenario: Create new MFA record of type manager with no manager email
     Given the user does not have a manager email address

@@ -22,6 +22,15 @@ class MfaBackendManager extends Component implements MfaBackendInterface
             throw new \Exception("A manager MFA record does not exist for this user", 1507904428);
         }
 
+        // If there is already a verified Manager MFA, don't create an additional one. Just resend it.
+        if ($mfa->verified) {
+            $existingCode = MfaBackupcode::findOne(['mfa_id' => $mfa->id]);
+            if ($existingCode !== null) {
+                $this->sendManagerEmail($mfa, $existingCode->value);
+                return [];
+            }
+        }
+
         $mfa->setVerified();
 
         $codes = MfaBackupcode::createBackupCodes($mfa->id, 1);
