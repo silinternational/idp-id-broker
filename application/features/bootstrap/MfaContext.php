@@ -34,11 +34,6 @@ class MfaContext extends \FeatureContext
     protected $backupCodes;
 
     /**
-     * MfaBackupcode $managerBackupCode
-     */
-    protected $managerBackupValue;
-
-    /**
      * @Given the user has a verified :mfaType MFA
      */
     public function iGiveThatUserAVerifiedMfa($mfaType)
@@ -95,37 +90,6 @@ class MfaContext extends \FeatureContext
 
         $this->mfa = Mfa::findOne(['user_id' => $user->id]);
         Assert::notEmpty($this->mfa, 'No MFA record found for that user.');
-    }
-
-    /**
-     * @Then an MFA record exists for an employee_id of :employeeId and has a backup code
-     */
-    public function anMfaRecordExistsForAnEmployeeIdOfAndHasABackupCode($employeeId)
-    {
-        $user = User::findOne(['employee_id' => $this->tempEmployeeId]);
-        Assert::notEmpty($user, 'Unable to find that user.');
-
-        $this->mfa = Mfa::findOne(['user_id' => $user->id]);
-        Assert::notEmpty($this->mfa, 'No MFA record found for that user.');
-
-        $buCode = MfaBackupcode::findOne(['mfa_id' => $this->mfa->id]);
-        Assert::notEmpty($buCode, 'Unable to find a backup code for that mfa.');
-    }
-
-    /**
-     * @Then an MFA backup code with the same value should exist
-     */
-    public function anMfaBackupCodeWithTheSameValueShouldExist()
-    {
-        $user = User::findOne(['employee_id' => $this->tempEmployeeId]);
-        Assert::notEmpty($user, 'Unable to find that user.');
-
-        $mfas = Mfa::findAll(['user_id' => $user->id, 'type' => Mfa::TYPE_MANAGER]);
-        Assert::eq( count($mfas), 1, "There should be exactly one manager mfa, but got " . count($mfas));
-
-        $buCodes = MfaBackupcode::findAll(['mfa_id' => $this->mfa->id]);
-        Assert::eq(count($buCodes), 1, "There should be exactly one backup code, but got " . count($buCodes));
-        Assert::eq($buCodes[0]->value, $this->managerBackupValue, 'The wrong backup code exists');
     }
 
     /**
@@ -365,24 +329,6 @@ class MfaContext extends \FeatureContext
         $this->setRequestBody('type', Mfa::TYPE_WEBAUTHN);
         $this->iRequestTheResourceBe('/mfa', 'created');
     }
-
-    /**
-     * @When I save a copy of the backup code for that manager MFA
-     */
-    public function iSaveACopyOfTheBackupCodeForThatManagerMfa()
-    {
-        $user = User::findOne(['employee_id' => $this->tempEmployeeId]);
-        Assert::notEmpty($user, 'Unable to find that user.');
-
-        $this->mfa = Mfa::findOne(['user_id' => $user->id]);
-        Assert::notEmpty($this->mfa, 'No MFA record found for that user.');
-
-        $buCode = MfaBackupcode::findOne(['mfa_id' => $this->mfa->id]);
-        Assert::notEmpty($buCode, 'Unable to find a backup code for that mfa.');
-
-        $this->managerBackupValue = $buCode->value;
-    }
-
 
     /**
      * @Then the MFA record is not stored
