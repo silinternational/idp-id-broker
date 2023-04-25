@@ -331,24 +331,6 @@ class MfaContext extends \FeatureContext
     }
 
     /**
-     * @When I save a copy of the backup code for that manager MFA
-     */
-    public function iSaveACopyOfTheBackupCodeForThatManagerMfa()
-    {
-        $user = User::findOne(['employee_id' => $this->tempEmployeeId]);
-        Assert::notEmpty($user, 'Unable to find that user.');
-
-        $this->mfa = Mfa::findOne(['user_id' => $user->id]);
-        Assert::notEmpty($this->mfa, 'No MFA record found for that user.');
-
-        $buCode = MfaBackupcode::findOne(['mfa_id' => $this->mfa->id]);
-        Assert::notEmpty($buCode, 'Unable to find a backup code for that mfa.');
-
-        $this->managerBackupValue = $buCode->value;
-    }
-
-
-    /**
      * @Then the MFA record is not stored
      */
     public function theMfaRecordIsNotStored()
