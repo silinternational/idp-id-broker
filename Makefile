@@ -57,9 +57,10 @@ dynamoclean:
 
 clean:
 	docker-compose kill
-	docker system prune -f
+	docker-compose rm -f
 
 raml2html:
+	touch api.html
 	docker-compose run --rm raml2html
 
 psr2:
