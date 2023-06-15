@@ -193,9 +193,27 @@ class MfaBackendWebAuthn extends Component implements MfaBackendInterface
             throw new NotFoundHttpException("MFA record for given ID not found");
         }
 
-        if (empty($mfa->external_uuid)) {
-            throw new ForbiddenHttpException("May not delete a webauthn backend without an external_uuid", 1658237150);;
+        // If not verified and there is no external_uuid, just delete this local mfa entry
+        if (!$mfa->verified && empty($mfa->external_uuid)) {
+            try {
+                $mfa->delete();
+                return true;
+            } catch (Exception $e) {
+                \Yii::error([
+                    'action' => 'mfa-delete',
+                    'mfa-type' => Mfa::TYPE_WEBAUTHN,
+                    'status' => 'error',
+                    'error' => $e->getMessage(),
+                ]);
+                throw new ServerErrorHttpException(
+                    sprintf("Unable to delete existing webauthn-type mfa. [id=%s]", $mfa->id),
+                    1686851200
+                );
+            }
+        } else if (empty($mfa->external_uuid)) {
+            throw new ForbiddenHttpException("May not delete a verified webauthn backend without an external_uuid", 1658237150);;
         }
+
 
         $headers = $this->getWebAuthnHeaders(
             $mfa->user->username,
