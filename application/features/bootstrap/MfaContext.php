@@ -330,7 +330,6 @@ class MfaContext extends \FeatureContext
         $this->iRequestTheResourceBe('/mfa', 'created');
     }
 
-
     /**
      * @Then the MFA record is not stored
      */
