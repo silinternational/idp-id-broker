@@ -7,6 +7,7 @@ use frontend\components\BaseRestController;
 use Yii;
 use yii\web\BadRequestHttpException;
 use yii\web\ForbiddenHttpException;
+use yii\web\ServerErrorHttpException;
 
 class AuthenticationController extends BaseRestController
 {
@@ -47,7 +48,21 @@ class AuthenticationController extends BaseRestController
         if ($authenticatedUser !== null) {
             $log['status'] = 'created';
             Yii::info($log, 'application');
-            $authenticatedUser->loadMfaData($rpOrigin);
+
+            try {
+                $authenticatedUser->loadMfaData($rpOrigin);
+            } catch (\TypeError $e) {
+
+                $log = [
+                    'action' => 'authentication/create',
+                    'message' => $e->getMessage(),
+                    'backTrace' => $e->getTrace(),
+                ];
+                Yii::error($log, 'application');
+                throw new ServerErrorHttpException("Error calling loadMfaData in Authentication Controller", 1687550025);
+            } catch (\Exception $e) {
+                throw $e;
+            }
             return $authenticatedUser;
         }
 
