@@ -45,10 +45,11 @@ $emailServiceConfig['validIpRanges'] = Env::getArray('EMAIL_SERVICE_validIpRange
 
 $passwordProfileUrl = Env::get('PASSWORD_PROFILE_URL');
 
-$logPrefix = function () {
+$logPrefix = function ($message) {
     $request = Yii::$app->request;
     $prefixData = [
         'env' => YII_ENV,
+        'message' => $message,
     ];
     if ($request instanceof \yii\web\Request) {
         // Assumes format: Bearer consumer-module-name-32randomcharacters
