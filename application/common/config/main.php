@@ -41,9 +41,9 @@ $envValidator('MFA_TOTP_apiSecret', 'apiSecret', $mfaTotpConfig);
 
 $mfaWebAuthnConfig = Env::getArrayFromPrefix('MFA_WEBAUTHN_');
 
-$envValidator('MFA_WEBAUTHN_apiBaseUrl', 'apiBaseUrl', $mfaTotpConfig);
-$envValidator('MFA_WEBAUTHN_apiKey', 'apiKey', $mfaTotpConfig);
-$envValidator('MFA_WEBAUTHN_apiSecret', 'apiSecret', $mfaTotpConfig);
+$envValidator('MFA_WEBAUTHN_apiBaseUrl', 'apiBaseUrl', $mfaWebAuthnConfig);
+$envValidator('MFA_WEBAUTHN_apiKey', 'apiKey', $mfaWebAuthnConfig);
+$envValidator('MFA_WEBAUTHN_apiSecret', 'apiSecret', $mfaWebAuthnConfig);
 
 $emailerClass = Env::get('EMAILER_CLASS', Emailer::class);
 
