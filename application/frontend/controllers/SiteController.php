@@ -49,9 +49,6 @@ class SiteController extends BaseRestController
             throw new Http500('Emailer config problem.');
         }
 
-        // Checking the email service status causes too many error emails to be sent out to the dev team
-        // $this->checkEmailServiceStatus($emailer);
-
         try {
             $webApp->get('totp');
         } catch (Exception $e) {

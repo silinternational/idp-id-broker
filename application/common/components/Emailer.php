@@ -65,13 +65,13 @@ class Emailer extends Component
      * @var array
      */
     public $emailServiceConfig = [];
-    
+
     /** @var EmailServiceClient */
     protected $emailServiceClient = null;
-    
+
     /** @var LoggerInterface */
     public $logger = null;
-    
+
     /**
      * Other values that should be made available to be inserted into emails.
      * The keys should be camelCase and will be made available as variables
@@ -113,7 +113,7 @@ class Emailer extends Component
      * @var array
      */
     protected $subjects;
-    
+
     public $subjectForInvite;
     public $subjectForMfaRateLimit;
     public $subjectForPasswordChanged;
@@ -165,7 +165,7 @@ class Emailer extends Component
             'baseUrl',
             'validIpRanges',
         ];
-        
+
         foreach ($requiredParams as $param) {
             if (! isset($this->emailServiceConfig[$param])) {
                 throw new InvalidArgumentException(
@@ -174,7 +174,7 @@ class Emailer extends Component
                 );
             }
         }
-        
+
         foreach ($this->subjects as $messageType => $subject) {
             if (empty($subject)) {
                 throw new InvalidArgumentException(sprintf(
@@ -225,7 +225,7 @@ class Emailer extends Component
 
         $this->getEmailServiceClient()->email($properties);
     }
-    
+
     /**
      * @return EmailServiceClient
      */
@@ -241,19 +241,8 @@ class Emailer extends Component
                 ]
             );
         }
-        
-        return $this->emailServiceClient;
-    }
 
-    /**
-     * Ping the /site/status URL, and throw an exception if there's a problem.
-     *
-     * @return string "OK".
-     * @throws Exception
-     */
-    public function getSiteStatus()
-    {
-        return $this->getEmailServiceClient()->getSiteStatus();
+        return $this->emailServiceClient;
     }
 
     /**
@@ -337,9 +326,9 @@ class Emailer extends Component
         $this->hrNotificationsEmail = $this->hrNotificationsEmail ?? '';
 
         $this->assertConfigIsValid();
-        
+
         $this->verifyOtherDataForEmailIsValid();
-        
+
         parent::init();
     }
 
@@ -423,7 +412,7 @@ class Emailer extends Component
 
         return MySqlDateTime::dateIsRecent($latestEmail->sent_utc, $this->emailRepeatDelayDays);
     }
-    
+
     /**
      * Whether we should send an invite message to the given User.
      *
@@ -438,7 +427,7 @@ class Emailer extends Component
             && $isNewUser
             && !$user->hasReceivedMessage(EmailLog::MESSAGE_TYPE_INVITE);
     }
-    
+
     /**
      * Whether we should send a password-changed message to the given User.
      *
@@ -455,7 +444,7 @@ class Emailer extends Component
             && array_key_exists('current_password_id', $changedAttributes)
             && !is_null($changedAttributes['current_password_id']);
     }
-    
+
     /**
      * Whether we should send a welcome message to the given User.
      *
@@ -608,7 +597,7 @@ class Emailer extends Component
             && $mfa->verified
             && $user->getVerifiedMfaOptionsCount() < 1;
     }
-    
+
     /**
      * Verify that the other data provided for use in emails is acceptable. If
      * any data is missing, log that error but let the email be sent anyway.
