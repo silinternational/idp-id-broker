@@ -17,7 +17,7 @@ depsfortests:
 	docker-compose run --rm dynamorestart composer install
 
 depsshow:
-	docker-compose run --rm cli bash -c "composer show -D > versions.txt"
+	docker-compose run --rm cli bash -c 'composer show --format=json --no-dev --no-ansi --locked | jq ".locked[] | { \"name\": .name, \"version\": .version }" > dependencies.json'
 
 depsupdate:
 	docker-compose run --rm cli composer update
