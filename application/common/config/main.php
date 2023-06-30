@@ -9,7 +9,6 @@ use common\components\MfaBackendWebAuthn;
 use Sil\JsonLog\target\EmailServiceTarget;
 use Sil\JsonLog\target\JsonStreamTarget;
 use Sil\PhpEnv\Env;
-use Sil\PhpEnv\EnvVarNotFoundException;
 use yii\db\Connection;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Json;
@@ -25,25 +24,10 @@ $notificationEmail = Env::get('NOTIFICATION_EMAIL');
 
 $mfaNumBackupCodes = Env::get('MFA_NUM_BACKUPCODES', 10);
 
-$envValidator = function($name, $key, $config) {
-    if (! isset($config[$key])) {
-        $message = "The $name environment variable is required";
-        throw new EnvVarNotFoundException($message);
-    }
-};
-
 $mfaTotpConfig = Env::getArrayFromPrefix('MFA_TOTP_');
 $mfaTotpConfig['issuer'] = $idpDisplayName;
 
-$envValidator('MFA_TOTP_apiBaseUrl', 'apiBaseUrl', $mfaTotpConfig);
-$envValidator('MFA_TOTP_apiKey', 'apiKey', $mfaTotpConfig);
-$envValidator('MFA_TOTP_apiSecret', 'apiSecret', $mfaTotpConfig);
-
 $mfaWebAuthnConfig = Env::getArrayFromPrefix('MFA_WEBAUTHN_');
-
-$envValidator('MFA_WEBAUTHN_apiBaseUrl', 'apiBaseUrl', $mfaWebAuthnConfig);
-$envValidator('MFA_WEBAUTHN_apiKey', 'apiKey', $mfaWebAuthnConfig);
-$envValidator('MFA_WEBAUTHN_apiSecret', 'apiSecret', $mfaWebAuthnConfig);
 
 $emailerClass = Env::get('EMAILER_CLASS', Emailer::class);
 
