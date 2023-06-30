@@ -40,6 +40,14 @@ class MfaApiClient
 
     public function __construct(string $apiBaseUrl, $apiKey, $apiSecret)
     {
+        if (empty($apiKey)) {
+            throw new \InvalidArgumentException('Missing MFA configuration for api key');
+        }
+
+        if (empty($apiSecret)) {
+            throw new \InvalidArgumentException('Missing MFA configuration for api secret');
+        }
+
         if (substr($apiBaseUrl, -1) !== '/') {
             throw new \InvalidArgumentException('The MFA apiBaseUrl must end with a slash (/).');
         }

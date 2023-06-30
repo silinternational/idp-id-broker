@@ -26,14 +26,14 @@ class SiteController extends BaseRestController
     {
         /* @var $webApp yii\web\Application */
         $webApp = Yii::$app;
-        
+
         try {
             $dbComponent = $webApp->get('db');
         } catch (Exception $e) {
             Yii::error('DB config problem: ' . $e->getMessage());
             throw new Http500('DB config problem.');
         }
-        
+
         try {
             $dbComponent->open();
         } catch (Exception $e) {
@@ -51,6 +51,20 @@ class SiteController extends BaseRestController
 
         // Checking the email service status causes too many error emails to be sent out to the dev team
         // $this->checkEmailServiceStatus($emailer);
+
+        try {
+            $webApp->get('totp');
+        } catch (Exception $e) {
+            Yii::error('TOTP config problem: ' . $e->getMessage());
+            throw new Http500('TOTP config problem.');
+        }
+
+        try {
+            $webApp->get('webauthn');
+        } catch (Exception $e) {
+            Yii::error('Webauthn config problem: ' . $e->getMessage());
+            throw new Http500('Webauthn config problem.');
+        }
 
         Yii::$app->response->statusCode = 204;
     }
