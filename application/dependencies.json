@@ -16,7 +16,7 @@
 }
 {
   "name": "doctrine/deprecations",
-  "version": "v1.0.0"
+  "version": "v1.1.1"
 }
 {
   "name": "doctrine/lexer",
@@ -24,7 +24,7 @@
 }
 {
   "name": "egulias/email-validator",
-  "version": "3.2.5"
+  "version": "3.2.6"
 }
 {
   "name": "ezyang/htmlpurifier",
@@ -36,15 +36,15 @@
 }
 {
   "name": "firebase/php-jwt",
-  "version": "v6.4.0"
+  "version": "v6.8.0"
 }
 {
   "name": "google/apiclient",
-  "version": "v2.13.2"
+  "version": "v2.14.0"
 }
 {
   "name": "google/apiclient-services",
-  "version": "v0.296.0"
+  "version": "v0.306.0"
 }
 {
   "name": "google/auth",
@@ -64,7 +64,7 @@
 }
 {
   "name": "guzzlehttp/promises",
-  "version": "1.5.2"
+  "version": "1.5.3"
 }
 {
   "name": "guzzlehttp/psr7",
@@ -88,7 +88,7 @@
 }
 {
   "name": "phpseclib/phpseclib",
-  "version": "3.0.19"
+  "version": "3.0.20"
 }
 {
   "name": "phpspec/php-diff",
@@ -116,11 +116,11 @@
 }
 {
   "name": "roave/security-advisories",
-  "version": "dev-master 20f03d2"
+  "version": "dev-master 9920192"
 }
 {
   "name": "silinternational/email-service-php-client",
-  "version": "2.4.0"
+  "version": "2.4.1"
 }
 {
   "name": "silinternational/php-array-dot-notation",
@@ -176,7 +176,7 @@
 }
 {
   "name": "yiisoft/yii2",
-  "version": "2.0.47"
+  "version": "2.0.48.1"
 }
 {
   "name": "yiisoft/yii2-composer",
@@ -184,7 +184,7 @@
 }
 {
   "name": "yiisoft/yii2-gii",
-  "version": "2.2.5"
+  "version": "2.2.6"
 }
 {
   "name": "yiisoft/yii2-swiftmailer",
