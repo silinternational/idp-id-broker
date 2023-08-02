@@ -53,9 +53,6 @@ services:
             MYSQL_DATABASE: appfortests
             MYSQL_USER: appfortests
             MYSQL_PASSWORD: appfortests
-            MFA_TOTP_apiBaseUrl: notinuse/
-            MFA_TOTP_apiKey: 10345678-1234-1234-1234-123456789012
-            MFA_TOTP_apiSecret: 11345678-1234-1234-1234-12345678
             MFA_WEBAUTHN_apiBaseUrl: mfaapi:8080/
             MFA_WEBAUTHN_apiKey: 10345678-1234-1234-1234-123456789012
             MFA_WEBAUTHN_apiSecret: 11345678-1234-1234-1234-12345678
@@ -168,9 +165,6 @@ services:
             EMAIL_SERVICE_assertValidIp: "false"
             EMAIL_SERVICE_baseUrl: dummy
             EMAIL_SIGNATURE: Dummy Signature for Test
-            MFA_TOTP_apiBaseUrl: notinuse:8080/
-            MFA_TOTP_apiKey: 10345678-1234-1234-1234-123456789012
-            MFA_TOTP_apiSecret: 11345678-1234-1234-1234-12345678
             MFA_WEBAUTHN_apiBaseUrl: mfaapi:8080/
             MFA_WEBAUTHN_apiKey: 10345678-1234-1234-1234-123456789012
             MFA_WEBAUTHN_apiSecret: 11345678-1234-1234-1234-12345678
