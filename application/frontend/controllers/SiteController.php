@@ -66,39 +66,6 @@ class SiteController extends BaseRestController
         Yii::$app->response->statusCode = 204;
     }
 
-    private function checkEmailServiceStatus($emailer)
-    {
-        try {
-            $emailer->getSiteStatus();
-        } catch (GuzzleCommandException $e) {
-            $response = $e->getResponse();
-            if ($response) {
-                $responseBody = $response->getBody();
-                if ($responseBody) {
-                    $responseContents = $responseBody->getContents();
-                }
-                $responseHeaders = $response->getHeaders();
-            }
-            Yii::error([
-                'event' => 'email service guzzle command error',
-                'errorCode' => $e->getCode(),
-                'errorMessage' => $e->getMessage(),
-                'responseHeaders' => $responseHeaders ?? null,
-                'responseContents' => $responseContents ?? null,
-                'stackTrace' => $e->getTrace(),
-            ]);
-            throw new Http500('Email Service problem.', $e->getCode());
-        } catch (Exception $e) {
-            Yii::error([
-                'event' => 'email service status error',
-                'exceptionClass' => get_class($e),
-                'errorCode' => $e->getCode(),
-                'errorMessage' => $e->getMessage(),
-            ]);
-            throw new Http500('Email Service problem.', $e->getCode());
-        }
-    }
-
     public function actionUndefinedRequest()
     {
         $method = Yii::$app->request->method;
