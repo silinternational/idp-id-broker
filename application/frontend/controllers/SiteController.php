@@ -26,14 +26,14 @@ class SiteController extends BaseRestController
     {
         /* @var $webApp yii\web\Application */
         $webApp = Yii::$app;
-        
+
         try {
             $dbComponent = $webApp->get('db');
         } catch (Exception $e) {
             Yii::error('DB config problem: ' . $e->getMessage());
             throw new Http500('DB config problem.');
         }
-        
+
         try {
             $dbComponent->open();
         } catch (Exception $e) {
@@ -49,43 +49,21 @@ class SiteController extends BaseRestController
             throw new Http500('Emailer config problem.');
         }
 
-        // Checking the email service status causes too many error emails to be sent out to the dev team
-        // $this->checkEmailServiceStatus($emailer);
+        try {
+            $webApp->get('totp');
+        } catch (Exception $e) {
+            Yii::error('TOTP config problem: ' . $e->getMessage());
+            throw new Http500('TOTP config problem.');
+        }
+
+        try {
+            $webApp->get('webauthn');
+        } catch (Exception $e) {
+            Yii::error('Webauthn config problem: ' . $e->getMessage());
+            throw new Http500('Webauthn config problem.');
+        }
 
         Yii::$app->response->statusCode = 204;
-    }
-
-    private function checkEmailServiceStatus($emailer)
-    {
-        try {
-            $emailer->getSiteStatus();
-        } catch (GuzzleCommandException $e) {
-            $response = $e->getResponse();
-            if ($response) {
-                $responseBody = $response->getBody();
-                if ($responseBody) {
-                    $responseContents = $responseBody->getContents();
-                }
-                $responseHeaders = $response->getHeaders();
-            }
-            Yii::error([
-                'event' => 'email service guzzle command error',
-                'errorCode' => $e->getCode(),
-                'errorMessage' => $e->getMessage(),
-                'responseHeaders' => $responseHeaders ?? null,
-                'responseContents' => $responseContents ?? null,
-                'stackTrace' => $e->getTrace(),
-            ]);
-            throw new Http500('Email Service problem.', $e->getCode());
-        } catch (Exception $e) {
-            Yii::error([
-                'event' => 'email service status error',
-                'exceptionClass' => get_class($e),
-                'errorCode' => $e->getCode(),
-                'errorMessage' => $e->getMessage(),
-            ]);
-            throw new Http500('Email Service problem.', $e->getCode());
-        }
     }
 
     public function actionUndefinedRequest()
