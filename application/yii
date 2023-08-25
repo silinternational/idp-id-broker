@@ -8,8 +8,12 @@
  * @license http://www.yiiframework.com/license/
  */
 
-defined('YII_DEBUG') or define('YII_DEBUG', true);
-defined('YII_ENV') or define('YII_ENV', 'dev');
+use Sil\PhpEnv\Env;
+
+require(__DIR__ . '/vendor/autoload.php');
+
+define('YII_ENV', Env::get('APP_ENV', 'prod'));
+define('YII_DEBUG', YII_ENV === 'dev' || YII_ENV === 'test');
 
 // fcgi doesn't have STDIN and STDOUT defined by default
 defined('STDIN') or define('STDIN', fopen('php://stdin', 'r'));
@@ -26,7 +30,7 @@ try {
     );
 } catch (Sil\PhpEnv\EnvVarNotFoundException $e) {
     fwrite(STDERR, $e->getMessage() . PHP_EOL);
-    
+
     exit(1);
 }
 
