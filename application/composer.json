@@ -25,7 +25,8 @@
     "br33f/php-ga4-mp": "^0.1.0",
     "yiisoft/yii2-swiftmailer": "^2.0",
     "ramsey/uuid": "^3.6",
-    "guzzlehttp/guzzle": "^6.2"
+    "guzzlehttp/guzzle": "^6.2",
+    "notamedia/yii2-sentry": "^1.7"
   },
   "require-dev": {
     "behat/behat": "^3.3",
@@ -36,7 +37,8 @@
   "config": {
     "process-timeout": 1800,
     "allow-plugins": {
-      "yiisoft/yii2-composer": true
+      "yiisoft/yii2-composer": true,
+      "php-http/discovery": false
     }
   },
   "autoload": {
