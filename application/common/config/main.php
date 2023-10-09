@@ -1,5 +1,7 @@
 <?php
 
+use notamedia\sentry\SentryTarget;
+use Sentry\Event;
 use common\components\Emailer;
 use common\components\MfaBackendBackupcode;
 use common\components\MfaBackendManager;
@@ -188,6 +190,24 @@ return [
                     'validIpRanges' => $emailServiceConfig['validIpRanges'],
                     'prefix' => $logPrefix,
                     'exportInterval' => 1,
+                ],
+                [
+                    'class' => SentryTarget::class,
+                    'enabled' => true,
+                    'dsn' => Env::get('SENTRY_DSN'),
+                    'levels' => ['error'],
+                    'context' => true,
+                    // Additional options for `Sentry\init`
+                    // https://docs.sentry.io/platforms/php/configuration/options
+                    'clientOptions' => [
+                        'attach_stacktrace' => false, // stack trace identifies the logger call stack, not helpful
+                        'environment' => YII_ENV,
+                        'release' => 'idp-id-broker@6.6.0-pre',
+                        'before_send' => function (Event $event) use ($idpName): ?Event {
+                            $event->setExtra(['idp' => $idpName]);
+                            return $event;
+                        },
+                    ],
                 ],
             ],
         ],
