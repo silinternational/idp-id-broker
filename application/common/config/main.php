@@ -1,13 +1,12 @@
 <?php
 
-use notamedia\sentry\SentryTarget;
-use Sentry\Event;
 use common\components\Emailer;
 use common\components\MfaBackendBackupcode;
 use common\components\MfaBackendManager;
 use common\components\MfaBackendTotp;
-use common\components\MfaBackendU2f;
 use common\components\MfaBackendWebAuthn;
+use notamedia\sentry\SentryTarget;
+use Sentry\Event;
 use Sil\JsonLog\target\EmailServiceTarget;
 use Sil\JsonLog\target\JsonStreamTarget;
 use Sil\PhpEnv\Env;
