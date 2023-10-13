@@ -156,9 +156,18 @@ class MfaBackendWebAuthn extends Component implements MfaBackendInterface
         if ($verifyType != Mfa::VERIFY_REGISTRATION) {
             $webauthnCount = $mfa->getMfaWebauthns()->count();
             if ($webauthnCount < 1) {
-                throw new NotFoundHttpException("No MFA Webauthn record found for MFA ID: " . $mfa->id, 1659637860);
+                throw new NotFoundHttpException("No MfaWebauthn records found for Mfa ID: " . $mfa->id, 1659637860);
             }
-            return $this->client->webauthnValidateAuthentication($headers, $value);
+
+            $response = $this->client->webauthnValidateAuthentication($headers, $value);
+            $webauthnId = $response['credentialId'];
+
+            $mfaWebauthn = MfaWebauthn::findOne(['id' => $webauthnId]);
+            if ($mfaWebauthn == null) {
+                throw new NotFoundHttpException("No MfaWebauthn record with ID: " . $webauthnId, 1697229804);
+            }
+            $mfaWebauthn->setLastUsed();
+            return true;
         }
 
         // Assume a new webauthn was requested and finish its registration process

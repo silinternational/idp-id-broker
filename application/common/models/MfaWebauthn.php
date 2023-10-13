@@ -92,4 +92,17 @@ class MfaWebauthn extends MfaWebauthnBase
 
         return $webauthn;
     }
+
+    public function setLastUsed()
+    {
+        $this->last_used_utc = MySqlDateTime::now();
+        if (! $this->save(true, ['last_used_utc'])) {
+            \Yii::error([
+                'action' => 'update webauthn last_used_utc',
+                'status' => 'error',
+                'mfa_id' => $this->id,
+                'error' => $this->getFirstErrors(),
+            ]);
+        }
+    }
 }
