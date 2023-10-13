@@ -49,7 +49,7 @@ class MfaContext extends \FeatureContext
         ]);
 
         Assert::true($this->mfa->save(), 'Failed to add that MFA record to the database.');
-
+        
         if ($mfaType === 'backupcode') {
             $this->backupCodes = MfaBackupcode::createBackupCodes($this->mfa->id, 10);
         } elseif ($mfaType === 'manager') {
@@ -260,6 +260,14 @@ class MfaContext extends \FeatureContext
     {
         $this->setRequestBody('label', $label);
         $this->iRequestTheResourceBe('/mfa/' . $this->mfa->id . '/verify/registration', 'created');
+    }
+
+    /**
+     * @When I request to verify the webauthn Mfa
+     */
+    public function iRequestToVerifyTheWebauthnMfa()
+    {
+        $this->iRequestTheResourceBe('/mfa/' . $this->mfa->id . '/verify', 'created');
     }
 
     /**

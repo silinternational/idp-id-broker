@@ -158,9 +158,6 @@ class MfaBackendWebAuthn extends Component implements MfaBackendInterface
             if ($webauthnCount < 1) {
                 throw new NotFoundHttpException("No MFA Webauthn record found for MFA ID: " . $mfa->id, 1659637860);
             }
-
-            $mfa->setLastUsed();
-
             return $this->client->webauthnValidateAuthentication($headers, $value);
         }
 
