@@ -169,9 +169,10 @@ class MfaBackendWebAuthn extends Component implements MfaBackendInterface
                     'status' => 'error',
                     'error' => 'No MfaWebauthn record with key_handle_hash: ' . $khh,
                 ]);
+            } else {
+                $mfaWebauthn->setLastUsed();
             }
 
-            $mfaWebauthn->setLastUsed();
             return true;
         }
 
