@@ -164,10 +164,15 @@ class MfaBackendWebAuthn extends Component implements MfaBackendInterface
 
             $mfaWebauthn = MfaWebauthn::findOne(['key_handle_hash' => $khh]);
             if ($mfaWebauthn == null) {
-                throw new NotFoundHttpException("No MfaWebauthn record with key_handle_hash: " . $khh, 1697229804);
+                \Yii::error([
+                    'action' => 'update MfaWebauth last_used_utc',
+                    'status' => 'error',
+                    'error' => 'No MfaWebauthn record with key_handle_hash: ' . $khh,
+                ]);
+            } else {
+                $mfaWebauthn->setLastUsed();
             }
 
-            $mfaWebauthn->setLastUsed();
             return true;
         }
 
