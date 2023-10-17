@@ -133,13 +133,13 @@ class MfaApiClient
     /**
      * @param array $additionalHeaders
      * @param array $signResultJson
-     * @return bool
+     * @return array
      * @throws GuzzleException
      */
-    public function webauthnValidateAuthentication(array $additionalHeaders, array $signResultJson): bool
+    public function webauthnValidateAuthentication(array $additionalHeaders, array $signResultJson): array
     {
-        $this->callApi('webauthn/login', 'PUT', $signResultJson, $additionalHeaders);
-        return true;
+        $response = $this->callApi('webauthn/login', 'PUT', $signResultJson, $additionalHeaders);
+        return Json::decode($response->getBody()->getContents());
     }
 
     /**
