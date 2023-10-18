@@ -162,11 +162,15 @@ class MfaBackendWebAuthn extends Component implements MfaBackendInterface
             $response = $this->client->webauthnValidateAuthentication($headers, $value);
             $khh = $response['key_handle_hash'];
 
-            $mfaWebauthn = MfaWebauthn::findOne(['key_handle_hash' => $khh]);
+            $mfaWebauthn = MfaWebauthn::find()->
+                where(['key_handle_hash' => $khh])->
+                orWhere(['key_handle_hash' => 'u2f', 'mfa_id' => $mfaId])->one();
+
             if ($mfaWebauthn == null) {
                 \Yii::error([
                     'action' => 'update MfaWebauth last_used_utc',
                     'status' => 'error',
+                    'mfa_id' => $mfaId,
                     'error' => 'No MfaWebauthn record with key_handle_hash: ' . $khh,
                 ]);
             } else {
