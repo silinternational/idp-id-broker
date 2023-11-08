@@ -298,6 +298,15 @@ class User extends UserBase
             $currentPassword = $this->currentPassword ?? new Password();
             if (! password_verify($this->password, $currentPassword->hash)) {
                 $this->addError($attributeName, 'Incorrect password.');
+            } else {
+                // check the current hash cost and rehash if necessary
+                if (password_needs_rehash(
+                    $currentPassword->hash,
+                    Password::HASH_ALGORITHM,
+                    ['cost' => Password::HASH_COST]
+                )) {
+                    $this->savePassword();
+                }
             }
         };
     }

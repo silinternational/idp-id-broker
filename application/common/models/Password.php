@@ -19,7 +19,11 @@ use yii\web\ConflictHttpException;
  */
 class Password extends PasswordBase
 {
-    const SCENARIO_UPDATE_METADATA = 'update_metadata';
+    public const SCENARIO_UPDATE_METADATA = 'update_metadata';
+
+    public const HASH_ALGORITHM = PASSWORD_BCRYPT;
+
+    public const HASH_COST = 13;
 
     public $password;
 
@@ -46,7 +50,7 @@ class Password extends PasswordBase
             ],
             [
                 'hash', 'default', 'value' => function () {
-                    return password_hash($this->password, PASSWORD_DEFAULT);
+                    return self::hashPassword($this->password);
                 },
             ],
             [
@@ -279,5 +283,10 @@ class Password extends PasswordBase
                 'message' => 'pwned password detected and processed'
             ]);
         }
+    }
+
+    public static function hashPassword(string $password): string
+    {
+        return password_hash($password, self::HASH_ALGORITHM, ["cost" => self::HASH_COST]);
     }
 }
