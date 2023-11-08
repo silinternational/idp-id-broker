@@ -55,7 +55,7 @@ class Sheets extends Component
         $this->delegatedAdmin = \Yii::$app->params['google']['delegatedAdmin'];
         $this->spreadsheetId = \Yii::$app->params['google']['spreadsheetId'];
 
-        if (! empty($this->jsonAuthFilePath)) {
+        if (!empty($this->jsonAuthFilePath)) {
             if (file_exists($this->jsonAuthFilePath)) {
                 $this->jsonAuthString = \file_get_contents($this->jsonAuthFilePath);
             } else {
@@ -84,14 +84,14 @@ class Sheets extends Component
 
     protected function getGoogleClient()
     {
-        if (! $this->service instanceof \Google_Service_Sheets) {
+        if (!$this->service instanceof \Google_Service_Sheets) {
             $jsonCreds = Json::decode($this->jsonAuthString);
             $googleClient = new \Google_Client();
             $googleClient->setApplicationName($this->applicationName);
             $googleClient->setScopes($this->scopes);
             $googleClient->setAuthConfig($jsonCreds);
             $googleClient->setAccessType('offline');
-            if (! empty($this->delegatedAdmin)) {
+            if (!empty($this->delegatedAdmin)) {
                 $googleClient->setSubject($this->delegatedAdmin);
             }
             $this->service = new \Google_Service_Sheets($googleClient);

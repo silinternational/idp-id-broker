@@ -225,7 +225,7 @@ class Password extends PasswordBase
 
         $this->scenario = self::SCENARIO_UPDATE_METADATA;
 
-        if (! $this->save()) {
+        if (!$this->save()) {
             \Yii::error('Failed to save grace period. ' . join(', ', $this->getFirstErrors()));
         }
     }
@@ -271,7 +271,7 @@ class Password extends PasswordBase
         $this->hibp_is_pwned = 'yes';
         $this->expires_on = MySqlDateTime::relativeTime('+5 minutes');
         $this->grace_period_ends_on = MySqlDateTime::relativeTime(\Yii::$app->params['hibpGracePeriod']);
-        if (! $this->save()) {
+        if (!$this->save()) {
             \Yii::error([
                 'action' => 'check and process hibp',
                 'employee_id' => $this->user->employee_id,

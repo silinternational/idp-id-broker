@@ -1,4 +1,5 @@
 <?php
+
 namespace common\models;
 
 use common\components\MfaBackendInterface;
@@ -17,15 +18,15 @@ use yii\web\TooManyRequestsHttpException;
  */
 class Mfa extends MfaBase
 {
-    const TYPE_TOTP = 'totp';
-    const TYPE_WEBAUTHN = 'webauthn';
-    const TYPE_BACKUPCODE = 'backupcode';
-    const TYPE_MANAGER = 'manager';
+    public const TYPE_TOTP = 'totp';
+    public const TYPE_WEBAUTHN = 'webauthn';
+    public const TYPE_BACKUPCODE = 'backupcode';
+    public const TYPE_MANAGER = 'manager';
 
-    const EVENT_TYPE_VERIFY = 'verify_mfa';
-    const EVENT_TYPE_DELETE = 'delete_mfa';
+    public const EVENT_TYPE_VERIFY = 'verify_mfa';
+    public const EVENT_TYPE_DELETE = 'delete_mfa';
 
-    const VERIFY_REGISTRATION = 'registration';
+    public const VERIFY_REGISTRATION = 'registration';
 
     /**
      * Holds additional data about method, such as initialized authentication data
@@ -129,7 +130,7 @@ class Mfa extends MfaBase
                 $this
             );
 
-            if (! \Yii::$app->params['mfaAllowDisable']
+            if (!\Yii::$app->params['mfaAllowDisable']
                 && $this->user->require_mfa === 'no'
             ) {
                 $this->user->require_mfa = 'yes';
@@ -223,7 +224,7 @@ class Mfa extends MfaBase
 
         return $authInit;
     }
-    
+
     protected function hasTooManyRecentFailures(): bool
     {
         $numRecentFailures = $this->countRecentFailures();
@@ -258,7 +259,7 @@ class Mfa extends MfaBase
         $backend = self::getBackendForType($this->type);
         if ($backend->verify($this->id, $value, $rpOrigin, $verifyType, $label) === true) {
             $this->last_used_utc = MySqlDateTime::now();
-            if (! $this->save()) {
+            if (!$this->save()) {
                 \Yii::error([
                     'action' => 'update last_used_utc on mfa after verification',
                     'status' => 'error',
@@ -308,7 +309,7 @@ class Mfa extends MfaBase
         /*
          * Make sure $type is valid
          */
-        if (! self::isValidType($type)) {
+        if (!self::isValidType($type)) {
             throw new BadRequestHttpException('Invalid MFA type');
         }
 
@@ -341,7 +342,7 @@ class Mfa extends MfaBase
             /*
              * Save $mfa before calling backend->regInit because type backupcode needs mfa record to exist first
              */
-            if (! $mfa->save()) {
+            if (!$mfa->save()) {
                 \Yii::error([
                     'action' => 'create mfa',
                     'type' => $type,
@@ -360,7 +361,7 @@ class Mfa extends MfaBase
         if (isset($results['uuid'])) {
             $mfa->external_uuid = $results['uuid'];
             unset($results['uuid']);
-            if (! $mfa->save()) {
+            if (!$mfa->save()) {
                 \Yii::error([
                     'action' => 'update mfa',
                     'type' => $type,
@@ -411,7 +412,7 @@ class Mfa extends MfaBase
             }
         }
     }
-    
+
     /**
      * Get the number of "recent" failed attempts to verify a value for this
      * MFA record.
@@ -423,12 +424,12 @@ class Mfa extends MfaBase
     public function countRecentFailures()
     {
         $cutoffForRecent = MySqlDateTime::relativeTime('-5 minutes');
-        
+
         return $this->getMfaFailedAttempts()->where(
             ['>', 'at_utc', $cutoffForRecent]
         )->count();
     }
-    
+
     /**
      * Record a failed verification attempt for this MFA. If unable to do so for
      * some reason, fail loudly (because we need to know about and fix this).
@@ -452,7 +453,7 @@ class Mfa extends MfaBase
                 1510083458
             );
         }
-        
+
         if ($this->hasTooManyRecentFailures()) {
             \Yii::warning([
                 'action' => 'MFA rate limit triggered',
@@ -461,7 +462,7 @@ class Mfa extends MfaBase
                 'status' => 'warning',
                 'username' => $this->user->username,
             ]);
-            
+
             /* @var \common\components\Emailer $emailer */
             $emailer = \Yii::$app->emailer;
             $emailer->sendMessageTo(
@@ -512,7 +513,7 @@ class Mfa extends MfaBase
      */
     protected static function deleteOldRecords(string $age, array $criteria): void
     {
-        if (! preg_match('/[\+\-].*/', $age)) {
+        if (!preg_match('/[\+\-].*/', $age)) {
             $age = '-' . $age;
         }
 
@@ -618,7 +619,7 @@ class Mfa extends MfaBase
     {
         if ($this->verified == 0) {
             $this->verified = 1;
-            if (! $this->save()) {
+            if (!$this->save()) {
                 throw new \Exception("Error saving MFA record", 1547066350);
             }
         }
@@ -631,7 +632,7 @@ class Mfa extends MfaBase
      */
     public function setLabel($label)
     {
-        if (is_string($label) && ! empty($label)) {
+        if (is_string($label) && !empty($label)) {
             $this->label = $label;
         } else {
             $this->label = $this->getReadableType();

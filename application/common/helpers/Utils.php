@@ -1,4 +1,5 @@
 <?php
+
 namespace common\helpers;
 
 use Br33f\Ga4\MeasurementProtocol\Dto\Request\BaseRequest;
@@ -10,8 +11,8 @@ use yii\web\BadRequestHttpException;
 
 class Utils
 {
-    const FRIENDLY_DT_FORMAT = 'l F j, Y g:iA T';
-    const DT_ISO8601 = 'Y-m-d\TH:i:s\Z';
+    public const FRIENDLY_DT_FORMAT = 'l F j, Y g:iA T';
+    public const DT_ISO8601 = 'Y-m-d\TH:i:s\Z';
 
     /**
      * @param int $length
@@ -82,7 +83,7 @@ class Utils
         }
 
         $validator = new EmailValidator();
-        if (! $validator->validate($email)) {
+        if (!$validator->validate($email)) {
             \Yii::warning([
                 'action' => 'mask email',
                 'status' => 'error',

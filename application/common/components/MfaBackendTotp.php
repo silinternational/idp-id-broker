@@ -1,4 +1,5 @@
 <?php
+
 namespace common\components;
 
 use common\models\Mfa;
@@ -93,7 +94,7 @@ class MfaBackendTotp extends Component implements MfaBackendInterface
         if ($this->client->validateTotp($mfa->external_uuid, $value)) {
             if ($mfa->verified !== 1) {
                 $mfa->verified = 1;
-                if (! $mfa->save()) {
+                if (!$mfa->save()) {
                     throw new ServerErrorHttpException();
                 }
             }

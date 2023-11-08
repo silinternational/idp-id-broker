@@ -1,4 +1,5 @@
 <?php
+
 namespace Sil\SilIdBroker\Behat\Context;
 
 use common\models\EmailLog;
@@ -33,7 +34,7 @@ class AnalyticsContext extends YiiContext
     /** @var  string */
     protected $noMethodButPersonal;
 
-    protected function createNewUser($makeActive=true, $requireMfa=false)
+    protected function createNewUser($makeActive = true, $requireMfa = false)
     {
         $employeeId = uniqid();
         $user = new User([
@@ -48,7 +49,7 @@ class AnalyticsContext extends YiiContext
 
 
         $user->scenario = User::SCENARIO_NEW_USER;
-        if (! $user->save()) {
+        if (!$user->save()) {
             throw new \Exception(
                 \json_encode($user->getFirstErrors(), JSON_PRETTY_PRINT)
             );
@@ -57,7 +58,7 @@ class AnalyticsContext extends YiiContext
         return $user;
     }
 
-    protected function createMfa($user, $type, $alreadyVerified=true)
+    protected function createMfa($user, $type, $alreadyVerified = true)
     {
         $mfa = new Mfa();
         $mfa->user_id = $user->id;

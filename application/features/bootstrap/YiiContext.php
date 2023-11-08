@@ -14,18 +14,18 @@ class YiiContext implements Context
 {
     /** @var FakeEmailer */
     protected $fakeEmailer;
-    
+
     /** @var FakeLogTarget */
     protected $fakeLogTarget;
-    
+
     private static $application;
-    
+
     public function __construct()
     {
         $yiiCommonConfig = require __DIR__ . '/../../common/config/main.php';
         $yiiEmailerConfig = $yiiCommonConfig['components']['emailer'];
         unset($yiiEmailerConfig['class']);
-        
+
         $this->fakeEmailer = new FakeEmailer(ArrayHelper::merge(
             $yiiEmailerConfig,
             [
@@ -42,10 +42,10 @@ class YiiContext implements Context
         $this->fakeEmailer->minimumBackupCodesBeforeNag = 4;
 
         Yii::$app->set('emailer', $this->fakeEmailer);
-        
+
         $this->addFakeLogTarget();
     }
-    
+
     protected function addFakeLogTarget()
     {
         $this->fakeLogTarget = new FakeLogTarget([

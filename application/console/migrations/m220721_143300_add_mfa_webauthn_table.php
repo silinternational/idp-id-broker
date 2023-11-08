@@ -8,7 +8,6 @@ use common\models\Mfa;
 */
 class m220721_143300_add_mfa_webauthn_table extends Migration
 {
-
     /**
      * {@inheritdoc}
      */

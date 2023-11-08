@@ -24,11 +24,11 @@ use yii\helpers\ArrayHelper;
 
 class User extends UserBase
 {
-    const SCENARIO_NEW_USER        = 'new_user';
-    const SCENARIO_UPDATE_USER     = 'update_user';
-    const SCENARIO_UPDATE_PASSWORD = 'update_password';
-    const SCENARIO_AUTHENTICATE    = 'authenticate';
-    const SCENARIO_INVITE          = 'invite';
+    public const SCENARIO_NEW_USER        = 'new_user';
+    public const SCENARIO_UPDATE_USER     = 'update_user';
+    public const SCENARIO_UPDATE_PASSWORD = 'update_password';
+    public const SCENARIO_AUTHENTICATE    = 'authenticate';
+    public const SCENARIO_INVITE          = 'invite';
 
     /** @var string */
     public $password;
@@ -55,7 +55,7 @@ class User extends UserBase
 
     public function beforeDelete()
     {
-        if (! parent::beforeDelete()) {
+        if (!parent::beforeDelete()) {
             return false;
         }
 
@@ -65,7 +65,7 @@ class User extends UserBase
          */
         $this->current_password_id = null;
         $this->active = 'no';
-        if (! $this->save(false, ['current_password_id', 'active'])) {
+        if (!$this->save(false, ['current_password_id', 'active'])) {
             \Yii::error([
                 'action' => 'unset current_password_id before deleting user',
                 'status' => 'error',
@@ -80,7 +80,7 @@ class User extends UserBase
         /* @var $passwordsOfUser Password[] */
         $passwordsOfUser = Password::findAll(['user_id' => $this->id]);
         foreach ($passwordsOfUser as $password) {
-            if (! $password->delete()) {
+            if (!$password->delete()) {
                 \Yii::error([
                     'action' => 'delete password record before deleting user',
                     'status' => 'error',
@@ -93,7 +93,7 @@ class User extends UserBase
         }
 
         foreach ($this->mfas as $mfa) {
-            if (! $mfa->delete()) {
+            if (!$mfa->delete()) {
                 \Yii::error([
                     'action' => 'delete mfa record before deleting user',
                     'status' => 'error',
@@ -106,7 +106,7 @@ class User extends UserBase
         }
 
         foreach ($this->methods as $method) {
-            if (! $method->delete()) {
+            if (!$method->delete()) {
                 \Yii::error([
                     'action' => 'delete method record before deleting user',
                     'status' => 'error',
@@ -119,7 +119,7 @@ class User extends UserBase
         }
 
         foreach ($this->invites as $invite) {
-            if (! $invite->delete()) {
+            if (!$invite->delete()) {
                 \Yii::error([
                     'action' => 'delete invite record before deleting user',
                     'status' => 'error',
@@ -135,7 +135,7 @@ class User extends UserBase
          * Delete email logs last in case other deletions trigger new emails
          */
         foreach ($this->emailLogs as $emailLog) {
-            if (! $emailLog->delete()) {
+            if (!$emailLog->delete()) {
                 \Yii::error([
                     'action' => 'delete email log record before deleting user',
                     'status' => 'error',
@@ -296,7 +296,7 @@ class User extends UserBase
     {
         return function ($attributeName) {
             $currentPassword = $this->currentPassword ?? new Password();
-            if (! password_verify($this->password, $currentPassword->hash)) {
+            if (!password_verify($this->password, $currentPassword->hash)) {
                 $this->addError($attributeName, 'Incorrect password.');
             } else {
                 // check the current hash cost and rehash if necessary
@@ -306,7 +306,7 @@ class User extends UserBase
                     ['cost' => Password::HASH_COST]
                 )) {
                     $currentPassword->hash = Password::hashPassword($this->password);
-                    if (! $currentPassword->save()) {
+                    if (!$currentPassword->save()) {
                         Yii::error([
                             'user_id' => $this->id,
                             'action' => 'rehash_password',
@@ -327,7 +327,7 @@ class User extends UserBase
     public function shouldHibpBeChecked(): bool
     {
         return (\Yii::$app->params['hibpCheckOnLogin'] &&
-                ! empty($this->password) &&
+                !empty($this->password) &&
                 time() >= strtotime($this->currentPassword->check_hibp_after) &&
                 $this->currentPassword->hibp_is_pwned == 'no');
     }
@@ -339,11 +339,11 @@ class User extends UserBase
      */
     public function checkAndProcessHIBP(): void
     {
-        if (! $this->shouldHibpBeChecked()) {
+        if (!$this->shouldHibpBeChecked()) {
             return;
         }
 
-        if (! $this->isPasswordPwned()) {
+        if (!$this->isPasswordPwned()) {
             $this->currentPassword->extendHibpCheckAfter();
             return;
         }
@@ -568,7 +568,7 @@ class User extends UserBase
             },
             'hide',
             'member' => function (self $model) {
-                if (! empty($model->groups)) {
+                if (!empty($model->groups)) {
                     $member = explode(',', $model->groups);
                 }
                 $member[] = \Yii::$app->params['idpName'];
@@ -801,11 +801,11 @@ class User extends UserBase
         $transaction = ActiveRecord::getDb()->beginTransaction();
 
         try {
-            if (! $this->savePassword()) {
+            if (!$this->savePassword()) {
                 return false;
             }
 
-            if (! parent::save()) {
+            if (!parent::save()) {
                 $transaction->rollBack();
 
                 return false;
@@ -830,7 +830,7 @@ class User extends UserBase
         $password->user_id = $this->id;
         $password->password = $this->password;
 
-        if (! $password->save()) {
+        if (!$password->save()) {
             $this->addErrors($password->errors);
 
             return false;
@@ -1038,7 +1038,7 @@ class User extends UserBase
             return false;
         }
 
-        if (! empty($this->email)) {
+        if (!empty($this->email)) {
             $this->expires_on = null;
         }
 
@@ -1052,7 +1052,7 @@ class User extends UserBase
             $this->require_mfa = 'yes';
         }
 
-        if (! \Yii::$app->params['mfaAllowDisable']
+        if (!\Yii::$app->params['mfaAllowDisable']
             && $this->require_mfa == 'no'
             && $this->getOldAttribute('require_mfa') == 'yes'
         ) {
@@ -1100,7 +1100,7 @@ class User extends UserBase
         $password->user_id = $this->id;
         $password->password = $newPassword;
 
-        if (! $password->validate()) {
+        if (!$password->validate()) {
             $this->addErrors($password->getErrors());
             return false;
         }
