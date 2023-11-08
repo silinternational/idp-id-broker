@@ -21,6 +21,8 @@ class Password extends PasswordBase
 {
     public const SCENARIO_UPDATE_METADATA = 'update_metadata';
 
+    // hash algorithm passed to PHPs `password_hash` function -- if this is changed, the options
+    // parameter passed to any `password_` functions may need to be changed as well
     public const HASH_ALGORITHM = PASSWORD_BCRYPT;
 
     public const HASH_COST = 13;
