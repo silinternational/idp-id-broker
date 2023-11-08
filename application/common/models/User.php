@@ -305,7 +305,7 @@ class User extends UserBase
                     Password::HASH_ALGORITHM,
                     ['cost' => Password::HASH_COST]
                 )) {
-                    $currentPassword->hash = Password::hashPassword($this->password);
+                    $currentPassword->password = $this->password;
                     if (!$currentPassword->save()) {
                         Yii::error([
                             'user_id' => $this->id,
