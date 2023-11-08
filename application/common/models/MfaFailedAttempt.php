@@ -1,4 +1,5 @@
 <?php
+
 namespace common\models;
 
 use common\helpers\MySqlDateTime;
@@ -7,8 +8,8 @@ use yii\helpers\ArrayHelper;
 
 class MfaFailedAttempt extends MfaFailedAttemptBase
 {
-    const RECENT_FAILURE_LIMIT = 5;
-    
+    public const RECENT_FAILURE_LIMIT = 5;
+
     /**
      * @inheritdoc
      */
@@ -19,7 +20,7 @@ class MfaFailedAttempt extends MfaFailedAttemptBase
             'at_utc' => Yii::t('app', 'At (UTC)'),
         ]);
     }
-    
+
     /**
      * {@inheritdoc}
      */

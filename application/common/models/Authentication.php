@@ -1,4 +1,5 @@
 <?php
+
 namespace common\models;
 
 use common\components\Emailer;
@@ -105,7 +106,7 @@ class Authentication
 
             $user->checkAndProcessHIBP();
 
-            if (! $user->save()) {
+            if (!$user->save()) {
                 \Yii::error([
                     'action' => 'save last_login_utc and nag dates for user after authentication',
                     'status' => 'error',

@@ -1,4 +1,5 @@
 <?php
+
 namespace common\models;
 
 use common\helpers\MySqlDateTime;
@@ -77,7 +78,7 @@ class MfaWebauthn extends MfaWebauthnBase
         $webauthn->mfa_id = $mfa->id;
         $webauthn->label = $label;
         $webauthn->key_handle_hash = $keyHandleHash;
-        if (! $webauthn->save()) {
+        if (!$webauthn->save()) {
             \Yii::error([
                 'action' => 'mfa-create-webauthn',
                 'mfa-type' => $mfa->type,
@@ -96,7 +97,7 @@ class MfaWebauthn extends MfaWebauthnBase
     public function setLastUsed()
     {
         $this->last_used_utc = MySqlDateTime::now();
-        if (! $this->save(true, ['last_used_utc'])) {
+        if (!$this->save(true, ['last_used_utc'])) {
             \Yii::error([
                 'action' => 'update webauthn last_used_utc',
                 'status' => 'error',

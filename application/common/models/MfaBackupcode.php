@@ -1,4 +1,5 @@
 <?php
+
 namespace common\models;
 
 use common\helpers\MySqlDateTime;
@@ -98,7 +99,7 @@ class MfaBackupcode extends MfaBackupcodeBase
         $code = new MfaBackupcode();
         $code->mfa_id = $mfaId;
         $code->value = password_hash($value, PASSWORD_DEFAULT);
-        if (! $code->save()) {
+        if (!$code->save()) {
             \Yii::error([
                 'action' => 'mfa-insert-backup-code',
                 'mfa-type' => Mfa::TYPE_BACKUPCODE,

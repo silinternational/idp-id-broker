@@ -1,4 +1,5 @@
 <?php
+
 namespace console\controllers;
 
 use common\helpers\Utils;
@@ -8,7 +9,6 @@ use Br33f\Ga4\MeasurementProtocol\Dto\Event\BaseEvent;
 
 class GaController extends Controller
 {
-
     /**
      * Send test event to Google Analytics
      * Call it with this command
@@ -43,7 +43,8 @@ class GaController extends Controller
 
         $gaId = \Yii::$app->params['googleAnalytics']['measurementId'];
 
-        print_r(PHP_EOL .
+        print_r(
+            PHP_EOL .
             "Now go to the Google Analytics data stream $gaId, " . PHP_EOL .
             "to the reports:realtime page " .
             " and make sure the events are appearing in the " . PHP_EOL .

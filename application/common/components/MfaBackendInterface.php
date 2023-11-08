@@ -1,9 +1,9 @@
 <?php
+
 namespace common\components;
 
 interface MfaBackendInterface
 {
-
     /**
      * Initialize a new MFA backend registration
      * @param int $userId

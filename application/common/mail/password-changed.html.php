@@ -34,8 +34,8 @@ use yii\helpers\Html as yHtml;
     in sync with any other accounts you have.
 </p>
 <?php
-if (! $hasRecoveryMethods) {
-?>
+if (!$hasRecoveryMethods) {
+    ?>
 <p>
     It is highly recommended that you configure
     <strong>recovery methods</strong> for the potential event that you forget your password. You
@@ -55,7 +55,7 @@ if (! $hasRecoveryMethods) {
 <?php } ?>
 
 <?php
-if (! $isMfaEnabled) {
+if (!$isMfaEnabled) {
     ?>
 <p>
     <strong>Enable 2-Step Verification</strong> (please)
@@ -78,7 +78,7 @@ if (! $isMfaEnabled) {
         Printable Codes)</li>
     <li>Log out and log in again to see how it works and to have it remember your computer for 30 days.</li>
 </ol>
-    <?php if (! empty($helpCenterUrl)) { ?>
+    <?php if (!empty($helpCenterUrl)) { ?>
 <p>
     To learn more about 2-Step Verification go to <?=yHtml::a(yHtml::encode($helpCenterUrl), $helpCenterUrl)?>
 </p>

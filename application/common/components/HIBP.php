@@ -1,11 +1,12 @@
 <?php
+
 namespace common\components;
 
 use GuzzleHttp\Client;
 
 class HIBP
 {
-    const HIBPBaseURL = "https://api.pwnedpasswords.com/range/";
+    public const HIBPBaseURL = "https://api.pwnedpasswords.com/range/";
 
 
     /**

@@ -1,11 +1,12 @@
 <?php
+
 namespace common\helpers;
 
 class MySqlDateTime
 {
-    const MYSQL_DATETIME_FORMAT = 'Y-m-d H:i:s';
-    const MYSQL_DATE_FORMAT     = 'Y-m-d';
-    const HUMAN_DATE_FORMAT     = 'F jS, Y'; // November 27th, 2017
+    public const MYSQL_DATETIME_FORMAT = 'Y-m-d H:i:s';
+    public const MYSQL_DATE_FORMAT     = 'Y-m-d';
+    public const HUMAN_DATE_FORMAT     = 'F jS, Y'; // November 27th, 2017
 
     public static function now(): string
     {
@@ -36,7 +37,7 @@ class MySqlDateTime
     {
         return self::formatDate(strtotime($difference));
     }
-    
+
     /**
      * Get a relative date-time based on given string
      * @param string $difference
@@ -55,7 +56,7 @@ class MySqlDateTime
      */
     public static function formatDateForHumans(string $timestamp = null)
     {
-        if (! is_numeric($timestamp)) {
+        if (!is_numeric($timestamp)) {
             $timestamp = strtotime($timestamp);
         }
 
@@ -100,7 +101,7 @@ class MySqlDateTime
             throw new \Exception('could not interpret time string');
         }
 
-        return ! ($eventTimeEpoch > $now);
+        return !($eventTimeEpoch > $now);
     }
 
     /**

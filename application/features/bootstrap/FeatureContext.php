@@ -38,7 +38,7 @@ class FeatureContext extends YiiContext
     protected $methodFromDb;
 
     private $now;
-    const ACCEPTABLE_DELTA_IN_SECONDS = 1;
+    public const ACCEPTABLE_DELTA_IN_SECONDS = 1;
 
     protected $tempEmployeeId = null;
 

@@ -1,4 +1,5 @@
 <?php
+
 namespace Sil\SilIdBroker\Behat\Context;
 
 use Behat\Gherkin\Node\TableNode;
@@ -163,7 +164,7 @@ class MfaContext extends \FeatureContext
 
         $id = $this->getResponseProperty('id');
         Assert::notEmpty($id, 'Unable to get id of new Webauthn MFA');
-        $mfa = Mfa::FindOne(['id'=>$id]);
+        $mfa = Mfa::FindOne(['id' => $id]);
         Assert::notEmpty($mfa, 'Unable to find that MFA.');
 
         // Ensure we're getting a challenge in the response
@@ -296,8 +297,10 @@ class MfaContext extends \FeatureContext
         ];
 
         $this->iProvideTheFollowingValidData(new TableNode($dataForTableNode));
-        $this->iRequestTheResourceBe('/mfa/' . $this->mfa->id . '/webauthn/' . $webauthnId,
-            'deleted');
+        $this->iRequestTheResourceBe(
+            '/mfa/' . $this->mfa->id . '/webauthn/' . $webauthnId,
+            'deleted'
+        );
     }
 
 

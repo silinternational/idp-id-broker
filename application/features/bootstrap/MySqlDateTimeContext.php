@@ -8,8 +8,6 @@ use Webmozart\Assert\Assert;
 
 class MySqlDateTimeContext implements Context
 {
-
-
     /** @var  bool */
     protected $dateIsRecent;
 

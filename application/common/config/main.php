@@ -169,7 +169,7 @@ return [
                 [
                     'class' => EmailServiceTarget::class,
                     'categories' => ['application'], // only messages from this app, not all of Yii's built-in messaging
-                    'enabled' => ! empty($notificationEmail),
+                    'enabled' => !empty($notificationEmail),
                     'except' => [
                         'yii\web\HttpException:400',
                         'yii\web\HttpException:401',

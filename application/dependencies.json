@@ -1,7 +1,7 @@
 [
   {
     "name": "bower-asset/inputmask",
-    "version": "3.3.11"
+    "version": "5.0.8"
   },
   {
     "name": "br33f/php-ga4-mp",
@@ -21,7 +21,7 @@
   },
   {
     "name": "doctrine/deprecations",
-    "version": "v1.1.1"
+    "version": "1.1.2"
   },
   {
     "name": "doctrine/lexer",
@@ -41,7 +41,7 @@
   },
   {
     "name": "firebase/php-jwt",
-    "version": "v6.8.0"
+    "version": "v6.9.0"
   },
   {
     "name": "google/apiclient",
@@ -49,7 +49,7 @@
   },
   {
     "name": "google/apiclient-services",
-    "version": "v0.306.0"
+    "version": "v0.323.0"
   },
   {
     "name": "google/auth",
@@ -89,7 +89,7 @@
   },
   {
     "name": "monolog/monolog",
-    "version": "2.9.1"
+    "version": "2.9.2"
   },
   {
     "name": "notamedia/yii2-sentry",
@@ -125,11 +125,11 @@
   },
   {
     "name": "php-http/promise",
-    "version": "1.1.0"
+    "version": "1.2.1"
   },
   {
     "name": "phpseclib/phpseclib",
-    "version": "3.0.20"
+    "version": "3.0.33"
   },
   {
     "name": "phpspec/php-diff",
@@ -169,7 +169,7 @@
   },
   {
     "name": "roave/security-advisories",
-    "version": "dev-master 9920192"
+    "version": "dev-master c94f188"
   },
   {
     "name": "sentry/sdk",
@@ -177,7 +177,7 @@
   },
   {
     "name": "sentry/sentry",
-    "version": "3.21.0"
+    "version": "3.22.0"
   },
   {
     "name": "silinternational/email-service-php-client",
@@ -213,7 +213,7 @@
   },
   {
     "name": "symfony/http-client",
-    "version": "v6.3.5"
+    "version": "v6.3.7"
   },
   {
     "name": "symfony/http-client-contracts",
@@ -221,39 +221,35 @@
   },
   {
     "name": "symfony/options-resolver",
-    "version": "v5.4.21"
+    "version": "v6.3.0"
   },
   {
     "name": "symfony/polyfill-ctype",
-    "version": "v1.27.0"
+    "version": "v1.28.0"
   },
   {
     "name": "symfony/polyfill-iconv",
-    "version": "v1.27.0"
+    "version": "v1.28.0"
   },
   {
     "name": "symfony/polyfill-intl-idn",
-    "version": "v1.27.0"
+    "version": "v1.28.0"
   },
   {
     "name": "symfony/polyfill-intl-normalizer",
-    "version": "v1.27.0"
+    "version": "v1.28.0"
   },
   {
     "name": "symfony/polyfill-mbstring",
-    "version": "v1.27.0"
+    "version": "v1.28.0"
   },
   {
     "name": "symfony/polyfill-php72",
-    "version": "v1.27.0"
-  },
-  {
-    "name": "symfony/polyfill-php73",
-    "version": "v1.27.0"
+    "version": "v1.28.0"
   },
   {
     "name": "symfony/polyfill-php80",
-    "version": "v1.27.0"
+    "version": "v1.28.0"
   },
   {
     "name": "symfony/service-contracts",
@@ -265,7 +261,7 @@
   },
   {
     "name": "yiisoft/yii2",
-    "version": "2.0.48.1"
+    "version": "2.0.49.2"
   },
   {
     "name": "yiisoft/yii2-composer",
