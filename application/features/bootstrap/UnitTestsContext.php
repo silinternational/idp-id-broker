@@ -488,7 +488,7 @@ class UnitTestsContext extends YiiContext
     public function theUserSubmitsANewPassword()
     {
         $this->tempUser->password = 'k23@U$%235u25@I2$o';
-        $this->tempUser->scenario = User::SCENARIO_UPDATE_PASSWORD;
+        $this->tempUser->setScenario(User::SCENARIO_UPDATE_PASSWORD);
         $this->tempUser->save();
     }
 
