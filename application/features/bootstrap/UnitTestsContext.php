@@ -541,4 +541,3 @@ class UnitTestsContext extends YiiContext
         Assert::false($bad);
     }
 }
-
