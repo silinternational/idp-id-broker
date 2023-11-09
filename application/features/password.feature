@@ -3,18 +3,17 @@ Feature: Password
   As an authorized user
   I need to be able to update a specific user password
 
-#  Scenario: Provide a new password for an existing user
-#    Given I receive an existing employee id
-#      And the requestor is authorized
-#      And the user does not already have a password
-#      And I receive a password
-#    When I receive a request to create a password for a specific user
-#    Then a new password hash should be stored
-#      And the last changed date should be stored as the instant it was stored
-#      And the last changed date should be stored in UTC
-#      And the last synched date should be stored as the instant it was stored
-#      And the last synched date should be stored in UTC
-#
+  Scenario: Provide a new password for an existing user
+    Given there is a user in the database
+    When the user submits a new password
+    Then a new password hash should be stored
+
+  Scenario: Update the password hash cost
+    Given there is a user in the database
+      And that user has a password with a low hash cost
+    When the user uses their password
+    Then the password hash should be updated
+
 #  Scenario: Attempt to update a password for a nonexistent user
 #  Scenario: Attempt to update a password for an existing user without providing a password
 #  Scenario: Attempt to update a password for an existing user without providing a valid password
