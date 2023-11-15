@@ -21,6 +21,8 @@ class Password extends PasswordBase
 {
     public const SCENARIO_UPDATE_METADATA = 'update_metadata';
 
+    public const SCENARIO_REHASH = 'rehash';
+
     // hash algorithm passed to PHPs `password_hash` function -- if this is changed, the options
     // parameter passed to any `password_` functions may need to be changed as well
     public const HASH_ALGORITHM = PASSWORD_BCRYPT;
@@ -48,7 +50,7 @@ class Password extends PasswordBase
                 'password', 'string',
             ],
             [
-                'password', 'checkRecentlyUsed',
+                'password', 'checkRecentlyUsed', 'on' => self::SCENARIO_DEFAULT
             ],
             [
                 'hash', 'default', 'value' => function () {
@@ -241,6 +243,8 @@ class Password extends PasswordBase
             'expires_on',
             'grace_period_ends_on',
         ];
+
+        $scenarios[self::SCENARIO_REHASH] = ['hash'];
 
         return $scenarios;
     }

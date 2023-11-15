@@ -9,6 +9,7 @@ use common\models\Method;
 use common\models\Mfa;
 use common\models\MfaBackupcode;
 use common\models\MfaWebauthn;
+use common\models\Password;
 use common\models\User;
 use Webmozart\Assert\Assert;
 
@@ -47,6 +48,8 @@ class UnitTestsContext extends YiiContext
     protected $originalParams = [];
 
     protected $dataToVerify;
+
+    private string $password;
 
     /**
      * @afterScenario @database
@@ -185,7 +188,7 @@ class UnitTestsContext extends YiiContext
      */
     public function theDatabaseContainsAUserWithNoInviteCodes()
     {
-        $this->tempUser = $this->createNewUserInDatabase('method_tester');
+        $this->tempUser = $this->createNewUserInDatabase('unit_test');
 
         foreach ($this->tempUser->invites as $invite) {
             Assert::notEq(
@@ -290,7 +293,7 @@ class UnitTestsContext extends YiiContext
      */
     public function thereIsAUserInTheDatabase()
     {
-        $this->tempUser = $this->createNewUserInDatabase('method_tester');
+        $this->tempUser = $this->createNewUserInDatabase('unit_test');
     }
 
     /**
@@ -479,4 +482,62 @@ class UnitTestsContext extends YiiContext
         $this->dataToVerify = User::find()->all();
     }
 
+    /**
+     * @When the user submits a new password
+     */
+    public function theUserSubmitsANewPassword()
+    {
+        $this->tempUser->password = 'k23@U$%235u25@I2$o';
+        $this->tempUser->setScenario(User::SCENARIO_UPDATE_PASSWORD);
+        $this->tempUser->save();
+    }
+
+    /**
+     * @Then a new password hash should be stored
+     */
+    public function aNewPasswordHashShouldBeStored()
+    {
+        $hash = $this->tempUser->currentPassword->hash;
+        Assert::notEmpty($hash);
+    }
+
+    /**
+     * @Given that user has a password with a low hash cost
+     */
+    public function thatUserHasAPasswordWithALowHashCost()
+    {
+        $this->password = 'k23@U24urchr,@I2$o';
+        $passwordObject = new Password();
+        $passwordObject->hash = password_hash(
+            $this->password,
+            Password::HASH_ALGORITHM,
+            ["cost" => Password::HASH_COST - 1],
+        );
+        $passwordObject->user_id = $this->tempUser->id;
+        Assert::true($passwordObject->save(false), var_export($passwordObject->errors, true));
+
+        $this->tempUser->current_password_id = $passwordObject->id;
+        Assert::true($this->tempUser->save(), var_export($passwordObject->errors, true));
+    }
+
+    /**
+     * @When the user uses their password
+     */
+    public function theUserUsesTheirPassword()
+    {
+        $this->tempUser->scenario = User::SCENARIO_AUTHENTICATE;
+        $this->tempUser->password = $this->password;
+        Assert::true($this->tempUser->validate(), var_export($this->tempUser->errors, true));
+    }
+
+    /**
+     * @Then the password hash should be updated
+     */
+    public function thePasswordHashShouldBeUpdated()
+    {
+        $currentPassword = $this->tempUser->getCurrentPassword()->one();
+        $hash = $currentPassword->hash;
+        $bad = password_needs_rehash($hash, Password::HASH_ALGORITHM, ["cost" => Password::HASH_COST]);
+        Assert::false($bad);
+    }
 }
