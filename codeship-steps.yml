@@ -1,12 +1,10 @@
-- type: parallel
-  name: tests
-  steps:
-  - name: check_psr2
-    service: app
-    command: /data/check-psr2.sh
-  - name: test
-    service: app
-    command: /data/run-tests.sh
+- name: check_psr2
+  service: app
+  command: /data/check-psr2.sh
+
+- name: test
+  service: app
+  command: /data/run-tests.sh
 
 - name: push_develop
   service: app
