@@ -169,7 +169,7 @@ return [
                 [
                     'class' => EmailServiceTarget::class,
                     'categories' => ['application'], // only messages from this app, not all of Yii's built-in messaging
-                    'enabled' => ! empty($notificationEmail),
+                    'enabled' => !empty($notificationEmail),
                     'except' => [
                         'yii\web\HttpException:400',
                         'yii\web\HttpException:401',
@@ -201,7 +201,7 @@ return [
                     'clientOptions' => [
                         'attach_stacktrace' => false, // stack trace identifies the logger call stack, not helpful
                         'environment' => YII_ENV,
-                        'release' => 'idp-id-broker@6.6.4',
+                        'release' => 'idp-id-broker@6.6.5',
                         'before_send' => function (Event $event) use ($idpName): ?Event {
                             $event->setExtra(['idp' => $idpName]);
                             return $event;

@@ -1,4 +1,5 @@
 <?php
+
 namespace common\components;
 
 use common\components\Emailer;
@@ -92,7 +93,7 @@ class MfaBackendManager extends Component implements MfaBackendInterface
             );
         }
 
-        if (! MfaBackupcode::validateAndRemove($mfaId, $value)) {
+        if (!MfaBackupcode::validateAndRemove($mfaId, $value)) {
             return false;
         }
 

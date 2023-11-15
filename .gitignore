@@ -15,6 +15,7 @@ vendor/
 
 # PHP-CS-Fixer cache file.
 .php_cs.cache
+.php-cs-fixer.cache
 
 api.html
 

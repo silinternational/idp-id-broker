@@ -1,4 +1,5 @@
 <?php
+
 namespace Sil\SilIdBroker\Behat\Context;
 
 use Behat\Behat\Tester\Exception\PendingException;
@@ -61,13 +62,13 @@ class SheetsUnitTestsContext extends UnitTestsContext
         Assert::eq($table[0][0], $users[0]['employee_id']);
         Assert::eq($table[0][1], $users[0]['email']);
         Assert::eq($table[0][2], date('Y-m-d'));
-        Assert::range(strtotime($table[0][3]), time()-5, time());
-        Assert::range(strtotime($table[0][4]), time()-5, time());
+        Assert::range(strtotime($table[0][3]), time() - 5, time());
+        Assert::range(strtotime($table[0][4]), time() - 5, time());
 
         Assert::eq($table[1][0], $users[1]['employee_id']);
         Assert::eq($table[1][1], $users[1]['email']);
         Assert::eq($table[1][2], date('Y-m-d'));
-        Assert::range(strtotime($table[1][3]), time()-5, time());
-        Assert::range(strtotime($table[1][4]), time()-5, time());
+        Assert::range(strtotime($table[1][3]), time() - 5, time());
+        Assert::range(strtotime($table[1][4]), time() - 5, time());
     }
 }

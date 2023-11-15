@@ -20,7 +20,7 @@ class m210112_185351_add_created_utc_to_user extends Migration
      */
     public function safeDown()
     {
-        $this->dropColumn('{{user}}', 'created_utc'); 
+        $this->dropColumn('{{user}}', 'created_utc');
     }
 
 }

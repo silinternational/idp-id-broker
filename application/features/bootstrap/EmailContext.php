@@ -1,4 +1,5 @@
 <?php
+
 namespace Sil\SilIdBroker\Behat\Context;
 
 use common\components\Emailer;
@@ -57,8 +58,8 @@ class EmailContext extends YiiContext
     /** @var array<array> */
     protected $matchingFakeEmails;
 
-    const METHOD_EMAIL_ADDRESS = 'method@example.com';
-    const MANAGER_EMAIL = 'manager@example.com';
+    public const METHOD_EMAIL_ADDRESS = 'method@example.com';
+    public const MANAGER_EMAIL = 'manager@example.com';
 
     /**
      * @Then a(n) :messageType email should have been sent to them
@@ -102,7 +103,7 @@ class EmailContext extends YiiContext
             'User::hasReceivedMessage() unexpectedly returned true.'
         );
     }
-    
+
     /**
      * @When that user is created
      */
@@ -137,7 +138,7 @@ class EmailContext extends YiiContext
         }
         $user = new User($properties);
         $user->scenario = User::SCENARIO_NEW_USER;
-        if (! $user->save()) {
+        if (!$user->save()) {
             throw new \Exception(
                 \json_encode($user->getFirstErrors(), JSON_PRETTY_PRINT)
             );
@@ -148,11 +149,11 @@ class EmailContext extends YiiContext
 
     protected function createMfa(
         $type,
-        $lastUsedDaysAgo=null,
-        $user=null,
-        $verified=1
+        $lastUsedDaysAgo = null,
+        $user = null,
+        $verified = 1
     ) {
-        if ($user ===null) {
+        if ($user === null) {
             $user = $this->tempUser;
         }
         $mfa = new Mfa();
@@ -164,7 +165,7 @@ class EmailContext extends YiiContext
 
         if ($lastUsedDaysAgo !== null) {
             $diffConfig = "-" . $lastUsedDaysAgo . " days";
-            $mfa->last_used_utc= MySqlDateTime::relative($diffConfig);
+            $mfa->last_used_utc = MySqlDateTime::relative($diffConfig);
         }
         Assert::true($mfa->save(), "Could not create new mfa.");
         $user->refresh();
@@ -224,7 +225,7 @@ class EmailContext extends YiiContext
             'User::hasReceivedMessage() unexpectedly returned false.'
         );
     }
-    
+
     /**
      * @Given we are configured to send invite emails
      */
@@ -232,7 +233,7 @@ class EmailContext extends YiiContext
     {
         $this->fakeEmailer->sendInviteEmails = true;
     }
-    
+
     /**
      * @Given we are configured to send password-changed emails
      */
@@ -369,7 +370,7 @@ class EmailContext extends YiiContext
             base64_encode(random_bytes(33)) // Random password
         );
     }
-    
+
     protected function setPasswordForUser(User $user, string $newPassword)
     {
         $oldScenario = $user->scenario;

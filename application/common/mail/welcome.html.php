@@ -17,7 +17,7 @@ use yii\helpers\Html as yHtml;
  * @var bool   $hasRecoveryMethods
  */
 
- $forgotUrl = $passwordProfileUrl . '/password/forgot';
+$forgotUrl = $passwordProfileUrl . '/password/forgot';
 ?>
 <p>
     Dear <?=yHtml::encode($displayName)?>,
@@ -44,7 +44,7 @@ use yii\helpers\Html as yHtml;
         <?=yHtml::a(yHtml::encode($forgotUrl), $forgotUrl)?>
     </li>
 
-    <?php if (! empty($helpCenterUrl)) { ?>
+    <?php if (!empty($helpCenterUrl)) { ?>
     <li>
         <strong>Help & FAQs:</strong>
         <?=yHtml::a(yHtml::encode($helpCenterUrl), $helpCenterUrl)?>

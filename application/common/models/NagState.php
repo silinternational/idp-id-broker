@@ -2,15 +2,15 @@
 
 namespace common\models;
 
-use \Exception;
+use Exception;
 use common\helpers\MySqlDateTime;
 
 class NagState
 {
-    const NAG_NONE           = 'none';
-    const NAG_ADD_MFA        = 'add_mfa';
-    const NAG_ADD_METHOD     = 'add_method';
-    const NAG_PROFILE_REVIEW = 'profile_review';
+    public const NAG_NONE           = 'none';
+    public const NAG_ADD_MFA        = 'add_mfa';
+    public const NAG_ADD_METHOD     = 'add_method';
+    public const NAG_PROFILE_REVIEW = 'profile_review';
 
     /** @var string */
     private $state;

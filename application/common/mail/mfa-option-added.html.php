@@ -32,7 +32,7 @@ use yii\helpers\Html as yHtml;
         foreach ($mfaOptions as $mfa) {
             echo '<li>' . yHtml::encode($mfa->getReadableType()) . '</li>';
         }
-    ?>
+?>
 </ol>
 
 <p>

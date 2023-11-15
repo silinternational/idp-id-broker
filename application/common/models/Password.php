@@ -19,7 +19,15 @@ use yii\web\ConflictHttpException;
  */
 class Password extends PasswordBase
 {
-    const SCENARIO_UPDATE_METADATA = 'update_metadata';
+    public const SCENARIO_UPDATE_METADATA = 'update_metadata';
+
+    public const SCENARIO_REHASH = 'rehash';
+
+    // hash algorithm passed to PHPs `password_hash` function -- if this is changed, the options
+    // parameter passed to any `password_` functions may need to be changed as well
+    public const HASH_ALGORITHM = PASSWORD_BCRYPT;
+
+    public const HASH_COST = 13;
 
     public $password;
 
@@ -42,11 +50,11 @@ class Password extends PasswordBase
                 'password', 'string',
             ],
             [
-                'password', 'checkRecentlyUsed',
+                'password', 'checkRecentlyUsed', 'on' => self::SCENARIO_DEFAULT
             ],
             [
                 'hash', 'default', 'value' => function () {
-                    return password_hash($this->password, PASSWORD_DEFAULT);
+                    return self::hashPassword($this->password);
                 },
             ],
             [
@@ -219,7 +227,7 @@ class Password extends PasswordBase
 
         $this->scenario = self::SCENARIO_UPDATE_METADATA;
 
-        if (! $this->save()) {
+        if (!$this->save()) {
             \Yii::error('Failed to save grace period. ' . join(', ', $this->getFirstErrors()));
         }
     }
@@ -235,6 +243,8 @@ class Password extends PasswordBase
             'expires_on',
             'grace_period_ends_on',
         ];
+
+        $scenarios[self::SCENARIO_REHASH] = ['hash'];
 
         return $scenarios;
     }
@@ -265,7 +275,7 @@ class Password extends PasswordBase
         $this->hibp_is_pwned = 'yes';
         $this->expires_on = MySqlDateTime::relativeTime('+5 minutes');
         $this->grace_period_ends_on = MySqlDateTime::relativeTime(\Yii::$app->params['hibpGracePeriod']);
-        if (! $this->save()) {
+        if (!$this->save()) {
             \Yii::error([
                 'action' => 'check and process hibp',
                 'employee_id' => $this->user->employee_id,
@@ -279,5 +289,10 @@ class Password extends PasswordBase
                 'message' => 'pwned password detected and processed'
             ]);
         }
+    }
+
+    public static function hashPassword(string $password): string
+    {
+        return password_hash($password, self::HASH_ALGORITHM, ["cost" => self::HASH_COST]);
     }
 }

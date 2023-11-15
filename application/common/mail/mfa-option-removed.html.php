@@ -35,7 +35,7 @@ use yii\helpers\Html as yHtml;
         foreach ($mfaOptions as $mfa) {
             echo '<li>' . yHtml::encode($mfa->getReadableType()) . '</li>';
         }
-    ?>
+?>
 </ol>
 <p>
     If you did not do this, it could be a sign someone else has compromised your account. Please contact

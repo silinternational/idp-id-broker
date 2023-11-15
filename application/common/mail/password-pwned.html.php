@@ -30,7 +30,7 @@ use yii\helpers\Html as yHtml;
 </p>
 
 <?php
-if (! $isMfaEnabled) {
+if (!$isMfaEnabled) {
     ?>
     <p>
         We also recommend you enable 2-Step Verification on all accounts where possible, but especially for your

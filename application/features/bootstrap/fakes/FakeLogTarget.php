@@ -1,4 +1,5 @@
 <?php
+
 namespace Sil\SilIdBroker\Behat\Context\fakes;
 
 use yii\log\Target;
@@ -12,7 +13,7 @@ class FakeLogTarget extends Target
     {
         // No op
     }
-    
+
     public function getLoggedMessagesJson()
     {
         return \json_encode($this->messages, JSON_PRETTY_PRINT);

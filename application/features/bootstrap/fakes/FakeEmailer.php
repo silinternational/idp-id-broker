@@ -1,4 +1,5 @@
 <?php
+
 namespace Sil\SilIdBroker\Behat\Context\fakes;
 
 use common\components\Emailer;
@@ -23,15 +24,15 @@ class FakeEmailer extends Emailer
                 ]
             );
         }
-        
+
         return $this->emailServiceClient;
     }
-    
+
     public function forgetFakeEmailsSent()
     {
         return $this->getEmailServiceClient()->emailsSent = [];
     }
-    
+
     /**
      * Get the actual email data (from this FakeEmailer) of any emails sent to
      * the given user and of the specified type.
@@ -51,7 +52,7 @@ class FakeEmailer extends Emailer
             function ($fakeEmail) use ($fakeEmailer, $messageType, $emailAddress, $user) {
                 $subject = $fakeEmail[Emailer::PROP_SUBJECT] ?? '';
                 $toAddress = $fakeEmail[Emailer::PROP_TO_ADDRESS] ?? '';
-                
+
                 return $fakeEmailer->isSubjectForMessageType($subject, $messageType, $user)
                     && ($toAddress === $emailAddress);
             }
@@ -62,7 +63,7 @@ class FakeEmailer extends Emailer
     {
         return $this->getEmailServiceClient()->emailsSent;
     }
-    
+
     public function isSubjectForMessageType(string $subject, string $messageType, User $user)
     {
         $dataForEmail = ArrayHelper::merge(

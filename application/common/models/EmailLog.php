@@ -1,4 +1,5 @@
 <?php
+
 namespace common\models;
 
 use common\helpers\MySqlDateTime;
@@ -12,25 +13,25 @@ class EmailLog extends EmailLogBase
      * NOTE: Changes must be made here, in the `getMessageTypes()` method below,
      *       and in the email_log.message_type enum list in the database.
      */
-    const MESSAGE_TYPE_INVITE = 'invite';
-    const MESSAGE_TYPE_MFA_RATE_LIMIT = 'mfa-rate-limit';
-    const MESSAGE_TYPE_PASSWORD_CHANGED = 'password-changed';
-    const MESSAGE_TYPE_WELCOME = 'welcome';
-    const MESSAGE_TYPE_GET_BACKUP_CODES = 'get-backup-codes';
-    const MESSAGE_TYPE_REFRESH_BACKUP_CODES = 'refresh-backup-codes';
-    const MESSAGE_TYPE_LOST_SECURITY_KEY = 'lost-security-key';
-    const MESSAGE_TYPE_MFA_OPTION_ADDED = 'mfa-option-added';
-    const MESSAGE_TYPE_MFA_OPTION_REMOVED = 'mfa-option-removed';
-    const MESSAGE_TYPE_MFA_ENABLED = 'mfa-enabled';
-    const MESSAGE_TYPE_MFA_DISABLED = 'mfa-disabled';
-    const MESSAGE_TYPE_METHOD_VERIFY = 'method-verify';
-    const MESSAGE_TYPE_METHOD_REMINDER = 'method-reminder';
-    const MESSAGE_TYPE_METHOD_PURGED = 'method-purged';
-    const MESSAGE_TYPE_MFA_MANAGER = 'mfa-manager';
-    const MESSAGE_TYPE_MFA_MANAGER_HELP = 'mfa-manager-help';
-    const MESSAGE_TYPE_PASSWORD_EXPIRING = 'password-expiring';
-    const MESSAGE_TYPE_PASSWORD_EXPIRED = 'password-expired';
-    const MESSAGE_TYPE_PASSWORD_PWNED = "password-pwned";
+    public const MESSAGE_TYPE_INVITE = 'invite';
+    public const MESSAGE_TYPE_MFA_RATE_LIMIT = 'mfa-rate-limit';
+    public const MESSAGE_TYPE_PASSWORD_CHANGED = 'password-changed';
+    public const MESSAGE_TYPE_WELCOME = 'welcome';
+    public const MESSAGE_TYPE_GET_BACKUP_CODES = 'get-backup-codes';
+    public const MESSAGE_TYPE_REFRESH_BACKUP_CODES = 'refresh-backup-codes';
+    public const MESSAGE_TYPE_LOST_SECURITY_KEY = 'lost-security-key';
+    public const MESSAGE_TYPE_MFA_OPTION_ADDED = 'mfa-option-added';
+    public const MESSAGE_TYPE_MFA_OPTION_REMOVED = 'mfa-option-removed';
+    public const MESSAGE_TYPE_MFA_ENABLED = 'mfa-enabled';
+    public const MESSAGE_TYPE_MFA_DISABLED = 'mfa-disabled';
+    public const MESSAGE_TYPE_METHOD_VERIFY = 'method-verify';
+    public const MESSAGE_TYPE_METHOD_REMINDER = 'method-reminder';
+    public const MESSAGE_TYPE_METHOD_PURGED = 'method-purged';
+    public const MESSAGE_TYPE_MFA_MANAGER = 'mfa-manager';
+    public const MESSAGE_TYPE_MFA_MANAGER_HELP = 'mfa-manager-help';
+    public const MESSAGE_TYPE_PASSWORD_EXPIRING = 'password-expiring';
+    public const MESSAGE_TYPE_PASSWORD_EXPIRED = 'password-expired';
+    public const MESSAGE_TYPE_PASSWORD_PWNED = "password-pwned";
 
     /**
      * @inheritdoc
@@ -41,7 +42,7 @@ class EmailLog extends EmailLogBase
             'sent_utc' => Yii::t('app', 'Sent (UTC)'),
         ]);
     }
-    
+
     public static function getMessageTypes()
     {
         return [
@@ -66,15 +67,15 @@ class EmailLog extends EmailLogBase
             self::MESSAGE_TYPE_PASSWORD_PWNED,
         ];
     }
-    
+
     public static function logMessage(string $messageType, $userId)
     {
         $emailLog = new EmailLog([
             'user_id' => $userId,
             'message_type' => $messageType,
         ]);
-        
-        if (! $emailLog->save()) {
+
+        if (!$emailLog->save()) {
             $errorMessage = sprintf(
                 'Failed to log %s email to User %s: %s',
                 var_export($messageType, true),
@@ -85,7 +86,7 @@ class EmailLog extends EmailLogBase
             throw new Exception($errorMessage, 1502398588);
         }
     }
-    
+
     /**
      * {@inheritdoc}
      */

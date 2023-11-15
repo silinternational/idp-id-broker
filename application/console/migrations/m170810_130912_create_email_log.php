@@ -16,7 +16,7 @@ class m170810_130912_create_email_log extends Migration
             ],
             'ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_general_ci'
         );
-        
+
         $this->addForeignKey(
             'fk_user_id',
             '{{email_log}}',
@@ -32,12 +32,12 @@ class m170810_130912_create_email_log extends Migration
             'message_type'
         );
     }
-    
+
     public function safeDown()
     {
         $this->dropIndex('idx_email_log_message_type', '{{email_log}}');
         $this->dropForeignKey('fk_user_id', '{{email_log}}');
-        
+
         $this->dropTable('{{email_log}}');
     }
 }
