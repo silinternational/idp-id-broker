@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
+
+# print script lines as they are executed
 set -x
+
+# exit if any line in the script fails
+set -e
 
 # establish a signal handler to catch the SIGTERM from a 'docker stop'
 # reference: https://medium.com/@gchudnov/trapping-signals-in-docker-containers-7a57fdda7d86
@@ -23,14 +28,14 @@ sleep $[ ( $RANDOM % 10 ) ]s
 
 
 # Run database migrations
-/data/yii migrate --interactive=0
+config-shim -v --app $APP_ID --config $CONFIG_ID --env $ENV_ID /data/yii migrate --interactive=0
 
 if [[ ! -z $RUN_TASK ]]; then
     ./yii $RUN_TASK
     exit $?
 fi
 
-apache2ctl -k start -D FOREGROUND
+config-shim -v --app $APP_ID --config $CONFIG_ID --env $ENV_ID apache2ctl -k start -D FOREGROUND
 
 # endless loop with a wait is needed for the trap to work
 while true

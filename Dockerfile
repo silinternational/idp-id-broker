@@ -22,5 +22,8 @@ COPY dockerbuild/vhost.conf /etc/apache2/sites-enabled/
 # ErrorLog inside a VirtualHost block is ineffective for unknown reasons
 RUN sed -i -E 's@ErrorLog .*@ErrorLog /proc/self/fd/2@i' /etc/apache2/apache2.conf
 
+ADD https://github.com/silinternational/config-shim/releases/latest/download/config-shim_0.0.2-pre.3_linux_amd64.tar.gz config-shim.tar.gz
+RUN tar xzf config-shim.tar.gz --directory /usr/local/bin --wildcards config-shim && rm config-shim*tar.gz
+
 EXPOSE 80
 CMD ["/data/run.sh"]
