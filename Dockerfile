@@ -1,5 +1,7 @@
 FROM silintl/php8:8.1
 
+ENV REFRESHED_AT 2024-02-27
+
 RUN apt-get update -y && \
     apt-get install -y make
 
