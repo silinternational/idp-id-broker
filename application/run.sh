@@ -18,13 +18,22 @@ chown -R www-data:www-data \
 echo 'sleeping a random number of seconds up to 9 to avoid migration runs clash'
 sleep $[ ( $RANDOM % 10 ) ]s
 
+if [[ -z "${APP_ID}" ]]; then
+  /data/yii migrate --interactive=0
 
-# Run database migrations
-config-shim -v --app $APP_ID --config $CONFIG_ID --env $ENV_ID /data/yii migrate --interactive=0
-
-if [[ ! -z $RUN_TASK ]]; then
+  if [[ ! -z $RUN_TASK ]]; then
     ./yii $RUN_TASK
     exit $?
-fi
+  fi
 
-config-shim -v --app $APP_ID --config $CONFIG_ID --env $ENV_ID apache2ctl -k start -D FOREGROUND
+  apache2ctl -k start -D FOREGROUND
+else
+  config-shim -v --app $APP_ID --config $CONFIG_ID --env $ENV_ID /data/yii migrate --interactive=0
+
+  if [[ ! -z $RUN_TASK ]]; then
+    config-shim -v --app $APP_ID --config $CONFIG_ID --env $ENV_ID ./yii $RUN_TASK
+    exit $?
+  fi
+
+  config-shim -v --app $APP_ID --config $CONFIG_ID --env $ENV_ID apache2ctl -k start -D FOREGROUND
+fi
