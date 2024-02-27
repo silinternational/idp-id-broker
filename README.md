@@ -23,6 +23,20 @@ Windows (not actively maintained as a development platform)
    on a Linux computer. Otherwise, run `id -u` and `id -g` and use the resulting numbers in place of `1000`.
 5. Run `make start`, or if using Vagrant, run `vagrant up`
 
+## Configuration
+By default, configuration is read from environment variables. These are documented
+in the `local.env.dist` file. Optionally, you can define configuration in AWS AppConfig.
+To do this, set the following environment variables to point to the configuration in
+AWS:
+
+* `APP_ID` - the application ID or name
+* `CONFIG_ID` - the configuration profile ID or name
+* `ENV_ID` - the environment ID or name
+
+The content of the configuration profile takes the form of a typical .env file, using
+`#` for comments and `=` for variable assignment. Any variables read from AppConfig 
+will overwrite variables set in the execution environment.
+
 ## Composer / GitHub rate limit
 If you hit problems of composer unable to pull the necessary dependencies
 due to a GitHub rate limit, copy the `auth.json.dist` file to `auth.json` and
