@@ -28,12 +28,12 @@ if [[ -z "${APP_ID}" ]]; then
 
   apache2ctl -k start -D FOREGROUND
 else
-  config-shim -v --app $APP_ID --config $CONFIG_ID --env $ENV_ID /data/yii migrate --interactive=0
+  config-shim --app $APP_ID --config $CONFIG_ID --env $ENV_ID /data/yii migrate --interactive=0
 
   if [[ ! -z $RUN_TASK ]]; then
-    config-shim -v --app $APP_ID --config $CONFIG_ID --env $ENV_ID ./yii $RUN_TASK
+    config-shim --app $APP_ID --config $CONFIG_ID --env $ENV_ID ./yii $RUN_TASK
     exit $?
   fi
 
-  config-shim -v --app $APP_ID --config $CONFIG_ID --env $ENV_ID apache2ctl -k start -D FOREGROUND
+  config-shim --app $APP_ID --config $CONFIG_ID --env $ENV_ID apache2ctl -k start -D FOREGROUND
 fi
