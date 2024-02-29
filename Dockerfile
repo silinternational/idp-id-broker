@@ -1,5 +1,7 @@
 FROM silintl/php8:8.1
 
+ENV REFRESHED_AT 2024-02-27
+
 RUN apt-get update -y && \
     apt-get install -y make
 
@@ -21,6 +23,9 @@ COPY dockerbuild/vhost.conf /etc/apache2/sites-enabled/
 
 # ErrorLog inside a VirtualHost block is ineffective for unknown reasons
 RUN sed -i -E 's@ErrorLog .*@ErrorLog /proc/self/fd/2@i' /etc/apache2/apache2.conf
+
+ADD https://github.com/silinternational/config-shim/releases/latest/download/config-shim.gz config-shim.gz
+RUN gzip -d config-shim.gz && chmod 755 config-shim && mv config-shim /usr/local/bin
 
 EXPOSE 80
 CMD ["/data/run.sh"]
