@@ -5,7 +5,7 @@
 .idea/
 /nbproject/
 # local config files
-local.env
+*.env
 
 # Git auth. token (to get past rate limiting for composer).
 auth.json
