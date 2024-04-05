@@ -109,6 +109,12 @@ class MethodController extends BaseRestController
         }
 
         $userId = User::findOne(['employee_id' => $employeeId])->id ?? null;
+        if ($userId == null) {
+            throw new NotFoundHttpException(
+                'employee_id not found',
+                1540990165
+            );
+        }
 
         return Method::findOrCreate($userId, $value);
     }
