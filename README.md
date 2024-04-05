@@ -34,7 +34,7 @@ AWS:
 * `CONFIG_ID` - the configuration profile ID or name
 * `ENV_ID` - the environment ID or name
 
-In addition, the AWS PHP SDK requires authentication. It is best to use an access role
+In addition, the AWS API requires authentication. It is best to use an access role
 such as an [ECS Task Role](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-iam-roles.html).
 If that is not an option, you can specify an access token using the `AWS_ACCESS_KEY_ID` and
 `AWS_SECRET_ACCESS_KEY` variables.
