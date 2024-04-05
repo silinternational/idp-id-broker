@@ -4,12 +4,12 @@ use common\components\Emailer;
 use common\components\MfaBackendBackupcode;
 use common\components\MfaBackendManager;
 use common\components\MfaBackendTotp;
-use common\components\MfaBackendU2f;
 use common\components\MfaBackendWebAuthn;
+use notamedia\sentry\SentryTarget;
+use Sentry\Event;
 use Sil\JsonLog\target\EmailServiceTarget;
 use Sil\JsonLog\target\JsonStreamTarget;
 use Sil\PhpEnv\Env;
-use Sil\PhpEnv\EnvVarNotFoundException;
 use yii\db\Connection;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Json;
@@ -25,25 +25,10 @@ $notificationEmail = Env::get('NOTIFICATION_EMAIL');
 
 $mfaNumBackupCodes = Env::get('MFA_NUM_BACKUPCODES', 10);
 
-$envValidator = function($name, $key, $config) {
-    if (! isset($config[$key])) {
-        $message = "The $name environment variable is required";
-        throw new EnvVarNotFoundException($message);
-    }
-};
-
 $mfaTotpConfig = Env::getArrayFromPrefix('MFA_TOTP_');
 $mfaTotpConfig['issuer'] = $idpDisplayName;
 
-$envValidator('MFA_TOTP_apiBaseUrl', 'apiBaseUrl', $mfaTotpConfig);
-$envValidator('MFA_TOTP_apiKey', 'apiKey', $mfaTotpConfig);
-$envValidator('MFA_TOTP_apiSecret', 'apiSecret', $mfaTotpConfig);
-
 $mfaWebAuthnConfig = Env::getArrayFromPrefix('MFA_WEBAUTHN_');
-
-$envValidator('MFA_WEBAUTHN_apiBaseUrl', 'apiBaseUrl', $mfaTotpConfig);
-$envValidator('MFA_WEBAUTHN_apiKey', 'apiKey', $mfaTotpConfig);
-$envValidator('MFA_WEBAUTHN_apiSecret', 'apiSecret', $mfaTotpConfig);
 
 $emailerClass = Env::get('EMAILER_CLASS', Emailer::class);
 
@@ -184,7 +169,7 @@ return [
                 [
                     'class' => EmailServiceTarget::class,
                     'categories' => ['application'], // only messages from this app, not all of Yii's built-in messaging
-                    'enabled' => ! empty($notificationEmail),
+                    'enabled' => !empty($notificationEmail),
                     'except' => [
                         'yii\web\HttpException:400',
                         'yii\web\HttpException:401',
@@ -204,6 +189,25 @@ return [
                     'validIpRanges' => $emailServiceConfig['validIpRanges'],
                     'prefix' => $logPrefix,
                     'exportInterval' => 1,
+                ],
+                [
+                    'class' => SentryTarget::class,
+                    'enabled' => !empty(Env::get('SENTRY_DSN')),
+                    'dsn' => Env::get('SENTRY_DSN'),
+                    'levels' => ['error'],
+                    'context' => true,
+                    // Additional options for `Sentry\init`
+                    // https://docs.sentry.io/platforms/php/configuration/options
+                    'clientOptions' => [
+                        'attach_stacktrace' => false, // stack trace identifies the logger call stack, not helpful
+                        'environment' => YII_ENV,
+                        'release' => 'idp-id-broker@' . Env::get('GITHUB_REF_NAME', 'unknown'),
+                        'max_request_body_size' => 'never', // never send request bodies
+                        'before_send' => function (Event $event) use ($idpName): ?Event {
+                            $event->setExtra(['idp' => $idpName]);
+                            return $event;
+                        },
+                    ],
                 ],
             ],
         ],

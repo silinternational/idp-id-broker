@@ -41,7 +41,7 @@ class Invite extends InviteBase
      * @return string
      * @throws \Exception
      */
-    private static function newCode():string
+    private static function newCode(): string
     {
         return Uuid::uuid4()->toString();
     }

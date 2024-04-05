@@ -1,4 +1,5 @@
 <?php
+
 namespace frontend\components;
 
 use yii\db\ActiveRecord;
@@ -20,7 +21,7 @@ class BaseRestController extends Controller
 
     protected function save(ActiveRecord $record)
     {
-        if (! $record->save()) {
+        if (!$record->save()) {
             throw new UnprocessableEntityHttpException(current($record->getFirstErrors()));
         }
     }

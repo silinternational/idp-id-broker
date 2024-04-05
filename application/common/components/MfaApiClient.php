@@ -40,6 +40,14 @@ class MfaApiClient
 
     public function __construct(string $apiBaseUrl, $apiKey, $apiSecret)
     {
+        if (empty($apiKey)) {
+            throw new \InvalidArgumentException('Missing MFA configuration for api key');
+        }
+
+        if (empty($apiSecret)) {
+            throw new \InvalidArgumentException('Missing MFA configuration for api secret');
+        }
+
         if (substr($apiBaseUrl, -1) !== '/') {
             throw new \InvalidArgumentException('The MFA apiBaseUrl must end with a slash (/).');
         }
@@ -125,13 +133,13 @@ class MfaApiClient
     /**
      * @param array $additionalHeaders
      * @param array $signResultJson
-     * @return bool
+     * @return array
      * @throws GuzzleException
      */
-    public function webauthnValidateAuthentication(array $additionalHeaders, array $signResultJson): bool
+    public function webauthnValidateAuthentication(array $additionalHeaders, array $signResultJson): array
     {
-        $this->callApi('webauthn/login', 'PUT', $signResultJson, $additionalHeaders);
-        return true;
+        $response = $this->callApi('webauthn/login', 'PUT', $signResultJson, $additionalHeaders);
+        return Json::decode($response->getBody()->getContents());
     }
 
     /**

@@ -34,7 +34,7 @@ $pwExtension = ltrim(\Yii::$app->params['passwordMfaLifespanExtension'], '+');
     Password last changed on: <?=yHtml::encode($passwordLastChanged)?><br>
     Password expired on: <?=yHtml::encode($passwordExpiresUtc)?>
 </p>
-<?php if (! $isMfaEnabled) { ?>
+<?php if (!$isMfaEnabled) { ?>
 <p>
     If you enable 2-Step Verification, your password expiration will be extended
     by <?= yHtml::encode($pwExtension) ?>. This would take effect immediately, so you would not have to change
@@ -48,7 +48,7 @@ $pwExtension = ltrim(\Yii::$app->params['passwordMfaLifespanExtension'], '+');
     <li>Log out and log in again to see how it works and to have it remember your computer for 30 days. Note that
         logging out will undo the "Remember this computer" setting.</li>
 </ol>
-    <?php if (! empty($helpCenterUrl)) { ?>
+    <?php if (!empty($helpCenterUrl)) { ?>
         <p>
             To learn more about 2-Step Verification go to <?=yHtml::a(yHtml::encode($helpCenterUrl), $helpCenterUrl)?>
         </p>

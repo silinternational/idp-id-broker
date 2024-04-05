@@ -626,6 +626,24 @@ Feature: User
     When I request "/user/123" be updated
     Then the response status code should be 422
 
+  Scenario: Attempt to update email to an empty string
+    Given the requester is authorized
+      And I provide the following valid data:
+        | property        | value                 |
+        | employee_id     | 123                   |
+        | first_name      | Established           |
+        | last_name       | User                  |
+        | username        | established_user      |
+        | email           | primary@example.com   |
+      And I request "/user" be created
+      And the response status code should be 200
+      And I provide the following valid data:
+        | property       | value                  |
+        | email          |                        |
+        | personal_email | personal@example.org   |
+    When I request "/user/123" be updated
+    Then the response status code should be 422
+
   Scenario Outline: Check "nag" state when user has or doesn't have methods and mfas
     Given there is a user in the database
       And that user has <verifiedMethods> verified methods

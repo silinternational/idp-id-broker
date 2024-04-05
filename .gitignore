@@ -5,7 +5,7 @@
 .idea/
 /nbproject/
 # local config files
-local.env
+*.env
 
 # Git auth. token (to get past rate limiting for composer).
 auth.json
@@ -15,6 +15,7 @@ vendor/
 
 # PHP-CS-Fixer cache file.
 .php_cs.cache
+.php-cs-fixer.cache
 
 api.html
 

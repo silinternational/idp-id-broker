@@ -1,4 +1,5 @@
 <?php
+
 namespace frontend\controllers;
 
 use common\models\Mfa;
@@ -16,7 +17,6 @@ use yii\web\TooManyRequestsHttpException;
 
 class MfaController extends BaseRestController
 {
-
     /**
      * Create new MFA record
      * @return array
@@ -29,7 +29,7 @@ class MfaController extends BaseRestController
     {
         $req = \Yii::$app->request;
         $type = $req->getBodyParam('type', 'invalid');
-        if (! Mfa::isValidType($type)) {
+        if (!Mfa::isValidType($type)) {
             throw new BadRequestHttpException('The provided type is not a supported MFA type', 1506695647);
         }
 
@@ -47,7 +47,7 @@ class MfaController extends BaseRestController
 
         // rpOrigin is needed for WebAuthn authentication
         $rpOrigin = urldecode($req->get('rpOrigin', ''));
-        if ($rpOrigin != '' && !in_array($rpOrigin, \Yii::$app->params['authorizedRPOrigins'])){
+        if ($rpOrigin != '' && !in_array($rpOrigin, \Yii::$app->params['authorizedRPOrigins'])) {
             throw new ForbiddenHttpException("Invalid rpOrigin: " . $rpOrigin, 1638539433);
         }
 
@@ -72,7 +72,7 @@ class MfaController extends BaseRestController
         }
 
         $label = $req->getBodyParam('label');
-        $label = $label?:'';
+        $label = $label ?: '';
 
         $employeeId = $req->getBodyParam('employee_id');
         if ($employeeId == null) {
@@ -107,11 +107,11 @@ class MfaController extends BaseRestController
 
         // rpOrigin is needed for WebAuthn authentication
         $rpOrigin = $req->get('rpOrigin', '');
-        if ($rpOrigin != '' && !in_array($rpOrigin, \Yii::$app->params['authorizedRPOrigins'])){
+        if ($rpOrigin != '' && !in_array($rpOrigin, \Yii::$app->params['authorizedRPOrigins'])) {
             throw new ForbiddenHttpException("Invalid rpOrigin", 1638539443);
         }
 
-        if (! $mfa->verify($value, $rpOrigin, $type, $label)) {
+        if (!$mfa->verify($value, $rpOrigin, $type, $label)) {
             throw new BadRequestHttpException();
         }
         $mfa->loadData($rpOrigin);
@@ -137,7 +137,7 @@ class MfaController extends BaseRestController
 
         // rpOrigin is needed for WebAuthn authentication
         $rpOrigin = \Yii::$app->request->get('rpOrigin', '');
-        if ($rpOrigin != '' && !in_array($rpOrigin, \Yii::$app->params['authorizedRPOrigins'])){
+        if ($rpOrigin != '' && !in_array($rpOrigin, \Yii::$app->params['authorizedRPOrigins'])) {
             throw new ForbiddenHttpException("Invalid rpOrigin", 1638378156);
         }
 
@@ -188,7 +188,7 @@ class MfaController extends BaseRestController
 
         // rpOrigin is needed for WebAuthn authentication
         $rpOrigin = \Yii::$app->request->get('rpOrigin', '');
-        if ($rpOrigin != '' && !in_array($rpOrigin, \Yii::$app->params['authorizedRPOrigins'])){
+        if ($rpOrigin != '' && !in_array($rpOrigin, \Yii::$app->params['authorizedRPOrigins'])) {
             throw new ForbiddenHttpException("Invalid rpOrigin", 1638539680);
         }
         $mfa->loadData($rpOrigin);
@@ -309,13 +309,13 @@ class MfaController extends BaseRestController
         $webauthn = MfaWebauthn::findOne(['id' => $webauthnId, 'mfa_id' => $mfaId]);
         if ($webauthn === null) {
             throw new NotFoundHttpException(
-               "MfaWebauthn not found with id: $webauthnId and mfa_id: $mfaId",
+                "MfaWebauthn not found with id: $webauthnId and mfa_id: $mfaId",
                 1660232933
             );
         }
 
         $label = \Yii::$app->request->getBodyParam('label');
-        $webauthn->label = $label?:"";
+        $webauthn->label = $label ?: "";
 
         if ($webauthn->validate() === false) {
             \Yii::error([

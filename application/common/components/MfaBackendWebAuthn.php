@@ -1,4 +1,5 @@
 <?php
+
 namespace common\components;
 
 use common\models\Mfa;
@@ -156,9 +157,30 @@ class MfaBackendWebAuthn extends Component implements MfaBackendInterface
         if ($verifyType != Mfa::VERIFY_REGISTRATION) {
             $webauthnCount = $mfa->getMfaWebauthns()->count();
             if ($webauthnCount < 1) {
-                throw new NotFoundHttpException("No MFA Webauthn record found for MFA ID: " . $mfa->id, 1659637860);
+                throw new NotFoundHttpException("No MfaWebauthn records found for Mfa ID: " . $mfa->id, 1659637860);
             }
-            return $this->client->webauthnValidateAuthentication($headers, $value);
+
+            $response = $this->client->webauthnValidateAuthentication($headers, $value);
+            $khh = $response['key_handle_hash'];
+
+            $mfaWebauthn = MfaWebauthn::findOne(['key_handle_hash' => $khh, 'mfa_id' => $mfaId]);
+            if ($mfaWebauthn == null) {
+                $mfaWebauthn = MfaWebauthn::findOne(['key_handle_hash' => 'u2f', 'mfa_id' => $mfaId]);
+                if ($mfaWebauthn == null) {
+                    \Yii::error([
+                        'action' => 'update MfaWebauthn last_used_utc',
+                        'status' => 'error',
+                        'mfa_id' => $mfaId,
+                        'error' => 'No MfaWebauthn record with key_handle_hash: "' . $khh . '" or  "u2f"',
+                    ]);
+                }
+            }
+
+            if ($mfaWebauthn != null) {
+                $mfaWebauthn->setLastUsed();
+            }
+
+            return true;
         }
 
         // Assume a new webauthn was requested and finish its registration process
@@ -168,7 +190,7 @@ class MfaBackendWebAuthn extends Component implements MfaBackendInterface
             throw new HttpException($e->getCode(), $e->getMessage(), 1660660611);
         }
 
-        if (! isset($results['key_handle_hash'])) {
+        if (!isset($results['key_handle_hash'])) {
             return false;
         }
 
@@ -197,8 +219,8 @@ class MfaBackendWebAuthn extends Component implements MfaBackendInterface
         if (!$mfa->verified && empty($mfa->external_uuid)) {
             // Let the $mfa->delete() process continue without further processing here
             return true;
-        } else if (empty($mfa->external_uuid)) {
-            throw new ForbiddenHttpException("May not delete a verified webauthn backend without an external_uuid", 1658237150);;
+        } elseif (empty($mfa->external_uuid)) {
+            throw new ForbiddenHttpException("May not delete a verified webauthn backend without an external_uuid", 1658237150);
         }
 
         $headers = $this->getWebAuthnHeaders(
@@ -225,11 +247,13 @@ class MfaBackendWebAuthn extends Component implements MfaBackendInterface
             'id' => $webauthnId,
         ]);
         if (empty($webauthn)) {
-            throw new NotFoundHttpException("MfaWebauthn not found with id: $webauthnId and mfa_id: $mfa->id",
-                1670950790);
+            throw new NotFoundHttpException(
+                "MfaWebauthn not found with id: $webauthnId and mfa_id: $mfa->id",
+                1670950790
+            );
         }
 
-        if (! $this->client->webauthnDeleteCredential($webauthn->key_handle_hash, $headers)) {
+        if (!$this->client->webauthnDeleteCredential($webauthn->key_handle_hash, $headers)) {
             throw new ServerErrorHttpException(
                 sprintf("Unable to delete existing backend webauthn key. [id=%s]", $webauthn->id),
                 1658237200

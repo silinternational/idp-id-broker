@@ -134,7 +134,7 @@ class Method extends MethodBase
         $this->verification_attempts = null;
         $this->verified = 1;
 
-        if (! $this->save()) {
+        if (!$this->save()) {
             \Yii::error([
                 'action' => 'validate and set method as verified',
                 'status' => 'error',
@@ -216,7 +216,7 @@ class Method extends MethodBase
         if ($method === null) {
             $method = self::create($userId, $value, $preVerified);
         } else {
-            if (! $method->isVerified()) {
+            if (!$method->isVerified()) {
                 $method->restartVerification();
             }
             return $method;
@@ -241,7 +241,7 @@ class Method extends MethodBase
         $this->verification_code = $this->createCode();
         $this->verification_expires = $this->calculateExpirationDate();
 
-        if (! $this->save()) {
+        if (!$this->save()) {
             throw new ServerErrorHttpException('Save error while restarting verification', 1545154473);
         }
 
@@ -326,7 +326,7 @@ class Method extends MethodBase
         $method->value = mb_strtolower($value);
         $method->verified = ($preVerified === true ? 1 : 0);
 
-        if (! $method->save()) {
+        if (!$method->save()) {
             throw new UnprocessableEntityHttpException(
                 'Validation failed, error: ' . print_r($method->getFirstErrors(), true),
                 1461441851

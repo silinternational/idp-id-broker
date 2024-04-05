@@ -1,4 +1,5 @@
 <?php
+
 namespace frontend\controllers;
 
 use common\exceptions\InvalidCodeException;
@@ -92,7 +93,7 @@ class MethodController extends BaseRestController
     public function actionCreate()
     {
         $value = \Yii::$app->request->post('value');
-        if ( ! is_string($value)) {
+        if (!is_string($value)) {
             throw new BadRequestHttpException(
                 'value is required',
                 1541627665
@@ -108,6 +109,12 @@ class MethodController extends BaseRestController
         }
 
         $userId = User::findOne(['employee_id' => $employeeId])->id ?? null;
+        if ($userId == null) {
+            throw new NotFoundHttpException(
+                'employee_id not found',
+                1540990165
+            );
+        }
 
         return Method::findOrCreate($userId, $value);
     }
@@ -182,7 +189,7 @@ class MethodController extends BaseRestController
     {
         $method = $this->getRequestedMethod($uid);
 
-        if (! $method->delete()) {
+        if (!$method->delete()) {
             throw new ServerErrorHttpException('Unable to delete method', 1540673326);
         }
 
