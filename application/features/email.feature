@@ -112,7 +112,7 @@ Feature: Email
       And I remove records of any emails that have been sent
       And no mfas exist
       And a user already exists
-      And a verified webauthn mfa option <webauthnExistsOrNot>
+      And <webauthnCount> verified webauthn mfa option <webauthnExistsOrNot>
       And a totp mfa option <totpExistsOrNot>
       And a backup code mfa option <backupExistsOrNot>
       And a "get-backup-codes" email <hasOrHasNot> been sent to that user
@@ -120,17 +120,18 @@ Feature: Email
     Then I see that a get backup codes email <shouldOrNot> be sent
 
     Examples:
-      | sendGetBackupCodesEml | webauthnExistsOrNot | totpExistsOrNot | backupExistsOrNot | hasOrHasNot | shouldOrNot |
-      | to send               | does NOT exist | does NOT exist  | does NOT exist    | has NOT     | should NOT  |
-      | to send               | does exist     | does NOT exist  | does NOT exist    | has NOT     | should      |
-      | to send               | does NOT exist | does exist      | does NOT exist    | has NOT     | should      |
-      | to send               | does exist     | does exist      | does NOT exist    | has NOT     | should NOT  |
-      | to send               | does exist     | does exist      | does exist        | has NOT     | should NOT  |
-      | to send               | does NOT exist | does exist      | does exist        | has NOT     | should NOT  |
-      | to send               | does exist     | does NOT exist  | does exist        | has NOT     | should NOT  |
-      | to send               | does NOT exist | does NOT exist  | does exist        | has NOT     | should NOT  |
-      | to send               | does exist     | does NOT exist  | does NOT exist    | has         | should NOT  |
-      | NOT to send           | does NOT exist | does exist      | does NOT exist    | has NOT     | should NOT  |
+      | sendGetBackupCodesEml | webauthnCount | webauthnExistsOrNot | totpExistsOrNot | backupExistsOrNot | hasOrHasNot | shouldOrNot |
+      | to send               | a | does NOT exist | does NOT exist  | does NOT exist    | has NOT     | should NOT  |
+      | to send               | a | does exist     | does NOT exist  | does NOT exist    | has NOT     | should      |
+      | to send               | 2 | does exist     | does NOT exist  | does NOT exist    | has NOT     | should NOT  |
+      | to send               | a | does NOT exist | does exist      | does NOT exist    | has NOT     | should      |
+      | to send               | a | does exist     | does exist      | does NOT exist    | has NOT     | should NOT  |
+      | to send               | a | does exist     | does exist      | does exist        | has NOT     | should NOT  |
+      | to send               | a | does NOT exist | does exist      | does exist        | has NOT     | should NOT  |
+      | to send               | a | does exist     | does NOT exist  | does exist        | has NOT     | should NOT  |
+      | to send               | a | does NOT exist | does NOT exist  | does exist        | has NOT     | should NOT  |
+      | to send               | a | does exist     | does NOT exist  | does NOT exist    | has         | should NOT  |
+      | NOT to send           | a | does NOT exist | does exist      | does NOT exist    | has NOT     | should NOT  |
 
   Scenario Outline: When to send mfa option added emails (after one has been added or deleted)
     Given we are configured <sendMfaOptionAddedEml> mfa option added emails
