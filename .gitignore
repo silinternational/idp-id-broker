@@ -1,6 +1,3 @@
-# Vagrant folder
-.vagrant/
-
 # phpstorm project files
 .idea/
 /nbproject/
@@ -18,8 +15,6 @@ vendor/
 .php-cs-fixer.cache
 
 api.html
-
-dockercfg
 
 # These folders are intended to offer a way to add logging for toubleshooting purposes
 serverless-mfa-api/override/*.go
