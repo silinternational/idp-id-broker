@@ -2,26 +2,17 @@
 
 
 ## Requirements ##
-Linux, macOS
-1. Docker
-
-or
-
-Windows (not actively maintained as a development platform)
-1. VirtualBox
-2. Vagrant
+- Docker
 
 ## Setup ##
 1. Clone this repo
-2. (Vagrant users only) Edit Vagrantfile to specify whatever IP address you want, and adjust the synced folder 
-   that gets mounted as /data if you need to
-3. Copy ```local.env.dist``` to ```local.env``` and fill in the required variable values.
-4. Set the following environment variables on your host (dev) machine:
+2. Copy ```local.env.dist``` to ```local.env``` and fill in the required variable values.
+3. Set the following environment variables on your host (dev) machine:
    - `COMPOSER_CACHE_DIR`: the path where composer should cache packages. This makes composer 
    installs and updates much faster. Typically `/home/user/.composer`
    - `DOCKER_UIDGID`: user ID and group ID. Use `1000:1000` if you are the primary user
    on a Linux computer. Otherwise, run `id -u` and `id -g` and use the resulting numbers in place of `1000`.
-5. Run `make start`, or if using Vagrant, run `vagrant up`
+4. Run `make start`
 
 ## Configuration
 By default, configuration is read from environment variables. These are documented
