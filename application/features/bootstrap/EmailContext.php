@@ -169,6 +169,11 @@ class EmailContext extends YiiContext
             $mfa->last_used_utc = MySqlDateTime::relative($diffConfig);
         }
         Assert::true($mfa->save(), "Could not create new mfa.");
+
+        if ($type == Mfa::TYPE_WEBAUTHN) {
+            MfaWebauthn::createWebauthn($mfa, '');
+        }
+
         $user->refresh();
     }
 
