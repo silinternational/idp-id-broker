@@ -9,6 +9,7 @@ use common\models\Invite;
 use common\models\Method;
 use common\models\Mfa;
 use common\models\MfaBackupcode;
+use common\models\MfaWebauthn;
 use common\models\User;
 use Sil\SilIdBroker\Behat\Context\YiiContext;
 use Webmozart\Assert\Assert;
@@ -93,7 +94,7 @@ class EmailContext extends YiiContext
         ]);
         Assert::isEmpty($emailLogs, sprintf(
             'Expected NOT to find any email logs for a(n) %s email to User %s, '
-            . 'but instead found %s of them.',
+                . 'but instead found %s of them.',
             var_export($messageType, true),
             var_export($this->tempUser->id, true),
             count($emailLogs)
@@ -168,6 +169,11 @@ class EmailContext extends YiiContext
             $mfa->last_used_utc = MySqlDateTime::relative($diffConfig);
         }
         Assert::true($mfa->save(), "Could not create new mfa.");
+
+        if ($type == Mfa::TYPE_WEBAUTHN) {
+            MfaWebauthn::createWebauthn($mfa, '');
+        }
+
         $user->refresh();
     }
 
@@ -215,7 +221,7 @@ class EmailContext extends YiiContext
         ]);
         Assert::count($emailLogs, 1, sprintf(
             'Expected to find an email log for a(n) %s email to User %s, but '
-            . 'instead found %s of them.',
+                . 'instead found %s of them.',
             var_export($messageType, true),
             var_export($this->tempUser->id, true),
             count($emailLogs)
@@ -291,14 +297,14 @@ class EmailContext extends YiiContext
             Assert::null(
                 $this->tempUser->current_password_id,
                 'The user already has a password, but this test needs a user '
-                . 'without a password.'
+                    . 'without a password.'
             );
         }
     }
 
     /**
      * @Given a second user exists with a totp mfa option
-    */
+     */
     public function aSecondUserExistsWithATotpMfaOption()
     {
         $this->tempUser2 = $this->createNewUser();
@@ -557,15 +563,24 @@ class EmailContext extends YiiContext
     public function noMfasExist()
     {
         MfaBackupcode::deleteAll();
+        MfaWebauthn::deleteAll();
         Mfa::deleteAll();
     }
 
     /**
-     * @Given a verified webauthn mfa option does exist
+     * @Given :count verified webauthn mfa option does exist
      */
-    public function aVerifiedWebAuthnMfaOptionDoesExist()
+    public function aVerifiedWebAuthnMfaOptionDoesExist($count)
     {
         $this->createMfa(Mfa::TYPE_WEBAUTHN);
+
+        if (intval($count) > 1) {
+            $mfa = $this->testMfaOption;
+
+            for ($i = 1; $i < $count; $i++) {
+                MfaWebauthn::createWebauthn($mfa, '');
+            }
+        }
     }
 
 
@@ -1139,7 +1154,7 @@ class EmailContext extends YiiContext
         Assert::true(
             $currentPassword->save(),
             'Failed to save updated password expiration date. '
-            . join(', ', $currentPassword->getFirstErrors())
+                . join(', ', $currentPassword->getFirstErrors())
         );
     }
 

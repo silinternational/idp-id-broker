@@ -665,7 +665,13 @@ class User extends UserBase
     {
         $count = 0;
         foreach ($this->mfas as $mfaOption) {
-            if ($mfaOption->verified === 1) {
+            if ($mfaOption->verified !== 1) {
+                continue;
+            }
+
+            if ($mfaOption->type === Mfa::TYPE_WEBAUTHN) {
+                $count += $mfaOption->getMfaWebauthns()->count();
+            } else {
                 $count += 1;
             }
         }
