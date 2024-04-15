@@ -568,7 +568,7 @@ class EmailContext extends YiiContext
     }
 
     /**
-     * @Given :arg1 verified webauthn mfa option does exist
+     * @Given :count verified webauthn mfa option does exist
      */
     public function aVerifiedWebAuthnMfaOptionDoesExist($count)
     {
@@ -577,7 +577,7 @@ class EmailContext extends YiiContext
         if (intval($count) > 1) {
             $mfa = $this->testMfaOption;
 
-            for ($i=1; $i < $count; $i++) { 
+            for ($i = 1; $i < $count; $i++) {
                 MfaWebauthn::createWebauthn($mfa, '');
             }
         }
