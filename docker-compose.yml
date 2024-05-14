@@ -194,7 +194,7 @@ services:
         # docker-compose run --rm test vendor/bin/behat --stop-on-failure features/user.feature:306
 
     phpmyadmin:
-        image: phpmyadmin/phpmyadmin
+        image: phpmyadmin:5
         ports:
             - "51141:80"
         depends_on:
