@@ -208,6 +208,7 @@ services:
 
     raml2html:
         image: mattjtodd/raml2html
+        platform: linux/amd64
         volumes:
             - ./api.raml:/api.raml
             - ./api.html:/api.html
