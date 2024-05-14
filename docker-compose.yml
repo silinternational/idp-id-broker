@@ -1,6 +1,7 @@
 services:
     data:
         image: silintl/data-volume:latest
+        platform: linux/amd64
         volumes:
             - ./application:/data
             - ./auth.json:/root/.composer/auth.json
@@ -73,6 +74,7 @@ services:
 
     cli:
         image: silintl/php8:8.1
+        platform: linux/amd64
         volumes:
             - ${COMPOSER_CACHE_DIR}:/composer
         volumes_from:
@@ -86,6 +88,7 @@ services:
 
     dynamo:
         image: amazon/dynamodb-local
+        platform: linux/amd64
         ports:
             - "8000:8000"
         environment:
@@ -147,6 +150,7 @@ services:
 
     test:
         image: silintl/php8:8.1
+        platform: linux/amd64
         volumes_from:
             - data
         mem_limit: 200m
