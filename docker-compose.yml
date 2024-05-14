@@ -1,7 +1,7 @@
-version: '2'
 services:
     data:
         image: silintl/data-volume:latest
+        platform: linux/amd64
         volumes:
             - ./application:/data
             - ./auth.json:/root/.composer/auth.json
@@ -74,6 +74,7 @@ services:
 
     cli:
         image: silintl/php8:8.1
+        platform: linux/amd64
         volumes:
             - ${COMPOSER_CACHE_DIR}:/composer
         volumes_from:
@@ -87,6 +88,7 @@ services:
 
     dynamo:
         image: amazon/dynamodb-local
+        platform: linux/amd64
         ports:
             - "8000:8000"
         environment:
@@ -148,6 +150,7 @@ services:
 
     test:
         image: silintl/php8:8.1
+        platform: linux/amd64
         volumes_from:
             - data
         mem_limit: 200m
@@ -191,7 +194,7 @@ services:
         # docker-compose run --rm test vendor/bin/behat --stop-on-failure features/user.feature:306
 
     phpmyadmin:
-        image: phpmyadmin/phpmyadmin
+        image: phpmyadmin:5
         ports:
             - "51141:80"
         depends_on:
@@ -205,6 +208,7 @@ services:
 
     raml2html:
         image: mattjtodd/raml2html
+        platform: linux/amd64
         volumes:
             - ./api.raml:/api.raml
             - ./api.html:/api.html
