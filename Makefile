@@ -1,27 +1,27 @@
 start: app
 
-app: db deps
+app: db composer
 	docker-compose up -d app phpmyadmin
 
-appfortests: testdb depsfortests
+appfortests: testdb composerfortests
 	docker-compose up -d appfortests
 
 bash:
 	docker-compose run --rm cli bash
 
-deps:
+composer:
 	docker-compose run --rm cli composer install
 
-depsfortests:
+composerfortests:
 	docker-compose run --rm appfortests composer install
 	docker-compose run --rm dynamorestart composer install
 
-depsshow:
+composershow:
 	docker-compose run --rm cli bash -c 'composer show --format=json --no-dev --no-ansi --locked | jq "[.locked[] | { \"name\": .name, \"version\": .version }]" > dependencies.json'
 
-depsupdate:
+composerupdate:
 	docker-compose run --rm cli composer update
-	make depsshow
+	make composershow
 
 db:
 	docker-compose up -d db
