@@ -76,7 +76,16 @@ class Mfa extends MfaBase
     {
         $this->data = [];
         if ($this->verified === 1 && $this->scenario === User::SCENARIO_AUTHENTICATE) {
-            $this->data += $this->authInit($rpOrigin);
+            try {
+                $this->data += $this->authInit($rpOrigin);
+            } catch (\Exception $exception) {
+                \Yii::error([
+                    'action' => 'load ' . $this->type . ' MFA data',
+                    'status' => 'error',
+                    'error' => 'authInit call failed (so skipping it): ' . $exception->getMessage(),
+                    'mfa_id' => $this->id,
+                ]);
+            }
         }
         if ($this->type === self::TYPE_BACKUPCODE || $this->type === self::TYPE_MANAGER) {
             $this->data += ['count' => count($this->mfaBackupcodes)];
