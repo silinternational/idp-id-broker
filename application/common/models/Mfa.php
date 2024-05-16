@@ -82,7 +82,7 @@ class Mfa extends MfaBase
                 \Yii::error([
                     'action' => 'load ' . $this->type . ' MFA data',
                     'status' => 'error',
-                    'error' => 'authInit call failed (so skipping it): ' . $exception->getMessage(),
+                    'error' => 'authInit failed for this MFA option: ' . $exception->getMessage(),
                     'mfa_id' => $this->id,
                 ]);
             }
