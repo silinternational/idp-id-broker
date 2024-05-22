@@ -12,6 +12,10 @@ default:
             paths:
                 - "%paths.base%/features/analytics.feature"
             contexts: [ FeatureContext, Sil\SilIdBroker\Behat\Context\AnalyticsContext ]
+        authentication_features:
+            paths:
+                - "%paths.base%/features/authentication.feature"
+            contexts: [ Sil\SilIdBroker\Behat\Context\AuthenticationContext ]
         email_features:
             paths:
                 - "%paths.base%/features/email.feature"
