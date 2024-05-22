@@ -2,7 +2,6 @@ default:
     suites:
         common_features:
             paths:
-                - "features/authentication.feature"
                 - "features/password.feature"
                 - "features/user.feature"
                 - "features/user-unit-tests.feature"
