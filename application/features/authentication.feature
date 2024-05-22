@@ -301,4 +301,5 @@ Feature: Authentication
       And the user has a valid WebAuthn MFA method
       But the WebAuthn MFA API is down
     When I provide the correct username and password for that user
-    Then I should see the TOTP MFA prompt
+    Then the response status code should be 200
+      And I should see the TOTP MFA prompt
