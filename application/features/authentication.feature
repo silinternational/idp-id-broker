@@ -294,3 +294,11 @@ Feature: Authentication
     Then the response status code should be 200
     And The user's current password should be marked as pwned
     And The user's password is expired
+
+  Scenario: Successfully authenticate even though WebAuthn MFA API is down
+    Given a user exists
+      And the user has a valid TOTP MFA method
+      And the user has a valid WebAuthn MFA method
+      But the WebAuthn MFA API is down
+    When I provide the correct username and password for that user
+    Then I should see the TOTP MFA prompt
