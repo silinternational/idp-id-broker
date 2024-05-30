@@ -296,8 +296,7 @@ Feature: Authentication
     And The user's password is expired
 
   Scenario: Successfully authenticate even though WebAuthn MFA API is down
-    Given "shep_clark" has a valid TOTP MFA method
-      And "shep_clark" has a valid WebAuthn MFA method
+    Given "shep_clark" has a valid WebAuthn MFA method
       And I provide the following valid data:
         | property  | value        |
         | username  | shep_clark   |
