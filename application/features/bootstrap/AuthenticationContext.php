@@ -6,31 +6,24 @@ use Behat\Behat\Tester\Exception\PendingException;
 use common\models\Mfa;
 use common\models\MfaWebauthn;
 use common\models\User;
+use Exception;
 use FeatureContext;
 use Webmozart\Assert\Assert;
-use Yii;
 
 class AuthenticationContext extends FeatureContext
 {
     /**
      * @Given :username has a valid TOTP MFA method
+     * @throws Exception
      */
     public function userHasAValidTotpMfaMethod($username)
     {
         $user = User::findByUsername($username);
         Assert::notEmpty($user, 'Unable to find user ' . $username);
-
-        $mfa = new Mfa([
-            'user_id' => $user->id,
-            'type' => mfa::TYPE_TOTP,
-            'verified' => 1,
-            'external_uuid' => 'ba3ae9f3-273d-4edb-93eb-021f33434c41',
-        ]);
-        Assert::true($mfa->save(), 'Failed to add that TOTP MFA record to the database.');
+        $result = Mfa::create($user->id, Mfa::TYPE_TOTP);
 
         // TEMP
-        $mfa->refresh();
-        echo 'totp mfa: ' . var_export($mfa->attributes, true) . PHP_EOL;
+        echo 'totp result: ' . json_encode($result, JSON_PRETTY_PRINT) . PHP_EOL;
     }
 
     /**
