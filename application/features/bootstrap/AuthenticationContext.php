@@ -84,4 +84,12 @@ class AuthenticationContext extends FeatureContext
             'TableName' => Env::get('API_KEY_TABLE'),
         ]);
     }
+
+    /**
+     * @Given we have the right password for the WebAuthn MFA API
+     */
+    public function weHaveTheRightPasswordForTheWebauthnMfaApi()
+    {
+        $this->setWebAuthnApiSecretTo(Env::get('MFA_WEBAUTHN_apiSecret'));
+    }
 }

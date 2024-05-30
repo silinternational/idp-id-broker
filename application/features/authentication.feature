@@ -295,13 +295,18 @@ Feature: Authentication
     And The user's current password should be marked as pwned
     And The user's password is expired
 
-  Scenario: Successfully authenticate even though WebAuthn MFA API is down
+  Scenario Outline: Successfully authenticate even though WebAuthn MFA API is down
     Given "shep_clark" has a valid WebAuthn MFA method
       And I provide the following valid data:
         | property  | value        |
         | username  | shep_clark   |
         | password  | govols!!!    |
-      But we have the wrong password for the WebAuthn MFA API
+      And we have the <rightOrWrongPassword> for the WebAuthn MFA API
     When I request "/authentication" be created
     Then the response status code should be 200
-      But the response body should not contain "publicKey"
+      And the response body should <containPublicKeyOrNot>
+
+    Examples:
+      | rightOrWrongPassword | containPublicKeyOrNot   |
+      | wrong password       | not contain "publicKey" |
+      | right password       | contain "publicKey"     |
