@@ -19,19 +19,16 @@ class AuthenticationContext extends FeatureContext
     {
         $user = User::findByUsername($username);
         Assert::notEmpty($user, 'Unable to find user ' . $username);
+
         $creationResult = Mfa::create($user->id, Mfa::TYPE_WEBAUTHN);
         $mfa = Mfa::findOne(['id' => $creationResult['id']]);
         $publicKey = $creationResult['data']['publicKey'];
         $rpId = $publicKey['rp']['id'];
 
-        // TEMP
-        echo 'webauthn result: ' . json_encode($creationResult, JSON_PRETTY_PRINT) . PHP_EOL;
-
         $this->cleanRequestBody();
         $this->setRequestBody('challenge', $publicKey['challenge']);
         $this->setRequestBody('relying_party_id', $rpId);
         $this->callU2fSimulator('/u2f/registration', 'created', $user, $mfa->external_uuid);
-
         $u2fSimResponse = $this->getResponseBody();
 
         if (isset($u2fSimResponse['clientExtensionResults']) && empty($u2fSimResponse['clientExtensionResults'])) {
@@ -39,19 +36,12 @@ class AuthenticationContext extends FeatureContext
             $u2fSimResponse['clientExtensionResults'] = new stdClass();
         }
 
-        // TEMP
-        echo 'u2f sim response body: ' . json_encode($u2fSimResponse, JSON_PRETTY_PRINT) . PHP_EOL;
-
         $mfaVerifyResult = $mfa->verify(
             $u2fSimResponse,
             $rpId,
             'registration'
         );
         Assert::true($mfaVerifyResult, 'Failed to verify the WebAuthn MFA');
-
-        // TEMP
-        Assert::true($mfa->refresh(), join("\n", $mfa->getErrorSummary(true)));
-        echo 'webauthn mfa: ' . json_encode($mfa->attributes, JSON_PRETTY_PRINT) . PHP_EOL;
     }
 
     /**
