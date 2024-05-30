@@ -304,6 +304,4 @@ Feature: Authentication
       But the WebAuthn MFA API is down
     When I request "/authentication" be created
     Then the response status code should be 200
-#      And the following data is returned:
-#        | property       | value        |
-#        | mfas           | 123          |
+      But the response body should not contain "publicKey"

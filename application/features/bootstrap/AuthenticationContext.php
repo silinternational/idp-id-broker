@@ -42,6 +42,9 @@ class AuthenticationContext extends FeatureContext
             'registration'
         );
         Assert::true($mfaVerifyResult, 'Failed to verify the WebAuthn MFA');
+
+        // TEMP
+        echo 'Please stop the WebAuthn MFA API now.' . PHP_EOL;
     }
 
     /**
@@ -49,6 +52,9 @@ class AuthenticationContext extends FeatureContext
      */
     public function theWebauthnMfaApiIsDown()
     {
-        throw new PendingException();
+        // Idea: Set the password this app has for the WebAuthn MFA (u2fsim) to an incorrect value.
+        sleep(5); // TEMP
+        echo '(Proceeding with the test...)' . PHP_EOL;
+//        throw new PendingException();
     }
 }
