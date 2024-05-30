@@ -2,16 +2,22 @@
 
 namespace Sil\SilIdBroker\Behat\Context;
 
-use Behat\Behat\Tester\Exception\PendingException;
+use Aws\DynamoDb\DynamoDbClient;
 use common\models\Mfa;
-use common\models\MfaWebauthn;
 use common\models\User;
 use FeatureContext;
+use Sil\PhpEnv\Env;
 use stdClass;
 use Webmozart\Assert\Assert;
 
 class AuthenticationContext extends FeatureContext
 {
+    public function __destruct()
+    {
+        // Ensure the (local) WebAuthn MFA API is left with the correct API Secret.
+        $this->setWebAuthnApiSecretTo(Env::get('MFA_WEBAUTHN_apiSecret'));
+    }
+
     /**
      * @Given :username has a valid WebAuthn MFA method
      */
@@ -48,13 +54,37 @@ class AuthenticationContext extends FeatureContext
     }
 
     /**
-     * @Given the WebAuthn MFA API is down
+     * @Given we have the wrong password for the WebAuthn MFA API
      */
-    public function theWebauthnMfaApiIsDown()
+    public function weHaveTheWrongPasswordForTheWebauthnMfaApi()
     {
-        // Idea: Set the password this app has for the WebAuthn MFA (u2fsim) to an incorrect value.
-        sleep(5); // TEMP
-        echo '(Proceeding with the test...)' . PHP_EOL;
-//        throw new PendingException();
+        /* This is setting the API secret to something else, so that the one
+         * ID Broker has is NOT correct anymore. */
+        $this->setWebAuthnApiSecretTo('something different');
+    }
+
+    protected function setWebAuthnApiSecretTo(string $newPlainTextApiSecret)
+    {
+        $newHashedApiSecret = password_hash($newPlainTextApiSecret, PASSWORD_DEFAULT);
+        $dynamoDbClient = new DynamoDbClient([
+            'region'   => getenv('AWS_DEFAULT_REGION'),
+            'endpoint' => getenv('AWS_ENDPOINT'),
+            'disableSSL' => true,
+            'version' => '2012-08-10',
+        ]);
+        $dynamoDbClient->updateItem([
+            'Key' => [
+                'value' => [
+                    'S' => Env::get('MFA_WEBAUTHN_apiKey'),
+                ],
+            ],
+            'UpdateExpression' => 'set hashedApiSecret = :newHashedApiSecret',
+            'ExpressionAttributeValues' => [
+                ':newHashedApiSecret' => [
+                    'S' => $newHashedApiSecret,
+                ],
+            ],
+            'TableName' => Env::get('API_KEY_TABLE'),
+        ]);
     }
 }

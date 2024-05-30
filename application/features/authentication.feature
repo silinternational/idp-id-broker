@@ -301,7 +301,7 @@ Feature: Authentication
         | property  | value        |
         | username  | shep_clark   |
         | password  | govols!!!    |
-      But the WebAuthn MFA API is down
+      But we have the wrong password for the WebAuthn MFA API
     When I request "/authentication" be created
     Then the response status code should be 200
       But the response body should not contain "publicKey"
