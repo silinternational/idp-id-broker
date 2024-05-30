@@ -48,9 +48,6 @@ class AuthenticationContext extends FeatureContext
             'registration'
         );
         Assert::true($mfaVerifyResult, 'Failed to verify the WebAuthn MFA');
-
-        // TEMP
-        echo 'Please stop the WebAuthn MFA API now.' . PHP_EOL;
     }
 
     /**
