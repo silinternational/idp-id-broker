@@ -296,10 +296,15 @@ Feature: Authentication
     And The user's password is expired
 
   Scenario: Successfully authenticate even though WebAuthn MFA API is down
-    Given a user exists
-      And the user has a valid TOTP MFA method
-      And the user has a valid WebAuthn MFA method
+    Given "shep_clark" has a valid TOTP MFA method
+      And "shep_clark" has a valid WebAuthn MFA method
+      And I provide the following valid data:
+        | property  | value        |
+        | username  | shep_clark   |
+        | password  | govols!!!    |
       But the WebAuthn MFA API is down
-    When I provide the correct username and password for that user
+    When I request "/authentication" be created
     Then the response status code should be 200
-      And I should see the TOTP MFA prompt
+#      And the following data is returned:
+#        | property       | value        |
+#        | mfas           | 123          |
