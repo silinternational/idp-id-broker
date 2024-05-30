@@ -295,7 +295,7 @@ Feature: Authentication
     And The user's current password should be marked as pwned
     And The user's password is expired
 
-  Scenario Outline: Successfully authenticate even though WebAuthn MFA API is down
+  Scenario Outline: Successfully authenticating even if the WebAuthn MFA API is unusable
     Given "shep_clark" has a valid WebAuthn MFA method
       And I provide the following valid data:
         | property  | value        |
