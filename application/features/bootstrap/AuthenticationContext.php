@@ -81,7 +81,7 @@ class AuthenticationContext extends FeatureContext
 
     protected function setWebAuthnApiSecretTo(string $newPlainTextApiSecret)
     {
-        $newHashedApiSecret = password_hash($newPlainTextApiSecret, PASSWORD_DEFAULT);
+        $newHashedApiSecret = password_hash($newPlainTextApiSecret, PASSWORD_BCRYPT);
         $dynamoDbClient = new DynamoDbClient([
             'region'   => getenv('AWS_DEFAULT_REGION'),
             'endpoint' => getenv('AWS_ENDPOINT'),
