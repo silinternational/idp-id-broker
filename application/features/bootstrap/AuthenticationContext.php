@@ -7,6 +7,7 @@ use common\models\Mfa;
 use common\models\MfaWebauthn;
 use common\models\User;
 use FeatureContext;
+use stdClass;
 use Webmozart\Assert\Assert;
 
 class AuthenticationContext extends FeatureContext
@@ -31,7 +32,22 @@ class AuthenticationContext extends FeatureContext
         $this->setRequestBody('relying_party_id', $rpId);
         $this->callU2fSimulator('/u2f/registration', 'created', $user, $mfa->external_uuid);
 
-        $this->iRequestTheResourceBe('/mfa/' . $mfa->id . '/verify/registration', 'created');
+        $u2fSimResponse = $this->getResponseBody();
+
+        if (isset($u2fSimResponse['clientExtensionResults']) && empty($u2fSimResponse['clientExtensionResults'])) {
+            // Force JSON-encoding to treat this as an empty object, not an empty array.
+            $u2fSimResponse['clientExtensionResults'] = new stdClass();
+        }
+
+        // TEMP
+        echo 'u2f sim response body: ' . json_encode($u2fSimResponse, JSON_PRETTY_PRINT) . PHP_EOL;
+
+        $mfaVerifyResult = $mfa->verify(
+            $u2fSimResponse,
+            $rpId,
+            'registration'
+        );
+        Assert::true($mfaVerifyResult, 'Failed to verify the WebAuthn MFA');
 
         // TEMP
         Assert::true($mfa->refresh(), join("\n", $mfa->getErrorSummary(true)));
