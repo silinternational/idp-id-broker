@@ -27,20 +27,16 @@ class AuthenticationContext extends FeatureContext
         Assert::notEmpty($user, 'Unable to find user ' . $username);
 
         $creationResult = Mfa::create($user->id, Mfa::TYPE_WEBAUTHN);
-        $mfa = Mfa::findOne(['id' => $creationResult['id']]);
+
         $publicKey = $creationResult['data']['publicKey'];
         $rpId = $publicKey['rp']['id'];
+        $mfa = Mfa::findOne(['id' => $creationResult['id']]);
+        Assert::notEmpty($mfa, sprintf(
+            "Unable to find MFA after creation, response was: \n%s",
+            json_encode($creationResult, JSON_PRETTY_PRINT)
+        ));
 
-        $this->cleanRequestBody();
-        $this->setRequestBody('challenge', $publicKey['challenge']);
-        $this->setRequestBody('relying_party_id', $rpId);
-        $this->callU2fSimulator('/u2f/registration', 'created', $user, $mfa->external_uuid);
-        $u2fSimResponse = $this->getResponseBody();
-
-        if (isset($u2fSimResponse['clientExtensionResults']) && empty($u2fSimResponse['clientExtensionResults'])) {
-            // Force JSON-encoding to treat this as an empty object, not an empty array.
-            $u2fSimResponse['clientExtensionResults'] = new stdClass();
-        }
+        $u2fSimResponse = $this->simulateU2fDevice($publicKey['challenge'], $rpId, $user, $mfa);
 
         $mfaVerifyResult = $mfa->verify(
             $u2fSimResponse,
@@ -48,6 +44,29 @@ class AuthenticationContext extends FeatureContext
             'registration'
         );
         Assert::true($mfaVerifyResult, 'Failed to verify the WebAuthn MFA');
+    }
+
+    /**
+     * Simulate the browser interactions for registering a U2F/WebAuthn device.
+     *
+     * @param $challenge
+     * @param $rpId
+     * @param User|null $user
+     * @param Mfa|null $mfa
+     * @return array|mixed
+     */
+    public function simulateU2fDevice($challenge, $rpId, User $user, Mfa $mfa)
+    {
+        $this->cleanRequestBody();
+        $this->setRequestBody('challenge', $challenge);
+        $this->setRequestBody('relying_party_id', $rpId);
+        $this->callU2fSimulator('/u2f/registration', 'created', $user, $mfa->external_uuid);
+        $u2fSimResponse = $this->getResponseBody();
+        if (isset($u2fSimResponse['clientExtensionResults']) && empty($u2fSimResponse['clientExtensionResults'])) {
+            // Force JSON-encoding to treat this as an empty object, not an empty array.
+            $u2fSimResponse['clientExtensionResults'] = new stdClass();
+        }
+        return $u2fSimResponse;
     }
 
     /**
