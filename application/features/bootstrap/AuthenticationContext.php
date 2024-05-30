@@ -18,20 +18,24 @@ class AuthenticationContext extends FeatureContext
     {
         $user = User::findByUsername($username);
         Assert::notEmpty($user, 'Unable to find user ' . $username);
-
-        $mfa = new Mfa([
-            'user_id' => $user->id,
-            'type' => mfa::TYPE_WEBAUTHN,
-            'verified' => 1,
-            'external_uuid' => '097791bf-2385-4ab4-8b06-14561a338d8e',
-        ]);
-        Assert::true($mfa->save(), 'Failed to add that WebAuthn MFA record to the database.');
-
-        $webauthn = MfaWebauthn::createWebauthn($mfa, uniqid());
+        $creationResult = Mfa::create($user->id, Mfa::TYPE_WEBAUTHN);
+        $mfa = Mfa::findOne(['id' => $creationResult['id']]);
+        $publicKey = $creationResult['data']['publicKey'];
+        $rpId = $publicKey['rp']['id'];
 
         // TEMP
-        echo 'webauthn mfa: ' . var_export($mfa->attributes, true) . PHP_EOL;
-        echo 'webauthn: ' . var_export($webauthn->attributes, true) . PHP_EOL;
+        echo 'webauthn result: ' . json_encode($creationResult, JSON_PRETTY_PRINT) . PHP_EOL;
+
+        $this->cleanRequestBody();
+        $this->setRequestBody('challenge', $publicKey['challenge']);
+        $this->setRequestBody('relying_party_id', $rpId);
+        $this->callU2fSimulator('/u2f/registration', 'created', $user, $mfa->external_uuid);
+
+        $this->iRequestTheResourceBe('/mfa/' . $mfa->id . '/verify/registration', 'created');
+
+        // TEMP
+        Assert::true($mfa->refresh(), join("\n", $mfa->getErrorSummary(true)));
+        echo 'webauthn mfa: ' . json_encode($mfa->attributes, JSON_PRETTY_PRINT) . PHP_EOL;
     }
 
     /**
