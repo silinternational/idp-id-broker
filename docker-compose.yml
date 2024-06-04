@@ -162,7 +162,12 @@ services:
         environment:
             TEST_SERVER_HOSTNAME: appfortests
             API_ACCESS_KEYS: api-test-NOTASECRET
+            API_KEY_TABLE: ApiKey
             APP_ENV: test
+            AWS_ENDPOINT: dynamo:8000
+            AWS_DEFAULT_REGION: us-east-1
+            AWS_ACCESS_KEY_ID: abc123
+            AWS_SECRET_ACCESS_KEY: abc123
             EMAILER_CLASS: \Sil\SilIdBroker\Behat\Context\fakes\FakeEmailer
             EMAIL_SERVICE_accessToken: dummy
             EMAIL_SERVICE_assertValidIp: "false"

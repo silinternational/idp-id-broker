@@ -263,6 +263,22 @@ class FeatureContext extends YiiContext
     }
 
     /**
+     * @Then the response body should not contain :notContainsText
+     */
+    public function theResponseBodyShouldNotContain($notContainsText)
+    {
+        Assert::notContains(
+            var_export($this->resBody, true),
+            $notContainsText,
+            sprintf(
+                "Unexpected response body. Should not contain: %s, body=%s",
+                $notContainsText,
+                var_export($this->resBody, true)
+            )
+        );
+    }
+
+    /**
      * @Then /^the property (\w+) should contain "(.*)"$/
      */
     public function thePropertyShouldContain($property, $contents)

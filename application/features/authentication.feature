@@ -294,3 +294,19 @@ Feature: Authentication
     Then the response status code should be 200
     And The user's current password should be marked as pwned
     And The user's password is expired
+
+  Scenario Outline: Successfully authenticating even if the WebAuthn MFA API is unusable
+    Given "shep_clark" has a valid WebAuthn MFA method
+      And I provide the following valid data:
+        | property  | value        |
+        | username  | shep_clark   |
+        | password  | govols!!!    |
+      And we have the <rightOrWrongPassword> for the WebAuthn MFA API
+    When I request "/authentication" be created
+    Then the response status code should be 200
+      And the response body should <containPublicKeyOrNot>
+
+    Examples:
+      | rightOrWrongPassword | containPublicKeyOrNot   |
+      | wrong password       | not contain "publicKey" |
+      | right password       | contain "publicKey"     |
