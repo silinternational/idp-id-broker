@@ -29,7 +29,7 @@ class AuthenticationController extends BaseRestController
         if ($rpOrigin != '' && !in_array($rpOrigin, \Yii::$app->params['authorizedRPOrigins'])) {
             $message = "Invalid rpOrigin. Received " . $rpOrigin . " authorized " .
                 var_export(\Yii::$app->params['authorizedRPOrigins'], true);
-            Yii::error($message);
+            \Yii::error($message);
             throw new ForbiddenHttpException($message, 1639169238);
         }
 
