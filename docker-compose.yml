@@ -195,8 +195,8 @@ services:
             U2F_SIM_HOST_AND_PORT: u2fsim:8080
         command: ./run-tests.sh
         # running isolated tests
-        # docker-compose run --rm test vendor/bin/behat --stop-on-failure features/user.feature
-        # docker-compose run --rm test vendor/bin/behat --stop-on-failure features/user.feature:306
+        # docker compose run --rm test vendor/bin/behat --stop-on-failure features/user.feature
+        # docker compose run --rm test vendor/bin/behat --stop-on-failure features/user.feature:306
 
     phpmyadmin:
         image: phpmyadmin:5
