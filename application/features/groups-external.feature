@@ -1,5 +1,8 @@
 Feature: Incorporating custom (external) groups in a User's `members` list
 
+  Background:
+    Given the requester is authorized
+
   # Scenarios that belong here in ID Broker:
 
   Scenario: Include external groups in a User's `members` list
