@@ -33,7 +33,7 @@ class GroupsExternalContext extends YiiContext
             'username' => 'john_smith',
         ]);
         $user->scenario = User::SCENARIO_NEW_USER;
-        
+
         $createdNewUser = $user->save();
         Assert::true($createdNewUser, sprintf(
             'Failed to create test user: %s',
@@ -52,17 +52,24 @@ class GroupsExternalContext extends YiiContext
 
         $savedChanges = $this->user->save();
         Assert::true($savedChanges, sprintf(
-            'Failed to save changes to test user: %s',
+            'Failed to set list of `groups` on test user: %s',
             join("\n", $this->user->getFirstErrors())
         ));
     }
 
     /**
-     * @Given that user's list of external groups is :arg1
+     * @Given that user's list of external groups is :commaSeparatedExternalGroups
      */
-    public function thatUsersListOfExternalGroupsIs($arg1)
+    public function thatUsersListOfExternalGroupsIs($commaSeparatedExternalGroups)
     {
-        throw new PendingException();
+        $this->user->groups_external = $commaSeparatedExternalGroups;
+        $this->user->scenario = User::SCENARIO_UPDATE_USER;
+
+        $savedChanges = $this->user->save();
+        Assert::true($savedChanges, sprintf(
+            'Failed to set list of `groups_external` on test user: %s',
+            join("\n", $this->user->getFirstErrors())
+        ));
     }
 
     /**
