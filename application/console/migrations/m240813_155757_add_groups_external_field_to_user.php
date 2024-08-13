@@ -9,7 +9,11 @@ class m240813_155757_add_groups_external_field_to_user extends Migration
 {
     public function safeUp()
     {
-        $this->addColumn('{{user}}', 'groups_external', 'string NOT NULL DEFAULT "" AFTER `groups`');
+        $this->addColumn(
+            '{{user}}',
+            'groups_external',
+            $this->string()->notNull()->defaultValue('')->after('groups')
+        );
     }
 
     public function safeDown()
