@@ -56,7 +56,7 @@ class UserBase extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['uuid', 'employee_id', 'first_name', 'last_name', 'username', 'active', 'locked', 'last_changed_utc', 'last_synced_utc', 'review_profile_after', 'groups_external', 'nag_for_mfa_after', 'nag_for_method_after'], 'required'],
+            [['uuid', 'employee_id', 'first_name', 'last_name', 'username', 'active', 'locked', 'last_changed_utc', 'last_synced_utc', 'review_profile_after', 'nag_for_mfa_after', 'nag_for_method_after'], 'required'],
             [['current_password_id'], 'integer'],
             [['active', 'locked', 'require_mfa', 'hide'], 'string'],
             [['last_changed_utc', 'last_synced_utc', 'review_profile_after', 'last_login_utc', 'expires_on', 'nag_for_mfa_after', 'nag_for_method_after', 'created_utc', 'deactivated_utc'], 'safe'],
