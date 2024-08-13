@@ -8,8 +8,6 @@
 1. Clone this repo
 2. Copy ```local.env.dist``` to ```local.env``` and fill in the required variable values.
 3. Set the following environment variables on your host (dev) machine:
-   - `COMPOSER_CACHE_DIR`: the path where composer should cache packages. This makes composer 
-   installs and updates much faster. Typically `/home/user/.composer`
    - `DOCKER_UIDGID`: user ID and group ID. Use `1000:1000` if you are the primary user
    on a Linux computer. Otherwise, run `id -u` and `id -g` and use the resulting numbers in place of `1000`.
 4. Run `make start`
