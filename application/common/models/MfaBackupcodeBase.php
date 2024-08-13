@@ -35,7 +35,7 @@ class MfaBackupcodeBase extends \yii\db\ActiveRecord
             [['mfa_id'], 'integer'],
             [['created_utc', 'expires_utc'], 'safe'],
             [['value'], 'string', 'max' => 255],
-            [['mfa_id'], 'exist', 'skipOnError' => true, 'targetClass' => Mfa::className(), 'targetAttribute' => ['mfa_id' => 'id']],
+            [['mfa_id'], 'exist', 'skipOnError' => true, 'targetClass' => Mfa::class, 'targetAttribute' => ['mfa_id' => 'id']],
         ];
     }
 
@@ -60,6 +60,6 @@ class MfaBackupcodeBase extends \yii\db\ActiveRecord
      */
     public function getMfa()
     {
-        return $this->hasOne(Mfa::className(), ['id' => 'mfa_id']);
+        return $this->hasOne(Mfa::class, ['id' => 'mfa_id']);
     }
 }

@@ -66,6 +66,6 @@ class PasswordBase extends \yii\db\ActiveRecord
      */
     public function getUsers()
     {
-        return $this->hasMany(User::className(), ['current_password_id' => 'id']);
+        return $this->hasMany(User::class, ['current_password_id' => 'id']);
     }
 }

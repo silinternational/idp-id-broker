@@ -37,7 +37,7 @@ class MfaWebauthnBase extends \yii\db\ActiveRecord
             [['created_utc', 'last_used_utc'], 'safe'],
             [['key_handle_hash'], 'string', 'max' => 255],
             [['label'], 'string', 'max' => 64],
-            [['mfa_id'], 'exist', 'skipOnError' => true, 'targetClass' => Mfa::className(), 'targetAttribute' => ['mfa_id' => 'id']],
+            [['mfa_id'], 'exist', 'skipOnError' => true, 'targetClass' => Mfa::class, 'targetAttribute' => ['mfa_id' => 'id']],
         ];
     }
 
@@ -63,6 +63,6 @@ class MfaWebauthnBase extends \yii\db\ActiveRecord
      */
     public function getMfa()
     {
-        return $this->hasOne(Mfa::className(), ['id' => 'mfa_id']);
+        return $this->hasOne(Mfa::class, ['id' => 'mfa_id']);
     }
 }
