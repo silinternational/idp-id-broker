@@ -123,9 +123,10 @@ class GroupsExternalContext extends FeatureContext
         foreach ($table as $row) {
             $group = $row['group'];
             Assert::inArray($group, $memberList, sprintf(
-                'Expected to find group %s, but only found %s.',
+                'Expected to find group %s, but only found %s. User: %s',
                 $group,
-                join(', ', $memberList)
+                join(', ', $memberList),
+                json_encode($this->user->attributes, JSON_PRETTY_PRINT)
             ));
         }
     }
