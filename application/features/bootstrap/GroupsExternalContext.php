@@ -2,28 +2,40 @@
 
 namespace Sil\SilIdBroker\Behat\Context;
 
-use Behat\Behat\Tester\Exception\PendingException;
+use Behat\Gherkin\Node\TableNode;
 use common\models\User;
+use FeatureContext;
 use Webmozart\Assert\Assert;
 
-class GroupsExternalContext extends YiiContext
+class GroupsExternalContext extends FeatureContext
 {
-    private string $userEmailAddress = 'john_smith@example.org';
     private User $user;
+    private string $userEmailAddress = 'john_smith@example.org';
+    private string $userPassword = 'dummy-password-#1';
 
     /**
      * @Given a user exists
      */
     public function aUserExists()
     {
-        $user = User::findByEmail($this->userEmailAddress);
-        if ($user === null) {
-            $user = $this->createTestUser();
-        }
-        $this->user = $user;
+        $this->deleteThatTestUser();
+        $this->createTestUser();
+        $this->setThatUsersPassword($this->userPassword);
     }
 
-    private function createTestUser(): User
+    private function deleteThatTestUser()
+    {
+        $user = User::findByEmail($this->userEmailAddress);
+        if ($user !== null) {
+            $didDeleteUser = $user->delete();
+            Assert::notFalse($didDeleteUser, sprintf(
+                'Failed to delete existing test user: %s',
+                join("\n", $user->getFirstErrors())
+            ));
+        }
+    }
+
+    private function createTestUser()
     {
         $user = new User([
             'email' => $this->userEmailAddress,
@@ -39,7 +51,20 @@ class GroupsExternalContext extends YiiContext
             'Failed to create test user: %s',
             join("\n", $user->getFirstErrors())
         ));
-        return $user;
+        $user->refresh();
+
+        $this->user = $user;
+    }
+
+    private function setThatUsersPassword(string $password)
+    {
+        $this->user->scenario = User::SCENARIO_UPDATE_PASSWORD;
+        $this->user->password = $password;
+
+        Assert::true($this->user->save(), sprintf(
+            "Failed to set the test user's password: %s",
+            join("\n", $this->user->getFirstErrors())
+        ));
     }
 
     /**
@@ -77,14 +102,31 @@ class GroupsExternalContext extends YiiContext
      */
     public function iSignInAsThatUser()
     {
-        throw new PendingException();
+        $dataForTableNode = [
+            ['property', 'value'],
+            ['username', $this->user->username],
+            ['password', $this->userPassword],
+        ];
+        $this->iProvideTheFollowingValidData(new TableNode($dataForTableNode));
+        $this->iRequestTheResourceBe('/authentication', 'created');
+        $this->theResponseStatusCodeShouldBe(200);
     }
 
     /**
-     * @Then the members list will be :arg1
+     * @Then the member list will include the following groups:
      */
-    public function theMembersListWillBe($arg1)
+    public function theMemberListWillIncludeTheFollowingGroups(TableNode $table)
     {
-        throw new PendingException();
+        $memberList = $this->getResponseProperty('member');
+        Assert::notEmpty($memberList);
+
+        foreach ($table as $row) {
+            $group = $row['group'];
+            Assert::inArray($group, $memberList, sprintf(
+                'Expected to find group %s, but only found %s.',
+                $group,
+                join(', ', $memberList)
+            ));
+        }
     }
 }
