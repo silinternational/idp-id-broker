@@ -64,7 +64,7 @@ class UserBase extends \yii\db\ActiveRecord
             [['employee_id'], 'unique'],
             [['username'], 'unique'],
             [['email'], 'unique'],
-            [['current_password_id'], 'exist', 'skipOnError' => true, 'targetClass' => Password::className(), 'targetAttribute' => ['current_password_id' => 'id']],
+            [['current_password_id'], 'exist', 'skipOnError' => true, 'targetClass' => Password::class, 'targetAttribute' => ['current_password_id' => 'id']],
         ];
     }
 
@@ -109,7 +109,7 @@ class UserBase extends \yii\db\ActiveRecord
      */
     public function getCurrentPassword()
     {
-        return $this->hasOne(Password::className(), ['id' => 'current_password_id']);
+        return $this->hasOne(Password::class, ['id' => 'current_password_id']);
     }
 
     /**
@@ -119,7 +119,7 @@ class UserBase extends \yii\db\ActiveRecord
      */
     public function getEmailLogs()
     {
-        return $this->hasMany(EmailLog::className(), ['user_id' => 'id']);
+        return $this->hasMany(EmailLog::class, ['user_id' => 'id']);
     }
 
     /**
@@ -129,7 +129,7 @@ class UserBase extends \yii\db\ActiveRecord
      */
     public function getInvites()
     {
-        return $this->hasMany(Invite::className(), ['user_id' => 'id']);
+        return $this->hasMany(Invite::class, ['user_id' => 'id']);
     }
 
     /**
@@ -139,7 +139,7 @@ class UserBase extends \yii\db\ActiveRecord
      */
     public function getMethods()
     {
-        return $this->hasMany(Method::className(), ['user_id' => 'id']);
+        return $this->hasMany(Method::class, ['user_id' => 'id']);
     }
 
     /**
@@ -149,6 +149,6 @@ class UserBase extends \yii\db\ActiveRecord
      */
     public function getMfas()
     {
-        return $this->hasMany(Mfa::className(), ['user_id' => 'id']);
+        return $this->hasMany(Mfa::class, ['user_id' => 'id']);
     }
 }
