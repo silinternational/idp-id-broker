@@ -17,6 +17,26 @@ Feature: Incorporating custom (external) groups in a User's `members` list
       | app-three |
       | app-four  |
 
+  Scenario: Gracefully handle an empty list of groups in a User's `members` list
+    Given a user exists
+      And that user's list of groups is ""
+      And that user's list of external groups is "app-three,app-four"
+    When I sign in as that user
+    Then the member list will include the following groups:
+      | group     |
+      | app-three |
+      | app-four  |
+
+  Scenario: Gracefully handle an empty list of external groups in a User's `members` list
+    Given a user exists
+      And that user's list of groups is "one,two"
+      And that user's list of external groups is ""
+    When I sign in as that user
+    Then the member list will include the following groups:
+      | group     |
+      | one       |
+      | two       |
+
 #  Scenario: Update a user's `groups_external` list, given a group prefix and list of groups
 
 #  # Scenarios that belong in the new "groups_external" sync:
