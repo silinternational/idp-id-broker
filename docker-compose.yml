@@ -211,6 +211,19 @@ services:
             PMA_USER: user
             PMA_PASSWORD: pass
 
+    phpmyadmintest:
+        image: phpmyadmin:5
+        ports:
+            - "51142:80"
+        depends_on:
+            - testdb
+        env_file:
+            - ./local.env
+        environment:
+            PMA_HOST: testdb
+            PMA_USER: appfortests
+            PMA_PASSWORD: appfortests
+
     raml2html:
         image: mattjtodd/raml2html
         platform: linux/amd64
