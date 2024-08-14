@@ -76,7 +76,7 @@ services:
         image: silintl/php8:8.1
         platform: linux/amd64
         volumes:
-            - ${COMPOSER_CACHE_DIR}:/composer
+            - composer-cache:/composer
         volumes_from:
             - data
         working_dir: /data
@@ -229,3 +229,5 @@ networks:
             - subnet: 10.20.39.0/24
               gateway: 10.20.39.1
 
+volumes:
+    composer-cache:
