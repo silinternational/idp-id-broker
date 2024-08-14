@@ -571,7 +571,15 @@ class User extends UserBase
             'member' => function (self $model) {
                 if (!empty($model->groups)) {
                     $member = explode(',', $model->groups);
+                } else {
+                    $member = [];
                 }
+
+                $externalGroups = explode(',', $model->groups_external);
+                foreach ($externalGroups as $externalGroup) {
+                    $member[] = $externalGroup;
+                }
+
                 $member[] = \Yii::$app->params['idpName'];
                 return $member;
             },
