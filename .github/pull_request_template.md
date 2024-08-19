@@ -5,7 +5,10 @@
 ### Added
 - 
 
-### Changed
+### Changed (non-breaking)
+-
+
+### Changed (BREAKING)
 -
 
 ### Deprecated
