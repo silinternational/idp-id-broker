@@ -44,7 +44,7 @@ class MfaBase extends \yii\db\ActiveRecord
             [['created_utc', 'last_used_utc'], 'safe'],
             [['external_uuid', 'label'], 'string', 'max' => 64],
             [['key_handle_hash'], 'string', 'max' => 255],
-            [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['user_id' => 'id']],
+            [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['user_id' => 'id']],
         ];
     }
 
@@ -73,7 +73,7 @@ class MfaBase extends \yii\db\ActiveRecord
      */
     public function getMfaBackupcodes()
     {
-        return $this->hasMany(MfaBackupcode::className(), ['mfa_id' => 'id']);
+        return $this->hasMany(MfaBackupcode::class, ['mfa_id' => 'id']);
     }
 
     /**
@@ -83,7 +83,7 @@ class MfaBase extends \yii\db\ActiveRecord
      */
     public function getMfaFailedAttempts()
     {
-        return $this->hasMany(MfaFailedAttempt::className(), ['mfa_id' => 'id']);
+        return $this->hasMany(MfaFailedAttempt::class, ['mfa_id' => 'id']);
     }
 
     /**
@@ -93,7 +93,7 @@ class MfaBase extends \yii\db\ActiveRecord
      */
     public function getMfaWebauthns()
     {
-        return $this->hasMany(MfaWebauthn::className(), ['mfa_id' => 'id']);
+        return $this->hasMany(MfaWebauthn::class, ['mfa_id' => 'id']);
     }
 
     /**
@@ -103,6 +103,6 @@ class MfaBase extends \yii\db\ActiveRecord
      */
     public function getUser()
     {
-        return $this->hasOne(User::className(), ['id' => 'user_id']);
+        return $this->hasOne(User::class, ['id' => 'user_id']);
     }
 }
