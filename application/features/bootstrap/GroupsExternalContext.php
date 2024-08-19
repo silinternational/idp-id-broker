@@ -111,23 +111,4 @@ class GroupsExternalContext extends FeatureContext
         $this->iRequestTheResourceBe('/authentication', 'created');
         $this->theResponseStatusCodeShouldBe(200);
     }
-
-    /**
-     * @Then the member list will include the following groups:
-     */
-    public function theMemberListWillIncludeTheFollowingGroups(TableNode $table)
-    {
-        $memberList = $this->getResponseProperty('member');
-        Assert::notEmpty($memberList);
-
-        foreach ($table as $row) {
-            $group = $row['group'];
-            Assert::inArray($group, $memberList, sprintf(
-                'Expected to find group %s, but only found %s. User: %s',
-                $group,
-                join(', ', $memberList),
-                json_encode($this->user->attributes, JSON_PRETTY_PRINT)
-            ));
-        }
-    }
 }
