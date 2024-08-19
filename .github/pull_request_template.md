@@ -27,6 +27,6 @@
 
 ### Feature PR Checklist
 - [ ] Documentation (README, local.env.dist, etc.)
-- [ ] Unit tests created or updated
+- [ ] Tests created or updated
 - [ ] Run `make composershow`
 - [ ] Run `make psr2`
