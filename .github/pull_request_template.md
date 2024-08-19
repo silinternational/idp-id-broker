@@ -1,7 +1,14 @@
+(Backlog issue's ID and title)
+
+---
+
 ### Added
 - 
 
-### Changed
+### Changed (non-breaking)
+-
+
+### Changed (BREAKING)
 -
 
 ### Deprecated
@@ -20,6 +27,6 @@
 
 ### Feature PR Checklist
 - [ ] Documentation (README, local.env.dist, etc.)
-- [ ] Unit tests created or updated
+- [ ] Tests created or updated
 - [ ] Run `make composershow`
 - [ ] Run `make psr2`
