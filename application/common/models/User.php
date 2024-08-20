@@ -571,7 +571,17 @@ class User extends UserBase
             'member' => function (self $model) {
                 if (!empty($model->groups)) {
                     $member = explode(',', $model->groups);
+                } else {
+                    $member = [];
                 }
+
+                $externalGroups = explode(',', $model->groups_external);
+                foreach ($externalGroups as $externalGroup) {
+                    if (!empty($externalGroup)) {
+                        $member[] = $externalGroup;
+                    }
+                }
+
                 $member[] = \Yii::$app->params['idpName'];
                 return $member;
             },
@@ -969,6 +979,7 @@ class User extends UserBase
         $labels['last_synced_utc'] = Yii::t('app', 'Last Synced (UTC)');
         $labels['created_utc'] = Yii::t('app', 'Created (UTC)');
         $labels['deactivated_utc'] = Yii::t('app', 'Deactivated (UTC)');
+        $labels['groups_external'] = Yii::t('app', 'Groups (External)');
 
         return $labels;
     }
