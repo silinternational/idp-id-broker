@@ -15,3 +15,4 @@ Feature: Updating a User's list of external groups
 
   # Scenario: Remove an external group from a user's list for a particular app
   # Scenario: Leave a user's external groups for a different app unchanged
+  # Scenario: Try to add an external group that does not match the given app-prefix
