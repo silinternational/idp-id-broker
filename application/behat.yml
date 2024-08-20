@@ -23,6 +23,10 @@ default:
             paths:
                 - "features/groups-external.feature"
             contexts: [ Sil\SilIdBroker\Behat\Context\GroupsExternalContext ]
+        groups_external_updates_features:
+            paths:
+                - "features/groups-external-updates.feature"
+            contexts: [ Sil\SilIdBroker\Behat\Context\GroupsExternalUpdatesContext ]
         hibp_unit_tests_features:
             paths:
                 - "features/hibp-unit-tests.feature"
