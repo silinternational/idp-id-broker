@@ -32,6 +32,6 @@ class GroupsExternalUpdatesContext extends GroupsExternalContext
     public function thatUsersListOfExternalGroupsShouldBe($commaSeparatedExternalGroups)
     {
         $user = User::findByEmail($this->getUserEmailAddress());
-        Assert::same($user->groups, $commaSeparatedExternalGroups);
+        Assert::same($user->groups_external, $commaSeparatedExternalGroups);
     }
 }
