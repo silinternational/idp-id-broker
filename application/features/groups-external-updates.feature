@@ -22,5 +22,13 @@ Feature: Updating a User's list of external groups
     Then the response status code should be 204
      And that user's list of external groups should be "wiki-managers"
 
-  # Scenario: Leave a user's external groups for a different app unchanged
+  Scenario: Leave a user's external groups for a different app unchanged
+    Given a user exists
+      And that user's list of external groups is "wiki-users,map-europe"
+    When I update that user's list of "map" external groups to the following:
+      | externalGroup |
+      | map-america   |
+    Then the response status code should be 204
+    And that user's list of external groups should be "wiki-users,map-america"
+
   # Scenario: Try to add an external group that does not match the given app-prefix
