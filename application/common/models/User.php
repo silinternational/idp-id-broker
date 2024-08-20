@@ -569,21 +569,7 @@ class User extends UserBase
             },
             'hide',
             'member' => function (self $model) {
-                if (!empty($model->groups)) {
-                    $member = explode(',', $model->groups);
-                } else {
-                    $member = [];
-                }
-
-                $externalGroups = explode(',', $model->groups_external);
-                foreach ($externalGroups as $externalGroup) {
-                    if (!empty($externalGroup)) {
-                        $member[] = $externalGroup;
-                    }
-                }
-
-                $member[] = \Yii::$app->params['idpName'];
-                return $member;
+                return $model->getMemberList();
             },
             'mfa',
             'method' => function (self $model) {
@@ -613,6 +599,26 @@ class User extends UserBase
     public function getDisplayName()
     {
         return $this->display_name ?? "$this->first_name $this->last_name";
+    }
+
+    /** @return string[] */
+    public function getMemberList(): array
+    {
+        if (!empty($this->groups)) {
+            $member = explode(',', $this->groups);
+        } else {
+            $member = [];
+        }
+
+        $externalGroups = explode(',', $this->groups_external);
+        foreach ($externalGroups as $externalGroup) {
+            if (!empty($externalGroup)) {
+                $member[] = $externalGroup;
+            }
+        }
+
+        $member[] = \Yii::$app->params['idpName'];
+        return $member;
     }
 
     /**
