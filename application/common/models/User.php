@@ -1005,6 +1005,18 @@ class User extends UserBase
 
     public function updateExternalGroups($appPrefix, $appExternalGroups): bool
     {
+        foreach ($appExternalGroups as $appExternalGroup) {
+            if (! str_starts_with($appExternalGroup, $appPrefix . '-')) {
+                $this->addErrors([
+                    'groups_external' => sprintf(
+                        'The given group %s does not start with the given prefix (%s)',
+                        json_encode($appExternalGroup),
+                        json_encode($appPrefix)
+                    ),
+                ]);
+                return false;
+            }
+        }
         $this->removeInMemoryExternalGroupsFor($appPrefix);
         $this->addInMemoryExternalGroups($appExternalGroups);
 

@@ -31,4 +31,12 @@ Feature: Updating a User's list of external groups
     Then the response status code should be 204
       And that user's list of external groups should be "wiki-users,map-america"
 
-  # Scenario: Try to add an external group that does not match the given app-prefix
+  Scenario: Try to add an external group that does not match the given app-prefix
+    Given a user exists
+      And that user's list of external groups is "wiki-users"
+    When I update that user's list of "wiki" external groups to the following:
+      | externalGroup |
+      | map-america   |
+    Then the response status code should be 422
+      And the response body should contain "prefix"
+      And that user's list of external groups should be "wiki-users"
