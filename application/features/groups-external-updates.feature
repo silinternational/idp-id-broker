@@ -10,7 +10,7 @@ Feature: Updating a User's list of external groups
       | externalGroup |
       | app-one       |
       | app-two       |
-    Then the response status code should be 200
+    Then the response status code should be 204
      And that user's list of external groups should be "app-one,app-two"
 
   # Scenario: Remove an external group from a user's list for a particular app
