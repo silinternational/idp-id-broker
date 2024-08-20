@@ -11,7 +11,7 @@ Feature: Updating a User's list of external groups
       | wiki-users    |
       | wiki-managers |
     Then the response status code should be 204
-     And that user's list of external groups should be "wiki-users,wiki-managers"
+      And that user's list of external groups should be "wiki-users,wiki-managers"
 
   Scenario: Remove an external group from a user's list for a particular app
     Given a user exists
@@ -20,7 +20,7 @@ Feature: Updating a User's list of external groups
       | externalGroup |
       | wiki-managers |
     Then the response status code should be 204
-     And that user's list of external groups should be "wiki-managers"
+      And that user's list of external groups should be "wiki-managers"
 
   Scenario: Leave a user's external groups for a different app unchanged
     Given a user exists
@@ -29,6 +29,6 @@ Feature: Updating a User's list of external groups
       | externalGroup |
       | map-america   |
     Then the response status code should be 204
-    And that user's list of external groups should be "wiki-users,map-america"
+      And that user's list of external groups should be "wiki-users,map-america"
 
   # Scenario: Try to add an external group that does not match the given app-prefix
