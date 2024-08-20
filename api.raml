@@ -48,7 +48,10 @@ types:
     type: object
     properties:
       email_address: string
-      app_prefix: string
+      app_prefix:
+        type: string
+        description: >
+          The app-specific prefix, without the trailing hyphen.
       groups:
         type: string[]
         description: >
