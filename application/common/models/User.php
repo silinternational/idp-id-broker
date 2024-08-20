@@ -1062,7 +1062,7 @@ class User extends UserBase
             $this->groups_external,
             join(',', $newExternalGroups)
         );
-        $this->groups_external .= trim($newCommaSeparatedExternalGroups, ',');
+        $this->groups_external = trim($newCommaSeparatedExternalGroups, ',');
     }
 
     /**
