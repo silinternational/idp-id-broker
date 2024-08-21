@@ -67,6 +67,11 @@ class GroupsExternalContext extends FeatureContext
         ));
     }
 
+    protected function getUserEmailAddress(): string
+    {
+        return $this->userEmailAddress;
+    }
+
     /**
      * @Given that user's list of groups is :commaSeparatedGroups
      */

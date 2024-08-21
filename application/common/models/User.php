@@ -1003,6 +1003,80 @@ class User extends UserBase
         return false;
     }
 
+    public function updateExternalGroups($appPrefix, $appExternalGroups): bool
+    {
+        foreach ($appExternalGroups as $appExternalGroup) {
+            if (! str_starts_with($appExternalGroup, $appPrefix . '-')) {
+                $this->addErrors([
+                    'groups_external' => sprintf(
+                        'The given group %s does not start with the given prefix (%s)',
+                        json_encode($appExternalGroup),
+                        json_encode($appPrefix)
+                    ),
+                ]);
+                return false;
+            }
+        }
+        $this->removeInMemoryExternalGroupsFor($appPrefix);
+        $this->addInMemoryExternalGroups($appExternalGroups);
+
+        $this->scenario = self::SCENARIO_UPDATE_USER;
+        $saved = $this->save(true, ['groups_external']);
+        if ($saved) {
+            return true;
+        } else {
+            Yii::warning(sprintf(
+                'Failed to update external groups for %s: %s',
+                $this->email,
+                join(', ', $this->getFirstErrors())
+            ));
+            return false;
+        }
+    }
+
+    /**
+     * Remove all entries from this User object's list of external groups that
+     * begin with the given prefix.
+     *
+     * NOTE:
+     * This only updates the property in memory. It leaves the calling code to
+     * call `save()` on this User when desired.
+     *
+     * @param $appPrefix
+     * @return void
+     */
+    private function removeInMemoryExternalGroupsFor($appPrefix)
+    {
+        $currentExternalGroups = explode(',', $this->groups_external);
+        $newExternalGroups = [];
+        foreach ($currentExternalGroups as $externalGroup) {
+            if (! str_starts_with($externalGroup, $appPrefix . '-')) {
+                $newExternalGroups[] = $externalGroup;
+            }
+        }
+        $this->groups_external = join(',', $newExternalGroups);
+    }
+
+    /**
+     * Add the given groups to this User objects' list of external groups.
+     *
+     * NOTE:
+     * This only updates the property in memory. It leaves the calling code to
+     * call `save()` on this User when desired.
+     *
+     * @param $newExternalGroups
+     * @return void
+     */
+    private function addInMemoryExternalGroups($newExternalGroups)
+    {
+        $newCommaSeparatedExternalGroups = sprintf(
+            '%s,%s',
+            $this->groups_external,
+            join(',', $newExternalGroups)
+        );
+        $this->groups_external = trim($newCommaSeparatedExternalGroups, ',');
+    }
+
     /**
      * Update the date field that corresponds to the current nag state
      */
