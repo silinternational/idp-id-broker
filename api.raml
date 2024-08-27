@@ -55,6 +55,20 @@ types:
       {
         "groups": ["myapp-users", "myapp-managers"]
       }
+  UserGroupsExternalResponse:
+    type: object
+    properties:
+      email:
+        type: string
+        description: That user's email address.
+      groups:
+        type: string[]
+        description: That user's list of groups with the specified app-prefix.
+    example: |
+      {
+        "email": "john_smith@example.com",
+        "groups": ["myapp-users", "myapp-managers"]
+      }
   UserResponse:
     description: >
       Information on user record. Password is not included if a password
@@ -429,36 +443,50 @@ types:
         description: A server-side error occurred.
         body:
           type: Error
-  /external-groups/{email}:
-    uriParameters:
-      email:
-        type: string
-        required: true
-        description: The (URL-encoded) email address.
+  /external-groups:
     queryParameters:
       app_prefix:
         type: string
         required: true
         description: >
           The app-specific prefix, without the trailing hyphen.
-    put:
+    get:
       description: >
-        Update the specified user's list of external groups for the given
-        app-prefix, to make it match the given list, leaving external groups
-        with other prefixes unchanged.
-      body:
-        type: GroupsExternalUpdate
+        Get the list of users (and their external groups with the given
+        app-prefix) who have at least one external group with the given
+        app-prefix (i.e. ignoring external groups with other prefixes).
       responses:
-        204:
-          description: >
-            The user's external groups for that app-prefix were updated.
-        404:
-          description: >
-            No such user found.
+        200:
+          body:
+            type: UserGroupsExternalResponse[]
         422:
           description: The given data does not satisfy some validation rule.
           body:
             type: Error
+    /{email}:
+      uriParameters:
+        email:
+          type: string
+          required: true
+          description: The (URL-encoded) email address.
+      put:
+        description: >
+          Update the specified user's list of external groups for the given
+          app-prefix, to make it match the given list, leaving external groups
+          with other prefixes unchanged.
+        body:
+          type: GroupsExternalUpdate
+        responses:
+          204:
+            description: >
+              The user's external groups for that app-prefix were updated.
+          404:
+            description: >
+              No such user found.
+          422:
+            description: The given data does not satisfy some validation rule.
+            body:
+              type: Error
   /{employee_id}:
     get:
       description: Get information about a specific user.
