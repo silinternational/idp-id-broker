@@ -19,11 +19,15 @@ class GroupsExternalUpdatesContext extends GroupsExternalContext
         }
 
         $this->cleanRequestBody();
-        $this->setRequestBody('email_address', $this->getUserEmailAddress());
-        $this->setRequestBody('app_prefix', $appPrefix);
         $this->setRequestBody('groups', $externalGroups);
 
-        $this->iRequestTheResourceBe('/user/external-groups', 'updated');
+        $urlPath = sprintf(
+            '/user/external-groups/%s?app_prefix=%s',
+            urlencode($this->getUserEmailAddress()),
+            urlencode($appPrefix),
+        );
+
+        $this->iRequestTheResourceBe($urlPath, 'updated');
     }
 
     /**

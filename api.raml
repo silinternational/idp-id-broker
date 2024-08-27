@@ -47,19 +47,12 @@ types:
   GroupsExternalUpdate:
     type: object
     properties:
-      email_address: string
-      app_prefix:
-        type: string
-        description: >
-          The app-specific prefix, without the trailing hyphen.
       groups:
         type: string[]
         description: >
           The desired list of groups, including the app-prefix.
     example: |
       {
-        "email_address": "john_smith@example.com",
-        "app_prefix": "myapp",
         "groups": ["myapp-users", "myapp-managers"]
       }
   UserResponse:
@@ -436,12 +429,20 @@ types:
         description: A server-side error occurred.
         body:
           type: Error
-  /external-groups:
+  /external-groups/{email}?app_prefix={app_prefix}:
+    uriParameters:
+      email:
+        type: string
+        description: The URL-encoded email address.
+      app_prefix:
+        type: string
+        description: >
+          The app-specific prefix, without the trailing hyphen.
     put:
       description: >
-        Update a user's list of external groups for a given app-prefix to be
-        exactly the given list, leaving external groups with other prefixes
-        unchanged.
+        Update the specified user's list of external groups for the given
+        app-prefix, to make it match the given list, leaving external groups
+        with other prefixes unchanged.
       body:
         type: GroupsExternalUpdate
       responses:

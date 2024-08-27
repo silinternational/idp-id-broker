@@ -45,13 +45,13 @@ return [
                 /*
                  * User routes
                  */
-                'GET  user'                                  => 'user/index',
-                'GET  user/<employeeId:\w+>'                 => 'user/view',
-                'POST user'                                  => 'user/create',
-                'PUT  user/external-groups'                  => 'user/update-external-groups',
-                'PUT  user/<employeeId:\w+>'                 => 'user/update',
-                'PUT  user/<employeeId:\w+>/password'        => 'user/update-password',
-                'PUT  user/<employeeId:\w+>/password/assess' => 'user/assess-password',
+                'GET  user'                                             => 'user/index',
+                'GET  user/<employeeId:\w+>'                            => 'user/view',
+                'POST user'                                             => 'user/create',
+                'PUT  user/external-groups/<email:[a-z._-]+@[a-z._-]+>' => 'user/update-external-groups',
+                'PUT  user/<employeeId:\w+>'                            => 'user/update',
+                'PUT  user/<employeeId:\w+>/password'                   => 'user/update-password',
+                'PUT  user/<employeeId:\w+>/password/assess'            => 'user/assess-password',
 
                 /*
                  * Authentication routes

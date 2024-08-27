@@ -77,9 +77,17 @@ class UserController extends BaseRestController
 
     public function actionUpdateExternalGroups()
     {
-        $emailAddress = Yii::$app->request->getBodyParam('email_address');
-        $appPrefix = Yii::$app->request->getBodyParam('app_prefix');
+        $emailAddress = Yii::$app->request->getQueryParam('email');
+        $appPrefix = Yii::$app->request->getQueryParam('app_prefix');
         $externalGroups = Yii::$app->request->getBodyParam('groups');
+
+        if (empty($emailAddress)) {
+            throw new UnprocessableEntityHttpException('No email address provided.');
+        }
+
+        if (empty($appPrefix)) {
+            throw new UnprocessableEntityHttpException('No app prefix provided.');
+        }
 
         $user = User::findByEmail($emailAddress);
         if ($user === null) {
