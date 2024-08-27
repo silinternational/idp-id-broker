@@ -429,13 +429,16 @@ types:
         description: A server-side error occurred.
         body:
           type: Error
-  /external-groups/{email}?app_prefix={app_prefix}:
+  /external-groups/{email}:
     uriParameters:
       email:
         type: string
-        description: The URL-encoded email address.
+        required: true
+        description: The (URL-encoded) email address.
+    queryParameters:
       app_prefix:
         type: string
+        required: true
         description: >
           The app-specific prefix, without the trailing hyphen.
     put:
