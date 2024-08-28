@@ -661,6 +661,7 @@ class User extends UserBase
             }
             if ($userIsMatch) {
                 $responseData[] = [
+                    'id' => $user->email, // TODO: Fix personnel-sync to not need this.
                     'email' => $user->email,
                     'groups' => join(',', $externalGroupsWithAppPrefix),
                 ];
