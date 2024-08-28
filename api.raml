@@ -58,7 +58,7 @@ types:
           The (comma-delimited) desired list of groups, including the app-prefix.
     example: |
       {
-        "email": "john_smith@example.com"
+        "email": "john_smith@example.com",
         "groups": "myapp-users,myapp-managers"
       }
   GroupsExternalUpdate:
@@ -484,9 +484,8 @@ types:
             type: Error
     post:
       description: >
-        Set the given external groups to the specified user's list of external
-        groups for the given app-prefix, leaving external groups with other
-        prefixes unchanged.
+        Give the specified user these external groups (for the specified
+        app-prefix), leaving external groups with other prefixes unchanged.
       body:
         type: GroupsExternalCreate
       responses:
