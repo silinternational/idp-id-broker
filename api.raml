@@ -44,6 +44,23 @@ types:
         "code": 0,
         "status": 400
       }
+  GroupsExternalCreate:
+    type: object
+    properties:
+      email:
+        type: string
+        required: true
+        description: >
+          The email address of the user to add these external groups to.
+      groups:
+        type: string
+        description: >
+          The (comma-delimited) desired list of groups, including the app-prefix.
+    example: |
+      {
+        "email": "john_smith@example.com"
+        "groups": "myapp-users,myapp-managers"
+      }
   GroupsExternalUpdate:
     type: object
     properties:
@@ -461,6 +478,24 @@ types:
         200:
           body:
             type: UserGroupsExternalResponse[]
+        422:
+          description: The given data does not satisfy some validation rule.
+          body:
+            type: Error
+    post:
+      description: >
+        Set the given external groups to the specified user's list of external
+        groups for the given app-prefix, leaving external groups with other
+        prefixes unchanged.
+      body:
+        type: GroupsExternalCreate
+      responses:
+        204:
+          description: >
+            The user's external groups for that app-prefix were set.
+        404:
+          description: >
+            No such user found.
         422:
           description: The given data does not satisfy some validation rule.
           body:

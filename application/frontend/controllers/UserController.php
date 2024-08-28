@@ -56,6 +56,35 @@ class UserController extends BaseRestController
         return $user;
     }
 
+    public function actionCreateExternalGroups()
+    {
+        $emailAddress = Yii::$app->request->getBodyParam('email');
+        $appPrefix = Yii::$app->request->getQueryParam('app_prefix');
+        $externalGroups = Yii::$app->request->getBodyParam('groups');
+
+        if (empty($emailAddress)) {
+            throw new UnprocessableEntityHttpException('No email address provided.');
+        }
+
+        if (empty($appPrefix)) {
+            throw new UnprocessableEntityHttpException('No app prefix provided.');
+        }
+
+        $user = User::findByEmail($emailAddress);
+        if ($user === null) {
+            Yii::$app->response->statusCode = 404;
+            return;
+        }
+
+        if ($user->updateExternalGroups($appPrefix, $externalGroups)) {
+            Yii::$app->response->statusCode = 204;
+            return;
+        }
+
+        $errors = join(', ', $user->getFirstErrors());
+        throw new UnprocessableEntityHttpException($errors);
+    }
+
     public function actionListExternalGroups()
     {
         $appPrefix = Yii::$app->request->getQueryParam('app_prefix');

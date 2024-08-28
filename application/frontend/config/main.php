@@ -43,13 +43,18 @@ return [
             // http://www.yiiframework.com/doc-2.0/guide-runtime-routing.html#named-parameters
             'rules' => [
                 /*
+                 * External Groups routes
+                 */
+                'GET  user/external-groups'                             => 'user/list-external-groups',
+                'POST user/external-groups'                             => 'user/create-external-groups',
+                'PUT  user/external-groups/<email:[a-z._-]+@[a-z._-]+>' => 'user/update-external-groups',
+
+                /*
                  * User routes
                  */
                 'GET  user'                                             => 'user/index',
                 'GET  user/<employeeId:\w+>'                            => 'user/view',
                 'POST user'                                             => 'user/create',
-                'GET  user/external-groups'                             => 'user/list-external-groups',
-                'PUT  user/external-groups/<email:[a-z._-]+@[a-z._-]+>' => 'user/update-external-groups',
                 'PUT  user/<employeeId:\w+>'                            => 'user/update',
                 'PUT  user/<employeeId:\w+>/password'                   => 'user/update-password',
                 'PUT  user/<employeeId:\w+>/password/assess'            => 'user/assess-password',
