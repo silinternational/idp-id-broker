@@ -22,6 +22,14 @@ Feature: Updating a User's list of external groups
     Then the response status code should be 204
       And that user's list of external groups should be "wiki-managers"
 
+  Scenario: Remove all external groups from a user's list for a particular app
+    Given a user exists
+      And that user's list of external groups is "wiki-users,wiki-managers"
+    When I update that user's list of "wiki" external groups to the following:
+      | externalGroup |
+    Then the response status code should be 204
+      And that user's list of external groups should be ""
+
   Scenario: Leave a user's external groups for a different app unchanged
     Given a user exists
       And that user's list of external groups is "wiki-users,map-europe"

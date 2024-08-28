@@ -1034,7 +1034,12 @@ class User extends UserBase
 
     public function updateExternalGroups(string $appPrefix, string $csvAppExternalGroups): bool
     {
-        $appExternalGroups = explode(',', $csvAppExternalGroups);
+        if (empty($csvAppExternalGroups)) {
+            $appExternalGroups = [];
+        } else {
+            $appExternalGroups = explode(',', $csvAppExternalGroups);
+        }
+
         foreach ($appExternalGroups as $appExternalGroup) {
             if (! str_starts_with($appExternalGroup, $appPrefix . '-')) {
                 $this->addErrors([

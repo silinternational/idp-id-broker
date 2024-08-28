@@ -90,7 +90,7 @@ class UserController extends BaseRestController
     {
         $emailAddress = Yii::$app->request->getQueryParam('email');
         $appPrefix = Yii::$app->request->getQueryParam('app_prefix');
-        $externalGroups = Yii::$app->request->getBodyParam('groups');
+        $externalGroups = Yii::$app->request->getBodyParam('groups', '');
 
         if (empty($emailAddress)) {
             throw new UnprocessableEntityHttpException('No email address provided.');
