@@ -49,10 +49,7 @@ class GroupsExternalListContext extends GroupsExternalContext
     {
         $expected = [];
         foreach ($table as $row) {
-            $expected[] = [
-                'email' => $row['email'],
-                'groups' => explode(',', $row['groups']),
-            ];
+            $expected[] = $row;
         }
         Assert::eq(
             json_encode($this->getResponseBody(), JSON_PRETTY_PRINT),

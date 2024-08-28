@@ -48,12 +48,12 @@ types:
     type: object
     properties:
       groups:
-        type: string[]
+        type: string
         description: >
-          The desired list of groups, including the app-prefix.
+          The (comma-delimited) desired list of groups, including the app-prefix.
     example: |
       {
-        "groups": ["myapp-users", "myapp-managers"]
+        "groups": "myapp-users,myapp-managers"
       }
   UserGroupsExternalResponse:
     type: object
@@ -62,12 +62,14 @@ types:
         type: string
         description: That user's email address.
       groups:
-        type: string[]
-        description: That user's list of groups with the specified app-prefix.
+        type: string
+        description: >
+          That user's comma-delimited list of groups with the specified
+          app-prefix.
     example: |
       {
         "email": "john_smith@example.com",
-        "groups": ["myapp-users", "myapp-managers"]
+        "groups": "myapp-users,myapp-managers"
       }
   UserResponse:
     description: >

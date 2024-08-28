@@ -19,7 +19,10 @@ class GroupsExternalUpdatesContext extends GroupsExternalContext
         }
 
         $this->cleanRequestBody();
-        $this->setRequestBody('groups', $externalGroups);
+        $this->setRequestBody(
+            'groups',
+            join(',', $externalGroups)
+        );
 
         $urlPath = sprintf(
             '/user/external-groups/%s?app_prefix=%s',

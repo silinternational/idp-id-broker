@@ -662,7 +662,7 @@ class User extends UserBase
             if ($userIsMatch) {
                 $responseData[] = [
                     'email' => $user->email,
-                    'groups' => $externalGroupsWithAppPrefix,
+                    'groups' => join(',', $externalGroupsWithAppPrefix),
                 ];
             }
         }
@@ -1031,8 +1031,9 @@ class User extends UserBase
         return false;
     }
 
-    public function updateExternalGroups($appPrefix, $appExternalGroups): bool
+    public function updateExternalGroups(string $appPrefix, string $csvAppExternalGroups): bool
     {
+        $appExternalGroups = explode(',', $csvAppExternalGroups);
         foreach ($appExternalGroups as $appExternalGroup) {
             if (! str_starts_with($appExternalGroup, $appPrefix . '-')) {
                 $this->addErrors([
