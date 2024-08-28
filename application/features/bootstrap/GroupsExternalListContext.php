@@ -2,8 +2,8 @@
 
 namespace Sil\SilIdBroker\Behat\Context;
 
-use Behat\Behat\Tester\Exception\PendingException;
 use Behat\Gherkin\Node\TableNode;
+use Webmozart\Assert\Assert;
 
 class GroupsExternalListContext extends GroupsExternalContext
 {
@@ -35,7 +35,7 @@ class GroupsExternalListContext extends GroupsExternalContext
         $this->cleanRequestBody();
 
         $urlPath = sprintf(
-            '/user/external-groups/?app_prefix=%s',
+            '/user/external-groups?app_prefix=%s',
             urlencode($appPrefix),
         );
 
@@ -43,10 +43,20 @@ class GroupsExternalListContext extends GroupsExternalContext
     }
 
     /**
-     * @Then the response body should contain only the following entries:
+     * @Then the response should only include the following users and groups:
      */
-    public function theResponseBodyShouldContainOnlyTheFollowingEntries(TableNode $table)
+    public function theResponseShouldOnlyIncludeTheFollowingUsersAndGroups(TableNode $table)
     {
-        throw new PendingException();
+        $expected = [];
+        foreach ($table as $row) {
+            $expected[] = [
+                'email' => $row['email'],
+                'groups' => explode(',', $row['groups']),
+            ];
+        }
+        Assert::eq(
+            json_encode($this->getResponseBody(), JSON_PRETTY_PRINT),
+            json_encode($expected, JSON_PRETTY_PRINT)
+        );
     }
 }

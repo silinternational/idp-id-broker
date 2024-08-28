@@ -641,6 +641,34 @@ class User extends UserBase
         return $this->nagState->getState();
     }
 
+    public static function listExternalGroups($appPrefix): array
+    {
+        /** @var User[] $users */
+        $users = User::find()->where(
+            ['like', 'groups_external', $appPrefix . '-']
+        )->all();
+
+        $responseData = [];
+        foreach ($users as $user) {
+            $userIsMatch = false;
+            $externalGroups = explode(',', $user->groups_external);
+            $externalGroupsWithAppPrefix = [];
+            foreach ($externalGroups as $externalGroup) {
+                if (str_starts_with($externalGroup, $appPrefix . '-')) {
+                    $userIsMatch = true;
+                    $externalGroupsWithAppPrefix[] = $externalGroup;
+                }
+            }
+            if ($userIsMatch) {
+                $responseData[] = [
+                    'email' => $user->email,
+                    'groups' => $externalGroupsWithAppPrefix,
+                ];
+            }
+        }
+        return $responseData;
+    }
+
     public function loadMfaData(string $rpOrigin = '')
     {
         $verifiedMfaOptions = $this->getVerifiedMfaOptions($rpOrigin);

@@ -48,6 +48,7 @@ return [
                 'GET  user'                                             => 'user/index',
                 'GET  user/<employeeId:\w+>'                            => 'user/view',
                 'POST user'                                             => 'user/create',
+                'GET  user/external-groups'                             => 'user/list-external-groups',
                 'PUT  user/external-groups/<email:[a-z._-]+@[a-z._-]+>' => 'user/update-external-groups',
                 'PUT  user/<employeeId:\w+>'                            => 'user/update',
                 'PUT  user/<employeeId:\w+>/password'                   => 'user/update-password',

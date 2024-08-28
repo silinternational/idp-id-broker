@@ -56,6 +56,17 @@ class UserController extends BaseRestController
         return $user;
     }
 
+    public function actionListExternalGroups()
+    {
+        $appPrefix = Yii::$app->request->getQueryParam('app_prefix');
+
+        if (empty($appPrefix)) {
+            throw new UnprocessableEntityHttpException('No app prefix provided.');
+        }
+
+        return User::listExternalGroups($appPrefix);
+    }
+
     public function actionUpdate(string $employeeId)
     {
         $user = User::findOne(['employee_id' => $employeeId]);
