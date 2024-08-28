@@ -43,17 +43,24 @@ class GroupsExternalListContext extends GroupsExternalContext
     }
 
     /**
-     * @Then the response should only include the following users and groups:
+     * @Then the response should only include the following groups for the following users:
      */
-    public function theResponseShouldOnlyIncludeTheFollowingUsersAndGroups(TableNode $table)
+    public function theResponseShouldOnlyIncludeTheFollowingGroupsForTheFollowingUsers(TableNode $table)
     {
-        $expected = [];
+        $expectedGroupsByUser = [];
         foreach ($table as $row) {
-            $expected[] = $row;
+            $expectedGroupsByUser[$row['email']] = $row['groups'];
         }
+
+        $actualGroupsByUser = [];
+        $responseBody = $this->getResponseBody();
+        foreach ($responseBody as $responseEntry) {
+            $actualGroupsByUser[$responseEntry['email']] = $responseEntry['groups'];
+        }
+
         Assert::eq(
-            json_encode($this->getResponseBody(), JSON_PRETTY_PRINT),
-            json_encode($expected, JSON_PRETTY_PRINT)
+            json_encode($actualGroupsByUser, JSON_PRETTY_PRINT),
+            json_encode($expectedGroupsByUser, JSON_PRETTY_PRINT)
         );
     }
 }

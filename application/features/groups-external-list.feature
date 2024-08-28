@@ -11,7 +11,7 @@ Feature: Getting a list of Users with external groups with a given prefix
       | bob_mcmanager@example.org | map-america,map-europe |
     When I get the list of users with "wiki" external groups
     Then the response status code should be 200
-      And the response should only include the following users and groups:
+      And the response should only include the following groups for the following users:
         | email                  | groups            |
         | john_smith@example.org | wiki-one          |
         | jane_doe@example.org   | wiki-one,wiki-two |
