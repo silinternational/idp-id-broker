@@ -670,6 +670,28 @@ class User extends UserBase
         return $responseData;
     }
 
+    public static function listUsersWithExternalGroupWith($appPrefix): array
+    {
+        $appPrefixWithHyphen = $appPrefix . '-';
+
+        /** @var User[] $users */
+        $users = User::find()->where(
+            ['like', 'groups_external', $appPrefixWithHyphen]
+        )->all();
+
+        $emailAddresses = [];
+        foreach ($users as $user) {
+            $externalGroups = explode(',', $user->groups_external);
+            foreach ($externalGroups as $externalGroup) {
+                if (str_starts_with($externalGroup, $appPrefixWithHyphen)) {
+                    $emailAddresses[] = $user->email;
+                    break;
+                }
+            }
+        }
+        return $emailAddresses;
+    }
+
     public function loadMfaData(string $rpOrigin = '')
     {
         $verifiedMfaOptions = $this->getVerifiedMfaOptions($rpOrigin);
@@ -1030,6 +1052,37 @@ class User extends UserBase
             }
         }
         return false;
+    }
+
+    public static function syncExternalGroups(string $appPrefix, array $desiredExternalGroupsByUserEmail): array
+    {
+        $errors = [];
+        $emailAddressesOfCurrentMatches = self::listUsersWithExternalGroupWith($appPrefix);
+
+        // Indicate that users not in the "desired" list should not have any
+        // such external groups.
+        foreach ($emailAddressesOfCurrentMatches as $email) {
+            if (! array_key_exists($email, $desiredExternalGroupsByUserEmail)) {
+                $desiredExternalGroupsByUserEmail[$email] = [];
+            }
+        }
+
+        foreach ($desiredExternalGroupsByUserEmail as $email => $groupsForPrefix) {
+            $user = User::findByEmail($email);
+            if ($user === null) {
+                $errors[] = 'No user found for ' . $email;
+                continue;
+            }
+            $successful = $user->updateExternalGroups($appPrefix, $groupsForPrefix);
+            if (! $successful) {
+                $errors[] = sprintf(
+                    'Failed to update external groups for %s: %s',
+                    $email,
+                    $user->getFirstErrors()
+                );
+            }
+        }
+        return $errors;
     }
 
     public function updateExternalGroups(string $appPrefix, string $csvAppExternalGroups): bool

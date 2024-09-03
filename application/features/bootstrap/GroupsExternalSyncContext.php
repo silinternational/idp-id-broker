@@ -22,6 +22,9 @@ class GroupsExternalSyncContext extends GroupsExternalContext
      */
     private array $externalGroupsLists = [];
 
+    /** @var string[] */
+    private array $syncErrors;
+
     /**
      * @Given the following users exist, with these external groups:
      */
@@ -64,10 +67,18 @@ class GroupsExternalSyncContext extends GroupsExternalContext
      */
     public function iSyncTheListOfExternalGroups($appPrefix)
     {
-        User::syncExternalGroups(
+        $this->syncErrors = User::syncExternalGroups(
             $appPrefix,
             $this->externalGroupsLists[$appPrefix]
         );
+    }
+
+    /**
+     * @Then there should not have been any sync errors
+     */
+    public function thereShouldNotHaveBeenAnySyncErrors()
+    {
+        Assert::isEmpty($this->syncErrors);
     }
 
     /**
@@ -77,11 +88,19 @@ class GroupsExternalSyncContext extends GroupsExternalContext
     {
         foreach ($table as $row) {
             $emailAddress = $row['email'];
-            $expectedExternalGroups = $row['groups'];
+            $expectedExternalGroups = explode(',', $row['groups']);
 
             $user = User::findByEmail($emailAddress);
             Assert::notNull($emailAddress, 'User not found: ' . $emailAddress);
-            Assert::same($user->groups_external, $expectedExternalGroups);
+            $actualExternalGroups = explode(',', $user->groups_external);
+
+            sort($actualExternalGroups);
+            sort($expectedExternalGroups);
+
+            Assert::same(
+                json_encode($actualExternalGroups, JSON_PRETTY_PRINT),
+                json_encode($expectedExternalGroups, JSON_PRETTY_PRINT)
+            );
         }
     }
 }
