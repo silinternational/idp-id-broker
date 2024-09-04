@@ -116,3 +116,5 @@ Feature: Syncing a specific app-prefix of external groups with an external list
       And the following users should have the following external groups:
         | email                  | groups            |
         | john_smith@example.org | wiki-one,wiki-two |
+
+  # Scenario: Send 1 notification email if sync finds group(s) for a user not in this IDP
