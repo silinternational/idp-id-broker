@@ -1076,9 +1076,9 @@ class User extends UserBase
             $successful = $user->updateExternalGroups($appPrefix, $groupsForPrefix);
             if (! $successful) {
                 $errors[] = sprintf(
-                    'Failed to update external groups for %s: %s',
+                    "Failed to update external groups for %s: \n%s",
                     $email,
-                    $user->getFirstErrors()
+                    json_encode($user->getFirstErrors(), JSON_PRETTY_PRINT)
                 );
             }
         }
