@@ -57,9 +57,6 @@ class GroupsExternalSyncContext extends GroupsExternalContext
             $userGroupsMap[$emailAddress] = $externalGroupsCsv;
         }
         $this->externalGroupsLists[$appPrefix] = $userGroupsMap;
-
-        //// TEMP
-        //echo json_encode($this->externalGroupsLists, JSON_PRETTY_PRINT) . PHP_EOL;
     }
 
     /**
@@ -101,6 +98,17 @@ class GroupsExternalSyncContext extends GroupsExternalContext
                 json_encode($actualExternalGroups, JSON_PRETTY_PRINT),
                 json_encode($expectedExternalGroups, JSON_PRETTY_PRINT)
             );
+        }
+    }
+
+    /**
+     * @Then there should have been a sync error
+     */
+    public function thereShouldHaveBeenASyncError()
+    {
+        Assert::notEmpty($this->syncErrors);
+        foreach ($this->syncErrors as $syncError) {
+            echo $syncError . PHP_EOL;
         }
     }
 }
