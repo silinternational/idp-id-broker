@@ -1070,7 +1070,7 @@ class User extends UserBase
         foreach ($desiredExternalGroupsByUserEmail as $email => $groupsForPrefix) {
             $user = User::findByEmail($email);
             if ($user === null) {
-                $errors[] = 'No user found for ' . $email;
+                $errors[] = 'No user found for email address ' . json_encode($email);
                 continue;
             }
             $successful = $user->updateExternalGroups($appPrefix, $groupsForPrefix);

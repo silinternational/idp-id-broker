@@ -102,3 +102,17 @@ Feature: Syncing a specific app-prefix of external groups with an external list
       And the following users should have the following external groups:
         | email                  | groups            |
         | john_smith@example.org | wiki-one,wiki-two |
+
+  Scenario: Properly handle an empty email address
+    Given the following users exist, with these external groups:
+        | email                  | groups   |
+        | john_smith@example.org | wiki-one |
+      And the "wiki" external groups list is the following:
+        | email                  | groups            |
+        |                        | wiki-one          |
+        | john_smith@example.org | wiki-one,wiki-two |
+    When I sync the list of "wiki" external groups
+    Then there should have been a sync error
+      And the following users should have the following external groups:
+        | email                  | groups            |
+        | john_smith@example.org | wiki-one,wiki-two |
