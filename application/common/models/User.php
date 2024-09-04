@@ -1025,6 +1025,19 @@ class User extends UserBase
         return false;
     }
 
+    /**
+     * Sync the given external-groups data (having the given app-prefix) with
+     * the current Users' external groups data.
+     *
+     * @param string $appPrefix -- Example: "wiki"
+     * @param array $desiredExternalGroupsByUserEmail -- The exhaustive list of
+     *     external groups for the given app-prefix, where each key is a User's
+     *     email address and each value is a comma-delimited string of which
+     *     groups (with that app-prefix) that the user should have. Any other
+     *     Users with external groups starting with the given app-prefix will
+     *     have those external groups removed.
+     * @return string[] -- The resulting error messages.
+     */
     public static function syncExternalGroups(string $appPrefix, array $desiredExternalGroupsByUserEmail): array
     {
         $errors = [];
