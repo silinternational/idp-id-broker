@@ -23,6 +23,3 @@ serverless-mfa-api/override/*.go
 serverless-mfa-api/override/server/*.go
 u2f-simulator/override/*.go
 u2f-simulator/override/u2fserver/*.go
-
-# Other files to exclude:
-*/config.json
