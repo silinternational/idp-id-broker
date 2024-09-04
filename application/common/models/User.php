@@ -1090,7 +1090,8 @@ class User extends UserBase
         if (empty($csvAppExternalGroups)) {
             $appExternalGroups = [];
         } else {
-            $appExternalGroups = explode(',', $csvAppExternalGroups);
+            $untrimmedAppExternalGroups = explode(',', $csvAppExternalGroups);
+            $appExternalGroups = array_map('trim', $untrimmedAppExternalGroups);
         }
 
         foreach ($appExternalGroups as $appExternalGroup) {

@@ -75,7 +75,10 @@ class GroupsExternalSyncContext extends GroupsExternalContext
      */
     public function thereShouldNotHaveBeenAnySyncErrors()
     {
-        Assert::isEmpty($this->syncErrors);
+        Assert::isEmpty($this->syncErrors, sprintf(
+            "Unexpected sync error(s): \n%s",
+            implode("\n", $this->syncErrors)
+        ));
     }
 
     /**
