@@ -1063,7 +1063,7 @@ class User extends UserBase
         // such external groups.
         foreach ($emailAddressesOfCurrentMatches as $email) {
             if (! array_key_exists($email, $desiredExternalGroupsByUserEmail)) {
-                $desiredExternalGroupsByUserEmail[$email] = [];
+                $desiredExternalGroupsByUserEmail[$email] = '';
             }
         }
 
