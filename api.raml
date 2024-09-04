@@ -44,50 +44,6 @@ types:
         "code": 0,
         "status": 400
       }
-  GroupsExternalCreate:
-    type: object
-    properties:
-      email:
-        type: string
-        required: true
-        description: >
-          The email address of the user to add these external groups to.
-      groups:
-        type: string
-        description: >
-          The (comma-delimited) desired list of groups, including the app-prefix.
-    example: |
-      {
-        "email": "john_smith@example.com",
-        "groups": "myapp-users,myapp-managers"
-      }
-  GroupsExternalUpdate:
-    type: object
-    properties:
-      groups:
-        type: string
-        description: >
-          The (comma-delimited) desired list of groups, including the app-prefix.
-    example: |
-      {
-        "groups": "myapp-users,myapp-managers"
-      }
-  UserGroupsExternalResponse:
-    type: object
-    properties:
-      email:
-        type: string
-        description: That user's email address.
-      groups:
-        type: string
-        description: >
-          That user's comma-delimited list of groups with the specified
-          app-prefix.
-    example: |
-      {
-        "email": "john_smith@example.com",
-        "groups": "myapp-users,myapp-managers"
-      }
   UserResponse:
     description: >
       Information on user record. Password is not included if a password
@@ -462,67 +418,6 @@ types:
         description: A server-side error occurred.
         body:
           type: Error
-  /external-groups:
-    queryParameters:
-      app_prefix:
-        type: string
-        required: true
-        description: >
-          The app-specific prefix, without the trailing hyphen.
-    get:
-      description: >
-        Get the list of users (and their external groups with the given
-        app-prefix) who have at least one external group with the given
-        app-prefix (i.e. ignoring external groups with other prefixes).
-      responses:
-        200:
-          body:
-            type: UserGroupsExternalResponse[]
-        422:
-          description: The given data does not satisfy some validation rule.
-          body:
-            type: Error
-    post:
-      description: >
-        Give the specified user these external groups (for the specified
-        app-prefix), leaving external groups with other prefixes unchanged.
-      body:
-        type: GroupsExternalCreate
-      responses:
-        204:
-          description: >
-            The user's external groups for that app-prefix were set.
-        404:
-          description: >
-            No such user found.
-        422:
-          description: The given data does not satisfy some validation rule.
-          body:
-            type: Error
-    /{email}:
-      uriParameters:
-        email:
-          type: string
-          required: true
-          description: The (URL-encoded) email address.
-      put:
-        description: >
-          Update the specified user's list of external groups for the given
-          app-prefix, to make it match the given list, leaving external groups
-          with other prefixes unchanged.
-        body:
-          type: GroupsExternalUpdate
-        responses:
-          204:
-            description: >
-              The user's external groups for that app-prefix were updated.
-          404:
-            description: >
-              No such user found.
-          422:
-            description: The given data does not satisfy some validation rule.
-            body:
-              type: Error
   /{employee_id}:
     get:
       description: Get information about a specific user.

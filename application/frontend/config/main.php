@@ -43,13 +43,6 @@ return [
             // http://www.yiiframework.com/doc-2.0/guide-runtime-routing.html#named-parameters
             'rules' => [
                 /*
-                 * External Groups routes
-                 */
-                'GET  user/external-groups'                             => 'user/list-external-groups',
-                'POST user/external-groups'                             => 'user/create-external-groups',
-                'PUT  user/external-groups/<email:[a-z._-]+@[a-z._-]+>' => 'user/update-external-groups',
-
-                /*
                  * User routes
                  */
                 'GET  user'                                             => 'user/index',
