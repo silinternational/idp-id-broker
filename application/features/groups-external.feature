@@ -39,9 +39,3 @@ Feature: Incorporating custom (external) groups in a User's `members` list
       | one       |
       | two       |
       | {idpName} |
-
-#  # Scenarios that belong in the new "groups_external" sync:
-#  Scenario: Send 1 notification email if sync finds group(s) for a user not in this IDP
-#  Scenario: Add entries in the synced Google Sheet to the `groups_external` field
-#  Scenario: Remove entries not in the synced Google Sheet from the `groups_external` field
-#  Scenario: Only use entries from the synced Google Sheet that specify this IDP
