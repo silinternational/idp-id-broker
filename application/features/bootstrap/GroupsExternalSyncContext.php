@@ -2,7 +2,6 @@
 
 namespace Sil\SilIdBroker\Behat\Context;
 
-use Behat\Behat\Tester\Exception\PendingException;
 use Behat\Gherkin\Node\TableNode;
 use common\models\User;
 use Webmozart\Assert\Assert;
