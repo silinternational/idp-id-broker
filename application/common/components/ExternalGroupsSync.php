@@ -37,8 +37,8 @@ class ExternalGroupsSync extends Component
                 ));
             } else {
                 Yii::warning(sprintf(
-                    'Syncing %s external groups from Google Sheet (%s)...',
-                    json_encode($appPrefix),
+                    "Syncing '%s' external groups from Google Sheet (%s)...",
+                    $appPrefix,
                     $googleSheetId
                 ));
                 self::syncSet($appPrefix, $googleSheetId);
@@ -51,7 +51,7 @@ class ExternalGroupsSync extends Component
         $desiredExternalGroups = self::getExternalGroupsFromGoogleSheet($googleSheetId);
         $errors = User::syncExternalGroups($appPrefix, $desiredExternalGroups);
         Yii::warning(sprintf(
-            'Ran sync for %s external groups.',
+            "Ran sync for '%s' external groups.",
             $appPrefix
         ));
 
