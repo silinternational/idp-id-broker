@@ -198,12 +198,6 @@ services:
         # docker compose run --rm test vendor/bin/behat --stop-on-failure features/user.feature
         # docker compose run --rm test vendor/bin/behat --stop-on-failure features/user.feature:306
 
-    externalgroupssync:
-        build: ./ext-groups-sync
-        volumes:
-            -   ./ext-groups-sync/config.json:/app/config.json
-            -   ./ext-groups-sync/.env:/app/.env
-
     phpmyadmin:
         image: phpmyadmin:5
         ports:
