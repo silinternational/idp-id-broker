@@ -641,7 +641,7 @@ class User extends UserBase
         return $this->nagState->getState();
     }
 
-    public static function listUsersWithExternalGroupWith($appPrefix): array
+    private static function listUsersWithExternalGroupWith($appPrefix): array
     {
         $appPrefixWithHyphen = $appPrefix . '-';
 
