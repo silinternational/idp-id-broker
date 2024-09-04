@@ -239,6 +239,7 @@ return [
             ],
             Env::getArrayFromPrefix('ABANDONED_USER_')
         ),
+        'externalGroupsSyncSets' => Env::getArrayFromPrefix('EXTERNAL_GROUPS_SYNC_'),
         'googleAnalytics'               => [
             'apiSecret' => Env::get('GA_API_SECRET'),
             'measurementId' => Env::get('GA_MEASUREMENT_ID'),

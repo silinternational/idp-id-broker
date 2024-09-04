@@ -2,6 +2,7 @@
 
 namespace console\controllers;
 
+use common\components\ExternalGroupsSync;
 use common\helpers\Utils;
 use common\models\Invite;
 use common\models\Method;
@@ -135,6 +136,16 @@ class CronController extends Controller
     public function actionExportToSheets()
     {
         User::exportToSheets();
+    }
+
+    /**
+     * Sync external groups from Google Sheets
+     */
+    public function actionSyncExternalGroups()
+    {
+        ExternalGroupsSync::syncAllSets(
+            \Yii::$app->params['externalGroupsSyncSets'] ?? []
+        );
     }
 
     /**
