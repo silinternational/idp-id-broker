@@ -1094,17 +1094,7 @@ class User extends UserBase
         $this->addInMemoryExternalGroups($appExternalGroups);
 
         $this->scenario = self::SCENARIO_UPDATE_USER;
-        $saved = $this->save(true, ['groups_external']);
-        if ($saved) {
-            return true;
-        } else {
-            Yii::warning(sprintf(
-                'Failed to update external groups for %s: %s',
-                $this->email,
-                join(', ', $this->getFirstErrors())
-            ));
-            return false;
-        }
+        return $this->save(true, ['groups_external']);
     }
 
     /**
