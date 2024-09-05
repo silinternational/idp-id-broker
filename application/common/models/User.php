@@ -1038,8 +1038,10 @@ class User extends UserBase
      *     with a different prefix will be left unchanged.
      * @return string[] -- The resulting error messages.
      */
-    public static function syncExternalGroups(string $appPrefix, array $desiredExternalGroupsByUserEmail): array
-    {
+    public static function updateUsersExternalGroups(
+        string $appPrefix,
+        array $desiredExternalGroupsByUserEmail
+    ): array {
         $errors = [];
         $emailAddressesOfCurrentMatches = self::listUsersWithExternalGroupWith($appPrefix);
 
