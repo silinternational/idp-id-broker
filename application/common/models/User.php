@@ -1526,7 +1526,13 @@ class User extends UserBase
             'status' => 'start',
         ]);
 
-        $googleSheetsClient = new Sheets();
+        $googleSheetsClient = new Sheets([
+            'applicationName' => Yii::$app->params['google']['applicationName'],
+            'jsonAuthFilePath' => Yii::$app->params['google']['jsonAuthFilePath'],
+            'jsonAuthString' => Yii::$app->params['google']['jsonAuthString'],
+            'delegatedAdmin' => Yii::$app->params['google']['delegatedAdmin'],
+            'spreadsheetId' => Yii::$app->params['google']['spreadsheetId'],
+        ]);
 
         $activeUsers = User::find()->where(['active' => 'yes'])->all();
         $table = [];
