@@ -18,52 +18,68 @@ class GroupsExternalContext extends FeatureContext
      */
     public function aUserExists()
     {
-        $this->deleteThatTestUser();
-        $this->createTestUser();
-        $this->setThatUsersPassword($this->userPassword);
+        $this->deleteTestUser($this->userEmailAddress);
+
+        $this->user = $this->createTestUser(
+            $this->userEmailAddress,
+            '11111'
+        );
+
+        $this->setTestUsersPassword(
+            $this->user,
+            $this->userPassword
+        );
     }
 
-    private function deleteThatTestUser()
+    protected function deleteTestUser(string $emailAddress)
     {
-        $user = User::findByEmail($this->userEmailAddress);
+        $user = User::findByEmail($emailAddress);
         if ($user !== null) {
             $didDeleteUser = $user->delete();
             Assert::notFalse($didDeleteUser, sprintf(
-                'Failed to delete existing test user: %s',
+                'Failed to delete existing test user (%s): %s',
+                $emailAddress,
                 join("\n", $user->getFirstErrors())
             ));
         }
     }
 
-    private function createTestUser()
-    {
+    protected function createTestUser(
+        string $emailAddress,
+        string $employeeId,
+        string $externalGroups = ''
+    ): User {
+        list($username, ) = explode('@', $emailAddress);
+        list($lcFirstName, $lcLastName) = explode('_', $username);
         $user = new User([
-            'email' => $this->userEmailAddress,
-            'employee_id' => '11111',
-            'first_name' => 'John',
-            'last_name' => 'Smith',
-            'username' => 'john_smith',
+            'email' => $emailAddress,
+            'employee_id' => $employeeId,
+            'first_name' => ucfirst($lcFirstName),
+            'last_name' => ucfirst($lcLastName),
+            'username' => $username,
+            'groups_external' => $externalGroups,
         ]);
         $user->scenario = User::SCENARIO_NEW_USER;
 
         $createdNewUser = $user->save();
         Assert::true($createdNewUser, sprintf(
-            'Failed to create test user: %s',
+            'Failed to create test user %s: %s',
+            json_encode($emailAddress),
             join("\n", $user->getFirstErrors())
         ));
         $user->refresh();
-
-        $this->user = $user;
+        return $user;
     }
 
-    private function setThatUsersPassword(string $password)
+    private function setTestUsersPassword(User $user, string $password)
     {
-        $this->user->scenario = User::SCENARIO_UPDATE_PASSWORD;
-        $this->user->password = $password;
+        $user->scenario = User::SCENARIO_UPDATE_PASSWORD;
+        $user->password = $password;
 
-        Assert::true($this->user->save(), sprintf(
-            "Failed to set the test user's password: %s",
-            join("\n", $this->user->getFirstErrors())
+        Assert::true($user->save(), sprintf(
+            "Failed to set the %s test user's password: %s",
+            json_encode($user->email),
+            join("\n", $user->getFirstErrors())
         ));
     }
 

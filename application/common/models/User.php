@@ -641,6 +641,28 @@ class User extends UserBase
         return $this->nagState->getState();
     }
 
+    private static function listUsersWithExternalGroupWith($appPrefix): array
+    {
+        $appPrefixWithHyphen = $appPrefix . '-';
+
+        /** @var User[] $users */
+        $users = User::find()->where(
+            ['like', 'groups_external', $appPrefixWithHyphen]
+        )->all();
+
+        $emailAddresses = [];
+        foreach ($users as $user) {
+            $externalGroups = explode(',', $user->groups_external);
+            foreach ($externalGroups as $externalGroup) {
+                if (str_starts_with($externalGroup, $appPrefixWithHyphen)) {
+                    $emailAddresses[] = $user->email;
+                    break;
+                }
+            }
+        }
+        return $emailAddresses;
+    }
+
     public function loadMfaData(string $rpOrigin = '')
     {
         $verifiedMfaOptions = $this->getVerifiedMfaOptions($rpOrigin);
@@ -1003,8 +1025,61 @@ class User extends UserBase
         return false;
     }
 
-    public function updateExternalGroups($appPrefix, $appExternalGroups): bool
+    /**
+     * Update users' external-groups data using the given external-groups data.
+     *
+     * @param string $appPrefix -- Example: "wiki"
+     * @param array $desiredExternalGroupsByUserEmail -- The authoritative list
+     *     of external groups for the given app-prefix, where each key is a
+     *     User's email address and each value is a comma-delimited string of
+     *     which groups (with that app-prefix) that the user should have. Any
+     *     other Users with external groups starting with the given app-prefix
+     *     will have those external groups removed. Any external groups starting
+     *     with a different prefix will be left unchanged.
+     * @return string[] -- The resulting error messages.
+     */
+    public static function updateUsersExternalGroups(
+        string $appPrefix,
+        array $desiredExternalGroupsByUserEmail
+    ): array {
+        $errors = [];
+        $emailAddressesOfCurrentMatches = self::listUsersWithExternalGroupWith($appPrefix);
+
+        // Indicate that users not in the "desired" list should not have any
+        // such external groups.
+        foreach ($emailAddressesOfCurrentMatches as $email) {
+            if (! array_key_exists($email, $desiredExternalGroupsByUserEmail)) {
+                $desiredExternalGroupsByUserEmail[$email] = '';
+            }
+        }
+
+        foreach ($desiredExternalGroupsByUserEmail as $email => $groupsForPrefix) {
+            $user = User::findByEmail($email);
+            if ($user === null) {
+                $errors[] = 'No user found for email address ' . json_encode($email);
+                continue;
+            }
+            $successful = $user->updateExternalGroups($appPrefix, $groupsForPrefix);
+            if (! $successful) {
+                $errors[] = sprintf(
+                    "Failed to update external groups for %s: \n%s",
+                    $email,
+                    json_encode($user->getFirstErrors(), JSON_PRETTY_PRINT)
+                );
+            }
+        }
+        return $errors;
+    }
+
+    public function updateExternalGroups(string $appPrefix, string $csvAppExternalGroups): bool
     {
+        if (empty($csvAppExternalGroups)) {
+            $appExternalGroups = [];
+        } else {
+            $untrimmedAppExternalGroups = explode(',', $csvAppExternalGroups);
+            $appExternalGroups = array_map('trim', $untrimmedAppExternalGroups);
+        }
+
         foreach ($appExternalGroups as $appExternalGroup) {
             if (! str_starts_with($appExternalGroup, $appPrefix . '-')) {
                 $this->addErrors([

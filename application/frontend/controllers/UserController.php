@@ -75,27 +75,6 @@ class UserController extends BaseRestController
         return $user;
     }
 
-    public function actionUpdateExternalGroups()
-    {
-        $emailAddress = Yii::$app->request->getBodyParam('email_address');
-        $appPrefix = Yii::$app->request->getBodyParam('app_prefix');
-        $externalGroups = Yii::$app->request->getBodyParam('groups');
-
-        $user = User::findByEmail($emailAddress);
-        if ($user === null) {
-            Yii::$app->response->statusCode = 404;
-            return;
-        }
-
-        if ($user->updateExternalGroups($appPrefix, $externalGroups)) {
-            Yii::$app->response->statusCode = 204;
-            return;
-        }
-
-        $errors = join(', ', $user->getFirstErrors());
-        throw new UnprocessableEntityHttpException($errors);
-    }
-
     public function actionUpdatePassword(string $employeeId)
     {
         $user = User::findOne(['employee_id' => $employeeId]);
