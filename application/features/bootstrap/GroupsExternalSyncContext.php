@@ -63,7 +63,7 @@ class GroupsExternalSyncContext extends GroupsExternalContext
      */
     public function iSyncTheListOfExternalGroups($appPrefix)
     {
-        $this->syncErrors = User::syncExternalGroups(
+        $this->syncErrors = User::updateUsersExternalGroups(
             $appPrefix,
             $this->externalGroupsLists[$appPrefix]
         );

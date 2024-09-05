@@ -1026,20 +1026,22 @@ class User extends UserBase
     }
 
     /**
-     * Sync the given external-groups data (having the given app-prefix) with
-     * the current Users' external groups data.
+     * Update users' external-groups data using the given external-groups data.
      *
      * @param string $appPrefix -- Example: "wiki"
-     * @param array $desiredExternalGroupsByUserEmail -- The exhaustive list of
-     *     external groups for the given app-prefix, where each key is a User's
-     *     email address and each value is a comma-delimited string of which
-     *     groups (with that app-prefix) that the user should have. Any other
-     *     Users with external groups starting with the given app-prefix will
-     *     have those external groups removed.
+     * @param array $desiredExternalGroupsByUserEmail -- The authoritative list
+     *     of external groups for the given app-prefix, where each key is a
+     *     User's email address and each value is a comma-delimited string of
+     *     which groups (with that app-prefix) that the user should have. Any
+     *     other Users with external groups starting with the given app-prefix
+     *     will have those external groups removed. Any external groups starting
+     *     with a different prefix will be left unchanged.
      * @return string[] -- The resulting error messages.
      */
-    public static function syncExternalGroups(string $appPrefix, array $desiredExternalGroupsByUserEmail): array
-    {
+    public static function updateUsersExternalGroups(
+        string $appPrefix,
+        array $desiredExternalGroupsByUserEmail
+    ): array {
         $errors = [];
         $emailAddressesOfCurrentMatches = self::listUsersWithExternalGroupWith($appPrefix);
 
