@@ -3,6 +3,7 @@
 namespace common\components;
 
 use common\models\User;
+use Webmozart\Assert\Assert;
 use Yii;
 use yii\base\Component;
 
@@ -49,7 +50,7 @@ class ExternalGroupsSync extends Component
     private static function syncSet(string $appPrefix, string $googleSheetId)
     {
         $desiredExternalGroups = self::getExternalGroupsFromGoogleSheet($googleSheetId);
-        $errors = User::syncExternalGroups($appPrefix, $desiredExternalGroups);
+        $errors = User::updateUsersExternalGroups($appPrefix, $desiredExternalGroups);
         Yii::warning(sprintf(
             "Ran sync for '%s' external groups.",
             $appPrefix
@@ -62,5 +63,48 @@ class ExternalGroupsSync extends Component
                 join(" / ", $errors)
             ));
         }
+    }
+
+    /**
+     * Get the desired external-group values, indexed by email address, from the
+     * specified Google Sheet, from the tab named after this IDP's code name
+     * (i.e. the name used in this IDP's subdomain).
+     *
+     * @throws \Google\Service\Exception
+     */
+    private static function getExternalGroupsFromGoogleSheet(string $googleSheetId): array
+    {
+        $googleSheetsClient = new Sheets([
+            'applicationName' => Yii::$app->params['google']['applicationName'],
+            'jsonAuthFilePath' => Yii::$app->params['google']['jsonAuthFilePath'],
+            'jsonAuthString' => Yii::$app->params['google']['jsonAuthString'],
+            'spreadsheetId' => $googleSheetId,
+        ]);
+        $tabName = Yii::$app->params['idpName'];
+
+        $values = $googleSheetsClient->getValuesFromTab($tabName);
+        $columnLabels = $values[0];
+
+        Assert::eq($columnLabels[0], 'email', sprintf(
+            "The first column in the '%s' tab must be 'email'",
+            $tabName
+        ));
+        Assert::eq($columnLabels[1], 'groups', sprintf(
+            "The second column in the '%s' tab must be 'groups'",
+            $tabName
+        ));
+        Assert::eq(
+            count($columnLabels),
+            2,
+            'There should only be two columns with values'
+        );
+
+        $data = [];
+        for ($i = 1; $i < count($values); $i++) {
+            $email = trim($values[$i][0]);
+            $groups = trim($values[$i][1] ?? '');
+            $data[$email] = $groups;
+        }
+        return $data;
     }
 }

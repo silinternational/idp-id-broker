@@ -2,6 +2,7 @@
 
 namespace common\components;
 
+use Google\Service\Exception;
 use InvalidArgumentException;
 use yii\base\Component;
 use yii\helpers\Json;
@@ -125,6 +126,43 @@ class Sheets extends Component
             ['majorDimension' => 'ROWS']
         );
         return $header['values'][0];
+    }
+
+    /**
+     * Get all the values from the specified tab in this Google Sheet.
+     *
+     * @param string $tabName
+     * @param string $range
+     * @return array[]
+     *     Example:
+     *     ```
+     *     [
+     *         [
+     *             "A1's value",
+     *             "B1's value"
+     *         ],
+     *         [
+     *             "A2's value",
+     *             "B2's value"
+     *         ],
+     *         [
+     *             "A3's value",
+     *             "B3's value"
+     *         ]
+     *     ]
+     *     ```
+     * @throws Exception
+     */
+    public function getValuesFromTab(string $tabName, string $range = 'A:ZZ'): array
+    {
+        $client = $this->getGoogleClient();
+
+        $valueRange = $client->spreadsheets_values->get(
+            $this->spreadsheetId,
+            $tabName . '!' . $range
+        );
+
+        return $valueRange->values;
     }
 
     /**
