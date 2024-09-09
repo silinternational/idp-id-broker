@@ -26,9 +26,9 @@ class ExternalGroupsSync extends Component
                 break;
             }
 
-            $appPrefix = $syncSetsParams[$appPrefixKey] ?? null;
-            $googleSheetId = $syncSetsParams[$googleSheetIdKey] ?? null;
-            $jsonAuthString = $syncSetsParams[$jsonAuthStringKey] ?? null;
+            $appPrefix = $syncSetsParams[$appPrefixKey] ?? '';
+            $googleSheetId = $syncSetsParams[$googleSheetIdKey] ?? '';
+            $jsonAuthString = $syncSetsParams[$jsonAuthStringKey] ?? '';
 
             if (empty($appPrefix) || empty($googleSheetId) || empty($jsonAuthString)) {
                 Yii::error(sprintf(
