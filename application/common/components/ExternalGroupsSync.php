@@ -57,11 +57,16 @@ class ExternalGroupsSync extends Component
         ));
 
         if (! empty($errors)) {
-            Yii::error(sprintf(
-                'Errors that occurred while syncing %s external groups: %s',
+            $errorSummary = sprintf(
+                'Errors that occurred (%s) while syncing %s external groups: %s',
+                count($errors),
                 $appPrefix,
                 join(" / ", $errors)
-            ));
+            );
+            if (strlen($errorSummary) > 1000) {
+                $errorSummary = substr($errorSummary, 0, 997) . '...';
+            }
+            Yii::error($errorSummary);
         }
     }
 
