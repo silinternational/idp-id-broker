@@ -156,11 +156,28 @@ class Sheets extends Component
     public function getValuesFromTab(string $tabName, string $range = 'A:ZZ'): array
     {
         $client = $this->getGoogleClient();
+        $tabWithRange = $tabName . '!' . $range;
 
-        $valueRange = $client->spreadsheets_values->get(
-            $this->spreadsheetId,
-            $tabName . '!' . $range
-        );
+        try {
+            $valueRange = $client->spreadsheets_values->get(
+                $this->spreadsheetId,
+                $tabWithRange
+            );
+        } catch (Exception $googleServiceException) {
+            $errorMessage = $googleServiceException->getMessage();
+            if (str_contains($errorMessage, 'Unable to parse range')) {
+                throw new InvalidArgumentException(
+                    sprintf(
+                        "Unable to parse range '%s'. Is there a '%s' tab in that Google Sheet?",
+                        $tabWithRange,
+                        $tabName
+                    ),
+                    $googleServiceException->getCode(),
+                    $googleServiceException
+                );
+            }
+            throw $googleServiceException;
+        }
 
         return $valueRange->values;
     }
