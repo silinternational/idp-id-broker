@@ -10,7 +10,6 @@ use common\models\Mfa;
 use common\models\User;
 use common\components\Emailer;
 use yii\console\Controller;
-
 use Br33f\Ga4\MeasurementProtocol\Dto\Event\BaseEvent;
 use TheIconic\Tracking\GoogleAnalytics\Analytics;
 
