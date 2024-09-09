@@ -1062,9 +1062,9 @@ class User extends UserBase
             $successful = $user->updateExternalGroups($appPrefix, $groupsForPrefix);
             if (! $successful) {
                 $errors[] = sprintf(
-                    "Failed to update external groups for %s: \n%s",
+                    'Failed to update external groups for %s: %s',
                     $email,
-                    json_encode($user->getFirstErrors(), JSON_PRETTY_PRINT)
+                    join(' / ', $user->getFirstErrors())
                 );
             }
         }
@@ -1084,9 +1084,9 @@ class User extends UserBase
             if (! str_starts_with($appExternalGroup, $appPrefix . '-')) {
                 $this->addErrors([
                     'groups_external' => sprintf(
-                        'The given group %s does not start with the given prefix (%s)',
-                        json_encode($appExternalGroup),
-                        json_encode($appPrefix)
+                        'The given group (%s) does not start with the given prefix (%s)',
+                        $appExternalGroup,
+                        $appPrefix
                     ),
                 ]);
                 return false;
@@ -1096,17 +1096,7 @@ class User extends UserBase
         $this->addInMemoryExternalGroups($appExternalGroups);
 
         $this->scenario = self::SCENARIO_UPDATE_USER;
-        $saved = $this->save(true, ['groups_external']);
-        if ($saved) {
-            return true;
-        } else {
-            Yii::warning(sprintf(
-                'Failed to update external groups for %s: %s',
-                $this->email,
-                join(', ', $this->getFirstErrors())
-            ));
-            return false;
-        }
+        return $this->save(true, ['groups_external']);
     }
 
     /**
