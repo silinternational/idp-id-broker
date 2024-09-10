@@ -49,7 +49,7 @@
   },
   {
     "name": "google/apiclient-services",
-    "version": "v0.368.0"
+    "version": "v0.372.0"
   },
   {
     "name": "google/auth",
@@ -169,7 +169,7 @@
   },
   {
     "name": "roave/security-advisories",
-    "version": "dev-master a143e74"
+    "version": "dev-master 791bcaf"
   },
   {
     "name": "sentry/sdk",
@@ -213,7 +213,7 @@
   },
   {
     "name": "symfony/http-client",
-    "version": "v6.4.10"
+    "version": "v6.4.11"
   },
   {
     "name": "symfony/http-client-contracts",
@@ -225,31 +225,27 @@
   },
   {
     "name": "symfony/polyfill-ctype",
-    "version": "v1.30.0"
+    "version": "v1.31.0"
   },
   {
     "name": "symfony/polyfill-iconv",
-    "version": "v1.30.0"
+    "version": "v1.31.0"
   },
   {
     "name": "symfony/polyfill-intl-idn",
-    "version": "v1.30.0"
+    "version": "v1.31.0"
   },
   {
     "name": "symfony/polyfill-intl-normalizer",
-    "version": "v1.30.0"
+    "version": "v1.31.0"
   },
   {
     "name": "symfony/polyfill-mbstring",
-    "version": "v1.30.0"
-  },
-  {
-    "name": "symfony/polyfill-php72",
-    "version": "v1.30.0"
+    "version": "v1.31.0"
   },
   {
     "name": "symfony/polyfill-php80",
-    "version": "v1.30.0"
+    "version": "v1.31.0"
   },
   {
     "name": "symfony/service-contracts",
@@ -258,6 +254,10 @@
   {
     "name": "theiconic/php-ga-measurement-protocol",
     "version": "v2.9.0"
+  },
+  {
+    "name": "webmozart/assert",
+    "version": "1.11.0"
   },
   {
     "name": "yiisoft/yii2",

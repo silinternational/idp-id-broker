@@ -4,7 +4,6 @@ namespace console\controllers;
 
 use common\helpers\Utils;
 use yii\console\Controller;
-
 use Br33f\Ga4\MeasurementProtocol\Dto\Event\BaseEvent;
 
 class GaController extends Controller

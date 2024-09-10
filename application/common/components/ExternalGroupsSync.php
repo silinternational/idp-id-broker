@@ -16,6 +16,7 @@ class ExternalGroupsSync extends Component
         for ($i = 1; $i <= self::MAX_SYNC_SETS; $i++) {
             $appPrefixKey = sprintf('set%uAppPrefix', $i);
             $googleSheetIdKey = sprintf('set%uGoogleSheetId', $i);
+            $jsonAuthStringKey = sprintf('set%uJsonAuthString', $i);
 
             if (! array_key_exists($appPrefixKey, $syncSetsParams)) {
                 Yii::warning(sprintf(
@@ -25,16 +26,18 @@ class ExternalGroupsSync extends Component
                 break;
             }
 
-            $appPrefix = $syncSetsParams[$appPrefixKey] ?? null;
-            $googleSheetId = $syncSetsParams[$googleSheetIdKey] ?? null;
+            $appPrefix = $syncSetsParams[$appPrefixKey] ?? '';
+            $googleSheetId = $syncSetsParams[$googleSheetIdKey] ?? '';
+            $jsonAuthString = $syncSetsParams[$jsonAuthStringKey] ?? '';
 
-            if (empty($appPrefix) || empty($googleSheetId)) {
+            if (empty($appPrefix) || empty($googleSheetId) || empty($jsonAuthString)) {
                 Yii::error(sprintf(
-                    'Unable to do external-groups sync set %s: '
-                    . 'app-prefix (%s) or Google Sheet ID (%s) was empty.',
+                    'Unable to do external-groups sync set %s: app-prefix (%s), '
+                    . 'Google Sheet ID (%s), or jsonAuthString (%s) was empty.',
                     $i,
                     json_encode($appPrefix),
                     json_encode($googleSheetId),
+                    json_encode($jsonAuthString),
                 ));
             } else {
                 Yii::warning(sprintf(
@@ -42,14 +45,20 @@ class ExternalGroupsSync extends Component
                     $appPrefix,
                     $googleSheetId
                 ));
-                self::syncSet($appPrefix, $googleSheetId);
+                self::syncSet($appPrefix, $googleSheetId, $jsonAuthString);
             }
         }
     }
 
-    private static function syncSet(string $appPrefix, string $googleSheetId)
-    {
-        $desiredExternalGroups = self::getExternalGroupsFromGoogleSheet($googleSheetId);
+    private static function syncSet(
+        string $appPrefix,
+        string $googleSheetId,
+        string $jsonAuthString
+    ) {
+        $desiredExternalGroups = self::getExternalGroupsFromGoogleSheet(
+            $googleSheetId,
+            $jsonAuthString
+        );
         $errors = User::updateUsersExternalGroups($appPrefix, $desiredExternalGroups);
         Yii::warning(sprintf(
             "Ran sync for '%s' external groups.",
@@ -72,12 +81,13 @@ class ExternalGroupsSync extends Component
      *
      * @throws \Google\Service\Exception
      */
-    private static function getExternalGroupsFromGoogleSheet(string $googleSheetId): array
-    {
+    private static function getExternalGroupsFromGoogleSheet(
+        string $googleSheetId,
+        string $jsonAuthString
+    ): array {
         $googleSheetsClient = new Sheets([
             'applicationName' => Yii::$app->params['google']['applicationName'],
-            'jsonAuthFilePath' => Yii::$app->params['google']['jsonAuthFilePath'],
-            'jsonAuthString' => Yii::$app->params['google']['jsonAuthString'],
+            'jsonAuthString' => $jsonAuthString,
             'spreadsheetId' => $googleSheetId,
         ]);
         $tabName = Yii::$app->params['idpName'];
