@@ -108,7 +108,10 @@ class GroupsExternalSyncContext extends GroupsExternalContext
      */
     public function thereShouldHaveBeenASyncError()
     {
-        Assert::notEmpty($this->syncErrors);
+        Assert::notEmpty(
+            $this->syncErrors,
+            'Expected sync errors, but found none.'
+        );
         foreach ($this->syncErrors as $syncError) {
             echo $syncError . PHP_EOL;
         }
