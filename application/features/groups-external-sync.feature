@@ -77,6 +77,10 @@ Feature: Syncing a specific app-prefix of external groups with an external list
         | email                  | groups   |
         | john_smith@example.org | map-asia |
 
+  Scenario: Try to use an app-prefix that does not begin with "ext-"
+    When I sync the list of "wiki" external groups
+    Then there should have been a sync error that mentions "ext-"
+
   Scenario: Try to add an external group that does not match the given app-prefix
     Given the following users exist, with these external groups:
         | email                  | groups   |
