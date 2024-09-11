@@ -63,7 +63,7 @@ class MfaController extends BaseRestController
      * @throws TooManyRequestsHttpException
      * @return null
      */
-    public function actionVerify(int $id, string $type = "")
+    public function actionVerify(int $id, string $type = ""): Mfa
     {
         $req = \Yii::$app->request;
         $value = $req->getBodyParam('value');
@@ -116,7 +116,7 @@ class MfaController extends BaseRestController
         }
         $mfa->loadData($rpOrigin);
         $user->last_login_utc = MySqlDateTime::now();
-        if (!$user->save()) {
+        if (!$user->save(false)) {
             \Yii::error([
                 'action' => 'save last_login_utc for user after mfa verification',
                 'status' => 'error',

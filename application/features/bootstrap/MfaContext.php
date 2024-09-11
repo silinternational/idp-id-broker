@@ -3,7 +3,6 @@
 namespace Sil\SilIdBroker\Behat\Context;
 
 use Behat\Gherkin\Node\TableNode;
-use common\models\EmailLog;
 use common\models\Mfa;
 use common\models\MfaBackupcode;
 use common\models\MfaWebauthn;
