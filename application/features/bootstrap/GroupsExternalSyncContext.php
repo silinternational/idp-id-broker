@@ -65,7 +65,7 @@ class GroupsExternalSyncContext extends GroupsExternalContext
     {
         $this->syncErrors = User::updateUsersExternalGroups(
             $appPrefix,
-            $this->externalGroupsLists[$appPrefix]
+            $this->externalGroupsLists[$appPrefix] ?? []
         );
     }
 
@@ -108,9 +108,30 @@ class GroupsExternalSyncContext extends GroupsExternalContext
      */
     public function thereShouldHaveBeenASyncError()
     {
-        Assert::notEmpty($this->syncErrors);
+        Assert::notEmpty(
+            $this->syncErrors,
+            'Expected sync errors, but found none.'
+        );
         foreach ($this->syncErrors as $syncError) {
             echo $syncError . PHP_EOL;
         }
+    }
+
+    /**
+     * @Then there should have been a sync error that mentions :text
+     */
+    public function thereShouldHaveBeenASyncErrorThatMentions($text)
+    {
+        $foundMatch = false;
+        foreach ($this->syncErrors as $syncError) {
+            echo $syncError . PHP_EOL;
+            if (str_contains($syncError, $text)) {
+                $foundMatch = true;
+            }
+        }
+        Assert::true($foundMatch, sprintf(
+            "Did not find a sync error that mentions '%s'",
+            $text
+        ));
     }
 }
