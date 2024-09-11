@@ -5,7 +5,7 @@ namespace frontend\controllers;
 use common\models\Mfa;
 use common\models\MfaWebauthn;
 use common\models\User;
-use common\components\MfaBackendWebAuthn;
+use common\helpers\MySqlDateTime;
 use frontend\components\BaseRestController;
 use stdClass;
 use yii\web\BadRequestHttpException;
@@ -115,6 +115,14 @@ class MfaController extends BaseRestController
             throw new BadRequestHttpException();
         }
         $mfa->loadData($rpOrigin);
+        $user->last_login_utc = MySqlDateTime::now();
+        if (!$user->save()) {
+            \Yii::error([
+                'action' => 'save last_login_utc for user after mfa verification',
+                'status' => 'error',
+                'message' => $user->getFirstErrors(),
+            ]);
+        }
         return $mfa;
     }
 

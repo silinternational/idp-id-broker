@@ -2,8 +2,6 @@
 
 namespace common\models;
 
-use common\components\Emailer;
-use common\helpers\MySqlDateTime;
 use yii\web\HttpException;
 
 /**
@@ -100,15 +98,13 @@ class Authentication
         if ($user->validate()) {
             $this->authenticatedUser = clone $user;
 
-            $user->last_login_utc = MySqlDateTime::now();
-
             $user->updateProfileReviewDates();
 
             $user->checkAndProcessHIBP();
 
             if (!$user->save()) {
                 \Yii::error([
-                    'action' => 'save last_login_utc and nag dates for user after authentication',
+                    'action' => 'save nag date for user after authentication',
                     'status' => 'error',
                     'message' => $user->getFirstErrors(),
                 ]);
