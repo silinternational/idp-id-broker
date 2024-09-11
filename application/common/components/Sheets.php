@@ -2,6 +2,7 @@
 
 namespace common\components;
 
+use Google\Service\Exception;
 use InvalidArgumentException;
 use yii\base\Component;
 use yii\helpers\Json;
@@ -49,12 +50,6 @@ class Sheets extends Component
      */
     public function init()
     {
-        $this->applicationName = \Yii::$app->params['google']['applicationName'];
-        $this->jsonAuthFilePath = \Yii::$app->params['google']['jsonAuthFilePath'];
-        $this->jsonAuthString = \Yii::$app->params['google']['jsonAuthString'];
-        $this->delegatedAdmin = \Yii::$app->params['google']['delegatedAdmin'];
-        $this->spreadsheetId = \Yii::$app->params['google']['spreadsheetId'];
-
         if (!empty($this->jsonAuthFilePath)) {
             if (file_exists($this->jsonAuthFilePath)) {
                 $this->jsonAuthString = \file_get_contents($this->jsonAuthFilePath);
@@ -131,6 +126,60 @@ class Sheets extends Component
             ['majorDimension' => 'ROWS']
         );
         return $header['values'][0];
+    }
+
+    /**
+     * Get all the values from the specified tab in this Google Sheet.
+     *
+     * @param string $tabName
+     * @param string $range
+     * @return array[]
+     *     Example:
+     *     ```
+     *     [
+     *         [
+     *             "A1's value",
+     *             "B1's value"
+     *         ],
+     *         [
+     *             "A2's value",
+     *             "B2's value"
+     *         ],
+     *         [
+     *             "A3's value",
+     *             "B3's value"
+     *         ]
+     *     ]
+     *     ```
+     * @throws Exception
+     */
+    public function getValuesFromTab(string $tabName, string $range = 'A:ZZ'): array
+    {
+        $client = $this->getGoogleClient();
+        $tabWithRange = $tabName . '!' . $range;
+
+        try {
+            $valueRange = $client->spreadsheets_values->get(
+                $this->spreadsheetId,
+                $tabWithRange
+            );
+        } catch (Exception $googleServiceException) {
+            $errorMessage = $googleServiceException->getMessage();
+            if (str_contains($errorMessage, 'Unable to parse range')) {
+                throw new InvalidArgumentException(
+                    sprintf(
+                        "Unable to parse range '%s'. Is there a '%s' tab in that Google Sheet?",
+                        $tabWithRange,
+                        $tabName
+                    ),
+                    $googleServiceException->getCode(),
+                    $googleServiceException
+                );
+            }
+            throw $googleServiceException;
+        }
+
+        return $valueRange->values;
     }
 
     /**

@@ -32,7 +32,7 @@ class MfaFailedAttemptBase extends \yii\db\ActiveRecord
             [['mfa_id', 'at_utc'], 'required'],
             [['mfa_id'], 'integer'],
             [['at_utc'], 'safe'],
-            [['mfa_id'], 'exist', 'skipOnError' => true, 'targetClass' => Mfa::className(), 'targetAttribute' => ['mfa_id' => 'id']],
+            [['mfa_id'], 'exist', 'skipOnError' => true, 'targetClass' => Mfa::class, 'targetAttribute' => ['mfa_id' => 'id']],
         ];
     }
 
@@ -55,6 +55,6 @@ class MfaFailedAttemptBase extends \yii\db\ActiveRecord
      */
     public function getMfa()
     {
-        return $this->hasOne(Mfa::className(), ['id' => 'mfa_id']);
+        return $this->hasOne(Mfa::class, ['id' => 'mfa_id']);
     }
 }

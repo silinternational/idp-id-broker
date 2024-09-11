@@ -450,7 +450,7 @@ class UnitTestsContext extends YiiContext
             }
         }
 
-        if($option === "is") {
+        if ($option === "is") {
             Assert::true($isIncluded);
         } else {
             Assert::false($isIncluded);

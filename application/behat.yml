@@ -19,6 +19,14 @@ default:
             paths:
                 - "features/email.feature"
             contexts: [ Sil\SilIdBroker\Behat\Context\EmailContext ]
+        groups_external_features:
+            paths:
+                - "features/groups-external.feature"
+            contexts: [ Sil\SilIdBroker\Behat\Context\GroupsExternalContext ]
+        groups_external_sync_features:
+            paths:
+                - "features/groups-external-sync.feature"
+            contexts: [ Sil\SilIdBroker\Behat\Context\GroupsExternalSyncContext ]
         hibp_unit_tests_features:
             paths:
                 - "features/hibp-unit-tests.feature"

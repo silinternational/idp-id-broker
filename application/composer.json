@@ -26,13 +26,13 @@
     "yiisoft/yii2-swiftmailer": "^2.0",
     "ramsey/uuid": "^3.6",
     "guzzlehttp/guzzle": "^6.2",
-    "notamedia/yii2-sentry": "^1.7"
+    "notamedia/yii2-sentry": "^1.7",
+    "webmozart/assert": "^1.2"
   },
   "require-dev": {
     "aws/aws-sdk-php": "~3.288.1",
     "behat/behat": "^3.3",
     "roave/security-advisories": "dev-master",
-    "webmozart/assert": "^1.2",
     "friendsofphp/php-cs-fixer": "^3.0"
   },
   "config": {

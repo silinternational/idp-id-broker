@@ -838,7 +838,7 @@ class FeatureContext extends YiiContext
             if ($want == '{idpName}') {
                 $want = \Yii::$app->params['idpName'];
             }
-            Assert::true(in_array($want, $property), '"' . $want . '" not in array');
+            Assert::true(in_array($want, $property), '"' . $want . '" not in array: ' . json_encode($property));
             $n++;
         }
 

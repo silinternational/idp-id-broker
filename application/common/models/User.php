@@ -569,11 +569,7 @@ class User extends UserBase
             },
             'hide',
             'member' => function (self $model) {
-                if (!empty($model->groups)) {
-                    $member = explode(',', $model->groups);
-                }
-                $member[] = \Yii::$app->params['idpName'];
-                return $member;
+                return $model->getMemberList();
             },
             'mfa',
             'method' => function (self $model) {
@@ -605,6 +601,26 @@ class User extends UserBase
         return $this->display_name ?? "$this->first_name $this->last_name";
     }
 
+    /** @return string[] */
+    public function getMemberList(): array
+    {
+        if (!empty($this->groups)) {
+            $member = explode(',', $this->groups);
+        } else {
+            $member = [];
+        }
+
+        $externalGroups = explode(',', $this->groups_external);
+        foreach ($externalGroups as $externalGroup) {
+            if (!empty($externalGroup)) {
+                $member[] = $externalGroup;
+            }
+        }
+
+        $member[] = \Yii::$app->params['idpName'];
+        return $member;
+    }
+
     /**
      * Based on current time and presence of MFA and Method options,
      * determine which "nag" to present to the user.
@@ -623,6 +639,28 @@ class User extends UserBase
         }
 
         return $this->nagState->getState();
+    }
+
+    private static function listUsersWithExternalGroupWith($appPrefix): array
+    {
+        $appPrefixWithHyphen = $appPrefix . '-';
+
+        /** @var User[] $users */
+        $users = User::find()->where(
+            ['like', 'groups_external', $appPrefixWithHyphen]
+        )->all();
+
+        $emailAddresses = [];
+        foreach ($users as $user) {
+            $externalGroups = explode(',', $user->groups_external);
+            foreach ($externalGroups as $externalGroup) {
+                if (str_starts_with($externalGroup, $appPrefixWithHyphen)) {
+                    $emailAddresses[] = $user->email;
+                    break;
+                }
+            }
+        }
+        return $emailAddresses;
     }
 
     public function loadMfaData(string $rpOrigin = '')
@@ -969,6 +1007,7 @@ class User extends UserBase
         $labels['last_synced_utc'] = Yii::t('app', 'Last Synced (UTC)');
         $labels['created_utc'] = Yii::t('app', 'Created (UTC)');
         $labels['deactivated_utc'] = Yii::t('app', 'Deactivated (UTC)');
+        $labels['groups_external'] = Yii::t('app', 'Groups (External)');
 
         return $labels;
     }
@@ -984,6 +1023,123 @@ class User extends UserBase
             }
         }
         return false;
+    }
+
+    /**
+     * Update users' external-groups data using the given external-groups data.
+     *
+     * @param string $appPrefix -- Example: "wiki"
+     * @param array $desiredExternalGroupsByUserEmail -- The authoritative list
+     *     of external groups for the given app-prefix, where each key is a
+     *     User's email address and each value is a comma-delimited string of
+     *     which groups (with that app-prefix) that the user should have. Any
+     *     other Users with external groups starting with the given app-prefix
+     *     will have those external groups removed. Any external groups starting
+     *     with a different prefix will be left unchanged.
+     * @return string[] -- The resulting error messages.
+     */
+    public static function updateUsersExternalGroups(
+        string $appPrefix,
+        array $desiredExternalGroupsByUserEmail
+    ): array {
+        $errors = [];
+        $emailAddressesOfCurrentMatches = self::listUsersWithExternalGroupWith($appPrefix);
+
+        // Indicate that users not in the "desired" list should not have any
+        // such external groups.
+        foreach ($emailAddressesOfCurrentMatches as $email) {
+            if (! array_key_exists($email, $desiredExternalGroupsByUserEmail)) {
+                $desiredExternalGroupsByUserEmail[$email] = '';
+            }
+        }
+
+        foreach ($desiredExternalGroupsByUserEmail as $email => $groupsForPrefix) {
+            $user = User::findByEmail($email);
+            if ($user === null) {
+                $errors[] = 'No user found for email address ' . json_encode($email);
+                continue;
+            }
+            $successful = $user->updateExternalGroups($appPrefix, $groupsForPrefix);
+            if (! $successful) {
+                $errors[] = sprintf(
+                    'Failed to update external groups for %s: %s',
+                    $email,
+                    join(' / ', $user->getFirstErrors())
+                );
+            }
+        }
+        return $errors;
+    }
+
+    public function updateExternalGroups(string $appPrefix, string $csvAppExternalGroups): bool
+    {
+        if (empty($csvAppExternalGroups)) {
+            $appExternalGroups = [];
+        } else {
+            $untrimmedAppExternalGroups = explode(',', $csvAppExternalGroups);
+            $appExternalGroups = array_map('trim', $untrimmedAppExternalGroups);
+        }
+
+        foreach ($appExternalGroups as $appExternalGroup) {
+            if (! str_starts_with($appExternalGroup, $appPrefix . '-')) {
+                $this->addErrors([
+                    'groups_external' => sprintf(
+                        'The given group (%s) does not start with the given prefix (%s)',
+                        $appExternalGroup,
+                        $appPrefix
+                    ),
+                ]);
+                return false;
+            }
+        }
+        $this->removeInMemoryExternalGroupsFor($appPrefix);
+        $this->addInMemoryExternalGroups($appExternalGroups);
+
+        $this->scenario = self::SCENARIO_UPDATE_USER;
+        return $this->save(true, ['groups_external']);
+    }
+
+    /**
+     * Remove all entries from this User object's list of external groups that
+     * begin with the given prefix.
+     *
+     * NOTE:
+     * This only updates the property in memory. It leaves the calling code to
+     * call `save()` on this User when desired.
+     *
+     * @param $appPrefix
+     * @return void
+     */
+    private function removeInMemoryExternalGroupsFor($appPrefix)
+    {
+        $currentExternalGroups = explode(',', $this->groups_external);
+        $newExternalGroups = [];
+        foreach ($currentExternalGroups as $externalGroup) {
+            if (! str_starts_with($externalGroup, $appPrefix . '-')) {
+                $newExternalGroups[] = $externalGroup;
+            }
+        }
+        $this->groups_external = join(',', $newExternalGroups);
+    }
+
+    /**
+     * Add the given groups to this User objects' list of external groups.
+     *
+     * NOTE:
+     * This only updates the property in memory. It leaves the calling code to
+     * call `save()` on this User when desired.
+     *
+     * @param $newExternalGroups
+     * @return void
+     */
+    private function addInMemoryExternalGroups($newExternalGroups)
+    {
+        $newCommaSeparatedExternalGroups = sprintf(
+            '%s,%s',
+            $this->groups_external,
+            join(',', $newExternalGroups)
+        );
+        $this->groups_external = trim($newCommaSeparatedExternalGroups, ',');
     }
 
     /**
@@ -1370,7 +1526,13 @@ class User extends UserBase
             'status' => 'start',
         ]);
 
-        $googleSheetsClient = new Sheets();
+        $googleSheetsClient = new Sheets([
+            'applicationName' => Yii::$app->params['google']['applicationName'],
+            'jsonAuthFilePath' => Yii::$app->params['google']['jsonAuthFilePath'],
+            'jsonAuthString' => Yii::$app->params['google']['jsonAuthString'],
+            'delegatedAdmin' => Yii::$app->params['google']['delegatedAdmin'],
+            'spreadsheetId' => Yii::$app->params['google']['spreadsheetId'],
+        ]);
 
         $activeUsers = User::find()->where(['active' => 'yes'])->all();
         $table = [];

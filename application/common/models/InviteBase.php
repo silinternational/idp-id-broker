@@ -35,7 +35,7 @@ class InviteBase extends \yii\db\ActiveRecord
             [['user_id'], 'integer'],
             [['created_utc', 'expires_on'], 'safe'],
             [['uuid'], 'string', 'max' => 36],
-            [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['user_id' => 'id']],
+            [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['user_id' => 'id']],
         ];
     }
 
@@ -60,6 +60,6 @@ class InviteBase extends \yii\db\ActiveRecord
      */
     public function getUser()
     {
-        return $this->hasOne(User::className(), ['id' => 'user_id']);
+        return $this->hasOne(User::class, ['id' => 'user_id']);
     }
 }

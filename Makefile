@@ -22,6 +22,7 @@ composershow:
 composerupdate:
 	docker compose run --rm cli composer update
 	make composershow
+	make basemodels
 
 db:
 	docker compose up -d db

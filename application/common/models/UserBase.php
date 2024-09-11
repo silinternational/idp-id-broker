@@ -26,6 +26,7 @@ use Yii;
  * @property string|null $manager_email
  * @property string $hide
  * @property string|null $groups
+ * @property string $groups_external
  * @property string|null $personal_email
  * @property string|null $expires_on
  * @property string $nag_for_mfa_after
@@ -60,11 +61,11 @@ class UserBase extends \yii\db\ActiveRecord
             [['active', 'locked', 'require_mfa', 'hide'], 'string'],
             [['last_changed_utc', 'last_synced_utc', 'review_profile_after', 'last_login_utc', 'expires_on', 'nag_for_mfa_after', 'nag_for_method_after', 'created_utc', 'deactivated_utc'], 'safe'],
             [['uuid'], 'string', 'max' => 64],
-            [['employee_id', 'first_name', 'last_name', 'display_name', 'username', 'email', 'manager_email', 'groups', 'personal_email'], 'string', 'max' => 255],
+            [['employee_id', 'first_name', 'last_name', 'display_name', 'username', 'email', 'manager_email', 'groups', 'groups_external', 'personal_email'], 'string', 'max' => 255],
             [['employee_id'], 'unique'],
             [['username'], 'unique'],
             [['email'], 'unique'],
-            [['current_password_id'], 'exist', 'skipOnError' => true, 'targetClass' => Password::className(), 'targetAttribute' => ['current_password_id' => 'id']],
+            [['current_password_id'], 'exist', 'skipOnError' => true, 'targetClass' => Password::class, 'targetAttribute' => ['current_password_id' => 'id']],
         ];
     }
 
@@ -93,6 +94,7 @@ class UserBase extends \yii\db\ActiveRecord
             'manager_email' => Yii::t('app', 'Manager Email'),
             'hide' => Yii::t('app', 'Hide'),
             'groups' => Yii::t('app', 'Groups'),
+            'groups_external' => Yii::t('app', 'Groups External'),
             'personal_email' => Yii::t('app', 'Personal Email'),
             'expires_on' => Yii::t('app', 'Expires On'),
             'nag_for_mfa_after' => Yii::t('app', 'Nag For Mfa After'),
@@ -109,7 +111,7 @@ class UserBase extends \yii\db\ActiveRecord
      */
     public function getCurrentPassword()
     {
-        return $this->hasOne(Password::className(), ['id' => 'current_password_id']);
+        return $this->hasOne(Password::class, ['id' => 'current_password_id']);
     }
 
     /**
@@ -119,7 +121,7 @@ class UserBase extends \yii\db\ActiveRecord
      */
     public function getEmailLogs()
     {
-        return $this->hasMany(EmailLog::className(), ['user_id' => 'id']);
+        return $this->hasMany(EmailLog::class, ['user_id' => 'id']);
     }
 
     /**
@@ -129,7 +131,7 @@ class UserBase extends \yii\db\ActiveRecord
      */
     public function getInvites()
     {
-        return $this->hasMany(Invite::className(), ['user_id' => 'id']);
+        return $this->hasMany(Invite::class, ['user_id' => 'id']);
     }
 
     /**
@@ -139,7 +141,7 @@ class UserBase extends \yii\db\ActiveRecord
      */
     public function getMethods()
     {
-        return $this->hasMany(Method::className(), ['user_id' => 'id']);
+        return $this->hasMany(Method::class, ['user_id' => 'id']);
     }
 
     /**
@@ -149,6 +151,6 @@ class UserBase extends \yii\db\ActiveRecord
      */
     public function getMfas()
     {
-        return $this->hasMany(Mfa::className(), ['user_id' => 'id']);
+        return $this->hasMany(Mfa::class, ['user_id' => 'id']);
     }
 }

@@ -2,6 +2,7 @@
 
 namespace console\controllers;
 
+use common\components\ExternalGroupsSync;
 use common\helpers\Utils;
 use common\models\Invite;
 use common\models\Method;
@@ -9,7 +10,6 @@ use common\models\Mfa;
 use common\models\User;
 use common\components\Emailer;
 use yii\console\Controller;
-
 use Br33f\Ga4\MeasurementProtocol\Dto\Event\BaseEvent;
 use TheIconic\Tracking\GoogleAnalytics\Analytics;
 
@@ -138,6 +138,16 @@ class CronController extends Controller
     }
 
     /**
+     * Sync external groups from Google Sheets
+     */
+    public function actionSyncExternalGroups()
+    {
+        ExternalGroupsSync::syncAllSets(
+            \Yii::$app->params['externalGroupsSyncSets'] ?? []
+        );
+    }
+
+    /**
      * Run all cron tasks, catching and logging errors to allow remaining tasks to run after an exception
      */
     public function actionAll()
@@ -150,6 +160,7 @@ class CronController extends Controller
             'actionSendMethodReminderEmails',
             'actionSendPasswordExpiryEmails',
             'actionGoogleAnalytics',
+            'actionSyncExternalGroups',
         ];
 
         if (\Yii::$app->params['google']['enableSheetsExport']) {
