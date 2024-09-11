@@ -3,7 +3,9 @@
 namespace Sil\SilIdBroker\Behat\Context;
 
 use Behat\Gherkin\Node\TableNode;
+use common\components\Emailer;
 use common\models\User;
+use Sil\PhpEnv\Env;
 use Webmozart\Assert\Assert;
 
 class GroupsExternalSyncContext extends GroupsExternalContext
@@ -133,5 +135,46 @@ class GroupsExternalSyncContext extends GroupsExternalContext
             "Did not find a sync error that mentions '%s'",
             $text
         ));
+    }
+
+    /**
+     * @Given only the following users exist, with these external groups:
+     */
+    public function onlyTheFollowingUsersExistWithTheseExternalGroups(TableNode $table)
+    {
+        Assert::eq(
+            Env::get('MYSQL_DATABASE'),
+            'appfortests',
+            'This test should only be run against the test database (it deletes users)'
+        );
+
+        $usersThatShouldExist = [];
+        foreach ($table as $row) {
+            $usersThatShouldExist[] = $row['email'];
+        }
+
+        $allUsers = User::find()->all();
+        foreach ($allUsers as $user) {
+            if (!in_array($user->email, $usersThatShouldExist, true)) {
+                Assert::notFalse($user->delete(), 'Failed to delete user for test');
+            }
+        }
+    }
+
+    /**
+     * @Then we should have sent exactly :expectedCount sync-error notification email
+     */
+    public function weShouldHaveSentExactlySyncErrorNotificationEmail($expectedCount)
+    {
+        $emails = $this->fakeEmailer->getFakeEmailsSent();
+        $syncErrorEmails = [];
+
+        foreach ($emails as $email) {
+            if ($email[Emailer::PROP_SUBJECT] === $this->fakeEmailer->subjectForSyncErrors) {
+                $syncErrorEmails[] = $email;
+            }
+        }
+
+        Assert::count($syncErrorEmails, $expectedCount);
     }
 }
