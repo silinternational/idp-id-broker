@@ -49,6 +49,8 @@ class Emailer extends Component
 
     public const SUBJ_ABANDONED_USER_ACCOUNTS = 'Unused {idpDisplayName} Identity Accounts';
 
+    public const SUBJ_SYNC_ERRORS = 'Errors while syncing {externalGroupsPrefix} external-groups to {idpDisplayName} IDP';
+
     public const PROP_SUBJECT = 'subject';
     public const PROP_TO_ADDRESS = 'to_address';
     public const PROP_CC_ADDRESS = 'cc_address';
@@ -140,6 +142,8 @@ class Emailer extends Component
     public $subjectForPasswordPwned;
 
     public $subjectForAbandonedUsers;
+
+    public $subjectForSyncErrors;
 
     /* The email to contact for HR notifications */
     public $hrNotificationsEmail;
@@ -301,6 +305,8 @@ class Emailer extends Component
         $this->subjectForPasswordPwned = $this->subjectForPasswordPwned ?? self::SUBJ_PASSWORD_PWNED;
 
         $this->subjectForAbandonedUsers = $this->subjectForAbandonedUsers ?? self::SUBJ_ABANDONED_USER_ACCOUNTS;
+
+        $this->subjectForSyncErrors = $this->subjectForSyncErrors ?? self::SUBJ_SYNC_ERRORS;
 
         $this->subjects = [
             EmailLog::MESSAGE_TYPE_INVITE => $this->subjectForInvite,
