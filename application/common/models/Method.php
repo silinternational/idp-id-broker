@@ -2,7 +2,6 @@
 
 namespace common\models;
 
-use common\components\Emailer;
 use common\exceptions\InvalidCodeException;
 use common\helpers\MySqlDateTime;
 use common\helpers\Utils;

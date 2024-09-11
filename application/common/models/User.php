@@ -4,7 +4,6 @@ namespace common\models;
 
 use Br33f\Ga4\MeasurementProtocol\Dto\Event\BaseEvent;
 use Closure;
-use common\components\Emailer;
 use common\components\HIBP;
 use common\components\Sheets;
 use common\helpers\MySqlDateTime;
@@ -13,7 +12,6 @@ use Exception;
 use Ramsey\Uuid\Uuid;
 use Sil\EmailService\Client\EmailServiceClientException;
 use Sil\PhpArrayDotNotation\DotNotation;
-use TheIconic\Tracking\GoogleAnalytics\Analytics;
 use Yii;
 use yii\behaviors\AttributeBehavior;
 use yii\data\ActiveDataProvider;

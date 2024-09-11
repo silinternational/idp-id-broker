@@ -2,7 +2,6 @@
 
 namespace common\components;
 
-use common\components\Emailer;
 use common\models\EmailLog;
 use common\models\Mfa;
 use common\models\MfaBackupcode;
@@ -10,7 +9,6 @@ use Sil\EmailService\Client\EmailServiceClientException;
 use yii\base\Component;
 use yii\web\BadRequestHttpException;
 use yii\web\ForbiddenHttpException;
-use yii\web\NotFoundHttpException;
 use yii\web\ServerErrorHttpException;
 
 class MfaBackendManager extends Component implements MfaBackendInterface

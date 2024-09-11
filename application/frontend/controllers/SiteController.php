@@ -4,7 +4,6 @@ namespace frontend\controllers;
 
 use Exception;
 use frontend\components\BaseRestController;
-use GuzzleHttp\Command\Exception\CommandException as GuzzleCommandException;
 use Yii;
 use yii\web\NotFoundHttpException;
 use yii\web\ServerErrorHttpException as Http500;

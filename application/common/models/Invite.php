@@ -2,7 +2,6 @@
 
 namespace common\models;
 
-use Closure;
 use common\helpers\MySqlDateTime;
 use Ramsey\Uuid\Uuid;
 use Yii;

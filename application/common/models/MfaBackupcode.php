@@ -3,7 +3,6 @@
 namespace common\models;
 
 use common\helpers\MySqlDateTime;
-use common\components\Emailer;
 use yii\helpers\ArrayHelper;
 use yii\web\ServerErrorHttpException;
 
