@@ -89,7 +89,7 @@ class Authentication
     /**
      * Run User validation rules. If all rules pass, $this->authenticatedUser will be a
      * clone of the User, and the User record in the database will be updated with new
-     * login and reminder dates.
+     * reminder dates.
      *
      * @param User $user
      */
