@@ -3,8 +3,8 @@
 namespace common\components;
 
 use GuzzleHttp\Client as GuzzleClient;
-use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\ClientException;
+use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Exception\ServerException;
 use Psr\Http\Message\ResponseInterface;
@@ -55,6 +55,7 @@ class MfaApiClient
             'X-MFA-APIKey' => $apiKey,
             'X-MFA-APISecret' => $apiSecret,
             'Content-type' => 'application/json',
+            'User-Agent' => 'idp-id-broker',
         ];
 
         $this->client = new GuzzleClient([
@@ -116,7 +117,6 @@ class MfaApiClient
             throw $e;
         }
     }
-
 
 
     /**
