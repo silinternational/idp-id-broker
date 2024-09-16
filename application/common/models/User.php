@@ -1043,6 +1043,15 @@ class User extends UserBase
         array $desiredExternalGroupsByUserEmail
     ): array {
         $errors = [];
+
+        if (preg_match('/^ext-[a-z0-9]+$/', $appPrefix) === 0) {
+            $errors[] = sprintf(
+                "The external-groups app-prefix must begin with 'ext-', then "
+                . "some combination of lowercase letters and/or numbers."
+            );
+            return $errors;
+        }
+
         $emailAddressesOfCurrentMatches = self::listUsersWithExternalGroupWith($appPrefix);
 
         // Indicate that users not in the "desired" list should not have any
