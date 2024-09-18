@@ -343,6 +343,11 @@ types:
       }
 /authentication:
   post:
+    queryParameters:
+      rpOrigin:
+        description: relying party origin
+        type: string
+        example: "https://sub.domain.com"
     body:
       type: Authentication
     responses:
@@ -357,6 +362,10 @@ types:
         description: >
           The given credentials were NOT acceptable/valid (i.e. - the
           authentication failed).
+        body:
+          type: Error
+      403:
+        description: The rpOrigin does not match any of the configured values.
         body:
           type: Error
       410:
