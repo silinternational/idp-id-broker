@@ -1052,17 +1052,24 @@ class User extends UserBase
             return $errors;
         }
 
+        $desiredExternalGroupsByLowercaseUserEmail = [];
+        foreach ($desiredExternalGroupsByUserEmail as $email => $groups) {
+            $desiredExternalGroupsByLowercaseUserEmail[mb_strtolower($email)] = $groups;
+        }
+        unset($desiredExternalGroupsByUserEmail);
+
         $emailAddressesOfCurrentMatches = self::listUsersWithExternalGroupWith($appPrefix);
 
         // Indicate that users not in the "desired" list should not have any
         // such external groups.
         foreach ($emailAddressesOfCurrentMatches as $email) {
-            if (! array_key_exists($email, $desiredExternalGroupsByUserEmail)) {
-                $desiredExternalGroupsByUserEmail[$email] = '';
+            $lowercaseEmail = mb_strtolower($email);
+            if (! array_key_exists($lowercaseEmail, $desiredExternalGroupsByLowercaseUserEmail)) {
+                $desiredExternalGroupsByLowercaseUserEmail[$lowercaseEmail] = '';
             }
         }
 
-        foreach ($desiredExternalGroupsByUserEmail as $email => $groupsForPrefix) {
+        foreach ($desiredExternalGroupsByLowercaseUserEmail as $email => $groupsForPrefix) {
             $user = User::findByEmail($email);
             if ($user === null) {
                 $errors[] = 'No user found for email address ' . json_encode($email);

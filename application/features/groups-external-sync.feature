@@ -121,4 +121,20 @@ Feature: Syncing a specific app-prefix of external groups with an external list
         | email                  | groups                    |
         | john_smith@example.org | ext-wiki-one,ext-wiki-two |
 
+  Scenario: Properly handle mismatched casing (uppercase/lowercase) in an email address
+    Given the following users exist, with these external groups:
+        | email                  | groups       |
+        | john_smith@example.org | ext-wiki-one |
+        | Jane_Doe@example.org   | ext-wiki-two |
+      And the "ext-wiki" external groups list is the following:
+        | email                  | groups       |
+        | John_smith@example.org | ext-wiki-one |
+        | jane_doe@example.org   | ext-wiki-two |
+    When I sync the list of "ext-wiki" external groups
+    Then there should not have been any sync errors
+      And the following users should have the following external groups:
+        | email                  | groups       |
+        | john_smith@example.org | ext-wiki-one |
+        | Jane_Doe@example.org   | ext-wiki-two |
+
   # Scenario: Send 1 notification email if sync finds group(s) for a user not in this IDP
