@@ -491,7 +491,7 @@ class FeatureContext extends YiiContext
             $current = $this->userFromDb->$name;
 
             $name === $property ? Assert::notEq($current, $previous, "$property is equal. Previous: $previous, Current: $current")
-                                : Assert::eq($current, $previous,"$property is not equal.  Previous: $previous, Current: $current");
+                                : Assert::eq($current, $previous, "$property is not equal.  Previous: $previous, Current: $current");
         }
     }
 

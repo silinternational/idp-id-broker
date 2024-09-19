@@ -800,7 +800,7 @@ class User extends UserBase
 
         return parent::save($runValidation, $attributeNames);
     }
-    
+
     public function updateLastLogin()
     {
         $this->last_login_utc = MySqlDateTime::now();

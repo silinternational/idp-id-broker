@@ -84,7 +84,7 @@ class UserController extends BaseRestController
 
             return null;
         }
-        
+
         $user->scenario = User::SCENARIO_UPDATE_USER;
 
         if (!$user->updateLastLogin()) {
