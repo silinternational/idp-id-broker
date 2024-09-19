@@ -75,6 +75,24 @@ class UserController extends BaseRestController
         return $user;
     }
 
+    public function actionUpdateLastLogin(string $employeeId)
+    {
+        $user = User::findOne(condition: ['employee_id' => $employeeId]);
+
+        if ($user === null) {
+            Yii::$app->response->statusCode = 404;
+
+            return null;
+        }
+
+        if (!$user->updateLastLogin()) {
+            Yii::$app->response->statusCode = 500;
+            return null;
+        }
+
+        return ['employee_id' => $user->employee_id, 'last_login_utc' => $user->last_login_utc];
+    }
+
     public function actionUpdatePassword(string $employeeId)
     {
         $user = User::findOne(['employee_id' => $employeeId]);
