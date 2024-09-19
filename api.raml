@@ -458,12 +458,14 @@ types:
           200:
             description: Successfully updated the last login time.
             body:
-              application/json:
-                example: |
-                  {
-                    "employee_id": "f6bf51f2-4ccc-4d85-8f75-02132c67af27",
-                    "last_login_utc": "2024-09-18T12:34:56Z"
-                  }
+              properties:
+                employee_id: string
+                last_login_utc: string
+              example: |
+                {
+                  "employee_id": "12345",
+                  "last_login_utc": "2024-09-18T12:34:56Z"
+                }
           404:
             description: Not found. The user with the specified `employeeId` was not found.
           500:

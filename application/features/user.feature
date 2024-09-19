@@ -137,14 +137,13 @@ Feature: User
 
   Scenario: update the last_login_utc of an existing user
     Given the requester is authorized
-    And I add a user with a employee_id of "123"
+    And I add a user with an employee_id of "123"
     And a record exists with an employee_id of "123"
     When I request "/user/123/update-last-login" be updated
     Then the response status code should be "200"
     And a record exists with an employee_id of "123"
     And last_login_utc should be stored as now UTC
     And the only property to change should be last_login_utc
-     #* @Then /^a record exists with (?:a|an) (.*) of "?([^"]*)"?$/
 
   Scenario: Deactivate an existing user
     Given a record does not exist with an employee_id of "123"
