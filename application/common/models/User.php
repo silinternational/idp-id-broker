@@ -805,7 +805,7 @@ class User extends UserBase
     {
         $this->last_login_utc = MySqlDateTime::now();
 
-        return $this->save(true, ['last_login_utc']);
+        return $this->save(false, ['last_login_utc']);
     }
 
     /**

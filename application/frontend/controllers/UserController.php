@@ -85,14 +85,12 @@ class UserController extends BaseRestController
             return null;
         }
 
-        $user->scenario = User::SCENARIO_UPDATE_USER;
-
         if (!$user->updateLastLogin()) {
             Yii::$app->response->statusCode = 500;
             return null;
         }
 
-        return $user;
+        return ['employee_id' => $user->employee_id, 'last_login_utc' => $user->last_login_utc];
     }
 
     public function actionUpdatePassword(string $employeeId)
