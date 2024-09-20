@@ -460,6 +460,25 @@ types:
           description: A server-side error occurred.
           body:
             type: Error
+    /update-last-login:
+      put:
+        description: Update the last login timestamp of a user based on their employee ID.
+        responses:
+          200:
+            description: Successfully updated the last login time.
+            body:
+              properties:
+                employee_id: string
+                last_login_utc: string
+              example: |
+                {
+                  "employee_id": "12345",
+                  "last_login_utc": "2024-09-18T12:34:56Z"
+                }
+          404:
+            description: Not found. The user with the specified `employeeId` was not found.
+          500:
+            description: Server error. Failed to update the last login time.
     /mfa:
       get:
         description: Get a list of configured MFA devices for user

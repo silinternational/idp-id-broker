@@ -452,9 +452,9 @@ class FeatureContext extends YiiContext
         $minAcceptable = $expectedNow - self::ACCEPTABLE_DELTA_IN_SECONDS;
         $maxAcceptable = $expectedNow + self::ACCEPTABLE_DELTA_IN_SECONDS;
 
-        $storedNow = strtotime($this->userFromDb->$property);
+        $storedNow = $this->userFromDb->$property ? strtotime($this->userFromDb->$property) : 0;
 
-        Assert::range($storedNow, $minAcceptable, $maxAcceptable);
+        Assert::range($storedNow, $minAcceptable, $maxAcceptable, "Stored time $storedNow is not within acceptable range of $minAcceptable to $maxAcceptable");
     }
 
     /**
@@ -490,8 +490,8 @@ class FeatureContext extends YiiContext
             $previous = $this->userFromDbBefore->$name;
             $current = $this->userFromDb->$name;
 
-            $name === $property ? Assert::notEq($current, $previous)
-                                : Assert::eq($current, $previous);
+            $name === $property ? Assert::notEq($current, $previous, "$property is equal. Previous: $previous, Current: $current")
+                                : Assert::eq($current, $previous, "$property is not equal.  Previous: $previous, Current: $current");
         }
     }
 
