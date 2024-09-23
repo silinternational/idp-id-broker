@@ -4,7 +4,6 @@ namespace common\models;
 
 use Br33f\Ga4\MeasurementProtocol\Dto\Event\BaseEvent;
 use Closure;
-use common\components\Emailer;
 use common\components\HIBP;
 use common\components\Sheets;
 use common\helpers\MySqlDateTime;
@@ -13,7 +12,6 @@ use Exception;
 use Ramsey\Uuid\Uuid;
 use Sil\EmailService\Client\EmailServiceClientException;
 use Sil\PhpArrayDotNotation\DotNotation;
-use TheIconic\Tracking\GoogleAnalytics\Analytics;
 use Yii;
 use yii\behaviors\AttributeBehavior;
 use yii\data\ActiveDataProvider;
@@ -803,6 +801,13 @@ class User extends UserBase
         return parent::save($runValidation, $attributeNames);
     }
 
+    public function updateLastLogin()
+    {
+        $this->last_login_utc = MySqlDateTime::now();
+
+        return $this->save(false, ['last_login_utc']);
+    }
+
     /**
      * @param bool $isNewUser
      * @param array $changedAttributes
@@ -1052,17 +1057,24 @@ class User extends UserBase
             return $errors;
         }
 
+        $desiredExternalGroupsByLowercaseUserEmail = [];
+        foreach ($desiredExternalGroupsByUserEmail as $email => $groups) {
+            $desiredExternalGroupsByLowercaseUserEmail[mb_strtolower($email)] = $groups;
+        }
+        unset($desiredExternalGroupsByUserEmail);
+
         $emailAddressesOfCurrentMatches = self::listUsersWithExternalGroupWith($appPrefix);
 
         // Indicate that users not in the "desired" list should not have any
         // such external groups.
         foreach ($emailAddressesOfCurrentMatches as $email) {
-            if (! array_key_exists($email, $desiredExternalGroupsByUserEmail)) {
-                $desiredExternalGroupsByUserEmail[$email] = '';
+            $lowercaseEmail = mb_strtolower($email);
+            if (! array_key_exists($lowercaseEmail, $desiredExternalGroupsByLowercaseUserEmail)) {
+                $desiredExternalGroupsByLowercaseUserEmail[$lowercaseEmail] = '';
             }
         }
 
-        foreach ($desiredExternalGroupsByUserEmail as $email => $groupsForPrefix) {
+        foreach ($desiredExternalGroupsByLowercaseUserEmail as $email => $groupsForPrefix) {
             $user = User::findByEmail($email);
             if ($user === null) {
                 $errors[] = 'No user found for email address ' . json_encode($email);

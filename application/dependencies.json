@@ -49,7 +49,7 @@
   },
   {
     "name": "google/apiclient-services",
-    "version": "v0.372.0"
+    "version": "v0.373.0"
   },
   {
     "name": "google/auth",
@@ -129,7 +129,7 @@
   },
   {
     "name": "phpseclib/phpseclib",
-    "version": "3.0.41"
+    "version": "3.0.42"
   },
   {
     "name": "phpspec/php-diff",
@@ -169,7 +169,7 @@
   },
   {
     "name": "roave/security-advisories",
-    "version": "dev-master 791bcaf"
+    "version": "dev-master cc2d3a5"
   },
   {
     "name": "sentry/sdk",
