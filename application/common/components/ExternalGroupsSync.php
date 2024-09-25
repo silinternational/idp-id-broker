@@ -50,7 +50,15 @@ class ExternalGroupsSync extends Component
         }
     }
 
-    private static function syncSet(
+    /**
+     * Sync the specified external-groups data with the specified Google Sheet.
+     *
+     * @param string $appPrefix
+     * @param string $googleSheetId
+     * @param string $jsonAuthString
+     * @throws \Google\Service\Exception
+     */
+    public static function syncSet(
         string $appPrefix,
         string $googleSheetId,
         string $jsonAuthString
@@ -59,9 +67,24 @@ class ExternalGroupsSync extends Component
             $googleSheetId,
             $jsonAuthString
         );
+        self::processUpdates($appPrefix, $desiredExternalGroups);
+    }
+
+    /**
+     * Update users' external-groups using the given data, and handle (and
+     * return) any errors.
+     *
+     * @param string $appPrefix
+     * @param array $desiredExternalGroups
+     * @return string[] -- The resulting error messages.
+     */
+    public static function processUpdates(
+        string $appPrefix,
+        array $desiredExternalGroups
+    ): array {
         $errors = User::updateUsersExternalGroups($appPrefix, $desiredExternalGroups);
         Yii::warning(sprintf(
-            "Ran sync for '%s' external groups.",
+            "Updated '%s' external groups.",
             $appPrefix
         ));
 
@@ -77,6 +100,7 @@ class ExternalGroupsSync extends Component
             }
             Yii::error($errorSummary);
         }
+        return $errors;
     }
 
     /**

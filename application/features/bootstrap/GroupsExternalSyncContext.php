@@ -4,6 +4,7 @@ namespace Sil\SilIdBroker\Behat\Context;
 
 use Behat\Gherkin\Node\TableNode;
 use common\components\Emailer;
+use common\components\ExternalGroupsSync;
 use common\models\User;
 use Sil\PhpEnv\Env;
 use Webmozart\Assert\Assert;
@@ -65,7 +66,7 @@ class GroupsExternalSyncContext extends GroupsExternalContext
      */
     public function iSyncTheListOfExternalGroups($appPrefix)
     {
-        $this->syncErrors = User::updateUsersExternalGroups(
+        $this->syncErrors = ExternalGroupsSync::processUpdates(
             $appPrefix,
             $this->externalGroupsLists[$appPrefix] ?? []
         );
