@@ -39,10 +39,10 @@ class FakeEmailer extends Emailer
      *
      * @param string $messageType The type of message.
      * @param string $emailAddress Email address to find.
-     * @param User $user User record for subject text completion.
+     * @param ?User $user User record for subject text completion, if applicable.
      * @return array[]
      */
-    public function getFakeEmailsOfTypeSentToUser(string $messageType, string $emailAddress, User $user)
+    public function getFakeEmailsOfTypeSentToUser(string $messageType, string $emailAddress, ?User $user = null)
     {
         $fakeEmailer = $this;
         $fakeEmailsSent = $fakeEmailer->getFakeEmailsSent();
@@ -64,10 +64,10 @@ class FakeEmailer extends Emailer
         return $this->getEmailServiceClient()->emailsSent;
     }
 
-    public function isSubjectForMessageType(string $subject, string $messageType, User $user)
+    public function isSubjectForMessageType(string $subject, string $messageType, ?User $user)
     {
         $dataForEmail = ArrayHelper::merge(
-            $user->getAttributesForEmail(),
+            $user?->getAttributesForEmail() ?? [],
             $this->otherDataForEmails
         );
 

@@ -345,15 +345,20 @@ class Emailer extends Component
      *
      * @param string $messageType The message type. Must be one of the
      *     EmailLog::MESSAGE_TYPE_* values.
-     * @param User $user The intended recipient.
+     * @param ?User $user The intended recipient, if applicable. If not provided, a 'toAddress'
+     *     must be in the $data parameter.
      * @param string[] $data Data fields for email template. Include key 'toAddress' to override
      *     sending to primary address in User object.
      * @param int $delaySeconds Number of seconds to delay sending the email. Default = no delay.
      * @throws \Sil\EmailService\Client\EmailServiceClientException
      */
-    public function sendMessageTo(string $messageType, User $user, array $data = [], int $delaySeconds = 0)
-    {
-        if ($user->active === 'no') {
+    public function sendMessageTo(
+        string $messageType,
+        ?User $user = null,
+        array $data = [],
+        int $delaySeconds = 0
+    ) {
+        if ($user?->active === 'no') {
             \Yii::warning([
                 'action' => 'send message',
                 'status' => 'canceled',
@@ -364,7 +369,7 @@ class Emailer extends Component
         }
 
         $dataForEmail = ArrayHelper::merge(
-            $user->getAttributesForEmail(),
+            $user?->getAttributesForEmail() ?? [],
             $this->otherDataForEmails,
             $data
         );
@@ -379,7 +384,9 @@ class Emailer extends Component
 
         $this->email($toAddress, $subject, $htmlBody, strip_tags($htmlBody), $ccAddress, $bccAddress, $delaySeconds);
 
-        EmailLog::logMessage($messageType, $user->id);
+        if ($user !== null) {
+            EmailLog::logMessage($messageType, $user->id);
+        }
     }
 
     /**
