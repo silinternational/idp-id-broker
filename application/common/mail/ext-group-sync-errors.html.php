@@ -37,4 +37,8 @@ if (empty ($googleSheetUrl)) {
 }
 ?>
 
+<p>
+    Other users' external groups may have been synced successfully.
+</p>
+
 <p><i><?= nl2br(yHtml::encode($emailSignature), false) ?></i></p>
