@@ -17,6 +17,7 @@ class ExternalGroupsSync extends Component
             $appPrefixKey = sprintf('set%uAppPrefix', $i);
             $googleSheetIdKey = sprintf('set%uGoogleSheetId', $i);
             $jsonAuthStringKey = sprintf('set%uJsonAuthString', $i);
+            $errorsEmailRecipientKey = sprintf('set%uErrorsEmailRecipient', $i);
 
             if (! array_key_exists($appPrefixKey, $syncSetsParams)) {
                 Yii::warning(sprintf(
@@ -29,6 +30,7 @@ class ExternalGroupsSync extends Component
             $appPrefix = $syncSetsParams[$appPrefixKey] ?? '';
             $googleSheetId = $syncSetsParams[$googleSheetIdKey] ?? '';
             $jsonAuthString = $syncSetsParams[$jsonAuthStringKey] ?? '';
+            $errorsEmailRecipient = $syncSetsParams[$errorsEmailRecipientKey] ?? '';
 
             if (empty($appPrefix) || empty($googleSheetId) || empty($jsonAuthString)) {
                 Yii::error(sprintf(
@@ -45,7 +47,12 @@ class ExternalGroupsSync extends Component
                     $appPrefix,
                     $googleSheetId
                 ));
-                self::syncSet($appPrefix, $googleSheetId, $jsonAuthString);
+                self::syncSet(
+                    $appPrefix,
+                    $googleSheetId,
+                    $jsonAuthString,
+                    $errorsEmailRecipient
+                );
             }
         }
     }
@@ -56,18 +63,25 @@ class ExternalGroupsSync extends Component
      * @param string $appPrefix
      * @param string $googleSheetId
      * @param string $jsonAuthString
+     * @param string $errorsEmailRecipient
      * @throws \Google\Service\Exception
      */
     public static function syncSet(
         string $appPrefix,
         string $googleSheetId,
-        string $jsonAuthString
+        string $jsonAuthString,
+        string $errorsEmailRecipient = ''
     ) {
         $desiredExternalGroups = self::getExternalGroupsFromGoogleSheet(
             $googleSheetId,
             $jsonAuthString
         );
-        self::processUpdates($appPrefix, $desiredExternalGroups);
+        self::processUpdates(
+            $appPrefix,
+            $desiredExternalGroups,
+            $errorsEmailRecipient,
+            $googleSheetId
+        );
     }
 
     /**
@@ -76,11 +90,15 @@ class ExternalGroupsSync extends Component
      *
      * @param string $appPrefix
      * @param array $desiredExternalGroups
+     * @param string $errorsEmailRecipient
+     * @param string $googleSheetId
      * @return string[] -- The resulting error messages.
      */
     public static function processUpdates(
         string $appPrefix,
-        array $desiredExternalGroups
+        array $desiredExternalGroups,
+        string $errorsEmailRecipient = '',
+        string $googleSheetId = ''
     ): array {
         $errors = User::updateUsersExternalGroups($appPrefix, $desiredExternalGroups);
         Yii::warning(sprintf(
@@ -99,6 +117,15 @@ class ExternalGroupsSync extends Component
                 $errorSummary = substr($errorSummary, 0, 997) . '...';
             }
             Yii::error($errorSummary);
+
+            if (!empty($errorsEmailRecipient)) {
+                self::sendSyncErrorsEmail(
+                    $appPrefix,
+                    $errors,
+                    $errorsEmailRecipient,
+                    $googleSheetId
+                );
+            }
         }
         return $errors;
     }
@@ -145,5 +172,28 @@ class ExternalGroupsSync extends Component
             $data[$email] = $groups;
         }
         return $data;
+    }
+
+    /**
+     * @param string $appPrefix
+     * @param string[] $errors
+     * @param string $recipient
+     * @param string $googleSheetId
+     * @return void
+     */
+    private static function sendSyncErrorsEmail(
+        string $appPrefix,
+        array $errors,
+        string $recipient,
+        string $googleSheetId
+    ) {
+        /* @var $emailer Emailer */
+        $emailer = \Yii::$app->emailer;
+        $emailer->sendExternalGroupSyncErrorsEmail(
+            $appPrefix,
+            $errors,
+            $recipient,
+            $googleSheetId
+        );
     }
 }

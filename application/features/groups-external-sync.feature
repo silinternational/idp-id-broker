@@ -146,9 +146,10 @@ Feature: Syncing a specific app-prefix of external groups with an external list
         | jane_doe@example.org      | ext-wiki-one |
         | john_smith@example.org    | ext-wiki-two |
         | bob_mcmanager@example.org | ext-wiki-two |
+      And we have provided an error-notifications email address
     When I sync the list of "ext-wiki" external groups
     Then there should have been a sync error
-      And we should have sent exactly 1 sync-error notification email
+      And we should have sent exactly 1 "ext-wiki" sync-error notification email
       And the following users should have the following external groups:
         | email                  | groups       |
         | john_smith@example.org | ext-wiki-two |

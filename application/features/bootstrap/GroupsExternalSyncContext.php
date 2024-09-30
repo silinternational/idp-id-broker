@@ -3,14 +3,16 @@
 namespace Sil\SilIdBroker\Behat\Context;
 
 use Behat\Gherkin\Node\TableNode;
-use common\components\Emailer;
 use common\components\ExternalGroupsSync;
+use common\models\EmailLog;
 use common\models\User;
 use Sil\PhpEnv\Env;
 use Webmozart\Assert\Assert;
 
 class GroupsExternalSyncContext extends GroupsExternalContext
 {
+    private string $errorsEmailRecipient = '';
+
     /**
      * The lists of external groups for use by these tests. Example:
      * ```
@@ -68,7 +70,9 @@ class GroupsExternalSyncContext extends GroupsExternalContext
     {
         $this->syncErrors = ExternalGroupsSync::processUpdates(
             $appPrefix,
-            $this->externalGroupsLists[$appPrefix] ?? []
+            $this->externalGroupsLists[$appPrefix] ?? [],
+            $this->errorsEmailRecipient,
+            'dummy-google-sheet-id'
         );
     }
 
@@ -163,19 +167,34 @@ class GroupsExternalSyncContext extends GroupsExternalContext
     }
 
     /**
-     * @Then we should have sent exactly :expectedCount sync-error notification email
+     * @Then we should have sent exactly :expectedCount :appPrefix sync-error notification email
      */
-    public function weShouldHaveSentExactlySyncErrorNotificationEmail($expectedCount)
+    public function weShouldHaveSentExactlySyncErrorNotificationEmail($expectedCount, $appPrefix)
     {
-        $emails = $this->fakeEmailer->getFakeEmailsSent();
-        $syncErrorEmails = [];
+        $fakeEmailer = $this->fakeEmailer;
 
-        foreach ($emails as $email) {
-            if ($email[Emailer::PROP_SUBJECT] === $this->fakeEmailer->subjectForExtGroupSyncErrors) {
-                $syncErrorEmails[] = $email;
-            }
-        }
+        // The $appPrefix is needed by the FakeEmailer, to find the appropriate
+        // emails (by being able to accurately generate the expected subject).
+        $fakeEmailer->otherDataForEmails['appPrefix'] = $appPrefix;
+        $syncErrorEmails = $fakeEmailer->getFakeEmailsOfTypeSentToUser(
+            EmailLog::MESSAGE_TYPE_EXT_GROUP_SYNC_ERRORS,
+            $this->errorsEmailRecipient
+        );
 
-        Assert::count($syncErrorEmails, $expectedCount);
+        Assert::count($syncErrorEmails, $expectedCount, sprintf(
+            'Expected %s sync-error emails (to %s), but found %s. Emails sent: %s',
+            $expectedCount,
+            $this->errorsEmailRecipient,
+            count($syncErrorEmails),
+            json_encode($fakeEmailer->getFakeEmailsSent(), JSON_PRETTY_PRINT)
+        ));
+    }
+
+    /**
+     * @Given we have provided an error-notifications email address
+     */
+    public function weHaveProvidedAnErrorNotificationsEmailAddress()
+    {
+        $this->errorsEmailRecipient = 'sync-errors@example.com';
     }
 }

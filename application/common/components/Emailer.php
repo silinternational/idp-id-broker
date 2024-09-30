@@ -754,6 +754,38 @@ class Emailer extends Component
         ]));
     }
 
+    public function sendExternalGroupSyncErrorsEmail(
+        string $appPrefix,
+        array $errors,
+        string $recipient,
+        string $googleSheetId
+    ) {
+        $logData = [
+            'action' => 'send external-groups sync errors email',
+            'status' => 'starting',
+        ];
+
+        $this->logger->info(array_merge($logData, [
+            'errors' => count($errors)
+        ]));
+
+        $this->sendMessageTo(
+            EmailLog::MESSAGE_TYPE_EXT_GROUP_SYNC_ERRORS,
+            null,
+            [
+                'toAddress' => $recipient,
+                'appPrefix' => $appPrefix,
+                'errors' => $errors,
+                'googleSheetUrl' => 'https://docs.google.com/spreadsheets/d/' . $googleSheetId,
+                'idpDisplayName' => \Yii::$app->params['idpDisplayName'],
+            ]
+        );
+
+        $this->logger->info(array_merge($logData, [
+            'status' => 'finished',
+        ]));
+    }
+
     /**
      * Sends email alert to HR with all abandoned users, if any
      */

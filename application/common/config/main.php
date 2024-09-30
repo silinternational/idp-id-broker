@@ -82,6 +82,7 @@ return [
             'otherDataForEmails' => [
                 'emailSignature' => Env::get('EMAIL_SIGNATURE', ''),
                 'helpCenterUrl' => Env::get('HELP_CENTER_URL'),
+                'idpName' => $idpName,
                 'idpDisplayName' => $idpDisplayName,
                 'passwordProfileUrl' => $passwordProfileUrl . '/#',
                 'supportEmail' => Env::get('SUPPORT_EMAIL'),
