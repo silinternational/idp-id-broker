@@ -147,10 +147,10 @@ class GroupsExternalSyncContext extends GroupsExternalContext
      */
     public function onlyTheFollowingUsersExistWithTheseExternalGroups(TableNode $table)
     {
-        Assert::eq(
+        Assert::inArray(
             Env::get('MYSQL_DATABASE'),
-            'appfortests',
-            'This test should only be run against the test database (it deletes users)'
+            ['appfortests', 'test'],
+            'This test should only be run against a test database (because it deletes users)'
         );
 
         $usersThatShouldExist = [];
