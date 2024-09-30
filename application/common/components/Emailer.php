@@ -758,7 +758,7 @@ class Emailer extends Component
         string $appPrefix,
         array $errors,
         string $recipient,
-        string $googleSheetId
+        string $googleSheetUrl
     ) {
         $logData = [
             'action' => 'send external-groups sync errors email',
@@ -776,7 +776,7 @@ class Emailer extends Component
                 'toAddress' => $recipient,
                 'appPrefix' => $appPrefix,
                 'errors' => $errors,
-                'googleSheetUrl' => 'https://docs.google.com/spreadsheets/d/' . $googleSheetId,
+                'googleSheetUrl' => $googleSheetUrl,
                 'idpDisplayName' => \Yii::$app->params['idpDisplayName'],
             ]
         );

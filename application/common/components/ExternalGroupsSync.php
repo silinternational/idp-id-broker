@@ -91,14 +91,15 @@ class ExternalGroupsSync extends Component
      * @param string $appPrefix
      * @param array $desiredExternalGroups
      * @param string $errorsEmailRecipient
-     * @param string $googleSheetId
+     * @param string $googleSheetIdForEmail -- The Google Sheet's ID, for use in
+     *     the sync-error notification email.
      * @return string[] -- The resulting error messages.
      */
     public static function processUpdates(
         string $appPrefix,
         array $desiredExternalGroups,
         string $errorsEmailRecipient = '',
-        string $googleSheetId = ''
+        string $googleSheetIdForEmail = ''
     ): array {
         $errors = User::updateUsersExternalGroups($appPrefix, $desiredExternalGroups);
         Yii::warning(sprintf(
@@ -123,7 +124,7 @@ class ExternalGroupsSync extends Component
                     $appPrefix,
                     $errors,
                     $errorsEmailRecipient,
-                    $googleSheetId
+                    'https://docs.google.com/spreadsheets/d/' . $googleSheetIdForEmail
                 );
             }
         }
@@ -178,14 +179,14 @@ class ExternalGroupsSync extends Component
      * @param string $appPrefix
      * @param string[] $errors
      * @param string $recipient
-     * @param string $googleSheetId
+     * @param string $googleSheetUrl
      * @return void
      */
     private static function sendSyncErrorsEmail(
         string $appPrefix,
         array $errors,
         string $recipient,
-        string $googleSheetId
+        string $googleSheetUrl
     ) {
         /* @var $emailer Emailer */
         $emailer = \Yii::$app->emailer;
@@ -193,7 +194,7 @@ class ExternalGroupsSync extends Component
             $appPrefix,
             $errors,
             $recipient,
-            $googleSheetId
+            $googleSheetUrl
         );
     }
 }
