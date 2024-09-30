@@ -17,7 +17,7 @@ use yii\helpers\Html as yHtml;
 <?= yHtml::ul($errors) ?>
 
 <?php
-if (empty ($googleSheetUrl)) {
+if (empty($googleSheetUrl)) {
     ?>
     <p>
         If any of these seem like simple data problems, you can potentially fix them
