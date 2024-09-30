@@ -49,7 +49,7 @@ class Emailer extends Component
 
     public const SUBJ_ABANDONED_USER_ACCOUNTS = 'Unused {idpDisplayName} Identity Accounts';
 
-    public const SUBJ_EXT_GROUP_SYNC_ERRORS = 'Errors while syncing {appPrefix} external-groups to {idpDisplayName} IDP';
+    public const SUBJ_EXT_GROUP_SYNC_ERRORS = "Errors while syncing '{appPrefix}' external-groups to the {idpDisplayName} IDP";
 
     public const PROP_SUBJECT = 'subject';
     public const PROP_TO_ADDRESS = 'to_address';
