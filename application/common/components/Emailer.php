@@ -313,6 +313,7 @@ class Emailer extends Component
             EmailLog::MESSAGE_TYPE_MFA_RATE_LIMIT => $this->subjectForMfaRateLimit,
             EmailLog::MESSAGE_TYPE_PASSWORD_CHANGED => $this->subjectForPasswordChanged,
             EmailLog::MESSAGE_TYPE_WELCOME => $this->subjectForWelcome,
+            EmailLog::MESSAGE_TYPE_EXT_GROUP_SYNC_ERRORS => $this->subjectForExtGroupSyncErrors,
             EmailLog::MESSAGE_TYPE_GET_BACKUP_CODES => $this->subjectForGetBackupCodes,
             EmailLog::MESSAGE_TYPE_REFRESH_BACKUP_CODES => $this->subjectForRefreshBackupCodes,
             EmailLog::MESSAGE_TYPE_LOST_SECURITY_KEY => $this->subjectForLostSecurityKey,
