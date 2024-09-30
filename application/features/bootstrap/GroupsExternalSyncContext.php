@@ -171,7 +171,7 @@ class GroupsExternalSyncContext extends GroupsExternalContext
         $syncErrorEmails = [];
 
         foreach ($emails as $email) {
-            if ($email[Emailer::PROP_SUBJECT] === $this->fakeEmailer->subjectForSyncErrors) {
+            if ($email[Emailer::PROP_SUBJECT] === $this->fakeEmailer->subjectForExtGroupSyncErrors) {
                 $syncErrorEmails[] = $email;
             }
         }

@@ -125,7 +125,7 @@ return [
             'subjectForPasswordExpiring' => Env::get('SUBJECT_FOR_PASSWORD_EXPIRING'),
             'subjectForPasswordExpired' => Env::get('SUBJECT_FOR_PASSWORD_EXPIRED'),
             'subjectForAbandonedUsers' => Env::get('SUBJECT_FOR_ABANDONED_USERS'),
-            'subjectForSyncErrors' => Env::get('SUBJECT_FOR_SYNC_ERRORS'),
+            'subjectForExtGroupSyncErrors' => Env::get('SUBJECT_FOR_EXT_GROUP_SYNC_ERRORS'),
 
             'lostSecurityKeyEmailDays' => Env::get('LOST_SECURITY_KEY_EMAIL_DAYS', 62),
             'minimumBackupCodesBeforeNag' => Env::get('MINIMUM_BACKUP_CODES_BEFORE_NAG', 4),
