@@ -358,7 +358,7 @@ class Emailer extends Component
         array $data = [],
         int $delaySeconds = 0
     ) {
-        if ($user?->active === 'no') {
+        if ($user && $user->active === 'no') {
             \Yii::warning([
                 'action' => 'send message',
                 'status' => 'canceled',
@@ -369,7 +369,7 @@ class Emailer extends Component
         }
 
         $dataForEmail = ArrayHelper::merge(
-            $user?->getAttributesForEmail() ?? [],
+            $user ? $user->getAttributesForEmail() : [],
             $this->otherDataForEmails,
             $data
         );

@@ -67,7 +67,7 @@ class FakeEmailer extends Emailer
     public function isSubjectForMessageType(string $subject, string $messageType, ?User $user)
     {
         $dataForEmail = ArrayHelper::merge(
-            $user?->getAttributesForEmail() ?? [],
+            $user ? $user->getAttributesForEmail() : [],
             $this->otherDataForEmails
         );
 
