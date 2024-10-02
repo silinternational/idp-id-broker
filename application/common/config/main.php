@@ -82,6 +82,7 @@ return [
             'otherDataForEmails' => [
                 'emailSignature' => Env::get('EMAIL_SIGNATURE', ''),
                 'helpCenterUrl' => Env::get('HELP_CENTER_URL'),
+                'idpName' => $idpName,
                 'idpDisplayName' => $idpDisplayName,
                 'passwordProfileUrl' => $passwordProfileUrl . '/#',
                 'supportEmail' => Env::get('SUPPORT_EMAIL'),
@@ -125,6 +126,7 @@ return [
             'subjectForPasswordExpiring' => Env::get('SUBJECT_FOR_PASSWORD_EXPIRING'),
             'subjectForPasswordExpired' => Env::get('SUBJECT_FOR_PASSWORD_EXPIRED'),
             'subjectForAbandonedUsers' => Env::get('SUBJECT_FOR_ABANDONED_USERS'),
+            'subjectForExtGroupSyncErrors' => Env::get('SUBJECT_FOR_EXT_GROUP_SYNC_ERRORS'),
 
             'lostSecurityKeyEmailDays' => Env::get('LOST_SECURITY_KEY_EMAIL_DAYS', 62),
             'minimumBackupCodesBeforeNag' => Env::get('MINIMUM_BACKUP_CODES_BEFORE_NAG', 4),

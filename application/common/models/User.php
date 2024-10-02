@@ -1031,7 +1031,8 @@ class User extends UserBase
     }
 
     /**
-     * Update users' external-groups data using the given external-groups data.
+     * Update users' external-groups data using the given external-groups data
+     * and return a list of any errors that occurred.
      *
      * @param string $appPrefix -- Example: "wiki"
      * @param array $desiredExternalGroupsByUserEmail -- The authoritative list

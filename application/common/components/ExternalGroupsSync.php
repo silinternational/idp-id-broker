@@ -17,6 +17,7 @@ class ExternalGroupsSync extends Component
             $appPrefixKey = sprintf('set%uAppPrefix', $i);
             $googleSheetIdKey = sprintf('set%uGoogleSheetId', $i);
             $jsonAuthStringKey = sprintf('set%uJsonAuthString', $i);
+            $errorsEmailRecipientKey = sprintf('set%uErrorsEmailRecipient', $i);
 
             if (! array_key_exists($appPrefixKey, $syncSetsParams)) {
                 Yii::warning(sprintf(
@@ -29,6 +30,7 @@ class ExternalGroupsSync extends Component
             $appPrefix = $syncSetsParams[$appPrefixKey] ?? '';
             $googleSheetId = $syncSetsParams[$googleSheetIdKey] ?? '';
             $jsonAuthString = $syncSetsParams[$jsonAuthStringKey] ?? '';
+            $errorsEmailRecipient = $syncSetsParams[$errorsEmailRecipientKey] ?? '';
 
             if (empty($appPrefix) || empty($googleSheetId) || empty($jsonAuthString)) {
                 Yii::error(sprintf(
@@ -45,23 +47,63 @@ class ExternalGroupsSync extends Component
                     $appPrefix,
                     $googleSheetId
                 ));
-                self::syncSet($appPrefix, $googleSheetId, $jsonAuthString);
+                self::syncSet(
+                    $appPrefix,
+                    $googleSheetId,
+                    $jsonAuthString,
+                    $errorsEmailRecipient
+                );
             }
         }
     }
 
-    private static function syncSet(
+    /**
+     * Sync the specified external-groups data with the specified Google Sheet.
+     *
+     * @param string $appPrefix
+     * @param string $googleSheetId
+     * @param string $jsonAuthString
+     * @param string $errorsEmailRecipient
+     * @throws \Google\Service\Exception
+     */
+    public static function syncSet(
         string $appPrefix,
         string $googleSheetId,
-        string $jsonAuthString
+        string $jsonAuthString,
+        string $errorsEmailRecipient = ''
     ) {
         $desiredExternalGroups = self::getExternalGroupsFromGoogleSheet(
             $googleSheetId,
             $jsonAuthString
         );
+        self::processUpdates(
+            $appPrefix,
+            $desiredExternalGroups,
+            $errorsEmailRecipient,
+            $googleSheetId
+        );
+    }
+
+    /**
+     * Update users' external-groups using the given data, and handle (and
+     * return) any errors.
+     *
+     * @param string $appPrefix
+     * @param array $desiredExternalGroups
+     * @param string $errorsEmailRecipient
+     * @param string $googleSheetIdForEmail -- The Google Sheet's ID, for use in
+     *     the sync-error notification email.
+     * @return string[] -- The resulting error messages.
+     */
+    public static function processUpdates(
+        string $appPrefix,
+        array $desiredExternalGroups,
+        string $errorsEmailRecipient = '',
+        string $googleSheetIdForEmail = ''
+    ): array {
         $errors = User::updateUsersExternalGroups($appPrefix, $desiredExternalGroups);
         Yii::warning(sprintf(
-            "Ran sync for '%s' external groups.",
+            "Updated '%s' external groups.",
             $appPrefix
         ));
 
@@ -76,7 +118,17 @@ class ExternalGroupsSync extends Component
                 $errorSummary = substr($errorSummary, 0, 997) . '...';
             }
             Yii::error($errorSummary);
+
+            if (!empty($errorsEmailRecipient)) {
+                self::sendSyncErrorsEmail(
+                    $appPrefix,
+                    $errors,
+                    $errorsEmailRecipient,
+                    'https://docs.google.com/spreadsheets/d/' . $googleSheetIdForEmail
+                );
+            }
         }
+        return $errors;
     }
 
     /**
@@ -121,5 +173,28 @@ class ExternalGroupsSync extends Component
             $data[$email] = $groups;
         }
         return $data;
+    }
+
+    /**
+     * @param string $appPrefix
+     * @param string[] $errors
+     * @param string $recipient
+     * @param string $googleSheetUrl
+     * @return void
+     */
+    private static function sendSyncErrorsEmail(
+        string $appPrefix,
+        array $errors,
+        string $recipient,
+        string $googleSheetUrl
+    ) {
+        /* @var $emailer Emailer */
+        $emailer = \Yii::$app->emailer;
+        $emailer->sendExternalGroupSyncErrorsEmail(
+            $appPrefix,
+            $errors,
+            $recipient,
+            $googleSheetUrl
+        );
     }
 }
