@@ -79,3 +79,92 @@ in order to sync values from a Google Sheet to the `user.groups_external` field
 in the database, which are then included in the SAML `member` attribute that can
 be sent to the website that the user is signing into. See the
 `EXTERNAL_GROUPS_SYNC_*` entries in the `local.env.dist` file.
+
+### How Many of What?
+
+You will need...
+
+* One Google Cloud Console Project.
+  * Example:  
+    `My IDPs External Groups Sync`
+* One Google Sheet per application that needs custom groups.
+  * Examples:  
+    `App A SSO Groups`  
+    `App B SSO Groups`
+* One Service Account (in that Project) per IDP that you want to sync the
+  custom groups into for that application.
+  * Examples:  
+    `IDP 1 groups for App A`  
+    `IDP 2 groups for App A`
+* One tab in each Google Sheet per IDP that you want to sync that application's
+  custom groups into.
+  * Examples:  
+    `idp1`  
+    `idp2`
+
+### Specific How-To Steps
+
+To do this...
+
+1. Use at least version 6.8.0 of ID Broker.
+2. Create a Google Sheet named for the application that needs the groups
+   (e.g. `App A SSO groups`).
+3. Create a tab (in that Google Sheet) named after the short/code name of your
+   IDP (e.g. `idp1`) with two columns: `email` and `groups`.
+   - To add groups for a specific user, put the user's (lowercase) email address
+     for that IDP in the `email` cell in their row.
+   - Only use one row per user.
+   - Put all of a user's desired groups in their `groups` cell, separated by
+     commas. Example: "ext-appa-managers, ext-appa-designers"
+   - Group names must begin with your chosen prefix and a dash
+     (e.g. "ext-appa-").
+4. Create a Google Cloud Console Project (e.g. `My IDPs External Groups Sync`).
+5. Add a Service Account to that Project.
+   - I recommend naming it after both the IDP you will use it for and the
+     application that needs the groups (e.g. `IDP 1 groups for App A`).
+6. Create a JSON Key for that Service Account.
+7. Share the Google Sheet that you created earlier with the `client_email` value
+   in that JSON Key file (as a Viewer, no notification).
+8. Set the following environment variables for your ID Broker instance:
+   - `EXTERNAL_GROUPS_SYNC_set1AppPrefix`
+     - Set this to some prefix starting with "ext-", e.g. `ext-appa`
+   - `EXTERNAL_GROUPS_SYNC_set1GoogleSheetId`
+     - Set this to the ID of the Google Sheet you created earlier.
+   - `EXTERNAL_GROUPS_SYNC_set1JsonAuthString`
+     - Use the JSON key you just created here, compacted to a single line by
+       something like this command:  
+       `cat service-account-key-from-google-abcdef123456.json | jq -c "."`
+9. You can also set the following environment variable if you want to send a
+   notification email any time the sync runs and encounters errors (such as
+   "No user found for email address ..." or "The given group (ext-appb-users)
+   does not start with the given prefix (ext-appa)"):
+   - `EXTERNAL_GROUPS_SYNC_set1ErrorsEmailRecipient`
+     - Set this to a single email address.
+10. If you need to sync those custom groups to another IDP...
+    - Ensure that IDP is also running a recent enough version of ID Broker.
+    - Create another tab in your Google Sheet.
+    - Create another Service Account and JSON Key.
+    - Share the Google Account with that new JSON Key's `client_email`.
+    - Set the above environment variables in that other IDP, using the same
+      app-prefix and Google Sheet ID, but the JSON Auth String from the new JSON
+      Key that you created.
+11. If you need to sync custom groups for _another app_ to your IDP...
+    - Create another Google Sheet similarly, but named for that other app, with
+      a tab for each of the relevant IDPs.
+    - Create another Service Account (and JSON Key) in that existing Google
+      Cloud Console Project.
+    - Share the Google Account with that JSON Key's `client_email`.
+    - Add another set of the above environment variables, but with the next
+      number in the lowercased portion
+      (e.g. `EXTERNAL_GROUPS_SYNC_set2AppPrefix`), using an app-prefix for that
+      other app, the new Google Sheet's ID, and the new JSON Key (as the JSON
+      Auth String).
+
+### Rotating external-groups sync credentials
+
+You can easily rotate the credentials for a Service Account by creating a new
+JSON Key for it. Then simply update the
+`EXTERNAL_GROUPS_SYNC_set(NUMBER)JsonAuthString` environment variable to use the
+contents of that new JSON Key. Since multiple Keys are supported, you can wait
+to delete the previous Key from that Service Account until you have deployed the
+new credentials, if desired, to avoid service interruption.
