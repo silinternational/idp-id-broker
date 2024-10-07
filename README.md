@@ -71,3 +71,11 @@ Calls are made to Google Analytics regarding users' mfas and whether a password 
 
 If you want to have an indication that those calls are likely to succeed, run 
 `$ make callGA`.
+
+## Adding groups to SSO `member` attribute from a Google Sheet
+
+The `local.env.dist` file shows how to add the necessary environment variables
+in order to sync values from a Google Sheet to the `user.groups_external` field
+in the database, which are then included in the SAML `member` attribute that can
+be sent to the website that the user is signing into. See the
+`EXTERNAL_GROUPS_SYNC_*` entries in the `local.env.dist` file.
