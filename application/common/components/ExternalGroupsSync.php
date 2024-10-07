@@ -120,11 +120,15 @@ class ExternalGroupsSync extends Component
             Yii::error($errorSummary);
 
             if (!empty($errorsEmailRecipient)) {
+                $googleSheetUrl = '';
+                if (!empty($googleSheetIdForEmail)) {
+                    $googleSheetUrl = 'https://docs.google.com/spreadsheets/d/' . $googleSheetIdForEmail;
+                }
                 self::sendSyncErrorsEmail(
                     $appPrefix,
                     $errors,
                     $errorsEmailRecipient,
-                    'https://docs.google.com/spreadsheets/d/' . $googleSheetIdForEmail
+                    $googleSheetUrl
                 );
             }
         }
