@@ -1122,7 +1122,7 @@ class User extends UserBase
         $saved = $this->save(true, ['groups_external']);
         if ($saved) {
             if ($previousExternalGroups !== $this->groups_external) {
-                Yii::warning(sprintf(
+                Yii::info(sprintf(
                     "Updated external groups for %s from '%s' to '%s'",
                     $this->email,
                     $previousExternalGroups,
