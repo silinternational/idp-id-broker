@@ -200,7 +200,7 @@ class Emailer extends Component
      * @param string $textBody The email body (as plain text).
      * @param string $ccAddress Optional. Email address to include as 'cc'.
      * @param string $bccAddress Optional. Email address to include as 'bcc'.
-     * @param string $delaySeconds Number of seconds to delay sending the email. Default = no delay.
+     * @param int $delaySeconds Number of seconds to delay sending the email. Default = no delay.
      * @throws \Sil\EmailService\Client\EmailServiceClientException
      */
     protected function email(

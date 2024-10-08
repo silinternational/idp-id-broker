@@ -84,7 +84,7 @@ class EmailLog extends EmailLogBase
                 \json_encode($emailLog->getFirstErrors(), JSON_PRETTY_PRINT)
             );
             \Yii::warning($errorMessage);
-            throw new Exception($errorMessage, 1502398588);
+            throw new \Exception($errorMessage, 1502398588);
         }
     }
 

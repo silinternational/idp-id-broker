@@ -1114,11 +1114,23 @@ class User extends UserBase
                 return false;
             }
         }
+        $previousExternalGroups = $this->groups_external;
         $this->removeInMemoryExternalGroupsFor($appPrefix);
         $this->addInMemoryExternalGroups($appExternalGroups);
 
         $this->scenario = self::SCENARIO_UPDATE_USER;
-        return $this->save(true, ['groups_external']);
+        $saved = $this->save(true, ['groups_external']);
+        if ($saved) {
+            if ($previousExternalGroups !== $this->groups_external) {
+                Yii::info(sprintf(
+                    "Updated external groups for %s from '%s' to '%s'",
+                    $this->email,
+                    $previousExternalGroups,
+                    $this->groups_external
+                ));
+            }
+        }
+        return $saved;
     }
 
     /**
