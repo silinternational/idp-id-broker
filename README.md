@@ -72,7 +72,7 @@ Calls are made to Google Analytics regarding users' mfas and whether a password 
 If you want to have an indication that those calls are likely to succeed, run 
 `$ make callGA`.
 
-## Adding groups to SSO `member` attribute from a Google Sheet
+## Adding groups to SAML `member` attribute from a Google Sheet
 
 The `local.env.dist` file shows how to add the necessary environment variables
 in order to sync values from a Google Sheet to the `user.groups_external` field
@@ -165,6 +165,11 @@ To do this...
 You can easily rotate the credentials for a Service Account by creating a new
 JSON Key for it. Then simply update the
 `EXTERNAL_GROUPS_SYNC_set(NUMBER)JsonAuthString` environment variable to use the
-contents of that new JSON Key. Since multiple Keys are supported, you can wait
-to delete the previous Key from that Service Account until you have deployed the
-new credentials, if desired, to avoid service interruption.
+contents of that new JSON Key.
+
+Since you can have multiple Keys on Google Cloud for a given Service Account,
+you can create a new Key in the Google Cloud Console, switch from the old one to
+the new one here, then remove the old one from the Google Cloud Console. In
+other words, you can wait to delete the previous Key from that Service Account
+until you have deployed the new credentials, if desired, to avoid service
+interruption.
