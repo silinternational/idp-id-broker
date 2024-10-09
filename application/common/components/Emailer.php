@@ -49,6 +49,8 @@ class Emailer extends Component
 
     public const SUBJ_ABANDONED_USER_ACCOUNTS = 'Unused {idpDisplayName} Identity Accounts';
 
+    public const SUBJ_EXT_GROUP_SYNC_ERRORS = "Errors while syncing '{appPrefix}' external-groups to the {idpDisplayName} IDP";
+
     public const PROP_SUBJECT = 'subject';
     public const PROP_TO_ADDRESS = 'to_address';
     public const PROP_CC_ADDRESS = 'cc_address';
@@ -141,6 +143,8 @@ class Emailer extends Component
 
     public $subjectForAbandonedUsers;
 
+    public $subjectForExtGroupSyncErrors;
+
     /* The email to contact for HR notifications */
     public $hrNotificationsEmail;
 
@@ -196,7 +200,7 @@ class Emailer extends Component
      * @param string $textBody The email body (as plain text).
      * @param string $ccAddress Optional. Email address to include as 'cc'.
      * @param string $bccAddress Optional. Email address to include as 'bcc'.
-     * @param string $delaySeconds Number of seconds to delay sending the email. Default = no delay.
+     * @param int $delaySeconds Number of seconds to delay sending the email. Default = no delay.
      * @throws \Sil\EmailService\Client\EmailServiceClientException
      */
     protected function email(
@@ -302,11 +306,14 @@ class Emailer extends Component
 
         $this->subjectForAbandonedUsers = $this->subjectForAbandonedUsers ?? self::SUBJ_ABANDONED_USER_ACCOUNTS;
 
+        $this->subjectForExtGroupSyncErrors = $this->subjectForExtGroupSyncErrors ?? self::SUBJ_EXT_GROUP_SYNC_ERRORS;
+
         $this->subjects = [
             EmailLog::MESSAGE_TYPE_INVITE => $this->subjectForInvite,
             EmailLog::MESSAGE_TYPE_MFA_RATE_LIMIT => $this->subjectForMfaRateLimit,
             EmailLog::MESSAGE_TYPE_PASSWORD_CHANGED => $this->subjectForPasswordChanged,
             EmailLog::MESSAGE_TYPE_WELCOME => $this->subjectForWelcome,
+            EmailLog::MESSAGE_TYPE_EXT_GROUP_SYNC_ERRORS => $this->subjectForExtGroupSyncErrors,
             EmailLog::MESSAGE_TYPE_GET_BACKUP_CODES => $this->subjectForGetBackupCodes,
             EmailLog::MESSAGE_TYPE_REFRESH_BACKUP_CODES => $this->subjectForRefreshBackupCodes,
             EmailLog::MESSAGE_TYPE_LOST_SECURITY_KEY => $this->subjectForLostSecurityKey,
@@ -338,15 +345,20 @@ class Emailer extends Component
      *
      * @param string $messageType The message type. Must be one of the
      *     EmailLog::MESSAGE_TYPE_* values.
-     * @param User $user The intended recipient.
+     * @param ?User $user The intended recipient, if applicable. If not provided, a 'toAddress'
+     *     must be in the $data parameter.
      * @param string[] $data Data fields for email template. Include key 'toAddress' to override
      *     sending to primary address in User object.
      * @param int $delaySeconds Number of seconds to delay sending the email. Default = no delay.
      * @throws \Sil\EmailService\Client\EmailServiceClientException
      */
-    public function sendMessageTo(string $messageType, User $user, array $data = [], int $delaySeconds = 0)
-    {
-        if ($user->active === 'no') {
+    public function sendMessageTo(
+        string $messageType,
+        ?User $user = null,
+        array $data = [],
+        int $delaySeconds = 0
+    ) {
+        if ($user && $user->active === 'no') {
             \Yii::warning([
                 'action' => 'send message',
                 'status' => 'canceled',
@@ -357,7 +369,7 @@ class Emailer extends Component
         }
 
         $dataForEmail = ArrayHelper::merge(
-            $user->getAttributesForEmail(),
+            $user ? $user->getAttributesForEmail() : [],
             $this->otherDataForEmails,
             $data
         );
@@ -372,7 +384,9 @@ class Emailer extends Component
 
         $this->email($toAddress, $subject, $htmlBody, strip_tags($htmlBody), $ccAddress, $bccAddress, $delaySeconds);
 
-        EmailLog::logMessage($messageType, $user->id);
+        if ($user !== null) {
+            EmailLog::logMessage($messageType, $user->id);
+        }
     }
 
     /**
@@ -737,6 +751,38 @@ class Emailer extends Component
         $this->logger->info(array_merge($logData, [
             'status' => 'finished',
             'number_sent' => $numEmailsSent,
+        ]));
+    }
+
+    public function sendExternalGroupSyncErrorsEmail(
+        string $appPrefix,
+        array $errors,
+        string $recipient,
+        string $googleSheetUrl
+    ) {
+        $logData = [
+            'action' => 'send external-groups sync errors email',
+            'status' => 'starting',
+        ];
+
+        $this->logger->info(array_merge($logData, [
+            'errors' => count($errors)
+        ]));
+
+        $this->sendMessageTo(
+            EmailLog::MESSAGE_TYPE_EXT_GROUP_SYNC_ERRORS,
+            null,
+            [
+                'toAddress' => $recipient,
+                'appPrefix' => $appPrefix,
+                'errors' => $errors,
+                'googleSheetUrl' => $googleSheetUrl,
+                'idpDisplayName' => \Yii::$app->params['idpDisplayName'],
+            ]
+        );
+
+        $this->logger->info(array_merge($logData, [
+            'status' => 'finished',
         ]));
     }
 
