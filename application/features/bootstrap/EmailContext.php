@@ -1228,7 +1228,7 @@ class EmailContext extends YiiContext
     }
 
     /**
-     * @When I send abandoned user email
+     * @When I send abandoned user email (again)
      */
     public function iSendAbandonedUserEmail()
     {
@@ -1269,5 +1269,22 @@ class EmailContext extends YiiContext
         Method::deleteAll();
         User::deleteAll();
         $this->fakeEmailer->forgetFakeEmailsSent();
+    }
+
+    /**
+     * @Then the abandoned user email has been sent :expectedNumber time(s)
+     */
+    public function theAbandonedUserEmailHasBeenSentTime($expectedCount)
+    {
+        $emails = $this->fakeEmailer->getFakeEmailsSent();
+        $actualCount = 0;
+
+        foreach ($emails as $email) {
+            if ($email[Emailer::PROP_SUBJECT] === $this->fakeEmailer->subjectForAbandonedUsers) {
+                $actualCount++;
+            }
+        }
+
+        Assert::eq($actualCount, $expectedCount);
     }
 }

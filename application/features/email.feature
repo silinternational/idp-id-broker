@@ -404,7 +404,6 @@ Feature: Email
       | to send      | -1     | has          | should NOT     |
       | NOT to send  | -1     | has NOT      | should NOT     |
 
-
   Scenario Outline: HR notification users
     Given hr notification email <isOrIsNot> set
       And the database has been purged
@@ -423,3 +422,12 @@ Feature: Email
       | is        | an inactive | 7 months  | has NOT     |
       | is        | a           | 5 months  | has NOT     |
       | is        | a           | 7 months  | has         |
+
+  Scenario: Not sending HR notification emails to frequently
+    Given hr notification email is set
+      And the database has been purged
+      And a user already exists
+      And the user has not logged in for "7 months"
+      And I send abandoned user email
+    When I send abandoned user email again
+    Then the abandoned user email has been sent 1 time
