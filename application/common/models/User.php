@@ -139,7 +139,7 @@ class User extends UserBase
                     'status' => 'error',
                     'error' => $emailLog->getFirstErrors(),
                     'email log id' => $emailLog->id,
-                    'user_id' => $emailLog->user_id,
+                    'user_id' => $this->id,
                 ]);
                 return false;
             }

@@ -69,18 +69,18 @@ class EmailLog extends EmailLogBase
         ];
     }
 
-    public static function logMessage(string $messageType, $userId)
+    public static function logMessage(string $messageType, string $toAddress)
     {
         $emailLog = new EmailLog([
-            'user_id' => $userId,
+            'to_address' => $toAddress,
             'message_type' => $messageType,
         ]);
 
         if (!$emailLog->save()) {
             $errorMessage = sprintf(
-                'Failed to log %s email to User %s: %s',
+                'Failed to log %s email to %s: %s',
                 var_export($messageType, true),
-                var_export($userId, true),
+                var_export($toAddress, true),
                 \json_encode($emailLog->getFirstErrors(), JSON_PRETTY_PRINT)
             );
             \Yii::warning($errorMessage);
