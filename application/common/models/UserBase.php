@@ -35,6 +35,7 @@ use Yii;
  * @property string|null $deactivated_utc
  *
  * @property Password $currentPassword
+ * @property EmailLog[] $emailLogs
  * @property Invite[] $invites
  * @property Method[] $methods
  * @property Mfa[] $mfas
@@ -111,6 +112,16 @@ class UserBase extends \yii\db\ActiveRecord
     public function getCurrentPassword()
     {
         return $this->hasOne(Password::class, ['id' => 'current_password_id']);
+    }
+
+    /**
+     * Gets query for [[EmailLogs]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getEmailLogs()
+    {
+        return $this->hasMany(EmailLog::class, ['to_address' => 'email']);
     }
 
     /**
