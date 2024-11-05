@@ -194,6 +194,11 @@ class Emailer extends Component
     /**
      * Use the email service to send an email.
      *
+     * WARNING:
+     * You probably shouldn't be calling this directly. Instead, call the
+     * `sendMessageTo()` method so that the sending of this email will be
+     * logged.
+     *
      * @param string $toAddress The recipient's email address.
      * @param string $subject The subject.
      * @param string $htmlBody The email body (as HTML).
@@ -811,9 +816,14 @@ class Emailer extends Component
             $dataForEmail['users'] = User::getAbandonedUsers();
 
             if (!empty($dataForEmail['users'])) {
-                $htmlBody = \Yii::$app->view->render('@common/mail/abandoned-users.html.php', $dataForEmail);
-
-                $this->email($this->hrNotificationsEmail, $this->subjectForAbandonedUsers, $htmlBody, strip_tags($htmlBody));
+                $this->sendMessageTo(
+                    'abandoned-users',
+                    null,
+                    ArrayHelper::merge(
+                        $dataForEmail,
+                        ['toAddress' => $this->hrNotificationsEmail]
+                    )
+                );
             }
         }
     }
