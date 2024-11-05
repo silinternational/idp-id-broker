@@ -17,6 +17,7 @@ class EmailLog extends EmailLogBase
     public const MESSAGE_TYPE_MFA_RATE_LIMIT = 'mfa-rate-limit';
     public const MESSAGE_TYPE_PASSWORD_CHANGED = 'password-changed';
     public const MESSAGE_TYPE_WELCOME = 'welcome';
+    public const MESSAGE_TYPE_ABANDONED_USERS = 'abandoned-users';
     public const MESSAGE_TYPE_EXT_GROUP_SYNC_ERRORS = 'ext-group-sync-errors';
     public const MESSAGE_TYPE_GET_BACKUP_CODES = 'get-backup-codes';
     public const MESSAGE_TYPE_REFRESH_BACKUP_CODES = 'refresh-backup-codes';
