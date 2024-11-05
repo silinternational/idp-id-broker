@@ -3,6 +3,7 @@
 namespace common\models;
 
 use common\helpers\MySqlDateTime;
+use ReflectionClass;
 use Yii;
 use yii\helpers\ArrayHelper;
 
@@ -48,27 +49,14 @@ class EmailLog extends EmailLogBase
 
     public static function getMessageTypes()
     {
-        return [
-            self::MESSAGE_TYPE_INVITE,
-            self::MESSAGE_TYPE_MFA_RATE_LIMIT,
-            self::MESSAGE_TYPE_PASSWORD_CHANGED,
-            self::MESSAGE_TYPE_WELCOME,
-            self::MESSAGE_TYPE_GET_BACKUP_CODES,
-            self::MESSAGE_TYPE_REFRESH_BACKUP_CODES,
-            self::MESSAGE_TYPE_LOST_SECURITY_KEY,
-            self::MESSAGE_TYPE_MFA_OPTION_ADDED,
-            self::MESSAGE_TYPE_MFA_OPTION_REMOVED,
-            self::MESSAGE_TYPE_MFA_ENABLED,
-            self::MESSAGE_TYPE_MFA_DISABLED,
-            self::MESSAGE_TYPE_METHOD_VERIFY,
-            self::MESSAGE_TYPE_METHOD_REMINDER,
-            self::MESSAGE_TYPE_METHOD_PURGED,
-            self::MESSAGE_TYPE_MFA_MANAGER,
-            self::MESSAGE_TYPE_MFA_MANAGER_HELP,
-            self::MESSAGE_TYPE_PASSWORD_EXPIRING,
-            self::MESSAGE_TYPE_PASSWORD_EXPIRED,
-            self::MESSAGE_TYPE_PASSWORD_PWNED,
-        ];
+        $reflectionClass = new ReflectionClass(__CLASS__);
+        $messageTypes = [];
+        foreach ($reflectionClass->getConstants() as $name => $value) {
+            if (str_starts_with($name, 'MESSAGE_TYPE_')) {
+                $messageTypes[] = $value;
+            }
+        }
+        return $messageTypes;
     }
 
     public static function logMessageToUser(string $messageType, $userId)
