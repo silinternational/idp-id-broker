@@ -423,7 +423,7 @@ Feature: Email
       | is        | a           | 5 months  | has NOT     |
       | is        | a           | 7 months  | has         |
 
-  Scenario: Not sending HR notification emails to frequently
+  Scenario: Not sending HR notification emails too frequently
     Given hr notification email is set
       And the database has been purged
       And a user already exists
