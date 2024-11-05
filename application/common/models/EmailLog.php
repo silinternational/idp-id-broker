@@ -49,16 +49,6 @@ class EmailLog extends EmailLogBase
         ]);
     }
 
-    /**
-     * Gets query for [[User]].
-     *
-     * @return \yii\db\ActiveQuery
-     */
-    public function getUser()
-    {
-        return $this->hasOne(User::class, ['email' => 'to_address']);
-    }
-
     public static function getMessageTypes(): array
     {
         $reflectionClass = new ReflectionClass(__CLASS__);
@@ -69,6 +59,16 @@ class EmailLog extends EmailLogBase
             }
         }
         return $messageTypes;
+    }
+
+    /**
+     * Gets query for [[User]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getUser()
+    {
+        return $this->hasOne(User::class, ['email' => 'to_address']);
     }
 
     public static function logMessage(string $messageType, string $toAddress)
