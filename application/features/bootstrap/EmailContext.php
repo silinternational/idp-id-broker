@@ -783,7 +783,10 @@ class EmailContext extends YiiContext
     public function iCheckIfAGetBackupCodesEmailHasBeenSentRecently()
     {
         $messageType = EmailLog::MESSAGE_TYPE_GET_BACKUP_CODES;
-        $this->getBackupCodesEmailHasBeenSent = $this->fakeEmailer->hasUserReceivedMessageRecently($this->tempUser, $messageType);
+        $this->getBackupCodesEmailHasBeenSent = $this->fakeEmailer->hasUserReceivedMessageRecently(
+            $this->tempUser->id,
+            $messageType
+        );
     }
 
     /**
