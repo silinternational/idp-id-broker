@@ -462,6 +462,26 @@ class Emailer extends Component
     }
 
     /**
+     * Whether we should send an abandoned-users message to HR.
+     *
+     * @return bool
+     */
+    public function shouldSendAbandonedUsersMessage(): bool
+    {
+        if (empty($this->hrNotificationsEmail)) {
+            return false;
+        }
+
+        $haveSentAbandonedUsersEmailRecently = $this->hasAddressReceivedMessageRecently(
+            $this->hrNotificationsEmail,
+            EmailLog::MESSAGE_TYPE_ABANDONED_USERS
+        );
+
+        return !$haveSentAbandonedUsersEmailRecently;
+    }
+
+
+    /**
      * Whether we should send an invite message to the given User.
      *
      * @param User $user The User in question.
@@ -834,14 +854,16 @@ class Emailer extends Component
             $dataForEmail['users'] = User::getAbandonedUsers();
 
             if (!empty($dataForEmail['users'])) {
-                $this->sendMessageTo(
-                    'abandoned-users',
-                    null,
-                    ArrayHelper::merge(
-                        $dataForEmail,
-                        ['toAddress' => $this->hrNotificationsEmail]
-                    )
-                );
+                if ($this->shouldSendAbandonedUsersMessage()) {
+                    $this->sendMessageTo(
+                        EmailLog::MESSAGE_TYPE_ABANDONED_USERS,
+                        null,
+                        ArrayHelper::merge(
+                            $dataForEmail,
+                            ['toAddress' => $this->hrNotificationsEmail]
+                        )
+                    );
+                }
             }
         }
     }
