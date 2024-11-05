@@ -11,8 +11,6 @@ use Yii;
  * @property string|null $message_type
  * @property string $sent_utc
  * @property string $to_address
- *
- * @property User $toAddress
  */
 class EmailLogBase extends \yii\db\ActiveRecord
 {
@@ -34,7 +32,6 @@ class EmailLogBase extends \yii\db\ActiveRecord
             [['sent_utc'], 'required'],
             [['sent_utc'], 'safe'],
             [['to_address'], 'string', 'max' => 255],
-            [['to_address'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['to_address' => 'email']],
         ];
     }
 
@@ -49,15 +46,5 @@ class EmailLogBase extends \yii\db\ActiveRecord
             'sent_utc' => Yii::t('app', 'Sent Utc'),
             'to_address' => Yii::t('app', 'To Address'),
         ];
-    }
-
-    /**
-     * Gets query for [[ToAddress]].
-     *
-     * @return \yii\db\ActiveQuery
-     */
-    public function getToAddress()
-    {
-        return $this->hasOne(User::class, ['email' => 'to_address']);
     }
 }

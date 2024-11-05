@@ -20,6 +20,9 @@ use yii\db\conditions\LikeCondition;
 use yii\db\conditions\OrCondition;
 use yii\helpers\ArrayHelper;
 
+/**
+ * @property EmailLog[] $emailLogs
+ */
 class User extends UserBase
 {
     public const SCENARIO_NEW_USER        = 'new_user';
@@ -1276,6 +1279,16 @@ class User extends UserBase
     public function getEmailAddress(): string
     {
         return $this->email ?? $this->personal_email ?? '';
+    }
+
+    /**
+     * Gets query for [[EmailLogs]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getEmailLogs()
+    {
+        return $this->hasMany(EmailLog::class, ['to_address' => 'email']);
     }
 
     /**

@@ -6,6 +6,9 @@ use common\helpers\MySqlDateTime;
 use Yii;
 use yii\helpers\ArrayHelper;
 
+/**
+ * @property ?User $user
+ */
 class EmailLog extends EmailLogBase
 {
     /* Valid message_type values.
@@ -42,6 +45,16 @@ class EmailLog extends EmailLogBase
         return ArrayHelper::merge(parent::attributeLabels(), [
             'sent_utc' => Yii::t('app', 'Sent (UTC)'),
         ]);
+    }
+
+    /**
+     * Gets query for [[User]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getUser()
+    {
+        return $this->hasOne(User::class, ['email' => 'to_address']);
     }
 
     public static function getMessageTypes()
