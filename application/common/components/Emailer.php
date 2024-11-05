@@ -392,9 +392,7 @@ class Emailer extends Component
 
         $this->email($toAddress, $subject, $htmlBody, strip_tags($htmlBody), $ccAddress, $bccAddress, $delaySeconds);
 
-        if ($user !== null) {
-            EmailLog::logMessage($messageType, $toAddress);
-        }
+        EmailLog::logMessage($messageType, $toAddress);
     }
 
     /**
