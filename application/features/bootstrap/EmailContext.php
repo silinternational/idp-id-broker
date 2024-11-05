@@ -1259,7 +1259,8 @@ class EmailContext extends YiiContext
         $hasBeenSent = false;
 
         foreach ($emails as $email) {
-            if ($email[Emailer::PROP_SUBJECT] === $this->fakeEmailer->subjectForAbandonedUsers) {
+            $subject = $email[Emailer::PROP_SUBJECT];
+            if ($this->fakeEmailer->isSubjectForMessageType($subject, 'abandoned-users')) {
                 $hasBeenSent = true;
                 break;
             }
@@ -1295,7 +1296,8 @@ class EmailContext extends YiiContext
         $actualCount = 0;
 
         foreach ($emails as $email) {
-            if ($email[Emailer::PROP_SUBJECT] === $this->fakeEmailer->subjectForAbandonedUsers) {
+            $subject = $email[Emailer::PROP_SUBJECT];
+            if ($this->fakeEmailer->isSubjectForMessageType($subject, 'abandoned-users')) {
                 $actualCount++;
             }
         }
