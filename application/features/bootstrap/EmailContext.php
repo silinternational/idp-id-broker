@@ -1255,16 +1255,8 @@ class EmailContext extends YiiContext
      */
     public function theAbandonedUserEmailHasOrHasNotBeenSent($hasOrHasNot)
     {
-        $emails = $this->fakeEmailer->getFakeEmailsSent();
-        $hasBeenSent = false;
-
-        foreach ($emails as $email) {
-            $subject = $email[Emailer::PROP_SUBJECT];
-            if ($this->fakeEmailer->isSubjectForMessageType($subject, 'abandoned-users')) {
-                $hasBeenSent = true;
-                break;
-            }
-        }
+        $numberSent = $this->countEmailsSent(EmailLog::MESSAGE_TYPE_ABANDONED_USERS);
+        $hasBeenSent = ($numberSent > 0);
 
         if ($hasOrHasNot === 'has') {
             Assert::true($hasBeenSent);
@@ -1292,16 +1284,22 @@ class EmailContext extends YiiContext
      */
     public function theAbandonedUserEmailHasBeenSentTime($expectedCount)
     {
+        $actualCount = $this->countEmailsSent(EmailLog::MESSAGE_TYPE_ABANDONED_USERS);
+
+        Assert::eq($actualCount, $expectedCount);
+    }
+
+    protected function countEmailsSent(string $messageType): int
+    {
         $emails = $this->fakeEmailer->getFakeEmailsSent();
         $actualCount = 0;
 
         foreach ($emails as $email) {
             $subject = $email[Emailer::PROP_SUBJECT];
-            if ($this->fakeEmailer->isSubjectForMessageType($subject, 'abandoned-users')) {
+            if ($this->fakeEmailer->isSubjectForMessageType($subject, $messageType)) {
                 $actualCount++;
             }
         }
-
-        Assert::eq($actualCount, $expectedCount);
+        return $actualCount;
     }
 }
