@@ -432,10 +432,33 @@ class Emailer extends Component
      * @param string $messageType
      * @return bool
      */
-    public function hasReceivedMessageRecently($userId, string $messageType)
+    public function hasUserReceivedMessageRecently($userId, string $messageType)
     {
         $latestEmail = EmailLog::find()->where(['user_id' => $userId, 'message_type' => $messageType])
             ->orderBy('sent_utc DESC')->one();
+        if (empty($latestEmail)) {
+            return false;
+        }
+
+        return MySqlDateTime::dateIsRecent($latestEmail->sent_utc, $this->emailRepeatDelayDays);
+    }
+
+    /**
+     * Whether the non-user address has already been sent this type of email in the last X days
+     *
+     * @param int $userId
+     * @param string $messageType
+     * @return bool
+     */
+    public function hasNonUserReceivedMessageRecently(string $emailAddress, string $messageType)
+    {
+        $latestEmail = EmailLog::find()->where([
+            'message_type' => $messageType,
+            'non_user_address' => $emailAddress,
+            'user_id' => null,
+        ])->orderBy(
+            'sent_utc DESC'
+        )->one();
         if (empty($latestEmail)) {
             return false;
         }
@@ -454,7 +477,7 @@ class Emailer extends Component
             return false;
         }
 
-        $haveSentAbandonedUsersEmailRecently = $this->hasAddressReceivedMessageRecently(
+        $haveSentAbandonedUsersEmailRecently = $this->hasNonUserReceivedMessageRecently(
             $this->hrNotificationsEmail,
             EmailLog::MESSAGE_TYPE_ABANDONED_USERS
         );
@@ -521,7 +544,7 @@ class Emailer extends Component
         return $this->sendGetBackupCodesEmails
             && $user->getVerifiedMfaOptionsCount() === 1
             && !$user->hasMfaBackupCodes()
-            && !$this->hasReceivedMessageRecently($user->id, EmailLog::MESSAGE_TYPE_GET_BACKUP_CODES);
+            && !$this->hasUserReceivedMessageRecently($user->id, EmailLog::MESSAGE_TYPE_GET_BACKUP_CODES);
     }
 
     /**
@@ -548,7 +571,7 @@ class Emailer extends Component
             return false;
         }
 
-        if ($this->hasReceivedMessageRecently($user->id, EmailLog::MESSAGE_TYPE_LOST_SECURITY_KEY)) {
+        if ($this->hasUserReceivedMessageRecently($user->id, EmailLog::MESSAGE_TYPE_LOST_SECURITY_KEY)) {
             return false;
         }
 
@@ -687,7 +710,7 @@ class Emailer extends Component
         foreach ($methods as $method) {
             $user = $method->user;
             if (!MySqlDateTime::dateIsRecent($method->created, 3) &&
-                !$this->hasReceivedMessageRecently($user->id, EmailLog::MESSAGE_TYPE_METHOD_REMINDER)
+                !$this->hasUserReceivedMessageRecently($user->id, EmailLog::MESSAGE_TYPE_METHOD_REMINDER)
             ) {
                 $this->sendMessageTo(
                     EmailLog::MESSAGE_TYPE_METHOD_REMINDER,
@@ -733,7 +756,7 @@ class Emailer extends Component
                 $passwordExpiry = strtotime($userPassword->getExpiresOn());
                 if ($passwordExpiry < strtotime(self::PASSWORD_EXPIRING_CUTOFF)
                     && !($passwordExpiry < time())
-                    && !$this->hasReceivedMessageRecently($user->id, EmailLog::MESSAGE_TYPE_PASSWORD_EXPIRING)
+                    && !$this->hasUserReceivedMessageRecently($user->id, EmailLog::MESSAGE_TYPE_PASSWORD_EXPIRING)
                 ) {
                     $this->sendMessageTo(EmailLog::MESSAGE_TYPE_PASSWORD_EXPIRING, $user);
                     $numEmailsSent++;
@@ -775,7 +798,7 @@ class Emailer extends Component
                 $passwordExpiry = strtotime($userPassword->getExpiresOn());
                 if ($passwordExpiry < time()
                     && $passwordExpiry > strtotime(self::PASSWORD_EXPIRED_CUTOFF)
-                    && !$this->hasReceivedMessageRecently($user->id, EmailLog::MESSAGE_TYPE_PASSWORD_EXPIRED)
+                    && !$this->hasUserReceivedMessageRecently($user->id, EmailLog::MESSAGE_TYPE_PASSWORD_EXPIRED)
                 ) {
                     $this->sendMessageTo(EmailLog::MESSAGE_TYPE_PASSWORD_EXPIRED, $user);
                     $numEmailsSent++;

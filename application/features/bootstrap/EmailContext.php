@@ -783,7 +783,10 @@ class EmailContext extends YiiContext
     public function iCheckIfAGetBackupCodesEmailHasBeenSentRecently()
     {
         $messageType = EmailLog::MESSAGE_TYPE_GET_BACKUP_CODES;
-        $this->getBackupCodesEmailHasBeenSent = $this->fakeEmailer->hasReceivedMessageRecently($this->tempUser, $messageType);
+        $this->getBackupCodesEmailHasBeenSent = $this->fakeEmailer->hasUserReceivedMessageRecently(
+            $this->tempUser,
+            $messageType
+        );
     }
 
     /**
@@ -952,7 +955,10 @@ class EmailContext extends YiiContext
      */
     public function iSeeThatTheFirstUserHasReceivedALostSecurityKeyEmail()
     {
-        Assert::true($this->fakeEmailer->hasReceivedMessageRecently($this->tempUser->id, EmailLog::MESSAGE_TYPE_LOST_SECURITY_KEY));
+        Assert::true($this->fakeEmailer->hasUserReceivedMessageRecently(
+            $this->tempUser->id,
+            EmailLog::MESSAGE_TYPE_LOST_SECURITY_KEY
+        ));
     }
 
     /**
@@ -960,7 +966,10 @@ class EmailContext extends YiiContext
      */
     public function iSeeThatTheSecondUserHasReceivedAGetBackupCodesEmail()
     {
-        Assert::true($this->fakeEmailer->hasReceivedMessageRecently($this->tempUser2->id, EmailLog::MESSAGE_TYPE_GET_BACKUP_CODES));
+        Assert::true($this->fakeEmailer->hasUserReceivedMessageRecently(
+            $this->tempUser2->id,
+            EmailLog::MESSAGE_TYPE_GET_BACKUP_CODES
+        ));
     }
 
     /**
@@ -968,7 +977,10 @@ class EmailContext extends YiiContext
      */
     public function iSeeThatTheFirstUserHasNotReceivedALostSecurityKeyEmail()
     {
-        Assert::false($this->fakeEmailer->hasReceivedMessageRecently($this->tempUser->id, EmailLog::MESSAGE_TYPE_LOST_SECURITY_KEY));
+        Assert::false($this->fakeEmailer->hasUserReceivedMessageRecently(
+            $this->tempUser->id,
+            EmailLog::MESSAGE_TYPE_LOST_SECURITY_KEY
+        ));
     }
 
     /**
@@ -976,7 +988,10 @@ class EmailContext extends YiiContext
      */
     public function iSeeThatTheSecondUserHasNotReceivedAGetBackupCodesEmail()
     {
-        Assert::false($this->fakeEmailer->hasReceivedMessageRecently($this->tempUser2->id, EmailLog::MESSAGE_TYPE_GET_BACKUP_CODES));
+        Assert::false($this->fakeEmailer->hasUserReceivedMessageRecently(
+            $this->tempUser2->id,
+            EmailLog::MESSAGE_TYPE_GET_BACKUP_CODES
+        ));
     }
 
     /**
@@ -1108,7 +1123,7 @@ class EmailContext extends YiiContext
      */
     public function iSeeThatARecoveryMethodReminderHasNotBeenSent($hasOrHasNot)
     {
-        $hasBeenSent = $this->fakeEmailer->hasReceivedMessageRecently(
+        $hasBeenSent = $this->fakeEmailer->hasUserReceivedMessageRecently(
             $this->tempUser->id,
             EmailLog::MESSAGE_TYPE_METHOD_REMINDER
         );
