@@ -784,7 +784,7 @@ class EmailContext extends YiiContext
     {
         $messageType = EmailLog::MESSAGE_TYPE_GET_BACKUP_CODES;
         $this->getBackupCodesEmailHasBeenSent = $this->fakeEmailer->hasUserReceivedMessageRecently(
-            $this->tempUser,
+            $this->tempUser->id,
             $messageType
         );
     }
