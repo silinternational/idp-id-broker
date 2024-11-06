@@ -261,6 +261,13 @@ class Emailer extends Component
     {
         $subject = $this->subjects[$messageType] ?? '';
 
+        if (empty($subject)) {
+            \Yii::error(sprintf(
+                'No subject known for %s email messages.',
+                $messageType
+            ));
+        }
+
         foreach ($data as $key => $value) {
             if (is_scalar($value)) {
                 $subject = str_replace('{' . $key . '}', $value, $subject);
@@ -382,13 +389,6 @@ class Emailer extends Component
         $ccAddress = $data['ccAddress'] ?? '';
         $bccAddress = $data['bccAddress'] ?? '';
         $subject = $this->getSubjectForMessage($messageType, $dataForEmail);
-
-        if (empty($subject)) {
-            \Yii::error(sprintf(
-                'No subject known for %s email messages.',
-                $messageType
-            ));
-        }
 
         $this->email($toAddress, $subject, $htmlBody, strip_tags($htmlBody), $ccAddress, $bccAddress, $delaySeconds);
 
