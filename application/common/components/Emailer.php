@@ -425,14 +425,13 @@ class Emailer extends Component
     }
 
     /**
-     *
      * Whether the user has already been sent this type of email in the last X days
      *
      * @param int $userId
      * @param string $messageType
      * @return bool
      */
-    public function hasUserReceivedMessageRecently($userId, string $messageType)
+    public function hasUserReceivedMessageRecently(int $userId, string $messageType): bool
     {
         $latestEmail = EmailLog::find()->where(['user_id' => $userId, 'message_type' => $messageType])
             ->orderBy('sent_utc DESC')->one();
@@ -446,11 +445,11 @@ class Emailer extends Component
     /**
      * Whether the non-user address has already been sent this type of email in the last X days
      *
-     * @param int $userId
+     * @param string $emailAddress
      * @param string $messageType
      * @return bool
      */
-    public function hasNonUserReceivedMessageRecently(string $emailAddress, string $messageType)
+    public function hasNonUserReceivedMessageRecently(string $emailAddress, string $messageType): bool
     {
         $latestEmail = EmailLog::find()->where([
             'message_type' => $messageType,
