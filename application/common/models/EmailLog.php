@@ -41,6 +41,7 @@ class EmailLog extends EmailLogBase
     {
         return ArrayHelper::merge(parent::attributeLabels(), [
             'sent_utc' => Yii::t('app', 'Sent (UTC)'),
+            'non_user_address' => Yii::t('app', 'Non-User Address'),
         ]);
     }
 
