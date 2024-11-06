@@ -341,7 +341,7 @@ class Emailer extends Component
     }
 
     /**
-     * Send the specified type of message to the given User.
+     * Send the specified type of message to the given User (or non-User address).
      *
      * @param string $messageType The message type. Must be one of the
      *     EmailLog::MESSAGE_TYPE_* values.
@@ -385,7 +385,9 @@ class Emailer extends Component
         $this->email($toAddress, $subject, $htmlBody, strip_tags($htmlBody), $ccAddress, $bccAddress, $delaySeconds);
 
         if ($user !== null) {
-            EmailLog::logMessage($messageType, $user->id);
+            EmailLog::logMessageToUser($messageType, $user->id);
+        } else {
+            EmailLog::logMessageToNonUser($messageType, $toAddress);
         }
     }
 

@@ -70,7 +70,7 @@ class EmailLog extends EmailLogBase
         ];
     }
 
-    public static function logMessage(string $messageType, $userId)
+    public static function logMessageToUser(string $messageType, $userId)
     {
         $emailLog = new EmailLog([
             'user_id' => $userId,
@@ -86,6 +86,25 @@ class EmailLog extends EmailLogBase
             );
             \Yii::warning($errorMessage);
             throw new \Exception($errorMessage, 1502398588);
+        }
+    }
+
+    public static function logMessageToNonUser(string $messageType, string $emailAddress)
+    {
+        $emailLog = new EmailLog([
+            'non_user_address' => $emailAddress,
+            'message_type' => $messageType,
+        ]);
+
+        if (!$emailLog->save()) {
+            $errorMessage = sprintf(
+                'Failed to log %s email to %s: %s',
+                var_export($messageType, true),
+                var_export($emailAddress, true),
+                \json_encode($emailLog->getFirstErrors(), JSON_PRETTY_PRINT)
+            );
+            \Yii::warning($errorMessage);
+            throw new \Exception($errorMessage, 1730909932);
         }
     }
 
