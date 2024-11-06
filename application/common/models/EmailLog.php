@@ -47,7 +47,7 @@ class EmailLog extends EmailLogBase
         ]);
     }
 
-    public static function getMessageTypes()
+    public static function getMessageTypes(): array
     {
         $reflectionClass = new ReflectionClass(__CLASS__);
         $messageTypes = [];
