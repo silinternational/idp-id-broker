@@ -122,6 +122,11 @@ class EmailLog extends EmailLogBase
                 'non_user_address',
                 'emptyIfUserIsSet',
             ],
+            [
+                'non_user_address',
+                'requiredIfUserIsEmpty',
+                'skipOnEmpty' => false,
+            ],
         ], parent::rules());
     }
 
@@ -132,6 +137,19 @@ class EmailLog extends EmailLogBase
                 $attribute,
                 sprintf(
                     'Only a user_id or a %s may be set, not both',
+                    $attribute
+                )
+            );
+        }
+    }
+
+    public function requiredIfUserIsEmpty($attribute)
+    {
+        if (empty($this->user_id) && empty($this[$attribute])) {
+            $this->addError(
+                $attribute,
+                sprintf(
+                    'Either a user_id or a %s must be set',
                     $attribute
                 )
             );

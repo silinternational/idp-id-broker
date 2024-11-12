@@ -1356,4 +1356,15 @@ class EmailContext extends YiiContext
             'No EmailLog validation errors were found'
         );
     }
+
+    /**
+     * @When I try to log an email as sent to neither a User nor a non-user address
+     */
+    public function iTryToLogAnEmailAsSentToNeitherAUserNorANonUserAddress()
+    {
+        $this->tempEmailLog = new EmailLog([
+            'message_type' => EmailLog::MESSAGE_TYPE_ABANDONED_USERS,
+        ]);
+        $this->tempEmailLog->save();
+    }
 }

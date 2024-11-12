@@ -442,3 +442,7 @@ Feature: Email
     Given a user already exists
     When I try to log an email as sent to that User and to a non-user address
     Then an email log validation error should have occurred
+
+  Scenario: Ensure each EmailLog is to either a User or a non-user address
+    When I try to log an email as sent to neither a User nor a non-user address
+    Then an email log validation error should have occurred
