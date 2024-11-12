@@ -11,7 +11,6 @@ use common\models\Mfa;
 use common\models\MfaBackupcode;
 use common\models\MfaWebauthn;
 use common\models\User;
-use Sil\SilIdBroker\Behat\Context\YiiContext;
 use Webmozart\Assert\Assert;
 
 class EmailContext extends YiiContext
