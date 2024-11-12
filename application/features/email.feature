@@ -431,3 +431,9 @@ Feature: Email
       And I send abandoned user email
     When I send abandoned user email again
     Then the abandoned user email has been sent 1 time
+
+  Scenario: Not sending external-group sync-error emails too frequently
+    Given the database has been purged
+      And I send an external-groups sync-error email
+    When I send an external-groups sync-error email again
+    Then the external-groups sync-error email has been sent 1 time

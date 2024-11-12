@@ -59,6 +59,8 @@ class EmailContext extends YiiContext
     /** @var array<array> */
     protected $matchingFakeEmails;
 
+    private string $dummyExtGroupsAppPrefix = 'ext-dummy';
+
     public const METHOD_EMAIL_ADDRESS = 'method@example.com';
     public const MANAGER_EMAIL = 'manager@example.com';
 
@@ -1299,6 +1301,34 @@ class EmailContext extends YiiContext
     public function theAbandonedUserEmailHasBeenSentTime($expectedCount)
     {
         $actualCount = $this->countEmailsSent(EmailLog::MESSAGE_TYPE_ABANDONED_USERS);
+        Assert::eq($actualCount, $expectedCount);
+    }
+
+    /**
+     * @Given I send an external-groups sync-error email (again)
+     */
+    public function iSendAnExternalGroupsSyncErrorEmail()
+    {
+        $this->fakeEmailer->sendExternalGroupSyncErrorsEmail(
+            $this->dummyExtGroupsAppPrefix,
+            ['dummy error'],
+            'dummy@example.com',
+            ''
+        );
+    }
+
+    /**
+     * @Then the external-groups sync-error email has been sent :expectedCount time(s)
+     */
+    public function theExternalGroupsSyncErrorEmailHasBeenSentTime($expectedCount)
+    {
+        // The $appPrefix is needed by the FakeEmailer, to find the appropriate
+        // emails (by being able to accurately generate the expected subject).
+        $this->fakeEmailer->otherDataForEmails['appPrefix'] = $this->dummyExtGroupsAppPrefix;
+
+        $actualCount = $this->countEmailsSent(
+            EmailLog::MESSAGE_TYPE_EXT_GROUP_SYNC_ERRORS
+        );
         Assert::eq($actualCount, $expectedCount);
     }
 }
