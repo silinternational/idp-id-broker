@@ -31,7 +31,7 @@ use yii\helpers\Html as yHtml;
 <p><b>Instructions to set up 2-Step Verification:</b></p>
 <ol>
     <li>Go to <?=yHtml::a(yHtml::encode($passwordProfileUrl), $passwordProfileUrl)?>.</li>
-    <li>Under 2-Step Verification, set up the options that suit you best (Security Key, Smartphone App, and/or
+    <li>Under 2-Step Verification, set up the options that suit you best (Security Key, Authenticator App, and/or
     Printable Codes)</li>
     <li>Log out and log in again to see how it works and to have it remember your browser for 30 days.</li>
 </ol>

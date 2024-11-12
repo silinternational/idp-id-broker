@@ -21,7 +21,7 @@ use yii\helpers\Html as yHtml;
 <p>
     We noticed you have a Security Key configured for 2-Step Verification on your <?= yHtml::encode($idpDisplayName) ?>
     Identity account but have not used it recently and instead have been using a different option for 2-Step
-    Verification (a Smartphone App or Printable Codes).
+    Verification (an Authenticator App or Printable Codes).
 </p>
 <p>
     This email is just a courtesy to check that you still have your Security Key. If not, please remove it from your
