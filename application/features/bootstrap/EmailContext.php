@@ -1295,7 +1295,7 @@ class EmailContext extends YiiContext
     }
 
     /**
-     * @Then the abandoned user email has been sent :expectedNumber time(s)
+     * @Then the abandoned user email has been sent :expectedCount time(s)
      */
     public function theAbandonedUserEmailHasBeenSentTime($expectedCount)
     {
