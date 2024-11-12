@@ -437,3 +437,8 @@ Feature: Email
       And I send an external-groups sync-error email
     When I send an external-groups sync-error email again
     Then the external-groups sync-error email has been sent 1 time
+
+  Scenario: Ensure no EmailLog is to both a User and a non-user address
+    Given a user already exists
+    When I try to log an email as sent to that User and to a non-user address
+    Then an email log validation error should have occurred

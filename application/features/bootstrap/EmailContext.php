@@ -60,6 +60,8 @@ class EmailContext extends YiiContext
 
     private string $dummyExtGroupsAppPrefix = 'ext-dummy';
 
+    private ?EmailLog $tempEmailLog;
+
     public const METHOD_EMAIL_ADDRESS = 'method@example.com';
     public const MANAGER_EMAIL = 'manager@example.com';
 
@@ -1329,5 +1331,29 @@ class EmailContext extends YiiContext
             EmailLog::MESSAGE_TYPE_EXT_GROUP_SYNC_ERRORS
         );
         Assert::eq($actualCount, $expectedCount);
+    }
+
+    /**
+     * @When I try to log an email as sent to that User and to a non-user address
+     */
+    public function iTryToLogAnEmailAsSentToThatUserAndToANonUserAddress()
+    {
+        $this->tempEmailLog = new EmailLog([
+            'message_type' => EmailLog::MESSAGE_TYPE_ABANDONED_USERS,
+            'non_user_address' => 'dummy@example.com',
+            'user_id' => $this->tempUser->id,
+        ]);
+        $this->tempEmailLog->save();
+    }
+
+    /**
+     * @Then an email log validation error should have occurred
+     */
+    public function anEmailLogValidationErrorShouldHaveOccurred()
+    {
+        Assert::notEmpty(
+            $this->tempEmailLog->errors,
+            'No EmailLog validation errors were found'
+        );
     }
 }

@@ -118,6 +118,23 @@ class EmailLog extends EmailLogBase
                 'default',
                 'value' => MySqlDateTime::now(),
             ],
+            [
+                'non_user_address',
+                'emptyIfUserIsSet',
+            ],
         ], parent::rules());
+    }
+
+    public function emptyIfUserIsSet($attribute)
+    {
+        if (!empty($this->user_id) && !empty($this[$attribute])) {
+            $this->addError(
+                $attribute,
+                sprintf(
+                    'Only a user_id or a %s may be set, not both',
+                    $attribute
+                )
+            );
+        }
     }
 }
