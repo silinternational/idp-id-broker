@@ -3,6 +3,7 @@
 namespace common\models;
 
 use common\helpers\MySqlDateTime;
+use ReflectionClass;
 use Yii;
 use yii\helpers\ArrayHelper;
 
@@ -17,6 +18,7 @@ class EmailLog extends EmailLogBase
     public const MESSAGE_TYPE_MFA_RATE_LIMIT = 'mfa-rate-limit';
     public const MESSAGE_TYPE_PASSWORD_CHANGED = 'password-changed';
     public const MESSAGE_TYPE_WELCOME = 'welcome';
+    public const MESSAGE_TYPE_ABANDONED_USERS = 'abandoned-users';
     public const MESSAGE_TYPE_EXT_GROUP_SYNC_ERRORS = 'ext-group-sync-errors';
     public const MESSAGE_TYPE_GET_BACKUP_CODES = 'get-backup-codes';
     public const MESSAGE_TYPE_REFRESH_BACKUP_CODES = 'refresh-backup-codes';
@@ -41,35 +43,23 @@ class EmailLog extends EmailLogBase
     {
         return ArrayHelper::merge(parent::attributeLabels(), [
             'sent_utc' => Yii::t('app', 'Sent (UTC)'),
+            'non_user_address' => Yii::t('app', 'Non-User Address'),
         ]);
     }
 
-    public static function getMessageTypes()
+    public static function getMessageTypes(): array
     {
-        return [
-            self::MESSAGE_TYPE_INVITE,
-            self::MESSAGE_TYPE_MFA_RATE_LIMIT,
-            self::MESSAGE_TYPE_PASSWORD_CHANGED,
-            self::MESSAGE_TYPE_WELCOME,
-            self::MESSAGE_TYPE_GET_BACKUP_CODES,
-            self::MESSAGE_TYPE_REFRESH_BACKUP_CODES,
-            self::MESSAGE_TYPE_LOST_SECURITY_KEY,
-            self::MESSAGE_TYPE_MFA_OPTION_ADDED,
-            self::MESSAGE_TYPE_MFA_OPTION_REMOVED,
-            self::MESSAGE_TYPE_MFA_ENABLED,
-            self::MESSAGE_TYPE_MFA_DISABLED,
-            self::MESSAGE_TYPE_METHOD_VERIFY,
-            self::MESSAGE_TYPE_METHOD_REMINDER,
-            self::MESSAGE_TYPE_METHOD_PURGED,
-            self::MESSAGE_TYPE_MFA_MANAGER,
-            self::MESSAGE_TYPE_MFA_MANAGER_HELP,
-            self::MESSAGE_TYPE_PASSWORD_EXPIRING,
-            self::MESSAGE_TYPE_PASSWORD_EXPIRED,
-            self::MESSAGE_TYPE_PASSWORD_PWNED,
-        ];
+        $reflectionClass = new ReflectionClass(__CLASS__);
+        $messageTypes = [];
+        foreach ($reflectionClass->getConstants() as $name => $value) {
+            if (str_starts_with($name, 'MESSAGE_TYPE_')) {
+                $messageTypes[] = $value;
+            }
+        }
+        return $messageTypes;
     }
 
-    public static function logMessage(string $messageType, $userId)
+    public static function logMessageToUser(string $messageType, $userId)
     {
         $emailLog = new EmailLog([
             'user_id' => $userId,
@@ -85,6 +75,25 @@ class EmailLog extends EmailLogBase
             );
             \Yii::warning($errorMessage);
             throw new \Exception($errorMessage, 1502398588);
+        }
+    }
+
+    public static function logMessageToNonUser(string $messageType, string $emailAddress)
+    {
+        $emailLog = new EmailLog([
+            'non_user_address' => $emailAddress,
+            'message_type' => $messageType,
+        ]);
+
+        if (!$emailLog->save()) {
+            $errorMessage = sprintf(
+                'Failed to log %s email to %s: %s',
+                var_export($messageType, true),
+                var_export($emailAddress, true),
+                \json_encode($emailLog->getFirstErrors(), JSON_PRETTY_PRINT)
+            );
+            \Yii::warning($errorMessage);
+            throw new \Exception($errorMessage, 1730909932);
         }
     }
 

@@ -8,9 +8,10 @@ use Yii;
  * This is the model class for table "email_log".
  *
  * @property int $id
- * @property int $user_id
+ * @property int|null $user_id
  * @property string|null $message_type
  * @property string $sent_utc
+ * @property string|null $non_user_address
  *
  * @property User $user
  */
@@ -30,10 +31,11 @@ class EmailLogBase extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['user_id', 'sent_utc'], 'required'],
             [['user_id'], 'integer'],
             [['message_type'], 'string'],
+            [['sent_utc'], 'required'],
             [['sent_utc'], 'safe'],
+            [['non_user_address'], 'string', 'max' => 255],
             [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['user_id' => 'id']],
         ];
     }
@@ -48,6 +50,7 @@ class EmailLogBase extends \yii\db\ActiveRecord
             'user_id' => Yii::t('app', 'User ID'),
             'message_type' => Yii::t('app', 'Message Type'),
             'sent_utc' => Yii::t('app', 'Sent Utc'),
+            'non_user_address' => Yii::t('app', 'Non User Address'),
         ];
     }
 

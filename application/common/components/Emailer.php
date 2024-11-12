@@ -194,6 +194,11 @@ class Emailer extends Component
     /**
      * Use the email service to send an email.
      *
+     * WARNING:
+     * You probably shouldn't be calling this directly. Instead, call the
+     * `sendMessageTo()` method so that the sending of this email will be
+     * logged.
+     *
      * @param string $toAddress The recipient's email address.
      * @param string $subject The subject.
      * @param string $htmlBody The email body (as HTML).
@@ -261,6 +266,13 @@ class Emailer extends Component
     {
         $subject = $this->subjects[$messageType] ?? '';
 
+        if (empty($subject)) {
+            \Yii::error(sprintf(
+                'No subject known for %s email messages.',
+                $messageType
+            ));
+        }
+
         foreach ($data as $key => $value) {
             if (is_scalar($value)) {
                 $subject = str_replace('{' . $key . '}', $value, $subject);
@@ -313,6 +325,7 @@ class Emailer extends Component
             EmailLog::MESSAGE_TYPE_MFA_RATE_LIMIT => $this->subjectForMfaRateLimit,
             EmailLog::MESSAGE_TYPE_PASSWORD_CHANGED => $this->subjectForPasswordChanged,
             EmailLog::MESSAGE_TYPE_WELCOME => $this->subjectForWelcome,
+            EmailLog::MESSAGE_TYPE_ABANDONED_USERS => $this->subjectForAbandonedUsers,
             EmailLog::MESSAGE_TYPE_EXT_GROUP_SYNC_ERRORS => $this->subjectForExtGroupSyncErrors,
             EmailLog::MESSAGE_TYPE_GET_BACKUP_CODES => $this->subjectForGetBackupCodes,
             EmailLog::MESSAGE_TYPE_REFRESH_BACKUP_CODES => $this->subjectForRefreshBackupCodes,
@@ -341,7 +354,7 @@ class Emailer extends Component
     }
 
     /**
-     * Send the specified type of message to the given User.
+     * Send the specified type of message to the given User (or non-User address).
      *
      * @param string $messageType The message type. Must be one of the
      *     EmailLog::MESSAGE_TYPE_* values.
@@ -385,7 +398,9 @@ class Emailer extends Component
         $this->email($toAddress, $subject, $htmlBody, strip_tags($htmlBody), $ccAddress, $bccAddress, $delaySeconds);
 
         if ($user !== null) {
-            EmailLog::logMessage($messageType, $user->id);
+            EmailLog::logMessageToUser($messageType, $user->id);
+        } else {
+            EmailLog::logMessageToNonUser($messageType, $toAddress);
         }
     }
 
@@ -410,14 +425,13 @@ class Emailer extends Component
     }
 
     /**
-     *
      * Whether the user has already been sent this type of email in the last X days
      *
      * @param int $userId
      * @param string $messageType
      * @return bool
      */
-    public function hasReceivedMessageRecently($userId, string $messageType)
+    public function hasUserReceivedMessageRecently(int $userId, string $messageType): bool
     {
         $latestEmail = EmailLog::find()->where(['user_id' => $userId, 'message_type' => $messageType])
             ->orderBy('sent_utc DESC')->one();
@@ -427,6 +441,49 @@ class Emailer extends Component
 
         return MySqlDateTime::dateIsRecent($latestEmail->sent_utc, $this->emailRepeatDelayDays);
     }
+
+    /**
+     * Whether the non-user address has already been sent this type of email in the last X days
+     *
+     * @param string $emailAddress
+     * @param string $messageType
+     * @return bool
+     */
+    public function hasNonUserReceivedMessageRecently(string $emailAddress, string $messageType): bool
+    {
+        $latestEmail = EmailLog::find()->where([
+            'message_type' => $messageType,
+            'non_user_address' => $emailAddress,
+            'user_id' => null,
+        ])->orderBy(
+            'sent_utc DESC'
+        )->one();
+        if (empty($latestEmail)) {
+            return false;
+        }
+
+        return MySqlDateTime::dateIsRecent($latestEmail->sent_utc, $this->emailRepeatDelayDays);
+    }
+
+    /**
+     * Whether we should send an abandoned-users message to HR.
+     *
+     * @return bool
+     */
+    public function shouldSendAbandonedUsersMessage(): bool
+    {
+        if (empty($this->hrNotificationsEmail)) {
+            return false;
+        }
+
+        $haveSentAbandonedUsersEmailRecently = $this->hasNonUserReceivedMessageRecently(
+            $this->hrNotificationsEmail,
+            EmailLog::MESSAGE_TYPE_ABANDONED_USERS
+        );
+
+        return !$haveSentAbandonedUsersEmailRecently;
+    }
+
 
     /**
      * Whether we should send an invite message to the given User.
@@ -486,7 +543,7 @@ class Emailer extends Component
         return $this->sendGetBackupCodesEmails
             && $user->getVerifiedMfaOptionsCount() === 1
             && !$user->hasMfaBackupCodes()
-            && !$this->hasReceivedMessageRecently($user->id, EmailLog::MESSAGE_TYPE_GET_BACKUP_CODES);
+            && !$this->hasUserReceivedMessageRecently($user->id, EmailLog::MESSAGE_TYPE_GET_BACKUP_CODES);
     }
 
     /**
@@ -513,7 +570,7 @@ class Emailer extends Component
             return false;
         }
 
-        if ($this->hasReceivedMessageRecently($user->id, EmailLog::MESSAGE_TYPE_LOST_SECURITY_KEY)) {
+        if ($this->hasUserReceivedMessageRecently($user->id, EmailLog::MESSAGE_TYPE_LOST_SECURITY_KEY)) {
             return false;
         }
 
@@ -652,7 +709,7 @@ class Emailer extends Component
         foreach ($methods as $method) {
             $user = $method->user;
             if (!MySqlDateTime::dateIsRecent($method->created, 3) &&
-                !$this->hasReceivedMessageRecently($user->id, EmailLog::MESSAGE_TYPE_METHOD_REMINDER)
+                !$this->hasUserReceivedMessageRecently($user->id, EmailLog::MESSAGE_TYPE_METHOD_REMINDER)
             ) {
                 $this->sendMessageTo(
                     EmailLog::MESSAGE_TYPE_METHOD_REMINDER,
@@ -698,7 +755,7 @@ class Emailer extends Component
                 $passwordExpiry = strtotime($userPassword->getExpiresOn());
                 if ($passwordExpiry < strtotime(self::PASSWORD_EXPIRING_CUTOFF)
                     && !($passwordExpiry < time())
-                    && !$this->hasReceivedMessageRecently($user->id, EmailLog::MESSAGE_TYPE_PASSWORD_EXPIRING)
+                    && !$this->hasUserReceivedMessageRecently($user->id, EmailLog::MESSAGE_TYPE_PASSWORD_EXPIRING)
                 ) {
                     $this->sendMessageTo(EmailLog::MESSAGE_TYPE_PASSWORD_EXPIRING, $user);
                     $numEmailsSent++;
@@ -740,7 +797,7 @@ class Emailer extends Component
                 $passwordExpiry = strtotime($userPassword->getExpiresOn());
                 if ($passwordExpiry < time()
                     && $passwordExpiry > strtotime(self::PASSWORD_EXPIRED_CUTOFF)
-                    && !$this->hasReceivedMessageRecently($user->id, EmailLog::MESSAGE_TYPE_PASSWORD_EXPIRED)
+                    && !$this->hasUserReceivedMessageRecently($user->id, EmailLog::MESSAGE_TYPE_PASSWORD_EXPIRED)
                 ) {
                     $this->sendMessageTo(EmailLog::MESSAGE_TYPE_PASSWORD_EXPIRED, $user);
                     $numEmailsSent++;
@@ -801,9 +858,16 @@ class Emailer extends Component
             $dataForEmail['users'] = User::getAbandonedUsers();
 
             if (!empty($dataForEmail['users'])) {
-                $htmlBody = \Yii::$app->view->render('@common/mail/abandoned-users.html.php', $dataForEmail);
-
-                $this->email($this->hrNotificationsEmail, $this->subjectForAbandonedUsers, $htmlBody, strip_tags($htmlBody));
+                if ($this->shouldSendAbandonedUsersMessage()) {
+                    $this->sendMessageTo(
+                        EmailLog::MESSAGE_TYPE_ABANDONED_USERS,
+                        null,
+                        ArrayHelper::merge(
+                            $dataForEmail,
+                            ['toAddress' => $this->hrNotificationsEmail]
+                        )
+                    );
+                }
             }
         }
     }
