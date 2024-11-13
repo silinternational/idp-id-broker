@@ -491,7 +491,7 @@ class Mfa extends MfaBase
         return [
             self::TYPE_BACKUPCODE => 'Printable Codes',
             self::TYPE_MANAGER => 'Manager Backup Code',
-            self::TYPE_TOTP => 'Smartphone App',
+            self::TYPE_TOTP => 'Authenticator App',
             self::TYPE_WEBAUTHN => 'Security Key',
         ];
     }
