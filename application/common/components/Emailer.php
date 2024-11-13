@@ -484,6 +484,26 @@ class Emailer extends Component
         return !$haveSentAbandonedUsersEmailRecently;
     }
 
+    /**
+     * Whether we should send an external-groups sync-errors email to the given
+     * email address.
+     *
+     * @param string $emailAddress
+     * @return bool
+     */
+    public function shouldSendExternalGroupsSyncErrorsEmailTo(string $emailAddress): bool
+    {
+        if (empty($emailAddress)) {
+            return false;
+        }
+
+        $haveSentEmailRecently = $this->hasNonUserReceivedMessageRecently(
+            $emailAddress,
+            EmailLog::MESSAGE_TYPE_EXT_GROUP_SYNC_ERRORS
+        );
+
+        return !$haveSentEmailRecently;
+    }
 
     /**
      * Whether we should send an invite message to the given User.
@@ -819,28 +839,38 @@ class Emailer extends Component
     ) {
         $logData = [
             'action' => 'send external-groups sync errors email',
-            'status' => 'starting',
+            'prefix' => $appPrefix,
         ];
 
-        $this->logger->info(array_merge($logData, [
-            'errors' => count($errors)
-        ]));
+        if (!$this->shouldSendExternalGroupsSyncErrorsEmailTo($recipient)) {
+            $this->logger->info(array_merge($logData, [
+                'errors' => count($errors),
+                'recipient' => $recipient,
+                'status' => 'skipping (too soon to resend)',
+            ]));
+        } else {
+            $this->logger->info(array_merge($logData, [
+                'errors' => count($errors),
+                'recipient' => $recipient,
+                'status' => 'starting',
+            ]));
 
-        $this->sendMessageTo(
-            EmailLog::MESSAGE_TYPE_EXT_GROUP_SYNC_ERRORS,
-            null,
-            [
-                'toAddress' => $recipient,
-                'appPrefix' => $appPrefix,
-                'errors' => $errors,
-                'googleSheetUrl' => $googleSheetUrl,
-                'idpDisplayName' => \Yii::$app->params['idpDisplayName'],
-            ]
-        );
+            $this->sendMessageTo(
+                EmailLog::MESSAGE_TYPE_EXT_GROUP_SYNC_ERRORS,
+                null,
+                [
+                    'toAddress' => $recipient,
+                    'appPrefix' => $appPrefix,
+                    'errors' => $errors,
+                    'googleSheetUrl' => $googleSheetUrl,
+                    'idpDisplayName' => \Yii::$app->params['idpDisplayName'],
+                ]
+            );
 
-        $this->logger->info(array_merge($logData, [
-            'status' => 'finished',
-        ]));
+            $this->logger->info(array_merge($logData, [
+                'status' => 'finished',
+            ]));
+        }
     }
 
     /**

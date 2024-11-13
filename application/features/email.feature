@@ -404,7 +404,6 @@ Feature: Email
       | to send      | -1     | has          | should NOT     |
       | NOT to send  | -1     | has NOT      | should NOT     |
 
-
   Scenario Outline: HR notification users
     Given hr notification email <isOrIsNot> set
       And the database has been purged
@@ -423,3 +422,27 @@ Feature: Email
       | is        | an inactive | 7 months  | has NOT     |
       | is        | a           | 5 months  | has NOT     |
       | is        | a           | 7 months  | has         |
+
+  Scenario: Not sending HR notification emails too frequently
+    Given hr notification email is set
+      And the database has been purged
+      And a user already exists
+      And the user has not logged in for "7 months"
+      And I send abandoned user email
+    When I send abandoned user email again
+    Then the abandoned user email has been sent 1 time
+
+  Scenario: Not sending external-group sync-error emails too frequently
+    Given the database has been purged
+      And I send an external-groups sync-error email
+    When I send an external-groups sync-error email again
+    Then the external-groups sync-error email has been sent 1 time
+
+  Scenario: Ensure no EmailLog is to both a User and a non-user address
+    Given a user already exists
+    When I try to log an email as sent to that User and to a non-user address
+    Then an email log validation error should have occurred
+
+  Scenario: Ensure each EmailLog is to either a User or a non-user address
+    When I try to log an email as sent to neither a User nor a non-user address
+    Then an email log validation error should have occurred

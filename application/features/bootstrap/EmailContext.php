@@ -11,7 +11,6 @@ use common\models\Mfa;
 use common\models\MfaBackupcode;
 use common\models\MfaWebauthn;
 use common\models\User;
-use Sil\SilIdBroker\Behat\Context\YiiContext;
 use Webmozart\Assert\Assert;
 
 class EmailContext extends YiiContext
@@ -58,6 +57,10 @@ class EmailContext extends YiiContext
 
     /** @var array<array> */
     protected $matchingFakeEmails;
+
+    private string $dummyExtGroupsAppPrefix = 'ext-dummy';
+
+    private ?EmailLog $tempEmailLog;
 
     public const METHOD_EMAIL_ADDRESS = 'method@example.com';
     public const MANAGER_EMAIL = 'manager@example.com';
@@ -1243,7 +1246,7 @@ class EmailContext extends YiiContext
     }
 
     /**
-     * @When I send abandoned user email
+     * @When I send abandoned user email (again)
      */
     public function iSendAbandonedUserEmail()
     {
@@ -1291,5 +1294,77 @@ class EmailContext extends YiiContext
         Method::deleteAll();
         User::deleteAll();
         $this->fakeEmailer->forgetFakeEmailsSent();
+    }
+
+    /**
+     * @Then the abandoned user email has been sent :expectedCount time(s)
+     */
+    public function theAbandonedUserEmailHasBeenSentTime($expectedCount)
+    {
+        $actualCount = $this->countEmailsSent(EmailLog::MESSAGE_TYPE_ABANDONED_USERS);
+        Assert::eq($actualCount, $expectedCount);
+    }
+
+    /**
+     * @Given I send an external-groups sync-error email (again)
+     */
+    public function iSendAnExternalGroupsSyncErrorEmail()
+    {
+        $this->fakeEmailer->sendExternalGroupSyncErrorsEmail(
+            $this->dummyExtGroupsAppPrefix,
+            ['dummy error'],
+            'dummy@example.com',
+            ''
+        );
+    }
+
+    /**
+     * @Then the external-groups sync-error email has been sent :expectedCount time(s)
+     */
+    public function theExternalGroupsSyncErrorEmailHasBeenSentTime($expectedCount)
+    {
+        // The $appPrefix is needed by the FakeEmailer, to find the appropriate
+        // emails (by being able to accurately generate the expected subject).
+        $this->fakeEmailer->otherDataForEmails['appPrefix'] = $this->dummyExtGroupsAppPrefix;
+
+        $actualCount = $this->countEmailsSent(
+            EmailLog::MESSAGE_TYPE_EXT_GROUP_SYNC_ERRORS
+        );
+        Assert::eq($actualCount, $expectedCount);
+    }
+
+    /**
+     * @When I try to log an email as sent to that User and to a non-user address
+     */
+    public function iTryToLogAnEmailAsSentToThatUserAndToANonUserAddress()
+    {
+        $this->tempEmailLog = new EmailLog([
+            'message_type' => EmailLog::MESSAGE_TYPE_ABANDONED_USERS,
+            'non_user_address' => 'dummy@example.com',
+            'user_id' => $this->tempUser->id,
+        ]);
+        $this->tempEmailLog->save();
+    }
+
+    /**
+     * @Then an email log validation error should have occurred
+     */
+    public function anEmailLogValidationErrorShouldHaveOccurred()
+    {
+        Assert::notEmpty(
+            $this->tempEmailLog->errors,
+            'No EmailLog validation errors were found'
+        );
+    }
+
+    /**
+     * @When I try to log an email as sent to neither a User nor a non-user address
+     */
+    public function iTryToLogAnEmailAsSentToNeitherAUserNorANonUserAddress()
+    {
+        $this->tempEmailLog = new EmailLog([
+            'message_type' => EmailLog::MESSAGE_TYPE_ABANDONED_USERS,
+        ]);
+        $this->tempEmailLog->save();
     }
 }
