@@ -15,6 +15,10 @@ class GaController extends Controller
      */
     public function actionRegister_event()
     {
+        \Yii::warning(
+            'Sending ID Broker data to Google Analytics is deprecated and will '
+            . 'be removed in a future release.'
+        );
 
         list($gaService, $gaRequest) = Utils::GoogleAnalyticsServiceAndRequest("cron");
         if ($gaService === null) {

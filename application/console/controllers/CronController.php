@@ -50,6 +50,11 @@ class CronController extends Controller
     {
         $eventCategory = 'mfa-usage';
 
+        \Yii::warning(
+            'Reporting ID Broker metrics to Google Analytics is deprecated and '
+            . 'will be removed in a future release.'
+        );
+
         $gaEvents = [
             'active_users' => User::find()->where(['active' => 'yes'])->count(),
             'active_users_with_require_mfa' => User::countUsersWithRequireMfa(),
