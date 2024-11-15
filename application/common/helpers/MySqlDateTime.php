@@ -85,6 +85,22 @@ class MySqlDateTime
     }
 
     /**
+     * Whether the given date-and-time qualifies as "recent" according to the
+     * given timeframe.
+     *
+     * @param string $dbDate formated datetime from database
+     * @param string $timeframe -- Example: '11 hours'
+     * @return bool
+     */
+    public static function dateTimeIsRecent(string $dbDate, string $timeframe)
+    {
+        $dtInterval = '-' . $timeframe;
+        $recentDate = self::relativeTime($dtInterval);
+
+        return strtotime($dbDate) >= strtotime($recentDate);
+    }
+
+    /**
      * Compare a date or datetime in MySQL format (yyyy-mm-dd or yyyy-mm-dd hh:mm::ss)
      * to an epoch time as returned from time().
      * Returns true if $eventTime is the same day or before $now.
