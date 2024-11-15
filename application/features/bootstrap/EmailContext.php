@@ -1375,14 +1375,20 @@ class EmailContext extends YiiContext
     {
         $this->iSendAnExternalGroupsSyncErrorEmail();
         $relativeTimeString = sprintf(
-            '-%u hours ago',
+            '-%u hours',
             $numberOfHours
         );
 
         /** @var EmailLog[] $emailLogs */
-        $emailLogs = EmailLog::find()->each();
+        $emailLogs = EmailLog::find()->all();
+
+        Assert::notEmpty(
+            $emailLogs,
+            'No email logs found to update the sent_at value for'
+        );
+
         foreach ($emailLogs as $emailLog) {
-            $emailLog->sent_utc = MysqlDateTime::relative($relativeTimeString);
+            $emailLog->sent_utc = MysqlDateTime::relativeTime($relativeTimeString);
             Assert::true(
                 $emailLog->save(true, ['sent_utc']),
                 sprintf(
