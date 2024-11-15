@@ -1379,12 +1379,13 @@ class EmailContext extends YiiContext
             $numberOfHours
         );
 
-        /** @var EmailLog[] $emailLogs */
-        $emailLogs = EmailLog::find()->all();
+        $emailLogs = EmailLog::findAll([
+            'message_type' => EmailLog::MESSAGE_TYPE_EXT_GROUP_SYNC_ERRORS,
+        ]);
 
         Assert::notEmpty(
             $emailLogs,
-            'No email logs found to update the sent_at value for'
+            'No external-group sync-error email logs found to set the sent_at value for'
         );
 
         foreach ($emailLogs as $emailLog) {
