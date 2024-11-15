@@ -513,8 +513,8 @@ class Emailer extends Component
             $emailAddress,
             EmailLog::MESSAGE_TYPE_EXT_GROUP_SYNC_ERRORS,
             '11 hours' /* Use slightly less than the desired interval, to avoid
-                                 * inconsistent results due to being a few seconds before
-                                 * or after the cutoff. */
+                        * inconsistent results due to being a few seconds before
+                        * or after the cutoff. */
         );
 
         return !$haveSentEmailRecently;
