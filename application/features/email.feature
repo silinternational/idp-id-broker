@@ -447,8 +447,8 @@ Feature: Email
     Examples:
       | hoursAgo     | timesSent |
       | 1 hour ago   | 1 time    |
-      | 11 hours ago | 1 time    |
-      | 13 hours ago | 2 times   |
+      | 10 hours ago | 1 time    |
+      | 12 hours ago | 2 times   |
 
   Scenario: Ensure no EmailLog is to both a User and a non-user address
     Given a user already exists
