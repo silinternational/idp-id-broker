@@ -95,9 +95,9 @@ class MySqlDateTime
     public static function dateTimeIsRecent(string $dbDate, string $timeframe)
     {
         $dtInterval = '-' . $timeframe;
-        $recentDate = self::relativeTime($dtInterval);
+        $recentDateTime = self::relativeTime($dtInterval);
 
-        return strtotime($dbDate) >= strtotime($recentDate);
+        return strtotime($dbDate) >= strtotime($recentDateTime);
     }
 
     /**
