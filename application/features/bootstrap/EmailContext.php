@@ -1367,4 +1367,37 @@ class EmailContext extends YiiContext
         ]);
         $this->tempEmailLog->save();
     }
+
+    /**
+     * @Given I sent an external-groups sync-error email :numberOfHours hour(s) ago
+     */
+    public function iSentAnExternalGroupsSyncErrorEmailHourAgo($numberOfHours)
+    {
+        $this->iSendAnExternalGroupsSyncErrorEmail();
+        $relativeTimeString = sprintf(
+            '-%u hours',
+            $numberOfHours
+        );
+
+        $emailLogs = EmailLog::findAll([
+            'message_type' => EmailLog::MESSAGE_TYPE_EXT_GROUP_SYNC_ERRORS,
+        ]);
+
+        Assert::notEmpty(
+            $emailLogs,
+            'No external-group sync-error email logs found to set the sent_at value for'
+        );
+
+        foreach ($emailLogs as $emailLog) {
+            $emailLog->sent_utc = MysqlDateTime::relativeTime($relativeTimeString);
+            Assert::true(
+                $emailLog->save(true, ['sent_utc']),
+                sprintf(
+                    'Failed to update email log record to be for %s: %s',
+                    $relativeTimeString,
+                    $emailLog->getFirstError('sent_utc')
+                )
+            );
+        }
+    }
 }

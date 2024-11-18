@@ -438,6 +438,18 @@ Feature: Email
     When I send an external-groups sync-error email again
     Then the external-groups sync-error email has been sent 1 time
 
+  Scenario Outline: Sending external-group sync-error emails up to every 12 hours
+    Given the database has been purged
+      And I sent an external-groups sync-error email <hoursAgo>
+    When I send an external-groups sync-error email again
+    Then the external-groups sync-error email has been sent <timesSent>
+
+    Examples:
+      | hoursAgo     | timesSent |
+      | 1 hour ago   | 1 time    |
+      | 10 hours ago | 1 time    |
+      | 12 hours ago | 2 times   |
+
   Scenario: Ensure no EmailLog is to both a User and a non-user address
     Given a user already exists
     When I try to log an email as sent to that User and to a non-user address

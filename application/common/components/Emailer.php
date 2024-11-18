@@ -443,14 +443,21 @@ class Emailer extends Component
     }
 
     /**
-     * Whether the non-user address has already been sent this type of email in the last X days
+     * Whether the non-user address has already been sent this type of email
+     * recently (where "recent" is defined by the given timeframe).
      *
      * @param string $emailAddress
      * @param string $messageType
+     * @param ?string $timeframe (Optional:) What qualifies as recent. If not
+     *     specified, this will default to `emailRepeatDelayDays` days.
+     *     Example: '11 hours'
      * @return bool
      */
-    public function hasNonUserReceivedMessageRecently(string $emailAddress, string $messageType): bool
-    {
+    public function hasNonUserReceivedMessageRecently(
+        string $emailAddress,
+        string $messageType,
+        ?string $timeframe = null
+    ): bool {
         $latestEmail = EmailLog::find()->where([
             'message_type' => $messageType,
             'non_user_address' => $emailAddress,
@@ -458,11 +465,16 @@ class Emailer extends Component
         ])->orderBy(
             'sent_utc DESC'
         )->one();
+
         if (empty($latestEmail)) {
             return false;
         }
 
-        return MySqlDateTime::dateIsRecent($latestEmail->sent_utc, $this->emailRepeatDelayDays);
+        if (empty($timeframe)) {
+            $timeframe = $this->emailRepeatDelayDays . ' days';
+        }
+
+        return MySqlDateTime::dateTimeIsRecent($latestEmail->sent_utc, $timeframe);
     }
 
     /**
@@ -499,7 +511,10 @@ class Emailer extends Component
 
         $haveSentEmailRecently = $this->hasNonUserReceivedMessageRecently(
             $emailAddress,
-            EmailLog::MESSAGE_TYPE_EXT_GROUP_SYNC_ERRORS
+            EmailLog::MESSAGE_TYPE_EXT_GROUP_SYNC_ERRORS,
+            '11 hours' /* Use slightly less than the desired interval, to avoid
+                        * inconsistent results due to being a few seconds before
+                        * or after the cutoff. */
         );
 
         return !$haveSentEmailRecently;
