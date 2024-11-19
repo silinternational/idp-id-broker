@@ -66,12 +66,6 @@ The API is described by [api.raml](api.raml), and an auto-generated [api.html](a
    * `./vendor/bin/behat features/authentication.feature`
    * `./vendor/bin/behat features/authentication.feature:298`
 
-## Google Analytics Calls - DEPRECATED
-Calls are made to Google Analytics regarding users' mfas and whether a password has been pwned.
-
-If you want to have an indication that those calls are likely to succeed, run 
-`$ make callGA`.
-
 ## Adding groups to SAML `member` attribute from a Google Sheet
 
 The `local.env.dist` file shows how to add the necessary environment variables
