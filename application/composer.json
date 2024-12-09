@@ -1,6 +1,6 @@
 {
   "name": "silinternational/idp-id-broker",
-  "minimum-stability": "stable",
+  "minimum-stability": "dev",
   "repositories": [
     {
       "type": "composer",
@@ -26,8 +26,8 @@
     "yiisoft/yii2-swiftmailer": "^2.0",
     "ramsey/uuid": "^3.6",
     "guzzlehttp/guzzle": "^6.2",
-    "notamedia/yii2-sentry": "^1.7",
-    "webmozart/assert": "^1.2"
+    "webmozart/assert": "^1.2",
+    "silinternational/yii2-sentry": "dev-master"
   },
   "require-dev": {
     "aws/aws-sdk-php": "~3.288.1",
