@@ -1,6 +1,6 @@
 {
   "name": "silinternational/idp-id-broker",
-  "minimum-stability": "dev",
+  "minimum-stability": "stable",
   "repositories": [
     {
       "type": "composer",
