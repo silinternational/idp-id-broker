@@ -3879,12 +3879,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/silinternational/yii2-sentry.git",
-                "reference": "3864b25ab67a54ccfd94e1eb0be8786cf2f72c6d"
+                "reference": "ebee16c9effda59c8fbcbdad61f6ee72992a4acd"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/silinternational/yii2-sentry/zipball/3864b25ab67a54ccfd94e1eb0be8786cf2f72c6d",
-                "reference": "3864b25ab67a54ccfd94e1eb0be8786cf2f72c6d",
+                "url": "https://api.github.com/repos/silinternational/yii2-sentry/zipball/ebee16c9effda59c8fbcbdad61f6ee72992a4acd",
+                "reference": "ebee16c9effda59c8fbcbdad61f6ee72992a4acd",
                 "shasum": ""
             },
             "require": {
@@ -3923,7 +3923,7 @@
             "support": {
                 "source": "https://github.com/silinternational/yii2-sentry/tree/master"
             },
-            "time": "2024-12-11T05:54:50+00:00"
+            "time": "2024-12-11T06:26:39+00:00"
         },
         {
             "name": "swiftmailer/swiftmailer",
