@@ -27,7 +27,7 @@
     "ramsey/uuid": "^3.6",
     "guzzlehttp/guzzle": "^6.2",
     "webmozart/assert": "^1.2",
-    "silinternational/yii2-sentry": "dev-master"
+    "silinternational/yii2-sentry": "2.0.0"
   },
   "require-dev": {
     "aws/aws-sdk-php": "~3.288.1",

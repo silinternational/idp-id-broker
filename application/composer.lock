@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "425d3a252345356dc458782e9a185647",
+    "content-hash": "2875e8b7408bc4e943a0dbd24b7c626e",
     "packages": [
         {
             "name": "bower-asset/inputmask",
@@ -3875,7 +3875,7 @@
         },
         {
             "name": "silinternational/yii2-sentry",
-            "version": "dev-master",
+            "version": "2.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/silinternational/yii2-sentry.git",
@@ -3898,7 +3898,6 @@
                 "codeception/module-asserts": "^1.3",
                 "codeception/module-yii2": "^1.1"
             },
-            "default-branch": true,
             "type": "yii2-extension",
             "extra": {
                 "asset-vcs-driver-options": {
@@ -3921,7 +3920,7 @@
                 "yii2"
             ],
             "support": {
-                "source": "https://github.com/silinternational/yii2-sentry/tree/master"
+                "source": "https://github.com/silinternational/yii2-sentry/tree/2.0.0"
             },
             "time": "2024-12-11T07:18:11+00:00"
         },
@@ -8135,8 +8134,7 @@
     "aliases": [],
     "minimum-stability": "dev",
     "stability-flags": {
-        "roave/security-advisories": 20,
-        "silinternational/yii2-sentry": 20
+        "roave/security-advisories": 20
     },
     "prefer-stable": false,
     "prefer-lowest": false,
@@ -8144,6 +8142,6 @@
         "php": ">=7.4",
         "ext-json": "*"
     },
-    "platform-dev": [],
+    "platform-dev": {},
     "plugin-api-version": "2.6.0"
 }
