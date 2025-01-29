@@ -35,6 +35,7 @@ class MySqlDateTime
      */
     public static function relative(string $difference = '+30 days'): string
     {
+        $difference = str_replace('--', '+', $difference);
         return self::formatDate(strtotime($difference));
     }
 

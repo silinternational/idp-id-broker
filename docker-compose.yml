@@ -67,7 +67,7 @@ services:
       MYSQL_PASSWORD: appfortests
 
   cli:
-    image: silintl/php8:8.1
+    image: silintl/php8:8.3
     platform: linux/amd64
     volumes:
       - composer-cache:/composer
@@ -78,7 +78,7 @@ services:
       COMPOSER_CACHE_DIR: /composer
     env_file:
       - ./local.env
-    command: [ "true" ]
+    command: ["true"]
 
   dynamo:
     image: amazon/dynamodb-local
@@ -143,7 +143,7 @@ services:
     command: bash -c "pwd && ls -al && php restart.php"
 
   test:
-    image: silintl/php8:8.1
+    image: silintl/php8:8.3
     platform: linux/amd64
     volumes:
       - ./application:/data
