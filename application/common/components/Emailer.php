@@ -776,21 +776,35 @@ class Emailer extends Component
             'status' => 'starting',
         ];
 
-        $users = User::getActiveUnlockedUsers();
+        $users = \Yii::$app->getDb()->createCommand("SELECT u.*
+            FROM `user` u
+                JOIN `password` p ON u.id = p.user_id
+                LEFT JOIN `email_log` e ON u.id = e.user_id
+                    AND e.message_type = 'password-expiring'
+                    AND e.sent_utc >= CURRENT_DATE() - INTERVAL 31 DAY # EMAIL_REPEAT_DELAY_DAYS
+            WHERE u.active = 'yes'
+                AND u.locked = 'no'
+                AND p.expires_on < CURRENT_DATE() + INTERVAL 15 DAY
+                AND p.expires_on >= CURRENT_DATE() # send a different message if expired
+                AND e.id IS NULL
+            GROUP BY u.id
+            HAVING COUNT(*) = 1;")->queryAll();
 
         $this->logger->info(array_merge($logData, [
-            'active_users' => count($users)
+            'users' => count($users)
         ]));
 
         $numEmailsSent = 0;
-        foreach ($users as $user) {
+        foreach ($users as $u) {
+            $user = new User();
+            User::populateRecord($user, $u);
+
             /** @var Password $userPassword */
             $userPassword = $user->currentPassword;
             if ($userPassword) {
                 $passwordExpiry = strtotime($userPassword->getExpiresOn());
                 if ($passwordExpiry < strtotime(self::PASSWORD_EXPIRING_CUTOFF)
                     && !($passwordExpiry < time())
-                    && !$this->hasUserReceivedMessageRecently($user->id, EmailLog::MESSAGE_TYPE_PASSWORD_EXPIRING)
                 ) {
                     $this->sendMessageTo(EmailLog::MESSAGE_TYPE_PASSWORD_EXPIRING, $user);
                     $numEmailsSent++;
@@ -818,21 +832,33 @@ class Emailer extends Component
             'status' => 'starting',
         ];
 
-        $users = User::getActiveUnlockedUsers();
+        $users = \Yii::$app->getDb()->createCommand("SELECT u.* FROM `user` u
+            JOIN `password` p ON u.id = p.user_id
+            LEFT JOIN `email_log` e ON u.id = e.user_id
+                AND e.message_type = 'password-expired'
+                AND e.sent_utc >= CURRENT_DATE() - INTERVAL 31 DAY # EMAIL_REPEAT_DELAY_DAYS
+            WHERE u.active = 'yes'
+                AND u.locked = 'no'
+                AND p.expires_on <= CURRENT_DATE()
+                AND e.id IS NULL
+            GROUP BY u.id
+            HAVING COUNT(*) = 1;")->queryAll();
 
         $this->logger->info(array_merge($logData, [
-            'active_users' => count($users)
+            'users' => count($users)
         ]));
 
         $numEmailsSent = 0;
-        foreach ($users as $user) {
+        foreach ($users as $u) {
+            $user = new User();
+            User::populateRecord($user, $u);
+
             /** @var Password $userPassword */
             $userPassword = $user->currentPassword;
             if ($userPassword) {
                 $passwordExpiry = strtotime($userPassword->getExpiresOn());
                 if ($passwordExpiry < time()
                     && $passwordExpiry > strtotime(self::PASSWORD_EXPIRED_CUTOFF)
-                    && !$this->hasUserReceivedMessageRecently($user->id, EmailLog::MESSAGE_TYPE_PASSWORD_EXPIRED)
                 ) {
                     $this->sendMessageTo(EmailLog::MESSAGE_TYPE_PASSWORD_EXPIRED, $user);
                     $numEmailsSent++;
