@@ -802,6 +802,7 @@ class Emailer extends Component
             /** @var Password $userPassword */
             $userPassword = $user->currentPassword;
             if ($userPassword) {
+                // password expiry still needs to be checked because it can be extended by having an active MFA
                 $passwordExpiry = strtotime($userPassword->getExpiresOn());
                 if ($passwordExpiry < strtotime(self::PASSWORD_EXPIRING_CUTOFF)
                     && !($passwordExpiry < time())
@@ -856,6 +857,7 @@ class Emailer extends Component
             /** @var Password $userPassword */
             $userPassword = $user->currentPassword;
             if ($userPassword) {
+                // password expiry still needs to be checked because it can be extended by having an active MFA
                 $passwordExpiry = strtotime($userPassword->getExpiresOn());
                 if ($passwordExpiry < time()
                     && $passwordExpiry > strtotime(self::PASSWORD_EXPIRED_CUTOFF)
