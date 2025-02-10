@@ -781,14 +781,16 @@ class Emailer extends Component
                 JOIN `password` p ON u.id = p.user_id
                 LEFT JOIN `email_log` e ON u.id = e.user_id
                     AND e.message_type = 'password-expiring'
-                    AND e.sent_utc >= CURRENT_DATE() - INTERVAL 31 DAY # EMAIL_REPEAT_DELAY_DAYS
+                    AND e.sent_utc >= CURRENT_DATE() - INTERVAL ? DAY
             WHERE u.active = 'yes'
                 AND u.locked = 'no'
                 AND p.expires_on < CURRENT_DATE() + INTERVAL 15 DAY
                 AND p.expires_on >= CURRENT_DATE() # send a different message if expired
                 AND e.id IS NULL
             GROUP BY u.id
-            HAVING COUNT(*) = 1;")->queryAll();
+            HAVING COUNT(*) = 1;")
+            ->bindValue(1, $this->emailRepeatDelayDays)
+            ->queryAll();
 
         $this->logger->info(array_merge($logData, [
             'users' => count($users)
@@ -837,13 +839,15 @@ class Emailer extends Component
             JOIN `password` p ON u.id = p.user_id
             LEFT JOIN `email_log` e ON u.id = e.user_id
                 AND e.message_type = 'password-expired'
-                AND e.sent_utc >= CURRENT_DATE() - INTERVAL 31 DAY # EMAIL_REPEAT_DELAY_DAYS
+                AND e.sent_utc >= CURRENT_DATE() - INTERVAL ? DAY
             WHERE u.active = 'yes'
                 AND u.locked = 'no'
                 AND p.expires_on <= CURRENT_DATE()
                 AND e.id IS NULL
             GROUP BY u.id
-            HAVING COUNT(*) = 1;")->queryAll();
+            HAVING COUNT(*) = 1;")
+            ->bindValue(1, $this->emailRepeatDelayDays)
+            ->queryAll();
 
         $this->logger->info(array_merge($logData, [
             'users' => count($users)
