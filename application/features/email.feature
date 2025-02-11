@@ -365,6 +365,7 @@ Feature: Email
   Scenario Outline:  When to send password expiring notice email
     Given we are configured <toSendOrNot> password expiring emails
       And I remove records of any emails that have been sent
+      And no mfas exist
       And a user already exists
       And that user has a password that expires in <number> days
       And a "password-expiring" email <hasOrHasNot> been sent to that user
@@ -383,9 +384,30 @@ Feature: Email
       | to send      | 15      | has          | should NOT     |
       | NOT to send  | 15      | has NOT      | should NOT     |
 
+  Scenario Outline:  When to send password expiring notice email for a user with MFA enabled
+    Given we are configured <toSendOrNot> password expiring emails
+    And the database has been purged
+    And a user already exists
+    And that user has a password that expires in <number> days
+    And a totp mfa option does exist
+    And a "password-expiring" email <hasOrHasNot> been sent to that user
+    When I send password expiring emails
+    Then a "password-expiring" email <shouldOrNot> have been sent to them
+
+    Examples:
+      | toSendOrNot | number | hasOrHasNot | shouldOrNot |
+      | to send     | -1462  | has NOT     | should NOT  |
+      | to send     | -1461  | has NOT     | should      |
+      | to send     | -1447  | has NOT     | should      |
+      | to send     | -1446  | has NOT     | should NOT  |
+      | to send     | -1461  | has         | should NOT  |
+      | to send     | -1447  | has         | should NOT  |
+      | NOT to send | -1447  | has NOT     | should NOT  |
+
   Scenario Outline:  When to send password expired notice email
     Given we are configured <toSendOrNot> password expired emails
       And I remove records of any emails that have been sent
+      And no mfas exist
       And a user already exists
       And that user has a password that expires in <number> days
       And a "password-expired" email <hasOrHasNot> been sent to that user

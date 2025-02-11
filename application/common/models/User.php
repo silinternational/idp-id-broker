@@ -1586,7 +1586,7 @@ class User extends UserBase
      * Returns a list of active, unlocked users that haven't recently received a given email message.
      * @param $template Email template name to use as search criteria
      * @param $days Number of days to consider an email sent recently
-     * @returns User[]
+     * @return User[]
      */
     public static function getUsersForEmail(string $template, int $days): array
     {
