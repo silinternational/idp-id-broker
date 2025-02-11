@@ -776,35 +776,17 @@ class Emailer extends Component
             'status' => 'starting',
         ];
 
-        $users = \Yii::$app->getDb()->createCommand("SELECT u.*
-            FROM `user` u
-                JOIN `password` p ON u.id = p.user_id
-                LEFT JOIN `email_log` e ON u.id = e.user_id
-                    AND e.message_type = 'password-expiring'
-                    AND e.sent_utc >= CURRENT_DATE() - INTERVAL ? DAY
-            WHERE u.active = 'yes'
-                AND u.locked = 'no'
-                AND p.expires_on < CURRENT_DATE() + INTERVAL 15 DAY
-                AND p.expires_on >= CURRENT_DATE() # send a different message if expired
-                AND e.id IS NULL
-            GROUP BY u.id
-            HAVING COUNT(*) = 1;")
-            ->bindValue(1, $this->emailRepeatDelayDays)
-            ->queryAll();
+        $users = User::getUsersForEmail('password-expiring', $this->emailRepeatDelayDays);
 
         $this->logger->info(array_merge($logData, [
             'users' => count($users)
         ]));
 
         $numEmailsSent = 0;
-        foreach ($users as $u) {
-            $user = new User();
-            User::populateRecord($user, $u);
-
+        foreach ($users as $user) {
             /** @var Password $userPassword */
             $userPassword = $user->currentPassword;
             if ($userPassword) {
-                // password expiry still needs to be checked because it can be extended by having an active MFA
                 $passwordExpiry = strtotime($userPassword->getExpiresOn());
                 if ($passwordExpiry < strtotime(self::PASSWORD_EXPIRING_CUTOFF)
                     && !($passwordExpiry < time())
@@ -835,33 +817,17 @@ class Emailer extends Component
             'status' => 'starting',
         ];
 
-        $users = \Yii::$app->getDb()->createCommand("SELECT u.* FROM `user` u
-            JOIN `password` p ON u.id = p.user_id
-            LEFT JOIN `email_log` e ON u.id = e.user_id
-                AND e.message_type = 'password-expired'
-                AND e.sent_utc >= CURRENT_DATE() - INTERVAL ? DAY
-            WHERE u.active = 'yes'
-                AND u.locked = 'no'
-                AND p.expires_on <= CURRENT_DATE()
-                AND e.id IS NULL
-            GROUP BY u.id
-            HAVING COUNT(*) = 1;")
-            ->bindValue(1, $this->emailRepeatDelayDays)
-            ->queryAll();
+        $users = User::getUsersForEmail('password-expired', $this->emailRepeatDelayDays);
 
         $this->logger->info(array_merge($logData, [
             'users' => count($users)
         ]));
 
         $numEmailsSent = 0;
-        foreach ($users as $u) {
-            $user = new User();
-            User::populateRecord($user, $u);
-
+        foreach ($users as $user) {
             /** @var Password $userPassword */
             $userPassword = $user->currentPassword;
             if ($userPassword) {
-                // password expiry still needs to be checked because it can be extended by having an active MFA
                 $passwordExpiry = strtotime($userPassword->getExpiresOn());
                 if ($passwordExpiry < time()
                     && $passwordExpiry > strtotime(self::PASSWORD_EXPIRED_CUTOFF)

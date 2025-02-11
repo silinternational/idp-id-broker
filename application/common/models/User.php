@@ -1581,4 +1581,36 @@ class User extends UserBase
             'status' => 'finish',
         ]);
     }
+
+    /*
+     * Returns a list of active, unlocked users that haven't recently received a given email message.
+     * @param $template Email template name to use as search criteria
+     * @param $days Number of days to consider an email sent recently
+     * @returns User[]
+     */
+    public static function getUsersForEmail(string $template, int $days): array
+    {
+        $usersArray = \Yii::$app->getDb()->createCommand("SELECT u.*
+            FROM `user` u
+                LEFT JOIN `email_log` e ON u.id = e.user_id
+                    AND e.message_type = :template
+                    AND e.sent_utc >= CURRENT_DATE() - INTERVAL :days DAY
+            WHERE u.active = 'yes'
+                AND u.locked = 'no'
+                AND e.id IS NULL
+            GROUP BY u.id
+            HAVING COUNT(*) = 1;")
+            ->bindValue('template', $template)
+            ->bindValue('days', $days)
+            ->queryAll();
+
+        $users = [];
+        foreach ($usersArray as $userData) {
+            $user = new User();
+            User::populateRecord($user, $userData);
+            $users[] = $user;
+        }
+
+        return $users;
+    }
 }
