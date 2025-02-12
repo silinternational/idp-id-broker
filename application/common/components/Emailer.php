@@ -776,10 +776,10 @@ class Emailer extends Component
             'status' => 'starting',
         ];
 
-        $users = User::getActiveUnlockedUsers();
+        $users = User::getUsersForEmail('password-expiring', $this->emailRepeatDelayDays);
 
         $this->logger->info(array_merge($logData, [
-            'active_users' => count($users)
+            'users' => count($users)
         ]));
 
         $numEmailsSent = 0;
@@ -790,7 +790,6 @@ class Emailer extends Component
                 $passwordExpiry = strtotime($userPassword->getExpiresOn());
                 if ($passwordExpiry < strtotime(self::PASSWORD_EXPIRING_CUTOFF)
                     && !($passwordExpiry < time())
-                    && !$this->hasUserReceivedMessageRecently($user->id, EmailLog::MESSAGE_TYPE_PASSWORD_EXPIRING)
                 ) {
                     $this->sendMessageTo(EmailLog::MESSAGE_TYPE_PASSWORD_EXPIRING, $user);
                     $numEmailsSent++;
@@ -818,10 +817,10 @@ class Emailer extends Component
             'status' => 'starting',
         ];
 
-        $users = User::getActiveUnlockedUsers();
+        $users = User::getUsersForEmail('password-expired', $this->emailRepeatDelayDays);
 
         $this->logger->info(array_merge($logData, [
-            'active_users' => count($users)
+            'users' => count($users)
         ]));
 
         $numEmailsSent = 0;
@@ -832,7 +831,6 @@ class Emailer extends Component
                 $passwordExpiry = strtotime($userPassword->getExpiresOn());
                 if ($passwordExpiry < time()
                     && $passwordExpiry > strtotime(self::PASSWORD_EXPIRED_CUTOFF)
-                    && !$this->hasUserReceivedMessageRecently($user->id, EmailLog::MESSAGE_TYPE_PASSWORD_EXPIRED)
                 ) {
                     $this->sendMessageTo(EmailLog::MESSAGE_TYPE_PASSWORD_EXPIRED, $user);
                     $numEmailsSent++;
