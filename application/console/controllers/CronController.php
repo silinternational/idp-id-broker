@@ -92,7 +92,7 @@ class CronController extends Controller
         if (\Yii::$app->params['google']['enableSheetsExport']) {
             $actions[] = 'actionExportToSheets';
         }
-        
+
         $actions[] = 'actionSendPasswordExpiryEmails';
 
         foreach ($actions as $action) {
