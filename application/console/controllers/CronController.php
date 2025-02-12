@@ -2,12 +2,12 @@
 
 namespace console\controllers;
 
+use common\components\Emailer;
 use common\components\ExternalGroupsSync;
 use common\models\Invite;
 use common\models\Method;
 use common\models\Mfa;
 use common\models\User;
-use common\components\Emailer;
 use yii\console\Controller;
 
 class CronController extends Controller
@@ -86,13 +86,14 @@ class CronController extends Controller
             'actionSendAbandonedUsersEmail',
             'actionSendDelayedMfaRelatedEmails',
             'actionSendMethodReminderEmails',
-            'actionSendPasswordExpiryEmails',
             'actionSyncExternalGroups',
         ];
 
         if (\Yii::$app->params['google']['enableSheetsExport']) {
             $actions[] = 'actionExportToSheets';
         }
+        
+        $actions[] = 'actionSendPasswordExpiryEmails';
 
         foreach ($actions as $action) {
             try {
