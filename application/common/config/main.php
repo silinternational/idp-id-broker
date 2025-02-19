@@ -1,18 +1,20 @@
 <?php
 
 use common\components\Emailer;
+use common\components\EmailLogTarget;
 use common\components\MfaBackendBackupcode;
 use common\components\MfaBackendManager;
 use common\components\MfaBackendTotp;
 use common\components\MfaBackendWebAuthn;
+use common\components\SesMailer;
 use Sentry\Event;
-use Sil\JsonLog\target\EmailServiceTarget;
 use Sil\JsonLog\target\JsonStreamTarget;
 use Sil\PhpEnv\Env;
 use Sil\Sentry\SentryTarget;
 use yii\db\Connection;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Json;
+use yii\swiftmailer\Mailer as SwiftMailer;
 
 $idpName        = Env::requireEnv('IDP_NAME');
 $idpDisplayName = Env::get('IDP_DISPLAY_NAME', $idpName);
@@ -32,17 +34,30 @@ $mfaWebAuthnConfig = Env::getArrayFromPrefix('MFA_WEBAUTHN_');
 
 $emailerClass = Env::get('EMAILER_CLASS', Emailer::class);
 
-/*
- * If using Email Service, the following ENV vars should be set:
- *  - EMAIL_SERVICE_accessToken
- *  - EMAIL_SERVICE_assertValidIp
- *  - EMAIL_SERVICE_baseUrl
- *  - EMAIL_SERVICE_validIpRanges
- */
-$emailServiceConfig = Env::getArrayFromPrefix('EMAIL_SERVICE_');
+$mailerConfig = [
+    'useFileTransport' => Env::get('MAILER_USEFILES', false),
+    'htmlLayout' => '@common/mail/layouts/html',
+    'textLayout' => '@common/mail/layouts/text',
+];
+$mailerHost = Env::get('MAILER_HOST');
+if (!empty($mailerHost)) {
+    $mailerConfig['class'] = SwiftMailer::class;
+    $mailerConfig['transport'] = [
+        'class' => 'Swift_SmtpTransport',
+        'host' => $mailerHost,
+        'username' => Env::requireEnv('MAILER_USERNAME'),
+        'password' => Env::requireEnv('MAILER_PASSWORD'),
+        'port' => '465',
+        'encryption' => 'ssl',
+    ];
+} else {
+    $mailerConfig['class'] = SesMailer::class;
+    $mailerConfig['awsRegion'] = Env::get('AWS_REGION', 'us-east-1');
+}
 
-// Re-retrieve the validIpRanges as an array.
-$emailServiceConfig['validIpRanges'] = Env::getArray('EMAIL_SERVICE_validIpRanges');
+$fromEmail         = Env::get('FROM_EMAIL', 'no_reply@example.com');
+$fromName          = Env::get('FROM_NAME', '');
+$emailQueueBatchSize = Env::get('EMAIL_QUEUE_BATCH_SIZE', 10);
 
 $passwordProfileUrl = Env::get('PASSWORD_PROFILE_URL');
 
@@ -77,7 +92,6 @@ return [
         ],
         'emailer' => [
             'class' => $emailerClass,
-            'emailServiceConfig' => $emailServiceConfig,
 
             'otherDataForEmails' => [
                 'emailSignature' => Env::get('EMAIL_SIGNATURE', ''),
@@ -169,7 +183,7 @@ return [
                     'exportInterval' => 1,
                 ],
                 [
-                    'class' => EmailServiceTarget::class,
+                    'class' => EmailLogTarget::class,
                     'categories' => ['application'], // only messages from this app, not all of Yii's built-in messaging
                     'enabled' => !empty($notificationEmail),
                     'except' => [
@@ -185,10 +199,6 @@ return [
                         'to' => $notificationEmail ?? '(disabled)',
                         'subject' => 'ERROR - ' . $idpName . ' ID Broker [' . YII_ENV . ']',
                     ],
-                    'baseUrl' => $emailServiceConfig['baseUrl'],
-                    'accessToken' => $emailServiceConfig['accessToken'],
-                    'assertValidIp' => $emailServiceConfig['assertValidIp'],
-                    'validIpRanges' => $emailServiceConfig['validIpRanges'],
                     'prefix' => $logPrefix,
                     'exportInterval' => 1,
                 ],
@@ -223,10 +233,14 @@ return [
                 ],
             ],
         ],
+        'mailer' => $mailerConfig,
     ],
     'params' => [
         'authorizedTokens'              => Env::getArray('API_ACCESS_KEYS'),
         'authorizedRPOrigins'           => Env::getArray('RP_ORIGINS'),
+        'fromEmail'                     => $fromEmail,
+        'fromName'                      => $fromName,
+        'emailQueueBatchSize'           => $emailQueueBatchSize,
         'idpName'                       => $idpName,
         'idpDisplayName'                => $idpDisplayName,
         'mfaAddInterval'                => Env::get('MFA_ADD_INTERVAL', '+30 days'),

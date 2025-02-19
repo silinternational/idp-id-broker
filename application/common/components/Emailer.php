@@ -10,12 +10,11 @@ use common\models\Password;
 use common\models\User;
 use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
-use Sil\EmailService\Client\EmailServiceClient;
 use Sil\Psr3Adapters\Psr3Yii2Logger;
 use yii\base\Component;
+use yii\db\Query;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Inflector;
-use yii\db\Query;
 
 class Emailer extends Component
 {
@@ -62,15 +61,8 @@ class Emailer extends Component
     public const PASSWORD_EXPIRED_CUTOFF = '-15 days';
     public const PASSWORD_EXPIRING_CUTOFF = '+15 days';
 
-    /**
-     * The configuration for the email-service client.
-     *
-     * @var array
-     */
-    public $emailServiceConfig = [];
-
-    /** @var EmailServiceClient */
-    protected $emailServiceClient = null;
+    /** @var EmailClient */
+    protected $emailClient = null;
 
     /** @var LoggerInterface */
     public $logger = null;
@@ -164,22 +156,6 @@ class Emailer extends Component
      */
     protected function assertConfigIsValid()
     {
-        $requiredParams = [
-            'accessToken',
-            'assertValidIp',
-            'baseUrl',
-            'validIpRanges',
-        ];
-
-        foreach ($requiredParams as $param) {
-            if (!isset($this->emailServiceConfig[$param])) {
-                throw new InvalidArgumentException(
-                    'Missing email service configuration for ' . $param,
-                    1502311757
-                );
-            }
-        }
-
         foreach ($this->subjects as $messageType => $subject) {
             if (empty($subject)) {
                 throw new InvalidArgumentException(sprintf(
@@ -192,7 +168,7 @@ class Emailer extends Component
     }
 
     /**
-     * Use the email service to send an email.
+     * Use the email client to send an email.
      *
      * WARNING:
      * You probably shouldn't be calling this directly. Instead, call the
@@ -206,7 +182,6 @@ class Emailer extends Component
      * @param string $ccAddress Optional. Email address to include as 'cc'.
      * @param string $bccAddress Optional. Email address to include as 'bcc'.
      * @param int $delaySeconds Number of seconds to delay sending the email. Default = no delay.
-     * @throws \Sil\EmailService\Client\EmailServiceClientException
      */
     protected function email(
         string $toAddress,
@@ -233,26 +208,19 @@ class Emailer extends Component
             $properties[self::PROP_BCC_ADDRESS] = $bccAddress;
         }
 
-        $this->getEmailServiceClient()->email($properties);
+        $this->getEmailClient()->email($properties);
     }
 
     /**
-     * @return EmailServiceClient
+     * @return EmailClient
      */
-    protected function getEmailServiceClient()
+    protected function getEmailClient()
     {
-        if ($this->emailServiceClient === null) {
-            $this->emailServiceClient = new EmailServiceClient(
-                $this->emailServiceConfig['baseUrl'],
-                $this->emailServiceConfig['accessToken'],
-                [
-                    EmailServiceClient::ASSERT_VALID_IP_CONFIG => $this->emailServiceConfig['assertValidIp'],
-                    EmailServiceClient::TRUSTED_IPS_CONFIG => $this->emailServiceConfig['validIpRanges'],
-                ]
-            );
+        if ($this->emailClient === null) {
+            $this->emailClient = new EmailClient();
         }
 
-        return $this->emailServiceClient;
+        return $this->emailClient;
     }
 
     /**
@@ -363,7 +331,6 @@ class Emailer extends Component
      * @param string[] $data Data fields for email template. Include key 'toAddress' to override
      *     sending to primary address in User object.
      * @param int $delaySeconds Number of seconds to delay sending the email. Default = no delay.
-     * @throws \Sil\EmailService\Client\EmailServiceClientException
      */
     public function sendMessageTo(
         string $messageType,
