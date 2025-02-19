@@ -29,7 +29,7 @@ class m250219_000000_add_email_queue_table extends Migration
         );
 
     }
-    
+
     public function safeDown()
     {
         $this->dropTable('{{email}}');

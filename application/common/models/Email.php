@@ -16,7 +16,7 @@ class Email extends EmailBase
 {
     /** int $delay number of seconds to delay sending */
     public $delay_seconds = 0;
-    
+
     public function scenarios()
     {
         $scenarios = [
@@ -31,10 +31,10 @@ class Email extends EmailBase
                 'send_after',
             ],
         ];
-        
+
         return $scenarios;
     }
-    
+
     public function rules()
     {
         return ArrayHelper::merge(
@@ -50,13 +50,13 @@ class Email extends EmailBase
                 ],
                 [
                     'text_body', 'required', 'when' => function ($model) {
-                    return empty($model->html_body);
-                },
+                        return empty($model->html_body);
+                    },
                 ],
             ]
         );
     }
-    
+
     public function behaviors()
     {
         // http://www.yiiframework.com/doc-2.0/yii-behaviors-timestampbehavior.html
@@ -64,7 +64,7 @@ class Email extends EmailBase
             TimestampBehavior::class,
         ];
     }
-    
+
     /**
      * Attempt to send email. Returns 1 on success.
      * @throws Exception if sending failed
@@ -79,12 +79,12 @@ class Email extends EmailBase
         if (!$message->send()) {
             throw new Exception('Unable to send email', 1461011826);
         }
-        
+
         /*
          * Remove entry from queue (if saved to queue) after successful send
          */
         $this->removeFromQueue();
-        
+
         /*
          * Log success
          */
@@ -97,7 +97,7 @@ class Email extends EmailBase
         ]);
         return 1;
     }
-    
+
     /**
      * Attempt to send email and on failure update attempts count and save (queue it)
      * @throws Exception
@@ -113,7 +113,7 @@ class Email extends EmailBase
              */
             $this->attempts_count += 1;
             $this->updated_at = time();
-            
+
             $log = [
                 'action' => 'retry sending email',
                 'to' => $this->to_address,
@@ -124,7 +124,7 @@ class Email extends EmailBase
                 'code' => $e->getCode()
             ];
             \Yii::error($log);
-            
+
             if (!$this->save()) {
                 \Yii::error([
                     'action' => 'save email after failed retry failed',
@@ -140,7 +140,7 @@ class Email extends EmailBase
         }
         return 0;
     }
-    
+
     /**
      * Builds a mailer object from $this and returns it
      * @return \yii\mail\MessageInterface
@@ -166,7 +166,7 @@ class Email extends EmailBase
         }
         $mailer->setTo($this->to_address);
         $mailer->setSubject($this->subject);
-        
+
         /*
          * Conditionally set optional fields
          */
@@ -179,7 +179,7 @@ class Email extends EmailBase
                 $mailer->$method($value);
             }
         }
-        
+
         // TODO: remove this
         \Yii::warning([
             'action' => 'new message',
@@ -188,7 +188,7 @@ class Email extends EmailBase
         ]);
         return $mailer;
     }
-    
+
     /**
      * Attempt to send messages from queue
      * @throws Exception
@@ -203,18 +203,18 @@ class Email extends EmailBase
             $queued = self::find()->orderBy(['updated_at' => SORT_ASC])
                 ->where(['<', 'send_after', time()])->orWhere('send_after IS NULL')
                 ->limit($batchSize)->all();
-            
+
             $log += [
                 'batchSize' => $batchSize,
                 'queuedEmails' => count($queued),
                 'sentEmails' => 0,
             ];
-            
+
             if (empty($queued)) {
                 // If nothing queued, no need to send log
                 return;
             }
-            
+
             /** @var Email $email */
             foreach ($queued as $email) {
                 $log['sentEmails'] += $email->retry();
@@ -227,11 +227,11 @@ class Email extends EmailBase
             ];
             \Yii::error($log);
         }
-        
+
         // Send log of successful processing
         \Yii::info($log);
     }
-    
+
     /**
      * If $this has been saved to database, it will be deleted and on failure throw an exception
      * @throws Exception
@@ -252,14 +252,14 @@ class Email extends EmailBase
                 'error' => $e->getMessage(),
             ];
             \Yii::error($log, 'application');
-            
+
             throw new Exception(
                 'Unable to delete email queue entry',
                 1461012337
             );
         }
     }
-    
+
     /**
      * @return array of fields that should be included in responses.
      */
@@ -279,16 +279,16 @@ class Email extends EmailBase
             'error',
             'send_after',
         ];
-        
+
         return $fields;
     }
-    
+
     public function beforeSave($insert)
     {
         if ($this->delay_seconds > 0) {
             $this->send_after = time() + $this->delay_seconds;
         }
-        
+
         return parent::beforeSave($insert);
     }
 }

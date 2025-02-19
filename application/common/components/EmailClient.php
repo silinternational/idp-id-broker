@@ -15,7 +15,6 @@ use yii\db\Exception;
  */
 class EmailClient extends Component
 {
-    
     /**
      * @throws Exception
      * @throws InvalidConfigException
@@ -24,11 +23,11 @@ class EmailClient extends Component
     {
         $email = new Email();
         $email->attributes = $properties;
-        
+
         if (!$email->validate()) {
             throw new Exception(current($email->getFirstErrors()));
         }
-        
+
         if ((int)$email->send_after <= time() && (int)$email->delay_seconds <= 0) {
             /*
              * Attempt to send email immediately
@@ -42,23 +41,23 @@ class EmailClient extends Component
                     'status' => 'error',
                     'error' => $e->getMessage(),
                 ]);
-                
+
                 // ignore the error, but queue the message
             }
         }
-        
+
         if (!$email->save()) {
             $details = current($email->getFirstErrors());
-            
+
             Yii::error([
                 'action' => 'create email',
                 'status' => 'error',
                 'error' => $details,
             ]);
-            
+
             throw new Exception(current($email->getFirstErrors()));
         }
-        
+
         Yii::info([
             'action' => 'email/queue',
             'status' => 'queued',

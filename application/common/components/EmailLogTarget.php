@@ -1,4 +1,5 @@
 <?php
+
 namespace common\components;
 
 use Sil\JsonLog\JsonLogHelper;
@@ -17,7 +18,7 @@ class EmailLogTarget extends Target
      * @var array $message Email config, properties: to, cc, bcc, subject
      */
     public $message;
-    
+
     /**
      * @inheritdoc
      */
@@ -27,13 +28,13 @@ class EmailLogTarget extends Target
         if (empty($this->message['to'])) {
             throw new InvalidConfigException('The "to" option must be set for EmailLogTarget::message.');
         }
-        
+
         $this->message['subject'] = $this->message['subject'] ?? 'System Alert';
         $this->message['cc'] = $this->message['cc'] ?? '';
         $this->message['bcc'] = $this->message['bcc'] ?? '';
     }
-    
-    
+
+
     /**
      * Format a log message as a string of JSON.
      *
@@ -47,20 +48,20 @@ class EmailLogTarget extends Target
             $logMessageData,
             $this->getMessagePrefix($logMessageData)
         );
-        
+
         return Json::encode(Json::decode($jsonString), JSON_PRETTY_PRINT);
     }
-    
+
     /**
      * Send message to Email Service
      */
     public function export()
     {
         $emailClient = new EmailClient();
-        
+
         foreach ($this->messages as $msg) {
             $body = $this->formatMessage($msg);
-            
+
             $emailClient->email([
                 'to_address' => $this->message['to'],
                 'cc_address' => $this->message['cc'],
