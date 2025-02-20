@@ -40,13 +40,13 @@ $mailerConfig = [
     'textLayout' => '@common/mail/layouts/text',
 ];
 $mailerHost = Env::get('MAILER_HOST');
-if (!empty($mailerHost)) {
+if (!empty($mailerHost) || $mailerConfig['useFileTransport'] === true) {
     $mailerConfig['class'] = SwiftMailer::class;
     $mailerConfig['transport'] = [
         'class' => 'Swift_SmtpTransport',
         'host' => $mailerHost,
-        'username' => Env::requireEnv('MAILER_USERNAME'),
-        'password' => Env::requireEnv('MAILER_PASSWORD'),
+        'username' => Env::get('MAILER_USERNAME'),
+        'password' => Env::get('MAILER_PASSWORD'),
         'port' => '465',
         'encryption' => 'ssl',
     ];

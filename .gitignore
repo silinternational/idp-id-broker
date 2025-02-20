@@ -23,3 +23,6 @@ serverless-mfa-api/override/*.go
 serverless-mfa-api/override/server/*.go
 u2f-simulator/override/*.go
 u2f-simulator/override/u2fserver/*.go
+
+# Test email message are stored in application/frontend/runtime/mail
+application/frontend/runtime/
