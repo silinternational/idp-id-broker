@@ -6,7 +6,7 @@ use frontend\components\BaseRestController;
 use Throwable;
 use Yii;
 use yii\web\NotFoundHttpException;
-use yii\web\ServerErrorHttpException as Http500;
+use yii\web\ServerErrorHttpException;
 
 class SiteController extends BaseRestController
 {
@@ -21,9 +21,9 @@ class SiteController extends BaseRestController
 
         return $behaviors;
     }
-    
+
     /**
-     * @throws Http500
+     * @throws ServerErrorHttpException
      */
     public function actionStatus()
     {
@@ -35,7 +35,7 @@ class SiteController extends BaseRestController
         } catch (Throwable $t) {
             $msg = sprintf('DB config error (%s:%d): %s', $t->getFile(), $t->getLine(), $t->getMessage());
             Yii::error($msg);
-            throw new Http500('DB config error.', $t->getCode(), $t);
+            throw new ServerErrorHttpException('DB config error.', $t->getCode(), $t);
         }
 
         try {
@@ -43,7 +43,7 @@ class SiteController extends BaseRestController
         } catch (Throwable $t) {
             $msg = sprintf('DB connection error (%s:%d): %s', $t->getFile(), $t->getLine(), $t->getMessage());
             Yii::error($msg);
-            throw new Http500('DB connection error.', $t->getCode(), $t);
+            throw new ServerErrorHttpException('DB connection error.', $t->getCode(), $t);
         }
 
         try {
@@ -51,7 +51,7 @@ class SiteController extends BaseRestController
         } catch (Throwable $t) {
             $msg = sprintf('Emailer error (%s:%d): %s', $t->getFile(), $t->getLine(), $t->getMessage());
             Yii::error($msg);
-            throw new Http500('Emailer error.', $t->getCode(), $t);
+            throw new ServerErrorHttpException('Emailer error.', $t->getCode(), $t);
         }
 
         try {
@@ -59,7 +59,7 @@ class SiteController extends BaseRestController
         } catch (Throwable $t) {
             $msg = sprintf('TOTP error (%s:%d): %s', $t->getFile(), $t->getLine(), $t->getMessage());
             Yii::error($msg);
-            throw new Http500('TOTP error.', $t->getCode(), $t);
+            throw new ServerErrorHttpException('TOTP error.', $t->getCode(), $t);
         }
 
         try {
@@ -67,7 +67,7 @@ class SiteController extends BaseRestController
         } catch (Throwable $t) {
             $msg = sprintf('Webauthn error (%s:%d): %s', $t->getFile(), $t->getLine(), $t->getMessage());
             Yii::error($msg);
-            throw new Http500('Webauthn error.', $t->getCode(), $t);
+            throw new ServerErrorHttpException('Webauthn error.', $t->getCode(), $t);
         }
 
         Yii::$app->response->statusCode = 204;
