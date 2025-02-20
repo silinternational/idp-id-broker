@@ -18,9 +18,9 @@ chown -R www-data:www-data \
 echo 'sleeping a random number of seconds up to 9 to avoid migration runs clash'
 sleep $[ ( $RANDOM % 10 ) ]s
 
-if [[ ${PARAMETER_STORE_PATH} ]]; then
+if [[ $PARAMETER_STORE_PATH ]]; then
   config="config-shim --path $PARAMETER_STORE_PATH"
-elif [[ ${APP_ID} ]]; then
+elif [[ $APP_ID ]]; then
   config="config-shim --app $APP_ID --config $CONFIG_ID --env $ENV_ID"
 else
   config=""
@@ -28,7 +28,7 @@ fi
 
 $config /data/yii migrate --interactive=0
 
-if [[ ! -z $RUN_TASK ]]; then
+if [[ $RUN_TASK ]]; then
   $config ./yii $RUN_TASK
   exit $?
 fi
