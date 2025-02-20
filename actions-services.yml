@@ -27,6 +27,7 @@ services:
             EMAIL_SERVICE_validIpRanges: 192.168.0.0/16
             EMAIL_SIGNATURE: Dummy Signature for Automated Tests
             EMAILER_CLASS: \Sil\SilIdBroker\Behat\Context\fakes\FakeEmailer
+            MAILER_USEFILES: "true"
             HELP_CENTER_URL: https://help-center
             IDP_NAME: Test
             MYSQL_HOST: testdb
