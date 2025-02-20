@@ -4,7 +4,8 @@ services:
     ports:
       - "3306"
     env_file:
-      - ./local.env
+      - path: ./local.env
+        required: false
 
   app:
     build: ./
@@ -17,7 +18,8 @@ services:
     depends_on:
       - db
     env_file:
-      - ./local.env
+      - path: ./local.env
+        required: false
     environment:
       #            RUN_TASK: cron/all
       EMAILER_CLASS: \Sil\SilIdBroker\Behat\Context\fakes\FakeEmailer
@@ -77,7 +79,8 @@ services:
     environment:
       COMPOSER_CACHE_DIR: /composer
     env_file:
-      - ./local.env
+      - path: ./local.env
+        required: false
     command: ["true"]
 
   dynamo:
@@ -200,7 +203,8 @@ services:
     depends_on:
       - db
     env_file:
-      - ./local.env
+      - path: ./local.env
+        required: false
     environment:
       PMA_HOST: db
       PMA_USER: user
@@ -213,7 +217,8 @@ services:
     depends_on:
       - testdb
     env_file:
-      - ./local.env
+      - path: ./local.env
+        required: false
     environment:
       PMA_HOST: testdb
       PMA_USER: appfortests
