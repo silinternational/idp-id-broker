@@ -2,9 +2,8 @@
 
 namespace frontend\controllers;
 
-use Exception;
 use frontend\components\BaseRestController;
-use GuzzleHttp\Command\Exception\CommandException as GuzzleCommandException;
+use Throwable;
 use Yii;
 use yii\web\NotFoundHttpException;
 use yii\web\ServerErrorHttpException as Http500;
@@ -22,7 +21,10 @@ class SiteController extends BaseRestController
 
         return $behaviors;
     }
-
+    
+    /**
+     * @throws Http500
+     */
     public function actionStatus()
     {
         /* @var $webApp yii\web\Application */
@@ -30,38 +32,42 @@ class SiteController extends BaseRestController
 
         try {
             $dbComponent = $webApp->get('db');
-        } catch (Exception $e) {
-            Yii::error('DB config problem: ' . $e->getMessage());
-            throw new Http500('DB config problem.');
+        } catch (Throwable $t) {
+            $msg = sprintf('DB config error (%s:%d): %s', $t->getFile(), $t->getLine(), $t->getMessage());
+            Yii::error($msg);
+            throw new Http500('DB config error.', $t->getCode(), $t);
         }
 
         try {
             $dbComponent->open();
-        } catch (Exception $e) {
-            Yii::error('DB connection problem: ' . $e->getMessage());
-            throw new Http500('DB connection problem.', $e->getCode());
+        } catch (Throwable $t) {
+            $msg = sprintf('DB connection error (%s:%d): %s', $t->getFile(), $t->getLine(), $t->getMessage());
+            Yii::error($msg);
+            throw new Http500('DB connection error.', $t->getCode(), $t);
         }
 
-
         try {
-            $emailer = $webApp->get('emailer');
-        } catch (Exception $e) {
-            Yii::error('Emailer config problem: ' . $e->getMessage());
-            throw new Http500('Emailer config problem.');
+            $webApp->get('emailer');
+        } catch (Throwable $t) {
+            $msg = sprintf('Emailer error (%s:%d): %s', $t->getFile(), $t->getLine(), $t->getMessage());
+            Yii::error($msg);
+            throw new Http500('Emailer error.', $t->getCode(), $t);
         }
 
         try {
             $webApp->get('totp');
-        } catch (Exception $e) {
-            Yii::error('TOTP config problem: ' . $e->getMessage());
-            throw new Http500('TOTP config problem.');
+        } catch (Throwable $t) {
+            $msg = sprintf('TOTP error (%s:%d): %s', $t->getFile(), $t->getLine(), $t->getMessage());
+            Yii::error($msg);
+            throw new Http500('TOTP error.', $t->getCode(), $t);
         }
 
         try {
             $webApp->get('webauthn');
-        } catch (Exception $e) {
-            Yii::error('Webauthn config problem: ' . $e->getMessage());
-            throw new Http500('Webauthn config problem.');
+        } catch (Throwable $t) {
+            $msg = sprintf('Webauthn error (%s:%d): %s', $t->getFile(), $t->getLine(), $t->getMessage());
+            Yii::error($msg);
+            throw new Http500('Webauthn error.', $t->getCode(), $t);
         }
 
         Yii::$app->response->statusCode = 204;
