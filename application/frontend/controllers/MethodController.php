@@ -6,6 +6,8 @@ use common\exceptions\InvalidCodeException;
 use common\models\Method;
 use common\models\User;
 use frontend\components\BaseRestController;
+use Throwable;
+use Yii;
 use yii\web\BadRequestHttpException;
 use yii\web\ConflictHttpException;
 use yii\web\HttpException;
@@ -165,11 +167,18 @@ class MethodController extends BaseRestController
 
         try {
             $method->setAsVerified();
-        } catch (\Exception $e) {
+        } catch (Throwable $t) {
+            $msg = sprintf(
+                'Unable to set method as verified (%s:%d): %s',
+                $t->getFile(),
+                $t->getLine(),
+                $t->getMessage()
+            );
+            Yii::error($msg);
             throw new ServerErrorHttpException(
-                'Unable to set method as verified: ' . $e->getMessage(),
+                'Unable to set method as verified: ' . $t->getMessage(),
                 1470315941,
-                $e
+                $t
             );
         }
 
