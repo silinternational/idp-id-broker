@@ -19,7 +19,7 @@ echo 'sleeping a random number of seconds up to 9 to avoid migration runs clash'
 sleep $[ ( $RANDOM % 10 ) ]s
 
 if [[ $PARAMETER_STORE_PATH ]]; then
-  config="config-shim --path $PARAMETER_STORE_PATH"
+  config="config-shim -v --path $PARAMETER_STORE_PATH"
 elif [[ $APP_ID ]]; then
   config="config-shim --app $APP_ID --config $CONFIG_ID --env $ENV_ID"
 else
