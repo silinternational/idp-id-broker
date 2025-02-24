@@ -177,7 +177,7 @@ class Email extends EmailBase
                 $mailer->$method($value);
             }
         }
-        
+
         return $mailer;
     }
 
