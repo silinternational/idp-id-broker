@@ -19,7 +19,7 @@ class Email extends EmailBase
 
     public function scenarios()
     {
-        $scenarios = [
+        return [
             self::SCENARIO_DEFAULT => [
                 'to_address',
                 'cc_address',
@@ -31,8 +31,6 @@ class Email extends EmailBase
                 'send_after',
             ],
         ];
-
-        return $scenarios;
     }
 
     public function rules()
@@ -179,13 +177,7 @@ class Email extends EmailBase
                 $mailer->$method($value);
             }
         }
-
-        // TODO: remove this
-        \Yii::warning([
-            'action' => 'new message',
-            'status' => 'info',
-            'from' => $from,
-        ]);
+        
         return $mailer;
     }
 
@@ -265,7 +257,7 @@ class Email extends EmailBase
      */
     public function fields(): array
     {
-        $fields = [
+        return [
             'id',
             'to_address',
             'cc_address',
@@ -279,8 +271,6 @@ class Email extends EmailBase
             'error',
             'send_after',
         ];
-
-        return $fields;
     }
 
     public function beforeSave($insert)

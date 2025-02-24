@@ -41,6 +41,9 @@ class EmailClientContext extends YiiContext
     #[Then('there is no error')]
     public function thereIsNoError(): void
     {
+        // This method is intentionally empty. EmailClient test scenarios were imported from
+        // Codeception. Each scenario is self-contained within one context method, and the
+        // "there is no error" is present simply to make the scenario read well.
     }
 
     #[When('we create an email by mass assignment using minimum fields for a text body')]
