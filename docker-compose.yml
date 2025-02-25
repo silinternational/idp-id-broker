@@ -48,8 +48,8 @@ services:
       MYSQL_USER: appfortests
       MYSQL_PASSWORD: appfortests
       MFA_WEBAUTHN_apiBaseUrl: mfaapi:8080/
-      MFA_WEBAUTHN_apiKey: 10345678-1234-1234-1234-123456789012
-      MFA_WEBAUTHN_apiSecret: 11345678-1234-1234-1234-12345678
+      MFA_API_KEY: 10345678-1234-1234-1234-123456789012
+      MFA_API_SECRET: 11345678-1234-1234-1234-12345678
       # the corresponding hash: $2a$10$8Bp9PqqfStjLvh1nQJ67JeY3CO/mEXmF1GKfe8Vk0kue1.i7fa2mC
       MFA_WEBAUTHN_appId: ourApp99
       MFA_WEBAUTHN_rpDisplayName: Our App
@@ -169,8 +169,8 @@ services:
       EMAIL_SERVICE_baseUrl: dummy
       EMAIL_SIGNATURE: Dummy Signature for Test
       MFA_WEBAUTHN_apiBaseUrl: mfaapi:8080/
-      MFA_WEBAUTHN_apiKey: 10345678-1234-1234-1234-123456789012
-      MFA_WEBAUTHN_apiSecret: 11345678-1234-1234-1234-12345678
+      MFA_API_KEY: 10345678-1234-1234-1234-123456789012
+      MFA_API_SECRET: 11345678-1234-1234-1234-12345678
       # the corresponding hash: $2a$10$8Bp9PqqfStjLvh1nQJ67JeY3CO/mEXmF1GKfe8Vk0kue1.i7fa2mC
       MFA_WEBAUTHN_appId: ourApp99
       MFA_WEBAUTHN_rpDisplayName: Our App

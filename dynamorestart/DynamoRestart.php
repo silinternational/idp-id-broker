@@ -70,7 +70,7 @@ class DynamoRestart
                 'value' => [
                     'S' => ApiKeyValue,
                 ],
-                // This assumes the MFA_WEBAUTHN_apiSecret env var is "11345678-1234-1234-1234-12345678"
+                // This assumes the MFA_API_SECRET env var is "11345678-1234-1234-1234-12345678"
                 // The value below comes from using this go code to match what happens in serverless-mfa-api-go
                 // 	a := "11345678-1234-1234-1234-12345678"
                 //	hashedApiSecret, err := bcrypt.GenerateFromPassword([]byte(a), bcrypt.DefaultCost)
