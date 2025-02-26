@@ -30,6 +30,18 @@ $mfaTotpConfig['issuer'] = $idpDisplayName;
 
 $mfaWebAuthnConfig = Env::getArrayFromPrefix('MFA_WEBAUTHN_');
 
+$mfaApiKey = Env::get('MFA_API_KEY');
+if (!empty($mfaApiKey)) {
+    $mfaTotpConfig['apiKey'] = $mfaApiKey;
+    $mfaWebAuthnConfig['apiKey'] = $mfaApiKey;
+}
+
+$mfaApiSecret = Env::get('MFA_API_SECRET');
+if (!empty($mfaApiSecret)) {
+    $mfaTotpConfig['apiSecret'] = $mfaApiSecret;
+    $mfaWebAuthnConfig['apiSecret'] = $mfaApiSecret;
+}
+
 $emailerClass = Env::get('EMAILER_CLASS', Emailer::class);
 
 /*
