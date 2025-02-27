@@ -25,10 +25,18 @@ $notificationEmail = Env::get('NOTIFICATION_EMAIL');
 
 $mfaNumBackupCodes = Env::get('MFA_NUM_BACKUPCODES', 10);
 
+$passwordProfileUrl = Env::get('PASSWORD_PROFILE_URL');
+
 $mfaTotpConfig = Env::getArrayFromPrefix('MFA_TOTP_');
 $mfaTotpConfig['issuer'] = $idpDisplayName;
 
 $mfaWebAuthnConfig = Env::getArrayFromPrefix('MFA_WEBAUTHN_');
+if (empty($mfaWebAuthnConfig['rpDisplayName'])) {
+    $mfaWebAuthnConfig['rpDisplayName'] = $idpDisplayName;
+}
+if (empty($mfaWebAuthnConfig['appId'])) {
+    $mfaWebAuthnConfig['appId'] = $passwordProfileUrl . '/app-id.json';
+}
 
 $mfaApiKey = Env::get('MFA_API_KEY');
 if (!empty($mfaApiKey)) {
@@ -55,8 +63,6 @@ $emailServiceConfig = Env::getArrayFromPrefix('EMAIL_SERVICE_');
 
 // Re-retrieve the validIpRanges as an array.
 $emailServiceConfig['validIpRanges'] = Env::getArray('EMAIL_SERVICE_validIpRanges');
-
-$passwordProfileUrl = Env::get('PASSWORD_PROFILE_URL');
 
 $logPrefix = function () {
     $request = Yii::$app->request;
