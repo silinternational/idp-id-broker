@@ -51,8 +51,6 @@ services:
       MFA_API_KEY: 10345678-1234-1234-1234-123456789012
       MFA_API_SECRET: 11345678-1234-1234-1234-12345678
       # the corresponding hash: $2a$10$8Bp9PqqfStjLvh1nQJ67JeY3CO/mEXmF1GKfe8Vk0kue1.i7fa2mC
-      MFA_WEBAUTHN_appId: ourApp99
-      MFA_WEBAUTHN_rpDisplayName: Our App
       MFA_WEBAUTHN_rpId: http://app99
       SUPPORT_EMAIL: support@example.com
 
@@ -172,8 +170,6 @@ services:
       MFA_API_KEY: 10345678-1234-1234-1234-123456789012
       MFA_API_SECRET: 11345678-1234-1234-1234-12345678
       # the corresponding hash: $2a$10$8Bp9PqqfStjLvh1nQJ67JeY3CO/mEXmF1GKfe8Vk0kue1.i7fa2mC
-      MFA_WEBAUTHN_appId: ourApp99
-      MFA_WEBAUTHN_rpDisplayName: Our App
       MFA_WEBAUTHN_rpId: http://app99
       HELP_CENTER_URL: https://www.example.com/help
       IDP_DISPLAY_NAME: Test

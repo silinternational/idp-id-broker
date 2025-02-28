@@ -43,8 +43,6 @@ services:
             MFA_WEBAUTHN_apiBaseUrl: mfaapi:8080/
             MFA_API_KEY: 10345678-1234-1234-1234-123456789012
             MFA_API_SECRET: 11345678-1234-1234-1234-12345678
-            MFA_WEBAUTHN_appId: ourApp99
-            MFA_WEBAUTHN_rpDisplayName: Our App
             MFA_WEBAUTHN_rpId: http://app99
             U2F_SIM_HOST_AND_PORT: u2fsim:8080
 
