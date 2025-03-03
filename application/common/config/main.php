@@ -64,10 +64,13 @@ $emailServiceConfig = Env::getArrayFromPrefix('EMAIL_SERVICE_');
 // Re-retrieve the validIpRanges as an array.
 $emailServiceConfig['validIpRanges'] = Env::getArray('EMAIL_SERVICE_validIpRanges');
 
-$logPrefix = function () {
+$version = Env::get('GITHUB_REF_NAME', 'unknown');
+
+$logPrefix = function () use ($version) {
     $request = Yii::$app->request;
     $prefixData = [
         'env' => YII_ENV,
+        'version' => $version,
     ];
     if ($request instanceof \yii\web\Request) {
         // Assumes format: Bearer consumer-module-name-32randomcharacters
@@ -231,7 +234,7 @@ return [
                     'clientOptions' => [
                         'attach_stacktrace' => false, // stack trace identifies the logger call stack, not helpful
                         'environment' => YII_ENV,
-                        'release' => 'idp-id-broker@' . Env::get('GITHUB_REF_NAME', 'unknown'),
+                        'release' => 'idp-id-broker@' . $version,
                         'max_request_body_size' => 'never', // never send request bodies
                         'before_send' => function (Event $event) use ($idpName): ?Event {
                             $event->setExtra(['idp' => $idpName]);
