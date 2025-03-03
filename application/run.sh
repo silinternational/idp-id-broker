@@ -6,6 +6,8 @@ set -x
 # exit if any line in the script fails
 set -e
 
+echo "starting idp-id-broker version $GITHUB_REF_NAME"
+
 if [[ $APP_ENV == "dev" ]]; then
     export XDEBUG_CONFIG="remote_enable=1 remote_host="$REMOTE_DEBUG_IP
     apt-get -y -q install php-xdebug
