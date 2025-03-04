@@ -55,7 +55,7 @@ if (!empty($mailerHost) || $mailerConfig['useFileTransport'] === true) {
     $mailerConfig['awsRegion'] = Env::get('AWS_REGION', 'us-east-1');
 }
 
-$fromEmail         = Env::get('FROM_EMAIL', 'no_reply@example.com');
+$fromEmail         = Env::get('FROM_EMAIL', '');
 $fromName          = Env::get('FROM_NAME', '');
 $emailQueueBatchSize = Env::get('EMAIL_QUEUE_BATCH_SIZE', 10);
 

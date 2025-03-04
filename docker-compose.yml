@@ -162,6 +162,7 @@ services:
       AWS_SECRET_ACCESS_KEY: abc123
       EMAILER_CLASS: \Sil\SilIdBroker\Behat\Context\fakes\FakeEmailer
       EMAIL_SIGNATURE: Dummy Signature for Test
+      FROM_EMAIL: no_reply@example.com
       MAILER_USEFILES: "true"
       MFA_WEBAUTHN_apiBaseUrl: mfaapi:8080/
       MFA_WEBAUTHN_apiKey: 10345678-1234-1234-1234-123456789012

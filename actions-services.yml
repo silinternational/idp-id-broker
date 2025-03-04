@@ -23,6 +23,7 @@ services:
             AWS_SECRET_ACCESS_KEY: abc123
             EMAIL_SIGNATURE: Dummy Signature for Automated Tests
             EMAILER_CLASS: \Sil\SilIdBroker\Behat\Context\fakes\FakeEmailer
+            FROM_EMAIL: no_reply@example.com
             MAILER_USEFILES: "true"
             HELP_CENTER_URL: https://help-center
             IDP_NAME: Test
