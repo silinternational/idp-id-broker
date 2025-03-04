@@ -1,9 +1,10 @@
 <?php
+
 use Sil\PhpEnv\Env;
 
 ?>
 <!DOCTYPE html>
-<html>
+<html lang="eng">
 <head>
     <meta charset="utf-8" />
 </head>
@@ -19,7 +20,7 @@ $maxWidth = Env::get('EMAIL_MAX_WIDTH', '600px');
                 <table style="background-color: <?= $brandColor ?>; width: 100%">
                     <tr>
                         <td>
-                            <img src="<?= $logo ?>" style="max-height: 4em; vertical-align: middle">
+                            <img src="<?= $logo ?>" style="max-height: 4em; vertical-align: middle" alt="logo">
                         </td>
                     </tr>
                 </table>

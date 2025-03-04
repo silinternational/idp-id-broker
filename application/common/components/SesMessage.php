@@ -2,6 +2,7 @@
 
 namespace common\components;
 
+use yii\base\NotSupportedException;
 use yii\mail\BaseMessage;
 
 /*
@@ -12,126 +13,126 @@ use yii\mail\BaseMessage;
 class SesMessage extends BaseMessage
 {
     /** @var string */
-    private $_charset;
+    private $charset;
 
     /** @var string */
-    private $_from;
+    private $from;
 
     /** @var string[] */
-    private $_to;
+    private $to;
 
     /** @var string[] */
-    private $_replyTo;
+    private $replyTo;
 
     /** @var string[] */
-    private $_cc;
+    private $cc;
 
     /** @var string[] */
-    private $_bcc;
+    private $bcc;
 
     /** @var string */
-    private $_subject;
+    private $subject;
 
     /** @var string */
-    private $_textBody;
+    private $textBody;
 
     /** @var string */
-    private $_htmlBody;
+    private $htmlBody;
 
     public function getCharset()
     {
-        return $this->_charset ?? 'UTF-8';
+        return $this->charset ?? 'UTF-8';
     }
 
     public function setCharset($charset)
     {
-        $this->_charset = $charset;
+        $this->charset = $charset;
     }
 
     public function getFrom()
     {
-        return $this->_from;
+        return $this->from;
     }
 
     public function setFrom($from)
     {
         if (is_array($from)) {
             if (isset($from[0])) {
-                $this->_from = $from[0];
+                $this->from = $from[0];
             } else {
                 $addresses = array_keys($from);
                 $names = array_values($from);
-                $this->_from = sprintf('%s <%s>', $names[0], $addresses[0]);
+                $this->from = sprintf('%s <%s>', $names[0], $addresses[0]);
             }
         } else {
-            $this->_from = $from;
+            $this->from = $from;
         }
     }
 
     public function getTo()
     {
-        return $this->_to;
+        return $this->to;
     }
 
     public function setTo($to)
     {
         if (is_array($to)) {
-            $this->_to = $to;
+            $this->to = $to;
         } else {
-            $this->_to = explode(",", $to);
+            $this->to = explode(",", $to);
         }
     }
 
     public function getReplyTo()
     {
-        return $this->_replyTo ?? [$this->getFrom()];
+        return $this->replyTo ?? [$this->getFrom()];
     }
 
     public function setReplyTo($replyTo)
     {
         if (is_array($replyTo)) {
-            $this->_replyTo = $replyTo;
+            $this->replyTo = $replyTo;
         } else {
-            $this->_replyTo = explode(",", $replyTo);
+            $this->replyTo = explode(",", $replyTo);
         }
     }
 
     public function getCc()
     {
-        return $this->_cc ?? [];
+        return $this->cc ?? [];
     }
 
     public function setCc($cc)
     {
         if (is_array($cc)) {
-            $this->_cc = $cc;
+            $this->cc = $cc;
         } else {
-            $this->_cc = explode(",", $cc);
+            $this->cc = explode(",", $cc);
         }
     }
 
     public function getBcc()
     {
-        return $this->_bcc ?? [];
+        return $this->bcc ?? [];
     }
 
     public function setBcc($bcc)
     {
         if (is_array($bcc)) {
-            $this->_bcc = $bcc;
+            $this->bcc = $bcc;
         } else {
-            $this->_bcc = explode(",", $bcc);
+            $this->bcc = explode(",", $bcc);
         }
     }
 
     public function getSubject()
     {
-        return $this->_subject;
+        return $this->subject;
     }
 
     public function setSubject($subject)
     {
-        $this->_subject = $subject;
+        $this->subject = $subject;
     }
 
     /**
@@ -139,15 +140,15 @@ class SesMessage extends BaseMessage
      */
     public function getTextBody()
     {
-        if (empty($this->_textBody)) {
-            return strip_tags($this->_htmlBody);
+        if (empty($this->textBody)) {
+            return strip_tags($this->htmlBody);
         }
-        return $this->_textBody;
+        return $this->textBody;
     }
 
     public function setTextBody($text)
     {
-        $this->_textBody = $text;
+        $this->textBody = $text;
     }
 
     /**
@@ -155,43 +156,39 @@ class SesMessage extends BaseMessage
      */
     public function getHtmlBody()
     {
-        if (empty($this->_htmlBody)) {
-            return htmlspecialchars($this->_textBody);
+        if (empty($this->htmlBody)) {
+            return htmlspecialchars($this->textBody);
         }
-        return $this->_htmlBody;
+        return $this->htmlBody;
     }
 
     public function setHtmlBody($html)
     {
-        $this->_htmlBody = $html;
+        $this->htmlBody = $html;
     }
 
     public function attach($fileName, array $options = [])
     {
-        throw new \Exception('attach is not implemented');
-        // TODO: Implement attach() method.
+        throw new NotSupportedException('attach is not implemented');
     }
 
     public function attachContent($content, array $options = [])
     {
-        throw new \Exception('attacheContent is not implemented');
-        // TODO: Implement attachContent() method.
+        throw new NotSupportedException('attacheContent is not implemented');
     }
 
     public function embed($fileName, array $options = [])
     {
-        throw new \Exception('embed is not implemented');
-        // TODO: Implement embed() method.
+        throw new NotSupportedException('embed is not implemented');
     }
 
     public function embedContent($content, array $options = [])
     {
-        throw new \Exception('embedContent is not implemented');
-        // TODO: Implement embedContent() method.
+        throw new NotSupportedException('embedContent is not implemented');
     }
 
     public function toString()
     {
-        return $this->_textBody;
+        return $this->textBody;
     }
 }
