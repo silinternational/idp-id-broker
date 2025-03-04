@@ -75,7 +75,7 @@ class Email extends EmailBase
          */
         $message = $this->getMessage();
         if (!$message->send()) {
-            throw new Exception('Unable to send email', 1461011826);
+            throw new Exception('Unable to send email', 1741067356);
         }
 
         /*
@@ -132,7 +132,7 @@ class Email extends EmailBase
                 throw new ServerErrorHttpException(
                     'Unable to save email after failing to retry sending. Error: ' .
                     print_r($this->getFirstErrors(), true),
-                    1500649788
+                    1741067362
                 );
             }
         }
@@ -188,7 +188,7 @@ class Email extends EmailBase
     public static function sendQueuedEmail()
     {
         $log = [
-            'action' => 'email/sendQueuedEmail',
+            'method' => 'Email::sendQueuedEmail',
         ];
         try {
             $batchSize = \Yii::$app->params['emailQueueBatchSize'];
@@ -234,7 +234,7 @@ class Email extends EmailBase
             if ($this->id && !$this->delete()) {
                 throw new Exception(
                     'Unable to delete email queue entry',
-                    1461012183
+                    1741067370
                 );
             }
         } catch (Exception $e) {
@@ -247,7 +247,7 @@ class Email extends EmailBase
 
             throw new Exception(
                 'Unable to delete email queue entry',
-                1461012337
+                1741067379
             );
         }
     }
