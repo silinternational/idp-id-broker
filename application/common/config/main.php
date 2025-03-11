@@ -27,10 +27,30 @@ $notificationEmail = Env::get('NOTIFICATION_EMAIL');
 
 $mfaNumBackupCodes = Env::get('MFA_NUM_BACKUPCODES', 10);
 
+$passwordProfileUrl = Env::get('PASSWORD_PROFILE_URL');
+
 $mfaTotpConfig = Env::getArrayFromPrefix('MFA_TOTP_');
 $mfaTotpConfig['issuer'] = $idpDisplayName;
 
 $mfaWebAuthnConfig = Env::getArrayFromPrefix('MFA_WEBAUTHN_');
+if (empty($mfaWebAuthnConfig['rpDisplayName'])) {
+    $mfaWebAuthnConfig['rpDisplayName'] = $idpDisplayName;
+}
+if (empty($mfaWebAuthnConfig['appId'])) {
+    $mfaWebAuthnConfig['appId'] = $passwordProfileUrl . '/app-id.json';
+}
+
+$mfaApiKey = Env::get('MFA_API_KEY');
+if (!empty($mfaApiKey)) {
+    $mfaTotpConfig['apiKey'] = $mfaApiKey;
+    $mfaWebAuthnConfig['apiKey'] = $mfaApiKey;
+}
+
+$mfaApiSecret = Env::get('MFA_API_SECRET');
+if (!empty($mfaApiSecret)) {
+    $mfaTotpConfig['apiSecret'] = $mfaApiSecret;
+    $mfaWebAuthnConfig['apiSecret'] = $mfaApiSecret;
+}
 
 $emailerClass = Env::get('EMAILER_CLASS', Emailer::class);
 
@@ -59,12 +79,13 @@ $fromEmail         = Env::get('FROM_EMAIL', '');
 $fromName          = Env::get('FROM_NAME', '');
 $emailQueueBatchSize = Env::get('EMAIL_QUEUE_BATCH_SIZE', 10);
 
-$passwordProfileUrl = Env::get('PASSWORD_PROFILE_URL');
+$version = Env::get('GITHUB_REF_NAME', 'unknown');
 
-$logPrefix = function () {
+$logPrefix = function () use ($version) {
     $request = Yii::$app->request;
     $prefixData = [
         'env' => YII_ENV,
+        'version' => $version,
     ];
     if ($request instanceof \yii\web\Request) {
         // Assumes format: Bearer consumer-module-name-32randomcharacters
@@ -222,7 +243,7 @@ return [
                     'clientOptions' => [
                         'attach_stacktrace' => false, // stack trace identifies the logger call stack, not helpful
                         'environment' => YII_ENV,
-                        'release' => 'idp-id-broker@' . Env::get('GITHUB_REF_NAME', 'unknown'),
+                        'release' => 'idp-id-broker@' . $version,
                         'max_request_body_size' => 'never', // never send request bodies
                         'before_send' => function (Event $event) use ($idpName): ?Event {
                             $event->setExtra(['idp' => $idpName]);

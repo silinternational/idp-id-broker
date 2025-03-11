@@ -15,7 +15,7 @@ class AuthenticationContext extends FeatureContext
     public function __destruct()
     {
         // Ensure the (local) WebAuthn MFA API is left with the correct API Secret.
-        $this->setWebAuthnApiSecretTo(Env::get('MFA_WEBAUTHN_apiSecret'));
+        $this->setWebAuthnApiSecretTo(Env::get('MFA_API_SECRET'));
     }
 
     /**
@@ -91,7 +91,7 @@ class AuthenticationContext extends FeatureContext
         $dynamoDbClient->updateItem([
             'Key' => [
                 'value' => [
-                    'S' => Env::get('MFA_WEBAUTHN_apiKey'),
+                    'S' => Env::get('MFA_API_KEY'),
                 ],
             ],
             'UpdateExpression' => 'set hashedApiSecret = :newHashedApiSecret',
@@ -109,6 +109,6 @@ class AuthenticationContext extends FeatureContext
      */
     public function weHaveTheRightPasswordForTheWebauthnMfaApi()
     {
-        $this->setWebAuthnApiSecretTo(Env::get('MFA_WEBAUTHN_apiSecret'));
+        $this->setWebAuthnApiSecretTo(Env::get('MFA_API_SECRET'));
     }
 }
