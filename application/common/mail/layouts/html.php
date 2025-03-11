@@ -2,6 +2,11 @@
 
 use Sil\PhpEnv\Env;
 
+$brandColor = Env::get('EMAIL_BRAND_COLOR', '');
+$logo = Env::get('EMAIL_BRAND_LOGO', '');
+$maxWidth = Env::get('EMAIL_MAX_WIDTH', '600px');
+/* @var $content string email contents */
+
 ?>
 <!DOCTYPE html>
 <html lang="eng">
@@ -10,11 +15,6 @@ use Sil\PhpEnv\Env;
   <title>Message</title>
 </head>
 <body>
-    <?php
-    $brandColor = Env::get('EMAIL_BRAND_COLOR', '');
-    $logo = Env::get('EMAIL_BRAND_LOGO', '');
-    $maxWidth = Env::get('EMAIL_MAX_WIDTH', '600px');
-?>
     <div style="padding: 25px 15px;">
         <div style="margin-left: auto; margin-right: auto; max-width: <?= $maxWidth ?>;">
             <header>
@@ -28,9 +28,6 @@ use Sil\PhpEnv\Env;
             </header>
 
             <div style="border-bottom: 1px solid #d3d3d3; padding: 10px;">
-                <?php
-            /* @var $content string email contents */
-?>
                 <?= $content ?>
             </div>
         </div>
