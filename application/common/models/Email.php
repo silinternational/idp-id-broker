@@ -2,7 +2,7 @@
 
 namespace common\models;
 
-use Exception;
+use yii\base\Exception;
 use yii\behaviors\TimestampBehavior;
 use yii\helpers\ArrayHelper;
 use yii\web\ServerErrorHttpException;

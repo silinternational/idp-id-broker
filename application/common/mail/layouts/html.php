@@ -7,21 +7,22 @@ use Sil\PhpEnv\Env;
 <html lang="eng">
 <head>
     <meta charset="utf-8" />
+  <title>Message</title>
 </head>
 <body>
     <?php
     $brandColor = Env::get('EMAIL_BRAND_COLOR', '');
-$logo = Env::get('EMAIL_BRAND_LOGO', '');
-$maxWidth = Env::get('EMAIL_MAX_WIDTH', '600px');
+    $logo = Env::get('EMAIL_BRAND_LOGO', '');
+    $maxWidth = Env::get('EMAIL_MAX_WIDTH', '600px');
 ?>
     <div style="padding: 25px 15px;">
         <div style="margin-left: auto; margin-right: auto; max-width: <?= $maxWidth ?>;">
             <header>
                 <table style="background-color: <?= $brandColor ?>; width: 100%">
                     <tr>
-                        <td>
+                        <th>
                             <img src="<?= $logo ?>" style="max-height: 4em; vertical-align: middle" alt="logo">
-                        </td>
+                        </th>
                     </tr>
                 </table>
             </header>
