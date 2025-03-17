@@ -6,7 +6,7 @@ ENV GITHUB_REF_NAME=$GITHUB_REF_NAME
 ENV REFRESHED_AT 2024-02-27
 
 RUN apt-get update -y && \
-    apt-get install -y make
+    apt-get install -y cron make
 
 WORKDIR /data
 
