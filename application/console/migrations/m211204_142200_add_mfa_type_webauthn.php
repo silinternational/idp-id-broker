@@ -6,7 +6,7 @@ use common\models\Mfa;
 /**
  * Class m211204_142200_add_mfa_type_webauthn
  */
-class m211204_142200_add_mfa_type_webauthn extends Migration
+class m211204_142205_add_mfa_type_webauthn_admin_email extends Migration
 {
     /**
      * {@inheritdoc}

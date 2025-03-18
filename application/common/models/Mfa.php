@@ -6,6 +6,7 @@ use common\components\MfaBackendInterface;
 use common\helpers\MySqlDateTime;
 use common\helpers\Utils;
 use yii\helpers\ArrayHelper;
+use yii\validators\EmailValidator;
 use yii\web\BadRequestHttpException;
 use yii\web\ConflictHttpException;
 use yii\web\ServerErrorHttpException;
@@ -21,7 +22,10 @@ class Mfa extends MfaBase
     public const TYPE_TOTP = 'totp';
     public const TYPE_WEBAUTHN = 'webauthn';
     public const TYPE_BACKUPCODE = 'backupcode';
+
     public const TYPE_MANAGER = 'manager';
+
+    public const TYPE_ADMIN = 'admin';
 
     public const EVENT_TYPE_VERIFY = 'verify_mfa';
     public const EVENT_TYPE_DELETE = 'delete_mfa';
@@ -204,7 +208,7 @@ class Mfa extends MfaBase
     public static function isValidType(string $type): bool
     {
         return  array_key_exists($type, self::getTypes());
-    }
+    } 
 
     /**
      * @param string $type
@@ -313,7 +317,7 @@ class Mfa extends MfaBase
      * @throws ServerErrorHttpException
      * @throws ConflictHttpException
      */
-    public static function create(int $userId, string $type, string $label = null, string $rpOrigin = ''): array
+    public static function create(int $userId, string $type, string $label = null, string $rpOrigin = '', string $adminEmail = ''): array
     {
         /*
          * Make sure $type is valid
@@ -334,6 +338,14 @@ class Mfa extends MfaBase
             throw new BadRequestHttpException('Manager email must be valid for this MFA type');
         }
 
+
+        if ($type == self::TYPE_ADMIN) {
+            $validator = new EmailValidator();
+            if (!$validator->validate($adminEmail)) {
+                throw new BadRequestHttpException('Admin email must be valid for this MFA type.', 1742328138);
+            }
+        }
+
         $existing = self::findOne(['user_id' => $userId, 'type' => $type, 'verified' => 1]);
 
         if ($existing instanceof Mfa) {
@@ -346,6 +358,7 @@ class Mfa extends MfaBase
             $mfa = new Mfa();
             $mfa->user_id = $userId;
             $mfa->type = $type;
+            $mfa->admin_email = $adminEmail;
             $mfa->setLabel($label);
 
             /*
@@ -493,6 +506,8 @@ class Mfa extends MfaBase
             self::TYPE_MANAGER => 'Manager Backup Code',
             self::TYPE_TOTP => 'Authenticator App',
             self::TYPE_WEBAUTHN => 'Security Key',
+            self::TYPE_ADMIN => 'Admin Backup Code',
+            
         ];
     }
 
