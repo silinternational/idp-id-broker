@@ -36,9 +36,6 @@ services:
     environment:
       API_ACCESS_KEYS: api-test-NOTASECRET
       APP_ENV: test
-      EMAIL_SERVICE_accessToken: dummy
-      EMAIL_SERVICE_assertValidIp: "false"
-      EMAIL_SERVICE_baseUrl: dummy
       EMAIL_SIGNATURE: Dummy Signature for Tests
       EMAILER_CLASS: \Sil\SilIdBroker\Behat\Context\fakes\FakeEmailer
       IDP_NAME: test
@@ -162,10 +159,9 @@ services:
       AWS_ACCESS_KEY_ID: abc123
       AWS_SECRET_ACCESS_KEY: abc123
       EMAILER_CLASS: \Sil\SilIdBroker\Behat\Context\fakes\FakeEmailer
-      EMAIL_SERVICE_accessToken: dummy
-      EMAIL_SERVICE_assertValidIp: "false"
-      EMAIL_SERVICE_baseUrl: dummy
       EMAIL_SIGNATURE: Dummy Signature for Test
+      FROM_EMAIL: no_reply@example.com
+      MAILER_USEFILES: "true"
       MFA_WEBAUTHN_apiBaseUrl: mfaapi:8080/
       MFA_API_KEY: 10345678-1234-1234-1234-123456789012
       MFA_API_SECRET: 11345678-1234-1234-1234-12345678

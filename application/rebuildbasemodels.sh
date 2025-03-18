@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 declare -A models
+models["email"]="EmailBase"
 models["email_log"]="EmailLogBase"
 models["user"]="UserBase"
 models["password"]="PasswordBase"

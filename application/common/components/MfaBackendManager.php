@@ -6,7 +6,6 @@ use common\components\Emailer;
 use common\models\EmailLog;
 use common\models\Mfa;
 use common\models\MfaBackupcode;
-use Sil\EmailService\Client\EmailServiceClientException;
 use yii\base\Component;
 use yii\web\BadRequestHttpException;
 use yii\web\ForbiddenHttpException;
@@ -36,7 +35,6 @@ class MfaBackendManager extends Component implements MfaBackendInterface
 
     /**
      * Send a email message to the manager with the code, and to the user with instructions
-     * @throws EmailServiceClientException
      */
     protected function sendManagerEmail($mfa, $code)
     {

@@ -21,12 +21,10 @@ services:
             AWS_DEFAULT_REGION: us-east-1
             AWS_ACCESS_KEY_ID: abc123
             AWS_SECRET_ACCESS_KEY: abc123
-            EMAIL_SERVICE_accessToken: fake-abc-123
-            EMAIL_SERVICE_assertValidIp: "false"
-            EMAIL_SERVICE_baseUrl: http://email
-            EMAIL_SERVICE_validIpRanges: 192.168.0.0/16
             EMAIL_SIGNATURE: Dummy Signature for Automated Tests
             EMAILER_CLASS: \Sil\SilIdBroker\Behat\Context\fakes\FakeEmailer
+            FROM_EMAIL: no_reply@example.com
+            MAILER_USEFILES: "true"
             HELP_CENTER_URL: https://help-center
             IDP_NAME: Test
             MYSQL_HOST: testdb
