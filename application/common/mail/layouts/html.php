@@ -9,7 +9,7 @@ $maxWidth = Env::get('EMAIL_MAX_WIDTH', '600px');
 
 ?>
 <!DOCTYPE html>
-<html lang="eng">
+<html lang="en">
 <head>
     <meta charset="utf-8" />
   <title>Message</title>
