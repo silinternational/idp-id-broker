@@ -44,11 +44,21 @@ class MfaBackendAdmin extends Component implements MfaBackendInterface
         $emailer = \Yii::$app->emailer;
 
         $emailer->sendMessageTo(
-            EmailLog::MESSAGE_TYPE_MFA_ADMIN_HELP,
+            EmailLog::MESSAGE_TYPE_MFA_ADMIN,
             $mfa->user,
             [
                 'toAddress' => $mfa->admin_email,
                 'code' => $code,
+            ]
+        );
+
+
+        $emailer->sendMessageTo(
+            EmailLog::MESSAGE_TYPE_MFA_ADMIN_HELP,
+            $mfa->user,
+            [
+                'toAddress' => $mfa->user->email,
+                'adminEmail' => $mfa->admin_email,
             ]
         );
     }
