@@ -3,6 +3,7 @@
 use common\components\Emailer;
 use common\components\MfaBackendBackupcode;
 use common\components\MfaBackendManager;
+use common\components\MfaBackendAdmin;
 use common\components\MfaBackendTotp;
 use common\components\MfaBackendWebAuthn;
 use Sentry\Event;
@@ -169,7 +170,8 @@ return [
             $mfaWebAuthnConfig
         ),
         'manager' => ['class' => MfaBackendManager::class],
-        // http://www.yiiframework.com/doc-2.0/guide-runtime-logging.html
+        // http://www.yiiframework.com/doc-2.0/guide-runtime-logging.html,
+        'admin' => ['class' => MfaBackendAdmin::class],
         'log' => [
             'targets' => [
                 [

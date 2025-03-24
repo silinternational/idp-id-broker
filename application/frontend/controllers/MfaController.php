@@ -53,6 +53,7 @@ class MfaController extends BaseRestController
             throw new ForbiddenHttpException("Invalid rpOrigin: " . $rpOrigin, 1638539433);
         }
 
+        
         return Mfa::create($user->id, $type, $label, $rpOrigin, $adminEmail);
     }
 
