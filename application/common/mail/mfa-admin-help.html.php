@@ -1,9 +1,10 @@
 <?php
+
 use yii\helpers\Html as yHtml;
 
 /**
  * @var string $displayName     Name of user. Provided by user profile.
- * @var string $managerEmail    Email address of user's manager ("recovery contact"). Provided by user profile.
+ * @var string $adminEmail      Email address for admin. Provided by MFA.
  * @var string $idpDisplayName  Display name of IDP instance. Provided by environment variable IDP_DISPLAY_NAME.
  * @var string $supportName     Help center name.  Provided by environment variable SUPPORT_NAME.
  * @var string $supportEmail    Help center email address.  Provided by environment variable SUPPORT_EMAIL.

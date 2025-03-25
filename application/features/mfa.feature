@@ -62,23 +62,6 @@ Feature: MFA
         | label     | A Label        |
         | verified  | 1              |
 
-  Scenario: Create new MFA record of type manager
-    Given the user has a manager email address
-      And I provide the following valid data:
-        | property    | value          |
-        | employee_id | 123            |
-        | type        | manager        |
-        | label       | A Label        |
-    When I request "/mfa" be created
-    Then the response status code should be 200
-      And the response should contain a data array with 0 items
-      And an MFA record exists for an employee_id of "123"
-      And the following MFA data should be stored:
-        | property  | value          |
-        | type      | manager        |
-        | label     | A Label        |
-        | verified  | 1              |
-
   Scenario: Create new MFA record of type admin
     Given I provide the following valid data:
         | property    | value             |

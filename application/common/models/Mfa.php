@@ -22,9 +22,7 @@ class Mfa extends MfaBase
     public const TYPE_TOTP = 'totp';
     public const TYPE_WEBAUTHN = 'webauthn';
     public const TYPE_BACKUPCODE = 'backupcode';
-
     public const TYPE_MANAGER = 'manager';
-
     public const TYPE_ADMIN = 'admin';
 
     public const EVENT_TYPE_VERIFY = 'verify_mfa';
@@ -43,13 +41,19 @@ class Mfa extends MfaBase
     {
         return ArrayHelper::merge([
             [
-                'created_utc', 'default', 'value' => MySqlDateTime::now(),
+                'created_utc',
+                'default',
+                'value' => MySqlDateTime::now(),
             ],
             [
-                'type', 'in', 'range' => array_keys(self::getTypes()),
+                'type',
+                'in',
+                'range' => array_keys(self::getTypes()),
             ],
             [
-                'verified', 'default', 'value' => 0,
+                'verified',
+                'default',
+                'value' => 0,
             ],
         ], parent::rules());
     }
@@ -144,7 +148,8 @@ class Mfa extends MfaBase
                 $this
             );
 
-            if (!\Yii::$app->params['mfaAllowDisable']
+            if (
+                !\Yii::$app->params['mfaAllowDisable']
                 && $this->user->require_mfa === 'no'
             ) {
                 $this->user->require_mfa = 'yes';
@@ -209,7 +214,7 @@ class Mfa extends MfaBase
     public static function isValidType(string $type): bool
     {
         return  array_key_exists($type, self::getTypes());
-    } 
+    }
 
     /**
      * @param string $type
@@ -508,7 +513,6 @@ class Mfa extends MfaBase
             self::TYPE_TOTP => 'Authenticator App',
             self::TYPE_WEBAUTHN => 'Security Key',
             self::TYPE_ADMIN => 'Admin Backup Code',
-            
         ];
     }
 
