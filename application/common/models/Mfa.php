@@ -41,19 +41,13 @@ class Mfa extends MfaBase
     {
         return ArrayHelper::merge([
             [
-                'created_utc',
-                'default',
-                'value' => MySqlDateTime::now(),
+                'created_utc', 'default', 'value' => MySqlDateTime::now(),
             ],
             [
-                'type',
-                'in',
-                'range' => array_keys(self::getTypes()),
+                'type', 'in', 'range' => array_keys(self::getTypes()),
             ],
             [
-                'verified',
-                'default',
-                'value' => 0,
+                'verified', 'default', 'value' => 0,
             ],
         ], parent::rules());
     }

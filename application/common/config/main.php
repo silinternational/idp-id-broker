@@ -170,8 +170,8 @@ return [
             $mfaWebAuthnConfig
         ),
         'manager' => ['class' => MfaBackendManager::class],
-        // http://www.yiiframework.com/doc-2.0/guide-runtime-logging.html,
         'admin' => ['class' => MfaBackendAdmin::class],
+        // http://www.yiiframework.com/doc-2.0/guide-runtime-logging.html
         'log' => [
             'targets' => [
                 [
