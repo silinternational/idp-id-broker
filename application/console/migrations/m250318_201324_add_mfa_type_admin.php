@@ -4,7 +4,7 @@ use yii\db\Migration;
 use common\models\Mfa;
 
 /**
- * Class m211204_142200_add_mfa_type_webauthn
+ * Class m250318_201324_add_mfa_type_admin
  */
 class m250318_201324_add_mfa_type_admin extends Migration
 {
@@ -13,7 +13,7 @@ class m250318_201324_add_mfa_type_admin extends Migration
      */
     public function safeUp()
     {
-      
+
         // add webauthn mfa type
         $this->alterColumn(
             '{{mfa}}',
@@ -21,11 +21,17 @@ class m250318_201324_add_mfa_type_admin extends Migration
             "enum('totp','u2f','backupcode','manager','webauthn', 'admin') not null"
         );
 
-        // add column to store webauthn admin recovery email
+        // add column to store admin recovery email
         $this->addColumn(
             '{{mfa}}',
             'admin_email',
             'varchar(255) null'
+        );
+
+        $this->alterColumn(
+            '{{email_log}}',
+            'message_type',
+            "enum('invite','welcome','mfa-rate-limit','password-changed','get-backup-codes','refresh-backup-codes','lost-security-key','mfa-option-added','mfa-option-removed','mfa-enabled','mfa-disabled','method-verify','mfa-manager','mfa-manager-help','method-reminder','method-purged','password-expiring','password-expired','password-pwned','ext-group-sync-errors','abandoned-users', 'mfa-admin', 'mfa-admin-help') null"
         );
     }
 
@@ -34,7 +40,7 @@ class m250318_201324_add_mfa_type_admin extends Migration
      */
     public function safeDown()
     {
-        // add webauthn mfa type
+        // remove admin mfa type
         $this->alterColumn(
             '{{mfa}}',
             'type',
@@ -45,6 +51,12 @@ class m250318_201324_add_mfa_type_admin extends Migration
         $this->dropColumn(
             '{{mfa}}',
             'admin_email'
+        );
+
+        $this->alterColumn(
+            '{{email_log}}',
+            'message_type',
+            "enum('invite','welcome','mfa-rate-limit','password-changed','get-backup-codes','refresh-backup-codes','lost-security-key','mfa-option-added','mfa-option-removed','mfa-enabled','mfa-disabled','method-verify','mfa-manager','mfa-manager-help','method-reminder','method-purged','password-expiring','password-expired','password-pwned','ext-group-sync-errors','abandoned-users') null"
         );
     }
 }
