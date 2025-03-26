@@ -65,6 +65,9 @@ class EmailContext extends YiiContext
     public const METHOD_EMAIL_ADDRESS = 'method@example.com';
     public const MANAGER_EMAIL = 'manager@example.com';
 
+    public const ADMIN_EMAIL = 'admin@example.com';
+
+
     /**
      * @Then a(n) :messageType email should have been sent to them
      */
@@ -155,7 +158,8 @@ class EmailContext extends YiiContext
         $type,
         $lastUsedDaysAgo = null,
         $user = null,
-        $verified = 1
+        $verified = 1,
+        $admin_email = ''
     ) {
         if ($user === null) {
             $user = $this->tempUser;
@@ -164,6 +168,7 @@ class EmailContext extends YiiContext
         $mfa->user_id = $user->id;
         $mfa->type = $type;
         $mfa->verified = $verified;
+        $mfa->admin_email = $admin_email;
 
         $this->testMfaOption = $mfa;
 
@@ -1028,6 +1033,8 @@ class EmailContext extends YiiContext
 
     protected function assertEmailSent($type, $address)
     {
+        var_dump($this->fakeEmailer->getFakeEmailsSent());
+        
         $this->matchingFakeEmails = $this->fakeEmailer->getFakeEmailsOfTypeSentToUser($type, $address, $this->tempUser);
 
         Assert::greaterThan(count($this->matchingFakeEmails), 0, sprintf(
@@ -1060,6 +1067,14 @@ class EmailContext extends YiiContext
     }
 
     /**
+     * @Then an Admin Rescue email is sent to the admin
+     */
+    public function anAdminRescueEmailIsSentToTheAdmin()
+    {
+        $this->assertEmailSent(EmailLog::MESSAGE_TYPE_MFA_ADMIN, $this->testMfaOption->admin_email);
+    }
+
+    /**
      * @Given an unverified method exists
      */
     public function anUnverifiedMethodExists()
@@ -1080,7 +1095,17 @@ class EmailContext extends YiiContext
      */
     public function iRequestANewManagerMfa()
     {
-        Mfa::create($this->tempUser->id, Mfa::TYPE_MANAGER, 'label');
+        Mfa::create($this->tempUser->id, Mfa::TYPE_MANAGER, label: 'label');
+    }
+
+    /**
+     * @When I request a new admin mfa
+     */
+    public function iRequestANewAdminMfa()
+    {
+        $result =  Mfa::create($this->tempUser->id, Mfa::TYPE_ADMIN,'label', '', 'admin@example.com');
+
+        $this->testMfaOption = MFA::find()->where('id = :id', [':id' => $result['id']])->one();
     }
 
     /**
@@ -1200,12 +1225,28 @@ class EmailContext extends YiiContext
         \Yii::$app->params['mfaManagerBcc'] = 'email@example.com';
     }
 
+     /**
+     * @Given a mfaAdminBcc email address is configured
+     */
+    public function aMfaAdminbccEmailAddressIsConfigured()
+    {
+        \Yii::$app->params['mfaAdminBcc'] = 'email@example.com';
+    }
+
     /**
      * @Then the mfaManagerBcc email address is on the bcc line
      */
     public function theMfamanagerbccEmailAddressIsOnTheBccLine()
     {
         $this->assertEmailBcc(\Yii::$app->params['mfaManagerBcc']);
+    }
+
+     /**
+     * @Then the mfaAdminBcc email address is on the bcc line
+     */
+    public function theMfaAdminbccEmailAddressIsOnTheBccLine()
+    {
+        $this->assertEmailBcc(\Yii::$app->params['mfaAdminBcc']);
     }
 
     /**
@@ -1216,12 +1257,28 @@ class EmailContext extends YiiContext
         \Yii::$app->params['mfaManagerHelpBcc'] = 'email@example.com';
     }
 
+     /**
+     * @Given a mfaAdminHelpBcc email address is configured
+     */
+    public function aMfaAdminHelpbccEmailAddressIsConfigured()
+    {
+        \Yii::$app->params['mfaAdminHelpBcc'] = 'email@example.com';
+    }
+
     /**
      * @Then the mfaManagerHelpBcc email address is on the bcc line
      */
     public function theMfamanagerHelpbccEmailAddressIsOnTheBccLine()
     {
         $this->assertEmailBcc(\Yii::$app->params['mfaManagerHelpBcc']);
+    }
+
+      /**
+     * @Then the mfaAdminHelpBcc email address is on the bcc line
+     */
+    public function theMfaAdminHelpbccEmailAddressIsOnTheBccLine()
+    {
+        $this->assertEmailBcc(\Yii::$app->params['mfaAdminHelpBcc']);
     }
 
     /**

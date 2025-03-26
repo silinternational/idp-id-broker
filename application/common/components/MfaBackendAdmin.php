@@ -48,6 +48,7 @@ class MfaBackendAdmin extends Component implements MfaBackendInterface
             $mfa->user,
             [
                 'toAddress' => $mfa->admin_email,
+                'bccAddress' => \Yii::$app->params['mfaAdminBcc'] ?? '',
                 'code' => $code,
             ]
         );
@@ -57,8 +58,7 @@ class MfaBackendAdmin extends Component implements MfaBackendInterface
             EmailLog::MESSAGE_TYPE_MFA_ADMIN_HELP,
             $mfa->user,
             [
-                'toAddress' => $mfa->user->email,
-                'adminEmail' => $mfa->admin_email,
+                'bccAddress' => \Yii::$app->params['mfaAdminHelpBcc'] ?? '',
             ]
         );
     }

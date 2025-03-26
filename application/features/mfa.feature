@@ -198,6 +198,12 @@ Feature: MFA
     Then the response status code should be 200
       And 0 codes should be stored
 
+  Scenario: Verify an admin MFA code
+    Given the user has a verified "admin" MFA
+    When I request to verify the code
+    Then the response status code should be 200
+      And 0 codes should be stored
+
   Scenario: Delete a backupcode MFA option
     Given the user has a verified "backupcode" MFA
     When I request to delete the MFA
