@@ -41,7 +41,7 @@ class MfaBase extends \yii\db\ActiveRecord
         return [
             [['user_id', 'type', 'verified', 'created_utc'], 'required'],
             [['user_id', 'verified'], 'integer'],
-            [['admin_email'],'string','max'=> 255],
+            [['admin_email'],'string','max' => 255],
             [['type'], 'string'],
             [['created_utc', 'last_used_utc'], 'safe'],
             [['external_uuid', 'label'], 'string', 'max' => 64],

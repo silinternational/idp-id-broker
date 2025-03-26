@@ -20,7 +20,7 @@ class MfaBackendAdmin extends Component implements MfaBackendInterface
         // Get existing MFA record for admin to create/update codes for
         $mfa = Mfa::findOne(['user_id' => $userId, 'type' => Mfa::TYPE_ADMIN]);
         if ($mfa === null) {
-            throw new \Exception("An admin MFA record does not exist for this user",1742846609 );
+            throw new \Exception("An admin MFA record does not exist for this user", 1742846609);
         }
 
         $mfa->setVerified();
@@ -58,6 +58,7 @@ class MfaBackendAdmin extends Component implements MfaBackendInterface
             EmailLog::MESSAGE_TYPE_MFA_ADMIN_HELP,
             $mfa->user,
             [
+                'adminEmail' => $mfa->admin_email,
                 'bccAddress' => \Yii::$app->params['mfaAdminHelpBcc'] ?? '',
             ]
         );

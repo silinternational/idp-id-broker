@@ -1033,8 +1033,6 @@ class EmailContext extends YiiContext
 
     protected function assertEmailSent($type, $address)
     {
-        var_dump($this->fakeEmailer->getFakeEmailsSent());
-        
         $this->matchingFakeEmails = $this->fakeEmailer->getFakeEmailsOfTypeSentToUser($type, $address, $this->tempUser);
 
         Assert::greaterThan(count($this->matchingFakeEmails), 0, sprintf(
@@ -1103,7 +1101,7 @@ class EmailContext extends YiiContext
      */
     public function iRequestANewAdminMfa()
     {
-        $result =  Mfa::create($this->tempUser->id, Mfa::TYPE_ADMIN,'label', '', 'admin@example.com');
+        $result =  Mfa::create($this->tempUser->id, Mfa::TYPE_ADMIN, 'label', '', 'admin@example.com');
 
         $this->testMfaOption = MFA::find()->where('id = :id', [':id' => $result['id']])->one();
     }
@@ -1225,7 +1223,7 @@ class EmailContext extends YiiContext
         \Yii::$app->params['mfaManagerBcc'] = 'email@example.com';
     }
 
-     /**
+    /**
      * @Given a mfaAdminBcc email address is configured
      */
     public function aMfaAdminbccEmailAddressIsConfigured()
@@ -1241,7 +1239,7 @@ class EmailContext extends YiiContext
         $this->assertEmailBcc(\Yii::$app->params['mfaManagerBcc']);
     }
 
-     /**
+    /**
      * @Then the mfaAdminBcc email address is on the bcc line
      */
     public function theMfaAdminbccEmailAddressIsOnTheBccLine()
@@ -1257,7 +1255,7 @@ class EmailContext extends YiiContext
         \Yii::$app->params['mfaManagerHelpBcc'] = 'email@example.com';
     }
 
-     /**
+    /**
      * @Given a mfaAdminHelpBcc email address is configured
      */
     public function aMfaAdminHelpbccEmailAddressIsConfigured()
@@ -1273,7 +1271,7 @@ class EmailContext extends YiiContext
         $this->assertEmailBcc(\Yii::$app->params['mfaManagerHelpBcc']);
     }
 
-      /**
+    /**
      * @Then the mfaAdminHelpBcc email address is on the bcc line
      */
     public function theMfaAdminHelpbccEmailAddressIsOnTheBccLine()
