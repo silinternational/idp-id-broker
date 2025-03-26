@@ -60,7 +60,7 @@ class MfaContext extends \FeatureContext
                 $this->backupCodes = MfaBackupcode::createBackupCodes($this->mfa->id, 1);
                 break;
             default:
-             break;
+                break;
         }
     }
 
