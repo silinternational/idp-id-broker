@@ -291,6 +291,7 @@ class Mfa extends MfaBase
             ]);
 
             $this->user->removeManagerCodes();
+            $this->user->removeRecoveryCodes();
 
             return true;
         }
@@ -604,7 +605,7 @@ class Mfa extends MfaBase
      */
     protected static function sendAppropriateMessages($user, $eventType, $mfa)
     {
-        if ($mfa->type === self::TYPE_MANAGER) {
+        if ($mfa->type === self::TYPE_MANAGER || $mfa->type === self::TYPE_RECOVERY) {
             return;
         }
 
@@ -667,5 +668,10 @@ class Mfa extends MfaBase
     public static function removeOldManagerMfaRecords(): void
     {
         self::deleteOldRecords('1 week', ['type' => Mfa::TYPE_MANAGER]);
+    }
+
+    public static function removeOldRecoveryMfaRecords(): void
+    {
+        self::deleteOldRecords('1 week', ['type' => Mfa::TYPE_RECOVERY]);
     }
 }
