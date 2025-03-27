@@ -13,20 +13,20 @@ use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
 use yii\web\ServerErrorHttpException;
 
-class MfaBackendAdmin extends Component implements MfaBackendInterface
+class MfaBackendRecovery extends Component implements MfaBackendInterface
 {
     public function regInit(int $userId, string $mfaExternalUuid = null, string $rpOrigin = ''): array
     {
-        // Get existing MFA record for admin to create/update codes for
-        $mfa = Mfa::findOne(['user_id' => $userId, 'type' => Mfa::TYPE_ADMIN]);
+        // Get existing MFA record for recovery contact to create/update codes for
+        $mfa = Mfa::findOne(['user_id' => $userId, 'type' => Mfa::TYPE_RECOVERY]);
         if ($mfa === null) {
-            throw new \Exception("An admin MFA record does not exist for this user", 1742846609);
+            throw new \Exception("A recovery MFA record does not exist for this user", 1742846609);
         }
 
         $mfa->setVerified();
 
         $codes = MfaBackupcode::createBackupCodes($mfa->id, 1);
-        $this->sendAdminEmail($mfa, $codes[0]);
+        $this->sendRecoveryEmail($mfa, $codes[0]);
 
         /*
          * Don't return the code because it's being sent by email.
@@ -35,31 +35,31 @@ class MfaBackendAdmin extends Component implements MfaBackendInterface
     }
 
     /**
-     * Send a email message to the admin with the code, and to the user with instructions
+     * Send a email message to the recovery contact with the code, and to the user with instructions
      * @throws EmailServiceClientException
      */
-    protected function sendAdminEmail($mfa, $code): void
+    protected function sendRecoveryEmail($mfa, $code): void
     {
         /* @var $emailer Emailer */
         $emailer = \Yii::$app->emailer;
 
         $emailer->sendMessageTo(
-            EmailLog::MESSAGE_TYPE_MFA_ADMIN,
+            EmailLog::MESSAGE_TYPE_MFA_RECOVERY,
             $mfa->user,
             [
-                'toAddress' => $mfa->admin_email,
-                'bccAddress' => \Yii::$app->params['mfaAdminBcc'] ?? '',
+                'toAddress' => $mfa->recovery_email,
+                'bccAddress' => \Yii::$app->params['mfaRecoveryBcc'] ?? '',
                 'code' => $code,
             ]
         );
 
 
         $emailer->sendMessageTo(
-            EmailLog::MESSAGE_TYPE_MFA_ADMIN_HELP,
+            EmailLog::MESSAGE_TYPE_MFA_RECOVERY_HELP,
             $mfa->user,
             [
-                'adminEmail' => $mfa->admin_email,
-                'bccAddress' => \Yii::$app->params['mfaAdminHelpBcc'] ?? '',
+                'recoveryEmail' => $mfa->recovery_email,
+                'bccAddress' => \Yii::$app->params['mfaRecoveryHelpBcc'] ?? '',
             ]
         );
     }
@@ -90,7 +90,7 @@ class MfaBackendAdmin extends Component implements MfaBackendInterface
     {
         if ($verifyType != "") {
             throw new BadRequestHttpException(
-                'A non-blank verification type is not allowed when verifying a mfa of type ' . Mfa::TYPE_ADMIN,
+                'A non-blank verification type is not allowed when verifying a mfa of type ' . Mfa::TYPE_RECOVERY,
                 1742846880
             );
         }
@@ -118,7 +118,7 @@ class MfaBackendAdmin extends Component implements MfaBackendInterface
     {
         if ($childId != 0) {
             throw new ForbiddenHttpException(
-                sprintf("May not delete a MfaWebauthn object on a %s mfa type", Mfa::TYPE_ADMIN),
+                sprintf("May not delete a MfaWebauthn object on a %s mfa type", Mfa::TYPE_RECOVERY),
                 1742846887
             );
         }

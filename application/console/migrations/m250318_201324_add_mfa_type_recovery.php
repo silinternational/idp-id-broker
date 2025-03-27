@@ -4,9 +4,9 @@ use yii\db\Migration;
 use common\models\Mfa;
 
 /**
- * Class m250318_201324_add_mfa_type_admin
+ * Class m250318_201324_add_mfa_type_recovery
  */
-class m250318_201324_add_mfa_type_admin extends Migration
+class m250318_201324_add_mfa_type_recovery extends Migration
 {
     /**
      * {@inheritdoc}
@@ -14,24 +14,24 @@ class m250318_201324_add_mfa_type_admin extends Migration
     public function safeUp()
     {
 
-        // add webauthn mfa type
+        // add recovery mfa type
         $this->alterColumn(
             '{{mfa}}',
             'type',
-            "enum('totp','u2f','backupcode','manager','webauthn', 'admin') not null"
+            "enum('totp','u2f','backupcode','manager','webauthn', 'recovery') not null"
         );
 
-        // add column to store admin recovery email
+        // add column to store recovery email
         $this->addColumn(
             '{{mfa}}',
-            'admin_email',
+            'recovery_email',
             'varchar(255) null'
         );
 
         $this->alterColumn(
             '{{email_log}}',
             'message_type',
-            "enum('invite','welcome','mfa-rate-limit','password-changed','get-backup-codes','refresh-backup-codes','lost-security-key','mfa-option-added','mfa-option-removed','mfa-enabled','mfa-disabled','method-verify','mfa-manager','mfa-manager-help','method-reminder','method-purged','password-expiring','password-expired','password-pwned','ext-group-sync-errors','abandoned-users', 'mfa-admin', 'mfa-admin-help') null"
+            "enum('invite','welcome','mfa-rate-limit','password-changed','get-backup-codes','refresh-backup-codes','lost-security-key','mfa-option-added','mfa-option-removed','mfa-enabled','mfa-disabled','method-verify','mfa-manager','mfa-manager-help','method-reminder','method-purged','password-expiring','password-expired','password-pwned','ext-group-sync-errors','abandoned-users', 'mfa-recovery', 'mfa-recovery-help') null"
         );
     }
 
@@ -40,17 +40,17 @@ class m250318_201324_add_mfa_type_admin extends Migration
      */
     public function safeDown()
     {
-        // remove admin mfa type
+        // remove recovery mfa type
         $this->alterColumn(
             '{{mfa}}',
             'type',
             "enum('totp','u2f','backupcode','manager','webauthn') not null"
         );
 
-        // Drop column that stores webauthn admin recovery email
+        // Drop column that stores recovery email
         $this->dropColumn(
             '{{mfa}}',
-            'admin_email'
+            'recovery_email'
         );
 
         $this->alterColumn(

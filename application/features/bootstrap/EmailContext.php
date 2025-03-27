@@ -64,8 +64,7 @@ class EmailContext extends YiiContext
 
     public const METHOD_EMAIL_ADDRESS = 'method@example.com';
     public const MANAGER_EMAIL = 'manager@example.com';
-
-    public const ADMIN_EMAIL = 'admin@example.com';
+    public const RECOVERY_EMAIL = 'recovery@example.com';
 
 
     /**
@@ -158,8 +157,7 @@ class EmailContext extends YiiContext
         $type,
         $lastUsedDaysAgo = null,
         $user = null,
-        $verified = 1,
-        $admin_email = ''
+        $verified = 1
     ) {
         if ($user === null) {
             $user = $this->tempUser;
@@ -168,7 +166,6 @@ class EmailContext extends YiiContext
         $mfa->user_id = $user->id;
         $mfa->type = $type;
         $mfa->verified = $verified;
-        $mfa->admin_email = $admin_email;
 
         $this->testMfaOption = $mfa;
 
@@ -1065,11 +1062,11 @@ class EmailContext extends YiiContext
     }
 
     /**
-     * @Then an Admin Rescue email is sent to the admin
+     * @Then a Recovery Rescue email is sent to the recovery contact
      */
-    public function anAdminRescueEmailIsSentToTheAdmin()
+    public function aRecoveryRescueEmailIsSentToTheRecoveryContact()
     {
-        $this->assertEmailSent(EmailLog::MESSAGE_TYPE_MFA_ADMIN, $this->testMfaOption->admin_email);
+        $this->assertEmailSent(EmailLog::MESSAGE_TYPE_MFA_RECOVERY, $this->testMfaOption->recovery_email);
     }
 
     /**
@@ -1097,13 +1094,12 @@ class EmailContext extends YiiContext
     }
 
     /**
-     * @When I request a new admin mfa
+     * @When I request a new recovery mfa
      */
-    public function iRequestANewAdminMfa()
+    public function iRequestANewRecoveryMfa()
     {
-        $result =  Mfa::create($this->tempUser->id, Mfa::TYPE_ADMIN, 'label', '', 'admin@example.com');
-
-        $this->testMfaOption = MFA::find()->where('id = :id', [':id' => $result['id']])->one();
+        $result =  Mfa::create($this->tempUser->id, Mfa::TYPE_RECOVERY, 'label', '', self::RECOVERY_EMAIL);
+        $this->testMfaOption = MFA::findOne($result['id']);
     }
 
     /**
@@ -1216,67 +1212,19 @@ class EmailContext extends YiiContext
     }
 
     /**
-     * @Given a mfaManagerBcc email address is configured
+     * @Given a :param email address is configured
      */
-    public function aMfamanagerbccEmailAddressIsConfigured()
+    public function aParamEmailAddressIsConfigured(string $param)
     {
-        \Yii::$app->params['mfaManagerBcc'] = 'email@example.com';
+        \Yii::$app->params[$param] = 'email@example.com';
     }
 
     /**
-     * @Given a mfaAdminBcc email address is configured
+     * @Then the :param email address is on the bcc line
      */
-    public function aMfaAdminbccEmailAddressIsConfigured()
+    public function theParamEmailAddressIsOnTheBccLine(string $param)
     {
-        \Yii::$app->params['mfaAdminBcc'] = 'email@example.com';
-    }
-
-    /**
-     * @Then the mfaManagerBcc email address is on the bcc line
-     */
-    public function theMfamanagerbccEmailAddressIsOnTheBccLine()
-    {
-        $this->assertEmailBcc(\Yii::$app->params['mfaManagerBcc']);
-    }
-
-    /**
-     * @Then the mfaAdminBcc email address is on the bcc line
-     */
-    public function theMfaAdminbccEmailAddressIsOnTheBccLine()
-    {
-        $this->assertEmailBcc(\Yii::$app->params['mfaAdminBcc']);
-    }
-
-    /**
-     * @Given a mfaManagerHelpBcc email address is configured
-     */
-    public function aMfamanagerHelpbccEmailAddressIsConfigured()
-    {
-        \Yii::$app->params['mfaManagerHelpBcc'] = 'email@example.com';
-    }
-
-    /**
-     * @Given a mfaAdminHelpBcc email address is configured
-     */
-    public function aMfaAdminHelpbccEmailAddressIsConfigured()
-    {
-        \Yii::$app->params['mfaAdminHelpBcc'] = 'email@example.com';
-    }
-
-    /**
-     * @Then the mfaManagerHelpBcc email address is on the bcc line
-     */
-    public function theMfamanagerHelpbccEmailAddressIsOnTheBccLine()
-    {
-        $this->assertEmailBcc(\Yii::$app->params['mfaManagerHelpBcc']);
-    }
-
-    /**
-     * @Then the mfaAdminHelpBcc email address is on the bcc line
-     */
-    public function theMfaAdminHelpbccEmailAddressIsOnTheBccLine()
-    {
-        $this->assertEmailBcc(\Yii::$app->params['mfaAdminHelpBcc']);
+        $this->assertEmailBcc(\Yii::$app->params[$param]);
     }
 
     /**

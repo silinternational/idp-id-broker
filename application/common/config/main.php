@@ -3,7 +3,7 @@
 use common\components\Emailer;
 use common\components\MfaBackendBackupcode;
 use common\components\MfaBackendManager;
-use common\components\MfaBackendAdmin;
+use common\components\MfaBackendRecovery;
 use common\components\MfaBackendTotp;
 use common\components\MfaBackendWebAuthn;
 use Sentry\Event;
@@ -170,7 +170,7 @@ return [
             $mfaWebAuthnConfig
         ),
         'manager' => ['class' => MfaBackendManager::class],
-        'admin' => ['class' => MfaBackendAdmin::class],
+        'recovery' => ['class' => MfaBackendRecovery::class],
         // http://www.yiiframework.com/doc-2.0/guide-runtime-logging.html
         'log' => [
             'targets' => [
@@ -292,8 +292,8 @@ return [
         'mfaLifetime'                   => Env::get('MFA_LIFETIME', '+2 hours'),
         'mfaManagerBcc'                 => Env::get('MFA_MANAGER_BCC', ''),
         'mfaManagerHelpBcc'             => Env::get('MFA_MANAGER_HELP_BCC', ''),
-        'mfaAdminBcc'                   => Env::get('MFA_ADMIN_BCC', ''),
-        'mfaAdminHelpBcc'               => Env::get('MFA_ADMIN_HELP_BCC', ''),
+        'mfaRecoveryBcc'                => Env::get('MFA_RECOVERY_BCC', ''),
+        'mfaRecoveryHelpBcc'            => Env::get('MFA_RECOVERY_HELP_BCC', ''),
         'contingentUserDuration'        => Env::get('CONTINGENT_USER_DURATION', '+4 weeks'),
         'inviteEmailDelaySeconds'       => Env::get('INVITE_EMAIL_DELAY_SECONDS', 0),
         'hibpCheckOnLogin'              => Env::get('HIBP_CHECK_ON_LOGIN', true),

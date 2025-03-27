@@ -45,7 +45,7 @@ class MfaController extends BaseRestController
 
         $label = $req->getBodyParam('label');
 
-        $adminEmail = $req->getBodyParam('admin_email');
+        $recoveryEmail = $req->getBodyParam('recovery_email');
 
         // rpOrigin is needed for WebAuthn authentication
         $rpOrigin = urldecode($req->get('rpOrigin', ''));
@@ -53,7 +53,7 @@ class MfaController extends BaseRestController
             throw new ForbiddenHttpException("Invalid rpOrigin: " . $rpOrigin, 1638539433);
         }
 
-        return Mfa::create($user->id, $type, $label, $rpOrigin, $adminEmail);
+        return Mfa::create($user->id, $type, $label, $rpOrigin, $recoveryEmail);
     }
 
     /**

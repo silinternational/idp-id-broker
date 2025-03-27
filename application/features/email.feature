@@ -335,22 +335,21 @@ Feature: Email
     Then a "mfa-manager-help" email should have been sent to them
       And the mfaManagerHelpBcc email address is on the bcc line
 
+  Scenario: Send a recovery rescue code email after creation of recovery mfa
+    Given a user already exists
+    And no mfas exist
+    And a mfaRecoveryBcc email address is configured
+    When I request a new recovery mfa
+    Then a Recovery Rescue email is sent to the recovery contact
+    And the mfaRecoveryBcc email address is on the bcc line
 
-Scenario: Send an admin rescue code email after creation of admin mfa
+  Scenario: Send a recovery rescue code help email after creation of recovery mfa
     Given a user already exists
-      And no mfas exist
-      And a mfaAdminBcc email address is configured
-    When I request a new admin mfa
-    Then an Admin Rescue email is sent to the admin
-      And the mfaAdminBcc email address is on the bcc line
-      
-  Scenario: Send an admin rescue code help email after creation of admin mfa
-    Given a user already exists
-      And no mfas exist
-      And a mfaAdminHelpBcc email address is configured
-    When I request a new admin mfa
-    Then a "mfa-admin-help" email should have been sent to them
-      And the mfaAdminHelpBcc email address is on the bcc line
+    And no mfas exist
+    And a mfaRecoveryHelpBcc email address is configured
+    When I request a new recovery mfa
+    Then a "mfa-recovery-help" email should have been sent to them
+    And the mfaRecoveryHelpBcc email address is on the bcc line
 
   Scenario: Copy a user's personal email address on invite email message
     Given a specific user does NOT exist

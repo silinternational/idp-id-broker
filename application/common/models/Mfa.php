@@ -23,7 +23,7 @@ class Mfa extends MfaBase
     public const TYPE_WEBAUTHN = 'webauthn';
     public const TYPE_BACKUPCODE = 'backupcode';
     public const TYPE_MANAGER = 'manager';
-    public const TYPE_ADMIN = 'admin';
+    public const TYPE_RECOVERY = 'recovery';
 
     public const EVENT_TYPE_VERIFY = 'verify_mfa';
     public const EVENT_TYPE_DELETE = 'delete_mfa';
@@ -68,7 +68,7 @@ class Mfa extends MfaBase
                 return null;
             },
             'data',
-            'admin_email',
+            'recovery_email',
         ];
     }
 
@@ -312,12 +312,14 @@ class Mfa extends MfaBase
      * @param int $userId
      * @param string $type
      * @param string|null $label
+     * @param string $rpOrigin
+     * @param string|null $recoveryEmail
      * @return array
      * @throws BadRequestHttpException
      * @throws ServerErrorHttpException
      * @throws ConflictHttpException
      */
-    public static function create(int $userId, string $type, string $label = null, string $rpOrigin = '', ?string $adminEmail = ''): array
+    public static function create(int $userId, string $type, ?string $label = null, string $rpOrigin = '', ?string $recoveryEmail = ''): array
     {
         /*
          * Make sure $type is valid
@@ -339,17 +341,17 @@ class Mfa extends MfaBase
         }
 
 
-        if ($type == self::TYPE_ADMIN) {
+        if ($type == self::TYPE_RECOVERY) {
             $validator = new EmailValidator();
-            if (!$validator->validate($adminEmail)) {
-                throw new BadRequestHttpException('Admin email must be valid for this MFA type.', 1742328138);
+            if (!$validator->validate($recoveryEmail)) {
+                throw new BadRequestHttpException('Recovery email must be valid for this MFA type.', 1742328138);
             }
         }
 
         $existing = self::findOne(['user_id' => $userId, 'type' => $type, 'verified' => 1]);
 
         if ($existing instanceof Mfa) {
-            if ($type == self::TYPE_BACKUPCODE || $type == self::TYPE_MANAGER || $type == self::TYPE_WEBAUTHN) {
+            if ($type == self::TYPE_BACKUPCODE || $type == self::TYPE_MANAGER || $type == self::TYPE_RECOVERY || $type == self::TYPE_WEBAUTHN) {
                 $mfa = $existing;
             } else {
                 throw new ConflictHttpException('An MFA of type ' . $type . ' already exists.', 1551190694);
@@ -358,7 +360,7 @@ class Mfa extends MfaBase
             $mfa = new Mfa();
             $mfa->user_id = $userId;
             $mfa->type = $type;
-            $mfa->admin_email = $adminEmail;
+            $mfa->recovery_email = $recoveryEmail;
             $mfa->setLabel($label);
 
             /*
@@ -506,7 +508,7 @@ class Mfa extends MfaBase
             self::TYPE_MANAGER => 'Manager Backup Code',
             self::TYPE_TOTP => 'Authenticator App',
             self::TYPE_WEBAUTHN => 'Security Key',
-            self::TYPE_ADMIN => 'Admin Backup Code',
+            self::TYPE_RECOVERY => 'Recovery Backup Code',
         ];
     }
 
