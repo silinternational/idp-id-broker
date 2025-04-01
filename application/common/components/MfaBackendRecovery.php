@@ -48,7 +48,6 @@ class MfaBackendRecovery extends Component implements MfaBackendInterface
             $mfa->user,
             [
                 'toAddress' => $mfa->recovery_email,
-                'bccAddress' => \Yii::$app->params['mfaRecoveryBcc'] ?? '',
                 'code' => $code,
             ]
         );
@@ -59,7 +58,6 @@ class MfaBackendRecovery extends Component implements MfaBackendInterface
             $mfa->user,
             [
                 'recoveryEmail' => $mfa->recovery_email,
-                'bccAddress' => \Yii::$app->params['mfaRecoveryHelpBcc'] ?? '',
             ]
         );
     }

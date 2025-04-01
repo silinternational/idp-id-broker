@@ -338,18 +338,14 @@ Feature: Email
   Scenario: Send a recovery rescue code email after creation of recovery mfa
     Given a user already exists
     And no mfas exist
-    And a mfaRecoveryBcc email address is configured
     When I request a new recovery mfa
     Then a Recovery Rescue email is sent to the recovery contact
-    And the mfaRecoveryBcc email address is on the bcc line
 
   Scenario: Send a recovery rescue code help email after creation of recovery mfa
     Given a user already exists
     And no mfas exist
-    And a mfaRecoveryHelpBcc email address is configured
     When I request a new recovery mfa
     Then a "mfa-recovery-help" email should have been sent to them
-    And the mfaRecoveryHelpBcc email address is on the bcc line
 
   Scenario: Copy a user's personal email address on invite email message
     Given a specific user does NOT exist
