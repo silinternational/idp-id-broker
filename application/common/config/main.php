@@ -140,8 +140,6 @@ return [
             'subjectForMfaOptionRemoved' => Env::get('SUBJECT_FOR_MFA_OPTION_REMOVED'),
             'subjectForMfaEnabled' => Env::get('SUBJECT_FOR_MFA_ENABLED'),
             'subjectForMfaDisabled' => Env::get('SUBJECT_FOR_MFA_DISABLED'),
-            'subjectForMfaManager' => Env::get('SUBJECT_FOR_MFA_MANAGER'),
-            'subjectForMfaManagerHelp' => Env::get('SUBJECT_FOR_MFA_MANAGER_HELP'),
             'subjectForMfaRecovery' => Env::get('SUBJECT_FOR_MFA_RECOVERY'),
             'subjectForMfaRecoveryHelp' => Env::get('SUBJECT_FOR_MFA_RECOVERY_HELP'),
 

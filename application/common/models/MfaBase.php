@@ -16,7 +16,6 @@ use Yii;
  * @property string $created_utc
  * @property string|null $last_used_utc
  * @property string|null $key_handle_hash
- * @property string|null $recovery_email
  *
  * @property MfaBackupcode[] $mfaBackupcodes
  * @property MfaFailedAttempt[] $mfaFailedAttempts
@@ -41,7 +40,6 @@ class MfaBase extends \yii\db\ActiveRecord
         return [
             [['user_id', 'type', 'verified', 'created_utc'], 'required'],
             [['user_id', 'verified'], 'integer'],
-            [['recovery_email'], 'string', 'max' => 255],
             [['type'], 'string'],
             [['created_utc', 'last_used_utc'], 'safe'],
             [['external_uuid', 'label'], 'string', 'max' => 64],
@@ -58,7 +56,6 @@ class MfaBase extends \yii\db\ActiveRecord
         return [
             'id' => Yii::t('app', 'ID'),
             'user_id' => Yii::t('app', 'User ID'),
-            'recovery_email' => Yii::t('app', 'Recovery Email'),
             'type' => Yii::t('app', 'Type'),
             'external_uuid' => Yii::t('app', 'External Uuid'),
             'label' => Yii::t('app', 'Label'),

@@ -34,10 +34,6 @@ class Emailer extends Component
         . ' Identity account';
     public const SUBJ_MFA_ENABLED = '2-Step Verification was enabled on your {idpDisplayName} Identity account';
     public const SUBJ_MFA_DISABLED = '2-Step Verification was disabled on your {idpDisplayName} Identity account';
-    public const SUBJ_MFA_MANAGER = '{displayName} has sent you a login code for their {idpDisplayName} Identity account';
-    public const SUBJ_MFA_MANAGER_HELP = 'An access code for your {idpDisplayName} Identity account has been sent to'
-        . ' your recovery contact';
-
     public const SUBJ_MFA_RECOVERY = '{displayName} has sent you a login code for their {idpDisplayName} Identity account';
     public const SUBJ_MFA_RECOVERY_HELP = 'An access code for your {idpDisplayName} Identity account has been sent to'
         . ' your recovery contact';
@@ -133,8 +129,6 @@ class Emailer extends Component
     public $subjectForMfaOptionRemoved;
     public $subjectForMfaEnabled;
     public $subjectForMfaDisabled;
-    public $subjectForMfaManager;
-    public $subjectForMfaManagerHelp;
     public $subjectForMfaRecovery;
     public $subjectForMfaRecoveryHelp;
     public $subjectForMethodVerify;
@@ -309,8 +303,6 @@ class Emailer extends Component
         $this->subjectForMfaOptionRemoved = $this->subjectForMfaOptionRemoved ?? self::SUBJ_MFA_OPTION_REMOVED;
         $this->subjectForMfaEnabled = $this->subjectForMfaEnabled ?? self::SUBJ_MFA_ENABLED;
         $this->subjectForMfaDisabled = $this->subjectForMfaDisabled ?? self::SUBJ_MFA_DISABLED;
-        $this->subjectForMfaManager = $this->subjectForMfaManager ?? self::SUBJ_MFA_MANAGER;
-        $this->subjectForMfaManagerHelp = $this->subjectForMfaManagerHelp ?? self::SUBJ_MFA_MANAGER_HELP;
         $this->subjectForMfaRecovery = $this->subjectForMfaRecovery ?? self::SUBJ_MFA_RECOVERY;
         $this->subjectForMfaRecoveryHelp = $this->subjectForMfaRecoveryHelp ?? self::SUBJ_MFA_RECOVERY_HELP;
 
@@ -343,8 +335,6 @@ class Emailer extends Component
             EmailLog::MESSAGE_TYPE_METHOD_VERIFY => $this->subjectForMethodVerify,
             EmailLog::MESSAGE_TYPE_METHOD_REMINDER => $this->subjectForMethodReminder,
             EmailLog::MESSAGE_TYPE_METHOD_PURGED => $this->subjectForMethodPurged,
-            EmailLog::MESSAGE_TYPE_MFA_MANAGER => $this->subjectForMfaManager,
-            EmailLog::MESSAGE_TYPE_MFA_MANAGER_HELP => $this->subjectForMfaManagerHelp,
             EmailLog::MESSAGE_TYPE_MFA_RECOVERY => $this->subjectForMfaRecovery,
             EmailLog::MESSAGE_TYPE_MFA_RECOVERY_HELP => $this->subjectForMfaRecoveryHelp,
             EmailLog::MESSAGE_TYPE_PASSWORD_EXPIRING => $this->subjectForPasswordExpiring,

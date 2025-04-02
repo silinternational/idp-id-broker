@@ -4,7 +4,7 @@ use yii\helpers\Html as yHtml;
 
 /**
  * @var string $displayName     Name of user. Provided by user profile.
- * @var string $recoveryEmail   Email address for recovery contact. Provided by MFA.
+ * @var string $recoveryEmail   Email address for recovery/manager contact. Provided by user profile or the MFA request.
  * @var string $idpDisplayName  Display name of IDP instance. Provided by environment variable IDP_DISPLAY_NAME.
  * @var string $supportName     Help center name.  Provided by environment variable SUPPORT_NAME.
  * @var string $supportEmail    Help center email address.  Provided by environment variable SUPPORT_EMAIL.

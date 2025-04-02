@@ -23,7 +23,6 @@ class CronController extends Controller
         Mfa::removeOldManagerMfaRecords();
 
         Mfa::removeOldRecoveryMfaRecords();
-
     }
 
     public function actionSendDelayedMfaRelatedEmails()

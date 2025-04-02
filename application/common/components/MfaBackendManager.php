@@ -15,7 +15,7 @@ use yii\web\ServerErrorHttpException;
 
 class MfaBackendManager extends Component implements MfaBackendInterface
 {
-    public function regInit(int $userId, string $mfaExternalUuid = null, string $rpOrigin = ''): array
+    public function regInit(int $userId, string $mfaExternalUuid = null, string $rpOrigin = '', ?string $recoveryEmail = null): array
     {
         // Get existing MFA record for manager to create/update codes for
         $mfa = Mfa::findOne(['user_id' => $userId, 'type' => Mfa::TYPE_MANAGER]);
@@ -44,7 +44,7 @@ class MfaBackendManager extends Component implements MfaBackendInterface
         $emailer = \Yii::$app->emailer;
 
         $emailer->sendMessageTo(
-            EmailLog::MESSAGE_TYPE_MFA_MANAGER,
+            EmailLog::MESSAGE_TYPE_MFA_RECOVERY,
             $mfa->user,
             [
                 'toAddress' => $mfa->user->manager_email,
@@ -54,9 +54,10 @@ class MfaBackendManager extends Component implements MfaBackendInterface
         );
 
         $emailer->sendMessageTo(
-            EmailLog::MESSAGE_TYPE_MFA_MANAGER_HELP,
+            EmailLog::MESSAGE_TYPE_MFA_RECOVERY_HELP,
             $mfa->user,
             [
+                'recoveryEmail' => $mfa->user->manager_email,
                 'bccAddress' => \Yii::$app->params['mfaManagerHelpBcc'] ?? '',
             ]
         );

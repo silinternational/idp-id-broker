@@ -73,7 +73,7 @@ class MfaBackendWebAuthn extends Component implements MfaBackendInterface
      * @return array JSON decoded object to be passed to browser credential create API for WebAuthn dance
      * @throws GuzzleException
      */
-    public function regInit(int $userId, string $mfaExternalUuid = null, string $rpOrigin = ''): array
+    public function regInit(int $userId, string $mfaExternalUuid = null, string $rpOrigin = '',  ?string $recoveryEmail = null): array
     {
         $user = User::findOne(['id' => $userId]);
         if ($user == null) {

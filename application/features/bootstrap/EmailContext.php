@@ -1058,7 +1058,7 @@ class EmailContext extends YiiContext
      */
     public function aManagerRescueEmailIsSentToTheManager()
     {
-        $this->assertEmailSent(EmailLog::MESSAGE_TYPE_MFA_MANAGER, self::MANAGER_EMAIL);
+        $this->assertEmailSent(EmailLog::MESSAGE_TYPE_MFA_RECOVERY, self::MANAGER_EMAIL);
     }
 
     /**
@@ -1066,7 +1066,7 @@ class EmailContext extends YiiContext
      */
     public function aRecoveryRescueEmailIsSentToTheRecoveryContact()
     {
-        $this->assertEmailSent(EmailLog::MESSAGE_TYPE_MFA_RECOVERY, $this->testMfaOption->recovery_email);
+        $this->assertEmailSent(EmailLog::MESSAGE_TYPE_MFA_RECOVERY, self::RECOVERY_EMAIL);
     }
 
     /**
@@ -1098,8 +1098,7 @@ class EmailContext extends YiiContext
      */
     public function iRequestANewRecoveryMfa()
     {
-        $result =  Mfa::create($this->tempUser->id, Mfa::TYPE_RECOVERY, 'label', '', self::RECOVERY_EMAIL);
-        $this->testMfaOption = MFA::findOne($result['id']);
+        Mfa::create($this->tempUser->id, Mfa::TYPE_RECOVERY, 'label', '', self::RECOVERY_EMAIL);
     }
 
     /**

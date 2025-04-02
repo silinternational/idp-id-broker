@@ -78,7 +78,6 @@ Feature: MFA
       | type           | recovery             |
       | label          | A Label              |
       | verified       | 1                    |
-      | recovery_email | recovery@example.com |
 
   Scenario: Create new MFA record of type recovery with no recovery email
     Given I provide the following valid data:
@@ -90,7 +89,7 @@ Feature: MFA
     Then the response status code should be 400
 
   Scenario: Create new MFA record of type recovery with an invalid recovery email
-    Given I provide the following valid data:
+    Given I provide the following data:
       | property       | value        |
       | employee_id    | 123          |
       | type           | recovery     |
@@ -101,7 +100,7 @@ Feature: MFA
 
   Scenario: Create new MFA record of type manager with no manager email
     Given the user does not have a manager email address
-      And I provide the following valid data:
+      And I provide the following data:
         | property    | value          |
         | employee_id | 123            |
         | type        | manager        |

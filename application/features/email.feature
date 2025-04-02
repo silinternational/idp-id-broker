@@ -332,7 +332,7 @@ Feature: Email
       And no mfas exist
       And a mfaManagerHelpBcc email address is configured
     When I request a new manager mfa
-    Then a "mfa-manager-help" email should have been sent to them
+    Then a "mfa-recovery-help" email should have been sent to them
       And the mfaManagerHelpBcc email address is on the bcc line
 
   Scenario: Send a recovery rescue code email after creation of recovery mfa

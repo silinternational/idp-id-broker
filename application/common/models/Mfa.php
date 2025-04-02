@@ -24,7 +24,7 @@ class Mfa extends MfaBase
     public const TYPE_BACKUPCODE = 'backupcode';
     public const TYPE_MANAGER = 'manager';
     public const TYPE_RECOVERY = 'recovery';
-
+    
     public const EVENT_TYPE_VERIFY = 'verify_mfa';
     public const EVENT_TYPE_DELETE = 'delete_mfa';
 
@@ -68,7 +68,6 @@ class Mfa extends MfaBase
                 return null;
             },
             'data',
-            'recovery_email',
         ];
     }
 
@@ -352,16 +351,15 @@ class Mfa extends MfaBase
         $existing = self::findOne(['user_id' => $userId, 'type' => $type, 'verified' => 1]);
 
         if ($existing instanceof Mfa) {
-            if ($type == self::TYPE_BACKUPCODE || $type == self::TYPE_MANAGER || $type == self::TYPE_RECOVERY || $type == self::TYPE_WEBAUTHN) {
-                $mfa = $existing;
+            if ($type == self::TYPE_TOTP) {
+                throw new ConflictHttpException('An MFA of type ' . self::TYPE_TOTP . ' already exists.', 1551190694);
             } else {
-                throw new ConflictHttpException('An MFA of type ' . $type . ' already exists.', 1551190694);
+                $mfa = $existing;
             }
         } else {
             $mfa = new Mfa();
             $mfa->user_id = $userId;
             $mfa->type = $type;
-            $mfa->recovery_email = $recoveryEmail;
             $mfa->setLabel($label);
 
             /*
@@ -381,7 +379,7 @@ class Mfa extends MfaBase
 
         $mfaExtId = $mfa->external_uuid ?: null;
         $backend = self::getBackendForType($type);
-        $results = $backend->regInit($userId, $mfaExtId, $rpOrigin);
+        $results = $backend->regInit($userId, $mfaExtId, $rpOrigin, $recoveryEmail);
 
         if (isset($results['uuid'])) {
             $mfa->external_uuid = $results['uuid'];
@@ -509,7 +507,7 @@ class Mfa extends MfaBase
             self::TYPE_MANAGER => 'Manager Backup Code',
             self::TYPE_TOTP => 'Authenticator App',
             self::TYPE_WEBAUTHN => 'Security Key',
-            self::TYPE_RECOVERY => 'Recovery Backup Code',
+            self::TYPE_RECOVERY => 'Recovery Contact Code',
         ];
     }
 

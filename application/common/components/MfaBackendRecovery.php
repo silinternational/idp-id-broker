@@ -15,7 +15,7 @@ use yii\web\ServerErrorHttpException;
 
 class MfaBackendRecovery extends Component implements MfaBackendInterface
 {
-    public function regInit(int $userId, string $mfaExternalUuid = null, string $rpOrigin = ''): array
+    public function regInit(int $userId, string $mfaExternalUuid = null, string $rpOrigin = '', ?string $recoveryEmail = null): array
     {
         // Get existing MFA record for recovery contact to create/update codes for
         $mfa = Mfa::findOne(['user_id' => $userId, 'type' => Mfa::TYPE_RECOVERY]);
@@ -26,7 +26,7 @@ class MfaBackendRecovery extends Component implements MfaBackendInterface
         $mfa->setVerified();
 
         $codes = MfaBackupcode::createBackupCodes($mfa->id, 1);
-        $this->sendRecoveryEmail($mfa, $codes[0]);
+        $this->sendRecoveryEmail($mfa, $codes[0], $recoveryEmail);
 
         /*
          * Don't return the code because it's being sent by email.
@@ -38,7 +38,7 @@ class MfaBackendRecovery extends Component implements MfaBackendInterface
      * Send a email message to the recovery contact with the code, and to the user with instructions
      * @throws EmailServiceClientException
      */
-    protected function sendRecoveryEmail($mfa, $code): void
+    protected function sendRecoveryEmail($mfa, $code, string $recoveryEmail): void
     {
         /* @var $emailer Emailer */
         $emailer = \Yii::$app->emailer;
@@ -47,7 +47,7 @@ class MfaBackendRecovery extends Component implements MfaBackendInterface
             EmailLog::MESSAGE_TYPE_MFA_RECOVERY,
             $mfa->user,
             [
-                'toAddress' => $mfa->recovery_email,
+                'toAddress' => $recoveryEmail,
                 'code' => $code,
             ]
         );
@@ -57,7 +57,7 @@ class MfaBackendRecovery extends Component implements MfaBackendInterface
             EmailLog::MESSAGE_TYPE_MFA_RECOVERY_HELP,
             $mfa->user,
             [
-                'recoveryEmail' => $mfa->recovery_email,
+                'recoveryEmail' => $recoveryEmail,
             ]
         );
     }
