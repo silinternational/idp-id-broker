@@ -24,7 +24,7 @@ class Mfa extends MfaBase
     public const TYPE_BACKUPCODE = 'backupcode';
     public const TYPE_MANAGER = 'manager';
     public const TYPE_RECOVERY = 'recovery';
-    
+
     public const EVENT_TYPE_VERIFY = 'verify_mfa';
     public const EVENT_TYPE_DELETE = 'delete_mfa';
 
