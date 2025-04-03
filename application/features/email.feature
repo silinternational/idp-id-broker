@@ -326,7 +326,7 @@ Feature: Email
     When I request a new manager mfa
     Then a Manager Rescue email is sent to the manager
       And the mfaManagerBcc email address is on the bcc line
-      
+
   Scenario: Send a manager rescue code help email after creation of manager mfa
     Given a user already exists
       And no mfas exist

@@ -45,7 +45,7 @@ class MfaController extends BaseRestController
 
         $label = $req->getBodyParam('label');
 
-        $recoveryEmail = $req->getBodyParam('recovery_email');
+        $recoveryEmail = $req->getBodyParam('recovery_email') ?? '';
 
         // rpOrigin is needed for WebAuthn authentication
         $rpOrigin = urldecode($req->get('rpOrigin', ''));

@@ -319,7 +319,7 @@ class Mfa extends MfaBase
      * @throws ServerErrorHttpException
      * @throws ConflictHttpException
      */
-    public static function create(int $userId, string $type, ?string $label = null, string $rpOrigin = '', ?string $recoveryEmail = ''): array
+    public static function create(int $userId, string $type, ?string $label = null, string $rpOrigin = '', string $recoveryEmail = ''): array
     {
         /*
          * Make sure $type is valid

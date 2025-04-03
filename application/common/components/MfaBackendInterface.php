@@ -12,7 +12,7 @@ interface MfaBackendInterface
      * @param string $recoveryEmail for mfa account recovery (only used for WebAuthn)
      * @return array
      */
-    public function regInit(int $userId, string $mfaExternalUuid, string $rpOrigin, ?string $recoveryEmail = null): array;
+    public function regInit(int $userId, string $mfaExternalUuid, string $rpOrigin, string $recoveryEmail = ""): array;
 
     /**
      * Initialize authentication sequence
