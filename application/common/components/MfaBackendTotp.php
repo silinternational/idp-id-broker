@@ -43,7 +43,7 @@ class MfaBackendTotp extends Component implements MfaBackendInterface
         parent::init();
     }
 
-    public function regInit(int $userId, string $mfaExternalUuid = null, string $rpOrigin = '', ?string $recoveryEmail = null): array
+    public function regInit(int $userId, string $mfaExternalUuid = null, string $rpOrigin = '', string $recoveryEmail = ''): array
     {
         $user = User::findOne(['id' => $userId]);
         if ($user == null) {
