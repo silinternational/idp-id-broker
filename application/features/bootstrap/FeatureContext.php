@@ -354,7 +354,7 @@ class FeatureContext extends YiiContext
     }
 
     /**
-     * @Given I provide the following valid data:
+     * @Given I provide the following (valid) data:
      */
     public function iProvideTheFollowingValidData(TableNode $data)
     {

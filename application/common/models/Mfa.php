@@ -6,6 +6,7 @@ use common\components\MfaBackendInterface;
 use common\helpers\MySqlDateTime;
 use common\helpers\Utils;
 use yii\helpers\ArrayHelper;
+use yii\validators\EmailValidator;
 use yii\web\BadRequestHttpException;
 use yii\web\ConflictHttpException;
 use yii\web\ServerErrorHttpException;
@@ -22,6 +23,7 @@ class Mfa extends MfaBase
     public const TYPE_WEBAUTHN = 'webauthn';
     public const TYPE_BACKUPCODE = 'backupcode';
     public const TYPE_MANAGER = 'manager';
+    public const TYPE_RECOVERY = 'recovery';
 
     public const EVENT_TYPE_VERIFY = 'verify_mfa';
     public const EVENT_TYPE_DELETE = 'delete_mfa';
@@ -139,7 +141,8 @@ class Mfa extends MfaBase
                 $this
             );
 
-            if (!\Yii::$app->params['mfaAllowDisable']
+            if (
+                !\Yii::$app->params['mfaAllowDisable']
                 && $this->user->require_mfa === 'no'
             ) {
                 $this->user->require_mfa = 'yes';
@@ -287,6 +290,7 @@ class Mfa extends MfaBase
             ]);
 
             $this->user->removeManagerCodes();
+            $this->user->removeRecoveryCodes();
 
             return true;
         }
@@ -308,12 +312,14 @@ class Mfa extends MfaBase
      * @param int $userId
      * @param string $type
      * @param string|null $label
+     * @param string $rpOrigin
+     * @param string|null $recoveryEmail
      * @return array
      * @throws BadRequestHttpException
      * @throws ServerErrorHttpException
      * @throws ConflictHttpException
      */
-    public static function create(int $userId, string $type, string $label = null, string $rpOrigin = ''): array
+    public static function create(int $userId, string $type, ?string $label = null, string $rpOrigin = '', string $recoveryEmail = ''): array
     {
         /*
          * Make sure $type is valid
@@ -334,13 +340,21 @@ class Mfa extends MfaBase
             throw new BadRequestHttpException('Manager email must be valid for this MFA type');
         }
 
+
+        if ($type == self::TYPE_RECOVERY) {
+            $validator = new EmailValidator();
+            if (!$validator->validate($recoveryEmail)) {
+                throw new BadRequestHttpException('Recovery email must be valid for this MFA type.', 1742328138);
+            }
+        }
+
         $existing = self::findOne(['user_id' => $userId, 'type' => $type, 'verified' => 1]);
 
         if ($existing instanceof Mfa) {
-            if ($type == self::TYPE_BACKUPCODE || $type == self::TYPE_MANAGER || $type == self::TYPE_WEBAUTHN) {
-                $mfa = $existing;
+            if ($type == self::TYPE_TOTP) {
+                throw new ConflictHttpException('An MFA of type ' . self::TYPE_TOTP . ' already exists.', 1551190694);
             } else {
-                throw new ConflictHttpException('An MFA of type ' . $type . ' already exists.', 1551190694);
+                $mfa = $existing;
             }
         } else {
             $mfa = new Mfa();
@@ -365,7 +379,7 @@ class Mfa extends MfaBase
 
         $mfaExtId = $mfa->external_uuid ?: null;
         $backend = self::getBackendForType($type);
-        $results = $backend->regInit($userId, $mfaExtId, $rpOrigin);
+        $results = $backend->regInit($userId, $mfaExtId, $rpOrigin, $recoveryEmail);
 
         if (isset($results['uuid'])) {
             $mfa->external_uuid = $results['uuid'];
@@ -493,6 +507,7 @@ class Mfa extends MfaBase
             self::TYPE_MANAGER => 'Manager Backup Code',
             self::TYPE_TOTP => 'Authenticator App',
             self::TYPE_WEBAUTHN => 'Security Key',
+            self::TYPE_RECOVERY => 'Recovery Contact Code',
         ];
     }
 
@@ -588,7 +603,7 @@ class Mfa extends MfaBase
      */
     protected static function sendAppropriateMessages($user, $eventType, $mfa)
     {
-        if ($mfa->type === self::TYPE_MANAGER) {
+        if ($mfa->type === self::TYPE_MANAGER || $mfa->type === self::TYPE_RECOVERY) {
             return;
         }
 
@@ -651,5 +666,10 @@ class Mfa extends MfaBase
     public static function removeOldManagerMfaRecords(): void
     {
         self::deleteOldRecords('1 week', ['type' => Mfa::TYPE_MANAGER]);
+    }
+
+    public static function removeOldRecoveryMfaRecords(): void
+    {
+        self::deleteOldRecords('1 week', ['type' => Mfa::TYPE_RECOVERY]);
     }
 }

@@ -3,6 +3,7 @@
 use common\components\Emailer;
 use common\components\MfaBackendBackupcode;
 use common\components\MfaBackendManager;
+use common\components\MfaBackendRecovery;
 use common\components\MfaBackendTotp;
 use common\components\MfaBackendWebAuthn;
 use Sentry\Event;
@@ -139,8 +140,14 @@ return [
             'subjectForMfaOptionRemoved' => Env::get('SUBJECT_FOR_MFA_OPTION_REMOVED'),
             'subjectForMfaEnabled' => Env::get('SUBJECT_FOR_MFA_ENABLED'),
             'subjectForMfaDisabled' => Env::get('SUBJECT_FOR_MFA_DISABLED'),
-            'subjectForMfaManager' => Env::get('SUBJECT_FOR_MFA_MANAGER'),
-            'subjectForMfaManagerHelp' => Env::get('SUBJECT_FOR_MFA_MANAGER_HELP'),
+            'subjectForMfaRecovery' => Env::get(
+                'SUBJECT_FOR_MFA_RECOVERY',
+                Env::get('SUBJECT_FOR_MFA_MANAGER')
+            ),
+            'subjectForMfaRecoveryHelp' => Env::get(
+                'SUBJECT_FOR_MFA_RECOVERY_HELP',
+                Env::get('SUBJECT_FOR_MFA_MANAGER_HELP')
+            ),
             'subjectForMethodVerify' => Env::get('SUBJECT_FOR_METHOD_VERIFY'),
             'subjectForMethodReminder' => Env::get('SUBJECT_FOR_METHOD_REMINDER'),
             'subjectForMethodPurged' => Env::get('SUBJECT_FOR_METHOD_PURGED'),
@@ -169,6 +176,7 @@ return [
             $mfaWebAuthnConfig
         ),
         'manager' => ['class' => MfaBackendManager::class],
+        'recovery' => ['class' => MfaBackendRecovery::class],
         // http://www.yiiframework.com/doc-2.0/guide-runtime-logging.html
         'log' => [
             'targets' => [

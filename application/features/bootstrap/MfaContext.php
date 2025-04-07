@@ -51,10 +51,16 @@ class MfaContext extends \FeatureContext
 
         Assert::true($this->mfa->save(), 'Failed to add that MFA record to the database.');
 
-        if ($mfaType === 'backupcode') {
-            $this->backupCodes = MfaBackupcode::createBackupCodes($this->mfa->id, 10);
-        } elseif ($mfaType === 'manager') {
-            $this->backupCodes = MfaBackupcode::createBackupCodes($this->mfa->id, 1);
+        switch ($mfaType) {
+            case Mfa::TYPE_BACKUPCODE:
+                $this->backupCodes = MfaBackupcode::createBackupCodes($this->mfa->id, 10);
+                break;
+            case Mfa::TYPE_MANAGER:
+            case Mfa::TYPE_RECOVERY:
+                $this->backupCodes = MfaBackupcode::createBackupCodes($this->mfa->id, 1);
+                break;
+            default:
+                break;
         }
     }
 

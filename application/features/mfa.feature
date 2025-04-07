@@ -62,9 +62,45 @@ Feature: MFA
         | label     | A Label        |
         | verified  | 1              |
 
+  Scenario: Create new MFA record of type recovery
+    Given I provide the following valid data:
+      | property       | value                |
+      | employee_id    | 123                  |
+      | type           | recovery             |
+      | label          | A Label              |
+      | recovery_email | recovery@example.com |
+    When I request "/mfa" be created
+    Then the response status code should be 200
+    And the response should contain a data array with 0 items
+    And an MFA record exists for an employee_id of "123"
+    And the following MFA data should be stored:
+      | property       | value                |
+      | type           | recovery             |
+      | label          | A Label              |
+      | verified       | 1                    |
+
+  Scenario: Create new MFA record of type recovery with no recovery email
+    Given I provide the following valid data:
+      | property    | value    |
+      | employee_id | 123      |
+      | type        | recovery |
+      | label       | A Label  |
+    When I request "/mfa" be created
+    Then the response status code should be 400
+
+  Scenario: Create new MFA record of type recovery with an invalid recovery email
+    Given I provide the following data:
+      | property       | value        |
+      | employee_id    | 123          |
+      | type           | recovery     |
+      | label          | A Label      |
+      | recovery_email | invalidEmail |
+    When I request "/mfa" be created
+    Then the response status code should be 400
+
   Scenario: Create new MFA record of type manager with no manager email
     Given the user does not have a manager email address
-      And I provide the following valid data:
+      And I provide the following data:
         | property    | value          |
         | employee_id | 123            |
         | type        | manager        |
@@ -157,6 +193,12 @@ Feature: MFA
 
   Scenario: Verify a manager MFA code
     Given the user has a verified "manager" MFA
+    When I request to verify the code
+    Then the response status code should be 200
+      And 0 codes should be stored
+
+  Scenario: Verify an recovery MFA code
+    Given the user has a verified "recovery" MFA
     When I request to verify the code
     Then the response status code should be 200
       And 0 codes should be stored
