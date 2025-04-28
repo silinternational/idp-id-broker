@@ -1601,10 +1601,13 @@ class User extends UserBase
             'spreadsheetId' => Yii::$app->params['google']['spreadsheetId'],
         ]);
 
+        /* @var $activeUsers User[] */
         $activeUsers = User::find()->where(['active' => 'yes'])->all();
         $table = [];
         foreach ($activeUsers as $user) {
-            $table[] = DotNotation::collapse($user->toArray());
+            $fields = DotNotation::collapse($user->toArray());
+            $fields['recovery_emails'] = $user->getValidRecoveryMethods();
+            $table[] = $fields;
         }
         $googleSheetsClient->append($table);
 
@@ -1645,5 +1648,22 @@ class User extends UserBase
         }
 
         return $users;
+    }
+
+    /**
+     * Returns a comma-separated list of verified recovery email addresses. If the user has one that matches their
+     * primary address, it is not included.
+     * @return string
+     */
+    protected function getValidRecoveryMethods(): string
+    {
+        $emails = [];
+        foreach ($this->methods as $method) {
+            if ($method->verified && $method->value !== $this->email) {
+                $emails[] = $method->value;
+            }
+        }
+
+        return join(',', $emails);
     }
 }
