@@ -1664,6 +1664,6 @@ class User extends UserBase
             }
         }
 
-        return implode(',', $emails);
+        return join(',', $emails);
     }
 }
