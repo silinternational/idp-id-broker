@@ -29,12 +29,6 @@ class YiiContext implements Context
         $this->fakeEmailer = new FakeEmailer(ArrayHelper::merge(
             $yiiEmailerConfig,
             [
-                'emailServiceConfig' => [
-                    'accessToken' => 'fake-token-123',
-                    'assertValidIp' => false,
-                    'baseUrl' => 'http://fake-url',
-                    'validIpRanges' => ['192.168.0.0/16'],
-                ],
                 'logger' => new Psr3ConsoleLogger(),
             ]
         ));

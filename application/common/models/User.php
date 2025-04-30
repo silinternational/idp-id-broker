@@ -10,7 +10,6 @@ use common\helpers\MySqlDateTime;
 use common\helpers\Utils;
 use Exception;
 use Ramsey\Uuid\Uuid;
-use Sil\EmailService\Client\EmailServiceClientException;
 use Sil\PhpArrayDotNotation\DotNotation;
 use Yii;
 use yii\behaviors\AttributeBehavior;
@@ -364,7 +363,7 @@ class User extends UserBase
             $emailer->sendMessageTo(EmailLog::MESSAGE_TYPE_PASSWORD_PWNED, $this, [
                 'bccAddress' => \Yii::$app->params['hibpNotificationBcc']
             ]);
-        } catch (EmailServiceClientException $e) {
+        } catch (Exception $e) {
             \Yii::error([
                 'action' => 'check and process hibp',
                 'employee_id' => $this->employee_id,

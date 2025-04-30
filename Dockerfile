@@ -3,10 +3,10 @@ FROM silintl/php8:8.3
 ARG GITHUB_REF_NAME
 ENV GITHUB_REF_NAME=$GITHUB_REF_NAME
 
-ENV REFRESHED_AT 2024-02-27
-
-RUN apt-get update -y && \
-    apt-get install -y make
+RUN apt-get update && apt-get install -y --no-install-recommends \
+  cron \
+  make \
+  && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /data
 

@@ -1,5 +1,13 @@
 [
   {
+    "name": "aws/aws-crt-php",
+    "version": "v1.2.7"
+  },
+  {
+    "name": "aws/aws-sdk-php",
+    "version": "3.288.1"
+  },
+  {
     "name": "bower-asset/inputmask",
     "version": "3.3.11"
   },
@@ -90,6 +98,10 @@
   {
     "name": "monolog/monolog",
     "version": "2.10.0"
+  },
+  {
+    "name": "mtdowling/jmespath.php",
+    "version": "2.8.0"
   },
   {
     "name": "paragonie/constant_time_encoding",

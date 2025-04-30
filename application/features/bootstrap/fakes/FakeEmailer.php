@@ -4,33 +4,25 @@ namespace Sil\SilIdBroker\Behat\Context\fakes;
 
 use common\components\Emailer;
 use common\models\User;
-use Sil\SilIdBroker\Behat\Context\fakes\FakeEmailServiceClient;
 use yii\helpers\ArrayHelper;
 
 class FakeEmailer extends Emailer
 {
     /**
-     * @return FakeEmailServiceClient
+     * @return FakeEmailClient
      */
-    protected function getEmailServiceClient()
+    protected function getEmailClient()
     {
-        if ($this->emailServiceClient === null) {
-            $this->emailServiceClient = new FakeEmailServiceClient(
-                $this->emailServiceConfig['baseUrl'],
-                $this->emailServiceConfig['accessToken'],
-                [
-                    FakeEmailServiceClient::ASSERT_VALID_IP_CONFIG => $this->emailServiceConfig['assertValidIp'],
-                    FakeEmailServiceClient::TRUSTED_IPS_CONFIG => $this->emailServiceConfig['validIpRanges'],
-                ]
-            );
+        if ($this->emailClient === null) {
+            $this->emailClient = new FakeEmailClient();
         }
 
-        return $this->emailServiceClient;
+        return $this->emailClient;
     }
 
     public function forgetFakeEmailsSent()
     {
-        return $this->getEmailServiceClient()->emailsSent = [];
+        return $this->getEmailClient()->emailsSent = [];
     }
 
     /**
@@ -61,7 +53,7 @@ class FakeEmailer extends Emailer
 
     public function getFakeEmailsSent()
     {
-        return $this->getEmailServiceClient()->emailsSent;
+        return $this->getEmailClient()->emailsSent;
     }
 
     public function isSubjectForMessageType(
