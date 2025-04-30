@@ -30,8 +30,8 @@ class EmailLog extends EmailLogBase
     public const MESSAGE_TYPE_METHOD_VERIFY = 'method-verify';
     public const MESSAGE_TYPE_METHOD_REMINDER = 'method-reminder';
     public const MESSAGE_TYPE_METHOD_PURGED = 'method-purged';
-    public const MESSAGE_TYPE_MFA_MANAGER = 'mfa-manager';
-    public const MESSAGE_TYPE_MFA_MANAGER_HELP = 'mfa-manager-help';
+    public const MESSAGE_TYPE_MFA_RECOVERY = 'mfa-recovery';
+    public const MESSAGE_TYPE_MFA_RECOVERY_HELP = 'mfa-recovery-help';
     public const MESSAGE_TYPE_PASSWORD_EXPIRING = 'password-expiring';
     public const MESSAGE_TYPE_PASSWORD_EXPIRED = 'password-expired';
     public const MESSAGE_TYPE_PASSWORD_PWNED = "password-pwned";

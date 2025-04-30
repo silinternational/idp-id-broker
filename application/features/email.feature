@@ -332,8 +332,20 @@ Feature: Email
       And no mfas exist
       And a mfaManagerHelpBcc email address is configured
     When I request a new manager mfa
-    Then a "mfa-manager-help" email should have been sent to them
+    Then a "mfa-recovery-help" email should have been sent to them
       And the mfaManagerHelpBcc email address is on the bcc line
+
+  Scenario: Send a recovery rescue code email after creation of recovery mfa
+    Given a user already exists
+    And no mfas exist
+    When I request a new recovery mfa
+    Then a Recovery Rescue email is sent to the recovery contact
+
+  Scenario: Send a recovery rescue code help email after creation of recovery mfa
+    Given a user already exists
+    And no mfas exist
+    When I request a new recovery mfa
+    Then a "mfa-recovery-help" email should have been sent to them
 
   Scenario: Copy a user's personal email address on invite email message
     Given a specific user does NOT exist

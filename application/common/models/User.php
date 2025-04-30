@@ -1337,6 +1337,39 @@ class User extends UserBase
     }
 
     /**
+     * Remove all recovery codes for this user
+     * @throws \Exception
+     */
+    public function removeRecoveryCodes()
+    {
+        $mfa = Mfa::findOne(['user_id' => $this->id, 'type' => Mfa::TYPE_RECOVERY]);
+        if ($mfa === null) {
+            return;
+        }
+
+        foreach ($mfa->mfaBackupcodes as $code) {
+            if ($code->delete() === false) {
+                \Yii::error([
+                    'action' => 'remove all recovery codes',
+                    'status' => 'error',
+                    'error' => $code->getFirstErrors(),
+                ]);
+                throw new \Exception("Unable to delete recovery code", 1743103763);
+            }
+        }
+
+        if ($mfa->delete() === false) {
+            \Yii::error([
+                'action' => 'remove recovery mfa',
+                'status' => 'error',
+                'error' => $mfa->getFirstErrors(),
+            ]);
+            throw new \Exception("Unable to delete recovery mfa", 1743103768);
+        }
+    }
+
+
+    /**
      * Extend grace period if password is past or nearly past the grace period. Intended to
      * be used in a situation where removal of the last MFA option has caused an immediate expiration
      * of the user's password.
@@ -1567,10 +1600,13 @@ class User extends UserBase
             'spreadsheetId' => Yii::$app->params['google']['spreadsheetId'],
         ]);
 
+        /* @var $activeUsers User[] */
         $activeUsers = User::find()->where(['active' => 'yes'])->all();
         $table = [];
         foreach ($activeUsers as $user) {
-            $table[] = DotNotation::collapse($user->toArray());
+            $fields = DotNotation::collapse($user->toArray());
+            $fields['recovery_emails'] = $user->getValidRecoveryMethods();
+            $table[] = $fields;
         }
         $googleSheetsClient->append($table);
 
@@ -1611,5 +1647,22 @@ class User extends UserBase
         }
 
         return $users;
+    }
+
+    /**
+     * Returns a comma-separated list of verified recovery email addresses. If the user has one that matches their
+     * primary address, it is not included.
+     * @return string
+     */
+    protected function getValidRecoveryMethods(): string
+    {
+        $emails = [];
+        foreach ($this->methods as $method) {
+            if ($method->verified && $method->value !== $this->email) {
+                $emails[] = $method->value;
+            }
+        }
+
+        return join(',', $emails);
     }
 }

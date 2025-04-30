@@ -6,26 +6,27 @@ use common\components\Emailer;
 use common\models\EmailLog;
 use common\models\Mfa;
 use common\models\MfaBackupcode;
+use Sil\EmailService\Client\EmailServiceClientException;
 use yii\base\Component;
 use yii\web\BadRequestHttpException;
 use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
 use yii\web\ServerErrorHttpException;
 
-class MfaBackendManager extends Component implements MfaBackendInterface
+class MfaBackendRecovery extends Component implements MfaBackendInterface
 {
     public function regInit(int $userId, string $mfaExternalUuid = null, string $rpOrigin = '', string $recoveryEmail = ''): array
     {
-        // Get existing MFA record for manager to create/update codes for
-        $mfa = Mfa::findOne(['user_id' => $userId, 'type' => Mfa::TYPE_MANAGER]);
+        // Get existing MFA record for recovery contact to create/update codes for
+        $mfa = Mfa::findOne(['user_id' => $userId, 'type' => Mfa::TYPE_RECOVERY]);
         if ($mfa === null) {
-            throw new \Exception("A manager MFA record does not exist for this user", 1507904428);
+            throw new \Exception("A recovery MFA record does not exist for this user", 1742846609);
         }
 
         $mfa->setVerified();
 
         $codes = MfaBackupcode::createBackupCodes($mfa->id, 1);
-        $this->sendManagerEmail($mfa, $codes[0]);
+        $this->sendRecoveryEmail($mfa, $codes[0], $recoveryEmail);
 
         /*
          * Don't return the code because it's being sent by email.
@@ -34,9 +35,10 @@ class MfaBackendManager extends Component implements MfaBackendInterface
     }
 
     /**
-     * Send a email message to the manager with the code, and to the user with instructions
+     * Send a email message to the recovery contact with the code, and to the user with instructions
+     * @throws EmailServiceClientException
      */
-    protected function sendManagerEmail($mfa, $code)
+    protected function sendRecoveryEmail($mfa, $code, string $recoveryEmail): void
     {
         /* @var $emailer Emailer */
         $emailer = \Yii::$app->emailer;
@@ -45,18 +47,17 @@ class MfaBackendManager extends Component implements MfaBackendInterface
             EmailLog::MESSAGE_TYPE_MFA_RECOVERY,
             $mfa->user,
             [
-                'toAddress' => $mfa->user->manager_email,
-                'bccAddress' => \Yii::$app->params['mfaManagerBcc'] ?? '',
+                'toAddress' => $recoveryEmail,
                 'code' => $code,
             ]
         );
+
 
         $emailer->sendMessageTo(
             EmailLog::MESSAGE_TYPE_MFA_RECOVERY_HELP,
             $mfa->user,
             [
-                'recoveryEmail' => $mfa->user->manager_email,
-                'bccAddress' => \Yii::$app->params['mfaManagerHelpBcc'] ?? '',
+                'recoveryEmail' => $recoveryEmail,
             ]
         );
     }
@@ -87,8 +88,8 @@ class MfaBackendManager extends Component implements MfaBackendInterface
     {
         if ($verifyType != "") {
             throw new BadRequestHttpException(
-                'A non-blank verification type is not allowed when verifying a mfa of type ' . Mfa::TYPE_MANAGER,
-                1670950770
+                'A non-blank verification type is not allowed when verifying a mfa of type ' . Mfa::TYPE_RECOVERY,
+                1742846880
             );
         }
 
@@ -115,8 +116,8 @@ class MfaBackendManager extends Component implements MfaBackendInterface
     {
         if ($childId != 0) {
             throw new ForbiddenHttpException(
-                sprintf("May not delete a MfaWebauthn object on a %s mfa type", Mfa::TYPE_MANAGER),
-                1658237120
+                sprintf("May not delete a MfaWebauthn object on a %s mfa type", Mfa::TYPE_RECOVERY),
+                1742846887
             );
         }
         return MfaBackupcode::deleteCodesForMfaId($mfaId);

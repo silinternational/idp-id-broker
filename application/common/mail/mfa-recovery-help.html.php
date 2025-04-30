@@ -1,9 +1,10 @@
 <?php
+
 use yii\helpers\Html as yHtml;
 
 /**
  * @var string $displayName     Name of user. Provided by user profile.
- * @var string $managerEmail    Email address of user's manager ("recovery contact"). Provided by user profile.
+ * @var string $recoveryEmail   Email address for recovery/manager contact. Provided by user profile or the MFA request.
  * @var string $idpDisplayName  Display name of IDP instance. Provided by environment variable IDP_DISPLAY_NAME.
  * @var string $supportName     Help center name.  Provided by environment variable SUPPORT_NAME.
  * @var string $supportEmail    Help center email address.  Provided by environment variable SUPPORT_EMAIL.
@@ -14,7 +15,7 @@ use yii\helpers\Html as yHtml;
 
 <p>
     You have requested assistance in accessing your <?= yHtml::encode($idpDisplayName) ?> Identity account. An email
-    containing an access code has been sent to your recovery contact at <?= yHtml::encode($managerEmail) ?>.
+    containing an access code has been sent to your recovery contact at <?= yHtml::encode($recoveryEmail) ?>.
     This access code can be used in place of your other 2-Step Verification options. Please contact
     your recovery contact to obtain this access code from them.
 </p>

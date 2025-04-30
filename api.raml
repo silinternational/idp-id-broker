@@ -222,8 +222,9 @@ types:
     properties:
       employee_id: string
       type:
-        enum: [ backupcode, totp, webauthn, manager ]
+        enum: [ backupcode, totp, webauthn, manager, recovery ]
       label?: string
+      recovery_email?: string
     example: |
       {
         "employee_id": "12345",
@@ -255,7 +256,7 @@ types:
     properties:
       id: integer
       type:
-        enum: [ backupcode, totp, webauthn, manager ]
+        enum: [ backupcode, totp, webauthn, manager, recovery ]
       label: string
       created_utc: string
       last_used_utc: string?

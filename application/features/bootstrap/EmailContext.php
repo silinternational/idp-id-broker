@@ -64,6 +64,8 @@ class EmailContext extends YiiContext
 
     public const METHOD_EMAIL_ADDRESS = 'method@example.com';
     public const MANAGER_EMAIL = 'manager@example.com';
+    public const RECOVERY_EMAIL = 'recovery@example.com';
+
 
     /**
      * @Then a(n) :messageType email should have been sent to them
@@ -1056,7 +1058,15 @@ class EmailContext extends YiiContext
      */
     public function aManagerRescueEmailIsSentToTheManager()
     {
-        $this->assertEmailSent(EmailLog::MESSAGE_TYPE_MFA_MANAGER, self::MANAGER_EMAIL);
+        $this->assertEmailSent(EmailLog::MESSAGE_TYPE_MFA_RECOVERY, self::MANAGER_EMAIL);
+    }
+
+    /**
+     * @Then a Recovery Rescue email is sent to the recovery contact
+     */
+    public function aRecoveryRescueEmailIsSentToTheRecoveryContact()
+    {
+        $this->assertEmailSent(EmailLog::MESSAGE_TYPE_MFA_RECOVERY, self::RECOVERY_EMAIL);
     }
 
     /**
@@ -1080,7 +1090,15 @@ class EmailContext extends YiiContext
      */
     public function iRequestANewManagerMfa()
     {
-        Mfa::create($this->tempUser->id, Mfa::TYPE_MANAGER, 'label');
+        Mfa::create($this->tempUser->id, Mfa::TYPE_MANAGER, label: 'label');
+    }
+
+    /**
+     * @When I request a new recovery mfa
+     */
+    public function iRequestANewRecoveryMfa()
+    {
+        Mfa::create($this->tempUser->id, Mfa::TYPE_RECOVERY, 'label', '', self::RECOVERY_EMAIL);
     }
 
     /**
@@ -1193,35 +1211,19 @@ class EmailContext extends YiiContext
     }
 
     /**
-     * @Given a mfaManagerBcc email address is configured
+     * @Given a :param email address is configured
      */
-    public function aMfamanagerbccEmailAddressIsConfigured()
+    public function aParamEmailAddressIsConfigured(string $param)
     {
-        \Yii::$app->params['mfaManagerBcc'] = 'email@example.com';
+        \Yii::$app->params[$param] = 'email@example.com';
     }
 
     /**
-     * @Then the mfaManagerBcc email address is on the bcc line
+     * @Then the :param email address is on the bcc line
      */
-    public function theMfamanagerbccEmailAddressIsOnTheBccLine()
+    public function theParamEmailAddressIsOnTheBccLine(string $param)
     {
-        $this->assertEmailBcc(\Yii::$app->params['mfaManagerBcc']);
-    }
-
-    /**
-     * @Given a mfaManagerHelpBcc email address is configured
-     */
-    public function aMfamanagerHelpbccEmailAddressIsConfigured()
-    {
-        \Yii::$app->params['mfaManagerHelpBcc'] = 'email@example.com';
-    }
-
-    /**
-     * @Then the mfaManagerHelpBcc email address is on the bcc line
-     */
-    public function theMfamanagerHelpbccEmailAddressIsOnTheBccLine()
-    {
-        $this->assertEmailBcc(\Yii::$app->params['mfaManagerHelpBcc']);
+        $this->assertEmailBcc(\Yii::$app->params[$param]);
     }
 
     /**
