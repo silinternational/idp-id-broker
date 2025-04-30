@@ -21,7 +21,11 @@ $maxWidth = Env::get('EMAIL_MAX_WIDTH', '600px');
                 <table style="background-color: <?= $brandColor ?>; width: 100%">
                     <tr>
                         <th>
-                            <img src="<?= $logo ?>" style="max-height: 4em; vertical-align: middle" alt="logo">
+                            <img
+                              src="<?= $logo ?>"
+                              style="max-height: 4em; vertical-align: middle; text-align: left;
+                              alt="logo"
+                            >
                         </th>
                     </tr>
                 </table>
