@@ -2,8 +2,6 @@
 
 namespace common\helpers;
 
-use Br33f\Ga4\MeasurementProtocol\Dto\Request\BaseRequest;
-use Br33f\Ga4\MeasurementProtocol\Service;
 use yii\base\Security;
 use yii\helpers\Html;
 use yii\validators\EmailValidator;
@@ -137,33 +135,5 @@ class Utils
         $newEmail .= str_repeat('*', strlen($nextPart) - 1);
 
         return $newEmail;
-    }
-
-    /**
-     * @param string $callerName the name of the calling event (just for the warning logs)
-     * @return [?Br33f\Ga4\MeasurementProtocol\Service, ?Br33f\Ga4\MeasurementProtocol\Dto\Request\BaseRequest]
-     */
-    public static function GoogleAnalyticsServiceAndRequest(string $callerName)
-    {
-        $gaApiSecret = \Yii::$app->params['googleAnalytics']['apiSecret']; // 'aB-abcdef7890123456789'
-        if ($gaApiSecret === null) {
-            \Yii::warning(['google-analytics' => "Aborting GA $callerName since the config has no GA apiSecret"]);
-            return [null, null];
-        }
-
-        $gaMeasurementID = \Yii::$app->params['googleAnalytics']['measurementId']; // 'G-ABCDE67890'
-        if ($gaMeasurementID === null) {
-            \Yii::warning(['google-analytics' => "Aborting GA $callerName since the config has no GA measurementId"]);
-            return [null, null];
-        }
-
-        $gaClientId = \Yii::$app->params['googleAnalytics']['clientId']; // 'IDP_ID_BROKER_LOCALHOST'
-        if ($gaClientId === null) {
-            \Yii::warning(['google-analytics' => "Aborting GA $callerName since the config has no GA clientId"]);
-            return [null, null];
-        }
-        $gaService = new Service($gaApiSecret, $gaMeasurementID);
-        $gaRequest = new BaseRequest($gaClientId);
-        return [$gaService, $gaRequest];
     }
 }

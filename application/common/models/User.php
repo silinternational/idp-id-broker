@@ -2,7 +2,6 @@
 
 namespace common\models;
 
-use Br33f\Ga4\MeasurementProtocol\Dto\Event\BaseEvent;
 use Closure;
 use common\components\HIBP;
 use common\components\Sheets;
@@ -346,8 +345,6 @@ class User extends UserBase
             return;
         }
 
-        $this->registerPwnedPasswordGAEvent();
-
         if (\Yii::$app->params['hibpTrackingOnly']) {
             // extend check after date to only track user once per checking period
             $this->currentPassword->extendHibpCheckAfter();
@@ -386,42 +383,6 @@ class User extends UserBase
         }
 
         return false;
-    }
-
-    public function registerPwnedPasswordGAEvent(): void
-    {
-        try {
-            list($gaService, $gaRequest) = Utils::GoogleAnalyticsServiceAndRequest("pwned");
-            if ($gaService === null) {
-                return;
-            }
-
-            $gaEvent = new BaseEvent('pwned_password');
-            $gaEvent->setCategory('password')
-                ->setAction('login')
-                ->setLabel('pwned');
-
-            $gaRequest->addEvent($gaEvent);
-
-            $debugResponse = $gaService->sendDebug($gaRequest);
-            $gaMessages = $debugResponse->getValidationMessages();
-            if (empty($gaMessages)) {
-                $gaService->send($gaRequest);
-            } else {
-                \Yii::warning([
-                    'google-analytics' => "Aborting GA pwned since the request was not accepted: " .
-                        var_export($gaMessages, true)
-                ]);
-                return;
-            }
-        } catch (\Exception $e) {
-            \Yii::warning([
-                'action' => 'track password pwned event',
-                'employee_id' => $this->employee_id,
-                'message' => 'unable to track event in GA',
-                'error' => $e->getMessage(),
-            ]);
-        }
     }
 
     public static function findByUsername(string $username)
@@ -888,73 +849,6 @@ class User extends UserBase
         $this->current_password_id = $password->id;
 
         return true;
-    }
-
-    /*
-     * @return integer Count of active users with a password
-     */
-    public static function countUsersWithPassword()
-    {
-        $users = User::find()->where(['active' => 'yes'])
-            ->andWhere(['not', ['current_password_id' => null]]);
-
-        return $users->count();
-    }
-
-    /*
-     * @return integer Count of active users with require_mfa = 'yes'
-     */
-    public static function countUsersWithRequireMfa()
-    {
-        $users = User::find()->where([
-            'active' => 'yes',
-            'require_mfa' => 'yes',
-        ]);
-        return $users->count();
-    }
-
-    /**
-     * @param string|null $mfaType
-     * @return ActiveQuery of active Users with a (certain type of) verified Mfa option
-     */
-    public static function getQueryOfUsersWithMfa($mfaType = null)
-    {
-        $criteria = ['verified' => 1];
-        if ($mfaType !== null) {
-            $criteria['type'] = $mfaType;
-        }
-
-        $mfas = Mfa::find()->select('user_id')
-                           ->groupBy('user_id')
-                           ->where($criteria);
-
-        $usersQuery = User::find()->where([
-            'active' => 'yes',
-            'id' => $mfas
-        ]);
-
-        return $usersQuery;
-    }
-
-    /**
-     * If there are no active users, returns 0.
-     * Otherwise, returns the total number of verified Mfa records that are associated with an active user
-     *   divided by the total number of active users that have a verified Mfa.
-     * @return float|int
-     */
-    public static function getAverageNumberOfMfasPerUserWithMfas()
-    {
-        $userCount = self::getQueryOfUsersWithMfa()->count();
-
-        $mfaCount = Mfa::find()->joinWith('user')
-            ->where(['verified' => 1])
-            ->andWhere(['user.active' => 'yes'])->count();
-
-        if ($userCount == 0) {
-            return 0;
-        }
-
-        return $mfaCount / $userCount;
     }
 
     public static function search($params): array
@@ -1498,50 +1392,6 @@ class User extends UserBase
         }
 
         return MySqlDateTime::formatDateForHumans($pw->created_utc);
-    }
-
-    /**
-     * Count the number of active users with a personal email address but no
-     * verified recovery methods.
-     * @return string
-     * @throws \yii\db\Exception
-     */
-    public static function numberWithPersonalEmailButNoMethods()
-    {
-        $result = Yii::$app->getDb()->createCommand("
-            SELECT COUNT(*)
-            FROM (
-                SELECT u.personal_email
-                FROM `user` u 
-                LEFT JOIN `method` m ON u.id=m.user_id
-                WHERE u.active='yes' AND (m.verified is NULL OR m.verified=0)
-                GROUP BY u.id
-            ) sub
-            WHERE sub.personal_email is NOT NULL
-        ")->queryOne();
-        return $result['COUNT(*)'];
-    }
-
-    /**
-     * Count the number of active users with one of either totp or webauthn, but no
-     * backup codes.
-     * @return string
-     * @throws \yii\db\Exception
-     */
-    public static function numberWithOneMfaNotBackupCodes()
-    {
-        $result = Yii::$app->getDb()->createCommand("
-            SELECT COUNT(*)
-            FROM (
-                SELECT GROUP_CONCAT(m.type) AS types,COUNT(m.type) AS n
-                FROM `mfa` m 
-                JOIN `user` u ON m.user_id=u.id 
-                WHERE m.verified=1 AND u.active='yes'
-                GROUP BY u.id
-                ) sub
-            WHERE sub.types NOT LIKE 'backupcode' AND sub.n=1
-        ")->queryOne();
-        return $result['COUNT(*)'];
     }
 
     protected function isExpired(): bool
