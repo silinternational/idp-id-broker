@@ -34,24 +34,13 @@ $mfaTotpConfig = Env::getArrayFromPrefix('MFA_TOTP_');
 $mfaTotpConfig['issuer'] = $idpDisplayName;
 
 $mfaWebAuthnConfig = Env::getArrayFromPrefix('MFA_WEBAUTHN_');
-if (empty($mfaWebAuthnConfig['rpDisplayName'])) {
-    $mfaWebAuthnConfig['rpDisplayName'] = $idpDisplayName;
-}
-if (empty($mfaWebAuthnConfig['appId'])) {
-    $mfaWebAuthnConfig['appId'] = $passwordProfileUrl . '/app-id.json';
-}
+$mfaWebAuthnConfig['rpDisplayName'] = $idpDisplayName;
+$mfaWebAuthnConfig['appId'] = $passwordProfileUrl . '/app-id.json';
 
-$mfaApiKey = Env::get('MFA_API_KEY');
-if (!empty($mfaApiKey)) {
-    $mfaTotpConfig['apiKey'] = $mfaApiKey;
-    $mfaWebAuthnConfig['apiKey'] = $mfaApiKey;
-}
-
-$mfaApiSecret = Env::get('MFA_API_SECRET');
-if (!empty($mfaApiSecret)) {
-    $mfaTotpConfig['apiSecret'] = $mfaApiSecret;
-    $mfaWebAuthnConfig['apiSecret'] = $mfaApiSecret;
-}
+$mfaTotpConfig['apiKey'] = Env::get('MFA_API_KEY');
+$mfaWebAuthnConfig['apiKey'] = Env::get('MFA_API_KEY');
+$mfaTotpConfig['apiSecret'] = Env::get('MFA_API_SECRET');
+$mfaWebAuthnConfig['apiSecret'] = Env::get('MFA_API_SECRET');
 
 $emailerClass = Env::get('EMAILER_CLASS', Emailer::class);
 
