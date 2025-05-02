@@ -7,10 +7,6 @@ default:
                 - "features/user-unit-tests.feature"
                 - "features/user-search.feature"
             contexts: [ FeatureContext, Sil\SilIdBroker\Behat\Context\UnitTestsContext ]
-        analytics_features:
-            paths:
-                - "features/analytics.feature"
-            contexts: [ FeatureContext, Sil\SilIdBroker\Behat\Context\AnalyticsContext ]
         authentication_features:
             paths:
                 - "features/authentication.feature"

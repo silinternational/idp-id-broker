@@ -264,10 +264,6 @@
     "version": "v3.5.1"
   },
   {
-    "name": "theiconic/php-ga-measurement-protocol",
-    "version": "v2.9.0"
-  },
-  {
     "name": "webmozart/assert",
     "version": "1.11.0"
   },
