@@ -23,7 +23,7 @@ $maxWidth = Env::get('EMAIL_MAX_WIDTH', '600px');
                         <th>
                             <img
                               src="<?= $logo ?>"
-                              style="max-height: 4em; vertical-align: middle; text-align: left;
+                              style="max-height: 4em; vertical-align: middle; text-align: left;"
                               alt="logo"
                             >
                         </th>
