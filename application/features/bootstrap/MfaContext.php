@@ -139,7 +139,7 @@ class MfaContext extends \FeatureContext
             ['manager_email', 'bob_johnson@example.org'],
         ];
         $this->iProvideTheFollowingValidData(new TableNode($dataForTableNode));
-        $this->iRequestTheResourceBe('/user/123', 'updated');
+        $this->iRequestTheResourceBe('/user/123', self::UPDATED);
         $this->theResponseStatusCodeShouldBe(200);
     }
 
@@ -153,7 +153,7 @@ class MfaContext extends \FeatureContext
             ['manager_email', ''],
         ];
         $this->iProvideTheFollowingValidData(new TableNode($dataForTableNode));
-        $this->iRequestTheResourceBe('/user/123', 'updated');
+        $this->iRequestTheResourceBe('/user/123', self::UPDATED);
         $this->theResponseStatusCodeShouldBe(200);
     }
 
@@ -166,7 +166,7 @@ class MfaContext extends \FeatureContext
         $user = User::findOne(['employee_id' => $this->tempEmployeeId]);
         Assert::notEmpty($user, 'Unable to find that user.');
         $this->setRequestBody('type', Mfa::TYPE_WEBAUTHN);
-        $this->iRequestTheResourceBe('/mfa', 'created');
+        $this->iRequestTheResourceBe('/mfa', self::CREATED);
 
         $id = $this->getResponseProperty('id');
         Assert::notEmpty($id, 'Unable to get id of new Webauthn MFA');
@@ -184,7 +184,7 @@ class MfaContext extends \FeatureContext
         $this->setRequestBody('relying_party_id', $rpId);
 
         // now call the u2f-simulator to get the values to send to the finish registration endpoint
-        $this->callU2fSimulator('/u2f/registration', 'created', $user, $mfa->external_uuid);
+        $this->callU2fSimulator('/u2f/registration', self::CREATED, $user, $mfa->external_uuid);
 
         $respBody = $this->getResponseBody();
         Assert::notEmpty($respBody['id'], "registration response is missing an id entry");
@@ -225,7 +225,7 @@ class MfaContext extends \FeatureContext
      */
     public function iUpdateTheMfa()
     {
-        $this->iRequestTheResourceBe('/mfa/' . $this->mfa->id, 'updated');
+        $this->iRequestTheResourceBe('/mfa/' . $this->mfa->id, self::UPDATED);
     }
 
 
@@ -234,7 +234,7 @@ class MfaContext extends \FeatureContext
      */
     public function iUpdateTheMfaWebauthn()
     {
-        $this->iRequestTheResourceBe('/mfa/' . $this->mfa->id . '/webauthn/' . $this->mfaWebauthn->id, 'updated');
+        $this->iRequestTheResourceBe('/mfa/' . $this->mfa->id . '/webauthn/' . $this->mfaWebauthn->id, self::UPDATED);
     }
 
     /**
@@ -249,7 +249,7 @@ class MfaContext extends \FeatureContext
         ];
 
         $this->iProvideTheFollowingValidData(new TableNode($dataForTableNode));
-        $this->iRequestTheResourceBe('/mfa/' . $this->mfa->id . '/verify', 'created');
+        $this->iRequestTheResourceBe('/mfa/' . $this->mfa->id . '/verify', self::CREATED);
     }
 
     /**
@@ -257,7 +257,7 @@ class MfaContext extends \FeatureContext
      */
     public function iRequestToVerifyTheWebauthnMfaRegistration()
     {
-        $this->iRequestTheResourceBe('/mfa/' . $this->mfa->id . '/verify/registration', 'created');
+        $this->iRequestTheResourceBe('/mfa/' . $this->mfa->id . '/verify/registration', self::CREATED);
     }
 
     /**
@@ -266,7 +266,7 @@ class MfaContext extends \FeatureContext
     public function iRequestToVerifyTheWebauthnMfaRegistrationWithALabelOf($label)
     {
         $this->setRequestBody('label', $label);
-        $this->iRequestTheResourceBe('/mfa/' . $this->mfa->id . '/verify/registration', 'created');
+        $this->iRequestTheResourceBe('/mfa/' . $this->mfa->id . '/verify/registration', self::CREATED);
     }
 
     /**
@@ -288,7 +288,7 @@ class MfaContext extends \FeatureContext
         ];
 
         $this->iProvideTheFollowingValidData(new TableNode($dataForTableNode));
-        $this->iRequestTheResourceBe('/mfa/' . $this->mfa->id, 'deleted');
+        $this->iRequestTheResourceBe('/mfa/' . $this->mfa->id, self::DELETED);
     }
 
 
@@ -305,7 +305,7 @@ class MfaContext extends \FeatureContext
         $this->iProvideTheFollowingValidData(new TableNode($dataForTableNode));
         $this->iRequestTheResourceBe(
             '/mfa/' . $this->mfa->id . '/webauthn/' . $webauthnId,
-            'deleted'
+            self::DELETED
         );
     }
 
@@ -328,7 +328,7 @@ class MfaContext extends \FeatureContext
         $user = User::findOne(['employee_id' => $this->tempEmployeeId]);
         Assert::notEmpty($user, 'Unable to find that user.');
         $this->setRequestBody('type', Mfa::TYPE_WEBAUTHN);
-        $this->iRequestTheResourceBe('/mfa', 'created');
+        $this->iRequestTheResourceBe('/mfa', self::CREATED);
     }
 
     /**

@@ -60,7 +60,7 @@ class AuthenticationContext extends FeatureContext
         $this->cleanRequestBody();
         $this->setRequestBody('challenge', $challenge);
         $this->setRequestBody('relying_party_id', $rpId);
-        $this->callU2fSimulator('/u2f/registration', 'created', $user, $mfa->external_uuid);
+        $this->callU2fSimulator('/u2f/registration', self::CREATED, $user, $mfa->external_uuid);
         $u2fSimResponse = $this->getResponseBody();
         if (isset($u2fSimResponse['clientExtensionResults']) && empty($u2fSimResponse['clientExtensionResults'])) {
             // Force JSON-encoding to treat this as an empty object, not an empty array.
