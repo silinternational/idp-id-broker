@@ -268,7 +268,6 @@ class Email extends EmailBase
             'attempts_count',
             'updated_at',
             'created_at',
-            'error',
             'send_after',
         ];
     }

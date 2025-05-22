@@ -15,6 +15,10 @@ default:
             paths:
                 - "features/email.feature"
             contexts: [ Sil\SilIdBroker\Behat\Context\EmailContext ]
+        email_api_features:
+            paths:
+                - "features/email-api.feature"
+            contexts: [ Sil\SilIdBroker\Behat\Context\EmailApiContext ]
         email_client_features:
             paths:
                 - "features/email-client.feature"

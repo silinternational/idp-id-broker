@@ -39,6 +39,7 @@ services:
       EMAIL_SIGNATURE: Dummy Signature for Tests
       EMAILER_CLASS: \Sil\SilIdBroker\Behat\Context\fakes\FakeEmailer
       IDP_NAME: test
+      MAILER_USEFILES: true
       MYSQL_ROOT_PASSWORD: r00tp@ss!
       MYSQL_HOST: testdb
       MYSQL_DATABASE: appfortests
