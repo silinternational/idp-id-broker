@@ -44,10 +44,10 @@ class FeatureContext extends YiiContext
 
     protected $tempUid = null;
 
-    const CREATED = 'created';
-    const DELETED = 'deleted';
-    const RETRIEVED = 'retrieved';
-    const UPDATED = 'updated';
+    public const CREATED = 'created';
+    public const DELETED = 'deleted';
+    public const RETRIEVED = 'retrieved';
+    public const UPDATED = 'updated';
 
 
     /**
