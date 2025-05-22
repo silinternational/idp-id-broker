@@ -49,7 +49,6 @@ class FeatureContext extends YiiContext
     public const RETRIEVED = 'retrieved';
     public const UPDATED = 'updated';
 
-
     /**
      * @Given I add a user with a(n) :property of :value
      */
