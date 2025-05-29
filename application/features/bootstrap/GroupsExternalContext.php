@@ -129,7 +129,7 @@ class GroupsExternalContext extends FeatureContext
             ['password', $this->userPassword],
         ];
         $this->iProvideTheFollowingValidData(new TableNode($dataForTableNode));
-        $this->iRequestTheResourceBe('/authentication', 'created');
+        $this->iRequestTheResourceBe('/authentication', self::CREATED);
         $this->theResponseStatusCodeShouldBe(200);
     }
 }

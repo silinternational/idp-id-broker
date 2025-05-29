@@ -3,14 +3,14 @@
 use Behat\Gherkin\Node\TableNode;
 use common\helpers\MySqlDateTime;
 use common\models\EmailLog;
-use common\models\Password;
+use common\models\Invite;
 use common\models\Method;
 use common\models\Mfa;
 use common\models\MfaBackupcode;
 use common\models\MfaFailedAttempt;
 use common\models\MfaWebauthn;
+use common\models\Password;
 use common\models\User;
-use common\models\Invite;
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Response;
 use Psr\Http\Message\ResponseInterface;
@@ -44,6 +44,11 @@ class FeatureContext extends YiiContext
 
     protected $tempUid = null;
 
+    public const CREATED = 'created';
+    public const DELETED = 'deleted';
+    public const RETRIEVED = 'retrieved';
+    public const UPDATED = 'updated';
+
     /**
      * @Given I add a user with a(n) :property of :value
      */
@@ -68,7 +73,7 @@ class FeatureContext extends YiiContext
             $dataForTableNode[] = [$sampleProperty, $sampleValue];
         }
         $this->iProvideTheFollowingValidData(new TableNode($dataForTableNode));
-        $this->iRequestTheResourceBe('/user', 'created');
+        $this->iRequestTheResourceBe('/user', self::CREATED);
         $this->theResponseStatusCodeShouldBe(200);
     }
 
@@ -189,13 +194,13 @@ class FeatureContext extends YiiContext
     private function sendRequest(Client $client, string $action, string $resource): ResponseInterface
     {
         switch ($action) {
-            case 'created':
+            case self::CREATED:
                 return $client->post($resource);
-            case 'updated':
+            case self::UPDATED:
                 return $client->put($resource);
-            case 'deleted':
+            case self::DELETED:
                 return $client->delete($resource);
-            case 'retrieved':
+            case self::RETRIEVED:
                 return $client->get($resource);
             case 'headed':
                 return $client->head($resource);
@@ -478,7 +483,7 @@ class FeatureContext extends YiiContext
 
         sleep(1); // so timestamps won't be the same
 
-        $this->iRequestTheResourceBe($resource, 'created');
+        $this->iRequestTheResourceBe($resource, self::CREATED);
     }
 
     /**
@@ -783,7 +788,7 @@ class FeatureContext extends YiiContext
         $dataArray = $data->getColumnsHash();
         foreach ($dataArray as $row) {
             $this->reqBody = $row;
-            $this->iRequestTheResourceBe('/user', 'created');
+            $this->iRequestTheResourceBe('/user', self::CREATED);
         }
     }
     /**
@@ -800,7 +805,7 @@ class FeatureContext extends YiiContext
     public function iSearchByField($field)
     {
         $request = '/user?' . $field . '=' . $this->queryParams[$field];
-        $this->iRequestTheResourceBe($request, 'retrieved');
+        $this->iRequestTheResourceBe($request, self::RETRIEVED);
     }
 
     /**

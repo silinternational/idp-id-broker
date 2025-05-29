@@ -342,6 +342,48 @@ types:
           "verified": true,
           "created": "2017-10-24T20:41:05Z"
       }
+  NewEmailRequest:
+    type: object
+    properties:
+      to_address: string
+      cc_address?: string
+      bcc_address?: string
+      subject: string
+      text_body:
+        requiredIfNot: [html_body]
+      html_body:
+        requiredIfNot: [text_body]
+      send_after?:
+        type: integer
+        description: send the message after this time (Unix epoch, UTC)
+        collidesWith: [delay_seconds]
+      delay_seconds?:
+        type: integer
+        description: number of seconds to delay sending
+        collidesWith: [send_after]
+  NewEmailCreated:
+    type: object
+    properties:
+      id: integer
+      to_address: string
+      cc_address?: string
+      bcc_address?: string
+      subject: string
+      text_body:
+        requiredIfNot: [html_body]
+      html_body:
+        requiredIfNot: [text_body]
+      attempts_count: integer
+      updated_at:
+        type: integer
+        description: UTC epoch
+      created_at:
+        type: integer
+        description: UTC epoch
+      error: string
+      send_after:
+        type: integer
+        description: message will be sent after this time (Unix epoch, UTC)
 /authentication:
   post:
     queryParameters:
@@ -934,3 +976,65 @@ types:
             description: User not found or method not found
             body:
               type: Error
+/email:
+  post:
+    description: Queues an email for later sending
+    body:
+      type: NewEmailRequest
+      example: |
+        {
+          "to_address": "to@example.org",
+          "subject": "Text only",
+          "text_body": "Email content"
+        }
+      example: |
+        {
+          "to_address": "to@example.org",
+          "subject": "HTML only",
+          "html_body": "<p>Email content</p>"
+          "send_after": 1556312556
+        }
+      example: |
+        {
+          "to_address": "to@example.org",
+          "subject": "HTML and text",
+          "text_body": "Email content",
+          "html_body": "<p>Email content</p>"
+          "delay_seconds": 3600
+        }
+    responses:
+      200:
+        body: NewEmailCreated
+      401:
+        description: The request was either missing the Authorization header or used an invalid token
+        body:
+          type: Error
+          example: |
+            {
+              "name": "Unauthorized",
+              "message": "Your request was made with invalid credentials.",
+              "code": 0,
+              "status": 401
+            }
+      422:
+        description: The request data does not satisfy some validation rule.
+        body:
+          type: Error
+          example: |
+            {
+              "name": "Unprocessable entity",
+              "message": "To Address cannot be blank.",
+              "code": 0,
+              "status": 422
+            }
+      500:
+        description: A server-side error occurred.
+        body:
+          type: Error
+          example: |
+            {
+              "name": "Internal Server Error",
+              "message": "Some error message.",
+              "code": 0,
+              "status": 500
+            }
