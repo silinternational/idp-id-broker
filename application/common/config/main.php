@@ -90,12 +90,15 @@ $logPrefix = function () use ($version) {
     return Json::encode($prefixData);
 };
 
-$caPath = '/rds-ca.pem';
-
-if (!file_exists($caPath) && getenv('RDS_CA_BUNDLE_B64')) {
-    $decoded = base64_decode(getenv('RDS_CA_BUNDLE_B64'));
+$dbAttributes = [];
+if (getenv('MYSQL_ATTR_SSL_CA')) {
+    $caPath = '/ca.pem';
+    $decoded = base64_decode(getenv('MYSQL_ATTR_SSL_CA'));
     file_put_contents($caPath, $decoded);
     chmod($caPath, 0600);
+    $dbAttributes = [
+        PDO::MYSQL_ATTR_SSL_CA => $caPath,
+    ];
 }
 
 return [
@@ -108,9 +111,7 @@ return [
             'username' => $mysqlUser,
             'password' => $mysqlPassword,
             'charset' => 'utf8',
-            'attributes' => [
-                PDO::MYSQL_ATTR_SSL_CA => '/rds-ca.pem',
-            ],
+            'attributes' => $dbAttributes,
         ],
         'emailer' => [
             'class' => $emailerClass,
