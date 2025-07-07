@@ -92,7 +92,7 @@ $logPrefix = function () use ($version) {
 
 $dbAttributes = [];
 if (getenv('MYSQL_ATTR_SSL_CA')) {
-    $caPath = '/tmp/ca.pem';
+    $caPath = 'console/runtime/ca.pem';
     $decoded = base64_decode(getenv('MYSQL_ATTR_SSL_CA'));
     file_put_contents($caPath, $decoded);
     chmod($caPath, 0600);
