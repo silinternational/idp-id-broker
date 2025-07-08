@@ -95,6 +95,7 @@ $caFile = '/data/console/runtime/ca.pem';
 if (file_exists($caFile)) {
     $dbAttributes = [
         PDO::MYSQL_ATTR_SSL_CA => $caFile,
+        PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT => 1,
     ];
 }
 
@@ -108,7 +109,12 @@ return [
             'username' => $mysqlUser,
             'password' => $mysqlPassword,
             'charset' => 'utf8',
-            'attributes' => $dbAttributes,
+//            'attributes' => $dbAttributes,
+            'attributes' => [
+                PDO::MYSQL_ATTR_SSL_CA => 'ca-cert.pem',
+                PDO::MYSQL_ATTR_SSL_CERT => 'server-cert.pem',
+                PDO::MYSQL_ATTR_SSL_KEY => 'server-key.pem',
+            ],
         ],
         'emailer' => [
             'class' => $emailerClass,
