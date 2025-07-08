@@ -17,7 +17,8 @@ try {
     exit($responseContent);
 }
 
-ini_set('display_errors', 1); error_reporting(E_ALL);
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
 
 if (getenv('MYSQL_ATTR_SSL_CA')) {
     $caPath = '/data/console/runtime';
