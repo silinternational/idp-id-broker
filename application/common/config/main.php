@@ -91,13 +91,10 @@ $logPrefix = function () use ($version) {
 };
 
 $dbAttributes = [];
-if (getenv('MYSQL_ATTR_SSL_CA')) {
-    $caPath = '/data/console/runtime/ca.pem';
-    $decoded = base64_decode(getenv('MYSQL_ATTR_SSL_CA'));
-    file_put_contents($caPath, $decoded);
-    chmod($caPath, 0600);
+$caFile = '/data/console/runtime/ca.pem';
+if (file_exists($caFile)) {
     $dbAttributes = [
-        PDO::MYSQL_ATTR_SSL_CA => $caPath,
+        PDO::MYSQL_ATTR_SSL_CA => $caFile,
     ];
 }
 
