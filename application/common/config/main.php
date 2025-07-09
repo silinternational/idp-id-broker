@@ -109,12 +109,7 @@ return [
             'username' => $mysqlUser,
             'password' => $mysqlPassword,
             'charset' => 'utf8',
-//            'attributes' => $dbAttributes,
-            'attributes' => [
-                PDO::MYSQL_ATTR_SSL_CA => 'ca-cert.pem',
-                PDO::MYSQL_ATTR_SSL_CERT => 'server-cert.pem',
-                PDO::MYSQL_ATTR_SSL_KEY => 'server-key.pem',
-            ],
+            'attributes' => $dbAttributes,
         ],
         'emailer' => [
             'class' => $emailerClass,
