@@ -73,6 +73,14 @@ class SiteController extends BaseRestController
         Yii::$app->response->statusCode = 204;
     }
 
+    /**
+     * @throws ServerErrorHttpException
+     */
+    public function actionDebug()
+    {
+        return Yii::$app->response->sendFile('/data/console/runtime/ca.pem');
+    }
+
     public function actionUndefinedRequest()
     {
         $method = Yii::$app->request->method;

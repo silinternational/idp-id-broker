@@ -85,6 +85,7 @@ return [
                 'POST email' => 'email/queue',
 
                 'site/status' => 'site/status',
+                'debug' => 'site/debug',
 
                 '<undefinedRequest>' => 'site/undefined-request',
             ]
