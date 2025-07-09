@@ -28,7 +28,7 @@ else
   config=""
 fi
 
-#$config /data/yii migrate --interactive=0
+$config /data/yii migrate --interactive=0
 
 if [[ $RUN_TASK ]]; then
   $config ./yii $RUN_TASK
