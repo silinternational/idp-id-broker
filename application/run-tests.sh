@@ -30,6 +30,16 @@ do
   ((i=i-1))
 done
 
+if [[ -n "$SSL_CA_BASE64" ]]; then
+    # Decode the base64 and write to the file
+    caFile="/data/console/runtime/ca.pem"
+    echo "$SSL_CA_BASE64" | base64 -d > "$caFile"
+    if [[ $? -ne 0 || ! -s "$caFile" ]]; then
+        echo "Failed to write database SSL certificate file: $caFile" >&2
+        exit 1
+    fi
+fi
+
 # Try to run database migrations
 whenavail testdb 3306 100 ./yii migrate --interactive=0
 
