@@ -3,6 +3,7 @@
 /nbproject/
 # local config files
 *.env
+!test.env
 
 # Git auth. token (to get past rate limiting for composer).
 auth.json
