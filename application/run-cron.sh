@@ -1,5 +1,11 @@
 #!/usr/bin/env bash
 
+# print script lines as they are executed
+set -x
+
+# exit if any line in the script fails
+set -e
+
 if [[ $PARAMETER_STORE_PATH ]]; then
   config="config-shim -v --path $PARAMETER_STORE_PATH"
 elif [[ $APP_ID ]]; then
