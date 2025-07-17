@@ -28,6 +28,6 @@ rm ca-key.pem db-key-pkcs8.pem db-req.pem testdb-key-pkcs8.pem testdb-req.pem
 chmod 644 ./*.pem
 
 ca=$(base64 ca.pem --wrap 0)
-echo "SSL_CA_BASE64=$ca" > cert.env
+echo "SSL_CA_BASE64=$ca" > test.env
 
 cd ../..
