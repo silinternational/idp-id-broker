@@ -39,6 +39,8 @@ services:
       - "80"
     depends_on:
       - testdb
+    env_file:
+      - ./db/certs/test.env
     environment:
       API_ACCESS_KEYS: api-test-NOTASECRET
       APP_ENV: test
@@ -160,6 +162,8 @@ services:
       - appfortests
       - mfaapi
       - u2fsim
+    env_file:
+      - ./db/certs/test.env
     environment:
       TEST_SERVER_HOSTNAME: appfortests
       API_ACCESS_KEYS: api-test-NOTASECRET
