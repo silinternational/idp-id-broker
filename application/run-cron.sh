@@ -1,8 +1,5 @@
 #!/usr/bin/env bash
 
-# print script lines as they are executed
-set -x
-
 # exit if any line in the script fails
 set -e
 

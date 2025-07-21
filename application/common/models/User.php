@@ -292,7 +292,7 @@ class User extends UserBase
     {
         return function ($attributeName) {
             $currentPassword = $this->currentPassword ?? new Password();
-            if ($currentPassword->hash === null || !password_verify($this->password, $currentPassword->hash)) {
+            if (!password_verify($this->password, $currentPassword->hash)) {
                 $this->addError($attributeName, 'Incorrect password.');
             } else {
                 // check the current hash cost and rehash if necessary
