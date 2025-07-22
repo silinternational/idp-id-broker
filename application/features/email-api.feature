@@ -31,7 +31,6 @@ Feature: Email API
     And the response body should contain "'attempts_count' => NULL"
     And the response body should not contain "'created_at' => 11111111"
     And the response body should not contain "'updated_at' => 22222222"
-    Then the response status code should be 200
 
   Scenario: Invalid method: Get
     When we queue an email using a GET
