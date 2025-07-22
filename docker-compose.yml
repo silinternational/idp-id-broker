@@ -7,7 +7,8 @@ services:
     ports:
       - "3306"
     env_file:
-      - ./local.env
+      - path: ./local.env
+        required: false
 
   app:
     build: ./
@@ -20,7 +21,8 @@ services:
     depends_on:
       - db
     env_file:
-      - ./local.env
+      - path: ./local.env
+        required: false
       - ./db/certs/test.env
     environment:
       #            RUN_TASK: cron/all
@@ -37,6 +39,8 @@ services:
       - "80"
     depends_on:
       - testdb
+    env_file:
+      - ./db/certs/test.env
     environment:
       API_ACCESS_KEYS: api-test-NOTASECRET
       APP_ENV: test
@@ -80,7 +84,8 @@ services:
     environment:
       COMPOSER_CACHE_DIR: /composer
     env_file:
-      - ./local.env
+      - path: ./local.env
+        required: false
     command: ["true"]
 
   dynamo:
@@ -157,6 +162,8 @@ services:
       - appfortests
       - mfaapi
       - u2fsim
+    env_file:
+      - ./db/certs/test.env
     environment:
       TEST_SERVER_HOSTNAME: appfortests
       API_ACCESS_KEYS: api-test-NOTASECRET
@@ -200,7 +207,8 @@ services:
     depends_on:
       - db
     env_file:
-      - ./local.env
+      - path: ./local.env
+        required: false
     environment:
       PMA_HOST: db
       PMA_USER: user
@@ -214,7 +222,8 @@ services:
     depends_on:
       - testdb
     env_file:
-      - ./local.env
+      - path: ./local.env
+        required: false
     environment:
       PMA_HOST: testdb
       PMA_USER: appfortests

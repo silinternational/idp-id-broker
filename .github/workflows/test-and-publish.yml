@@ -12,9 +12,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
       - name: Check PSR2
-        run: docker compose -f actions-services.yml run --rm app ./check-psr12.sh
+        run: docker compose run --rm test ./check-psr12.sh
       - name: Run unit tests
-        run: docker compose -f actions-services.yml run --rm app ./run-tests.sh
+        run: make test
 
   build-and-publish:
     name: Build and Publish
