@@ -22,9 +22,15 @@ Feature: Email API
   Scenario: All fields
     When we queue an email with all fields
     Then the response status code should be 200
-    And the response body should not contain 456
-    And the response body should not contain 11111111
-    And the response body should not contain 22222222
+    And the response body should contain "'to_address' => 'test@example.org'"
+    And the response body should contain "'cc_address' => 'testcc@example.org'"
+    And the response body should contain "'bcc_address' => 'testbcc@example.org'"
+    And the response body should contain "'subject' => 'subject all fields'"
+    And the response body should contain "'text_body' => 'text body'"
+    And the response body should contain "'html_body' => 'html body'"
+    And the response body should contain "'attempts_count' => NULL"
+    And the response body should not contain "'created_at' => 11111111"
+    And the response body should not contain "'updated_at' => 22222222"
     Then the response status code should be 200
 
   Scenario: Invalid method: Get
