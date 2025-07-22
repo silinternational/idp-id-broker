@@ -3,6 +3,8 @@
 # exit if any line in the script fails
 set -e
 
+set -x
+
 # Try to install composer dev dependencies
 cd /data
 composer install --no-interaction --no-scripts --no-progress
@@ -28,6 +30,7 @@ do
     break
   fi
 
+  docker compose logs appfortests
   echo "Waiting for $localServer container:" $i
   sleep 1
   ((i=i-1))
