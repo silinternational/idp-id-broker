@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+# exit if any line in the script fails
+set -e
+
 # Try to install composer dev dependencies
 cd /data
 composer install --no-interaction --no-scripts --no-progress
