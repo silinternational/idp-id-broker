@@ -1,6 +1,9 @@
 services:
     testdb:
         image: mariadb:10
+        volumes:
+            - ./db/certs:/certs:ro
+            - ./db/testdb.cnf:/etc/mysql/conf.d/my.cnf:ro
         environment:
             MYSQL_ROOT_PASSWORD: r00tp@ss!
             MYSQL_DATABASE: test
@@ -14,6 +17,8 @@ services:
             - mfaapi
             - u2fsim
         working_dir: /data
+        env_file:
+            - ./db/certs/test.env
         environment:
             API_KEY_TABLE: ApiKey
             APP_ENV: test

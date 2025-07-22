@@ -26,7 +26,8 @@
     "guzzlehttp/guzzle": "^6.2",
     "webmozart/assert": "^1.2",
     "silinternational/yii2-sentry": "^2.0",
-    "aws/aws-sdk-php": "~3.288.1"
+    "aws/aws-sdk-php": "~3.288.1",
+    "ext-pdo": "*"
   },
   "require-dev": {
     "behat/behat": "^3.3",
