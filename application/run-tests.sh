@@ -11,27 +11,12 @@ composer install --no-interaction --no-scripts --no-progress
 rc=$?; if [[ $rc != 0 ]]; then exit $rc; fi
 
 # avoid having issues locally due to the random sleep on the appfortests container
-i=0
 testServer=${TEST_SERVER_HOSTNAME}
 localServer='appfortests'
 
 if [[ "$testServer" == "$localServer" ]]; then
-  i=10
+  whenavail $localServer 80 10 true
 fi
-
-while [ "$i" -ne 0 ]
-do
-  want='Page not found.'
-  cRes="$(curl $localServer)"
-  if [[ "$cRes" == *"$want"* ]]; then
-    echo "Successfully connected to $localServer"
-    break
-  fi
-
-  echo "Waiting for $localServer container:" $i
-  sleep 1
-  ((i=i-1))
-done
 
 if [[ -n "$SSL_CA_BASE64" ]]; then
     # Decode the base64 and write to the file
